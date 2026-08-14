@@ -7,10 +7,10 @@ pages by copying its `<style>` block and adapting the component patterns below, 
 designing a look from scratch. If a concept clearly calls for something structurally
 different, deviate — but treat this as the default, not one option among many.
 
-This supersedes the earlier, sparser look used by `earth-moon-race.html`,
-`gravity-lab.html`, `mass-energy.html`, and `planet-light-delay.html`. Those pages haven't
-been migrated yet (see [HANDOVER.md](HANDOVER.md)); do so opportunistically when touching
-them, not as a dedicated sweep unless asked.
+This supersedes the earlier, sparser look originally used by `gravity-lab.html`,
+`mass-energy.html`, and `planet-light-delay.html`. All pages on the site — including those
+three — were migrated to this style on 2026-08-14; see [HANDOVER.md](HANDOVER.md) for
+per-page migration notes.
 
 ## Why a Markdown file, not a shared `.css`
 

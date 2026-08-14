@@ -1,0 +1,541 @@
+<title>Two sticks measure a planet</title>
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  .topgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
+
+  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqn{display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);font-size:clamp(26px,3.6vw,40px);line-height:1;font-weight:300}
+  .eqn .eq{color:var(--muted)}
+  .eqn .frac{display:inline-flex;flex-direction:column;align-items:center}
+  .eqn .frac .row{display:flex;gap:.16em;align-items:flex-start}
+  .eqn .frac .num{padding:0 .3em .06em}
+  .eqn .frac .den{padding:.06em .3em 0}
+  .eqn .frac .bar{height:1.5px;background:var(--fg);width:100%}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:1.6em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:8px 2px}
+  .legend .sym{font-size:17px;font-weight:300;transition:color .2s}
+  .legend .name{font-size:12.5px;color:var(--muted2)}
+  .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero svg{width:100%;height:auto;display:block}
+  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s,color .2s}
+  .hero .note-inline{position:absolute;font:400 10px ui-monospace,monospace;color:var(--muted);letter-spacing:.03em}
+
+  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
+
+  .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;transition:color .2s}
+  .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
+  .readout{font-family:ui-monospace,monospace;font-size:clamp(26px,2.8vw,34px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
+  .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
+  .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
+  .track .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
+  .track .thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
+  .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
+
+  .result{text-align:left}
+  .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
+  .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
+  .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px}
+  .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
+  .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
+  .gauge{position:relative;height:56px;margin-top:16px;max-width:420px}
+  .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
+  .gauge .reach{position:absolute;top:14px;height:10px;border-radius:2px 0 0 2px;background:color-mix(in srgb, var(--accent) 16%, transparent);left:0}
+  .gauge .tick{position:absolute;top:26px;width:1px;height:5px;background:var(--line2)}
+  .gauge .ticklabel{position:absolute;top:33px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
+  .gauge .limit{position:absolute;top:9px;height:20px;width:1px;background:var(--muted2)}
+  .gauge .limitlabel{position:absolute;top:0;white-space:nowrap;font:400 9px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted2)}
+  .gauge .mark{position:absolute;top:12px;height:14px;width:3px;border-radius:2px;transition:left .12s linear,background .12s linear}
+  .gauge .marklabel{position:absolute;top:-3px;white-space:nowrap;font:500 11px ui-monospace,monospace;transition:left .12s linear,color .12s linear}
+
+  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+  .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
+  .preset:hover{border-color:var(--accent);color:var(--accent)}
+
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;max-width:88ch;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../index.html">&larr; Physics you can see</a>
+    <div class="topbar-right">
+      <span>Eratosthenes' method</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>Two sticks <em>measure a planet</em>.</h1>
+      <p class="sub">Around 240 BC, Eratosthenes compared shadow angles cast by the sun at two Egyptian cities a known distance apart &mdash; and worked out the size of the whole Earth without leaving the ground.</p>
+    </div>
+
+    <div class="eqnbox">
+      <div class="eqn">
+        <em>D</em>
+        <span class="eq">=</span>
+        <span class="frac">
+          <span class="row num"><span>360&deg;</span><em id="dTerm">d</em></span>
+          <span class="bar"></span>
+          <span class="row den"><em>&pi;</em><em id="thetaTerm">&Delta;&theta;</em></span>
+        </span>
+      </div>
+    </div>
+
+    <div class="legendbox">
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="hero" id="heroWrap">
+    <div class="lbl" id="lblD"></div>
+    <div class="lbl" id="lblTheta"></div>
+    <div class="lbl" id="lblGlobe" style="text-align:center;transform:translateX(-50%)">the same wedge, full scale</div>
+    <div class="note-inline" id="lblScale">not to scale</div>
+    <svg id="heroSvg" role="img" aria-label="Two vertical sticks a known distance apart. The near-overhead sun casts no shadow on the left stick, but a shadow at an angle on the right one; that angle, multiplied out to 360 degrees, gives the size of the whole planet, shown as a highlighted wedge on the small globe.">
+      <circle id="globeCircle" fill="none" stroke="var(--line2)" stroke-width="1.25"></circle>
+      <path id="globeWedge" fill="var(--accent)" opacity="0.22" stroke="none"></path>
+      <circle id="globeDot1" r="2.5" fill="var(--fg)"></circle>
+      <circle id="globeDot2" r="2.5" fill="var(--accent)"></circle>
+      <line id="fan1" stroke="var(--line2)" stroke-width="1" stroke-dasharray="2 4"></line>
+      <line id="fan2" stroke="var(--line2)" stroke-width="1" stroke-dasharray="2 4"></line>
+      <line id="groundLine" stroke="var(--line)" stroke-width="1.25"></line>
+      <line id="ray1" stroke="var(--muted)" stroke-width="1.25" stroke-dasharray="3 4"></line>
+      <line id="stick1" stroke="var(--fg)" stroke-width="2.5" stroke-linecap="round"></line>
+      <circle id="base1" r="2.5" fill="var(--fg)"></circle>
+      <line id="ray2" stroke="var(--muted)" stroke-width="1.25" stroke-dasharray="3 4"></line>
+      <line id="rayVertGuide2" stroke="var(--line2)" stroke-width="1" stroke-dasharray="2 3"></line>
+      <path id="angleArc" fill="none" stroke="var(--accent)" stroke-width="1.25"></path>
+      <line id="stick2" stroke="var(--fg)" stroke-width="2.5" stroke-linecap="round"></line>
+      <line id="shadow2" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"></line>
+      <circle id="base2" r="2.5" fill="var(--fg)"></circle>
+      <line id="dimBase" stroke="var(--line)" stroke-width="1"></line>
+      <line id="dimLeftV" stroke="var(--line2)" stroke-width="1"></line>
+      <line id="dimRightV" stroke="var(--line2)" stroke-width="1"></line>
+    </svg>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrls">
+      <div class="ctrl" id="dCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Distance apart <em id="dLabel">d</em></span>
+          <span class="ctrl-rel">d &prop; D</span>
+        </div>
+        <div class="readout mono" id="dReadout"></div>
+        <div class="track" id="dTrack" tabindex="0" role="slider" aria-label="Distance between the two sticks">
+          <div class="rail"></div>
+          <div class="fill" id="dFill"></div>
+          <div class="thumb" id="dThumb"></div>
+        </div>
+        <div class="track-range"><span>100 km</span><span class="mid">how far apart the sticks are</span><span>2000 km</span></div>
+      </div>
+
+      <div class="ctrl" id="thetaCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Shadow angle <em id="thetaLabel">&Delta;&theta;</em></span>
+          <span class="ctrl-rel">&Delta;&theta;&#8315;&#185; &prop; D</span>
+        </div>
+        <div class="readout mono" id="thetaReadout"></div>
+        <div class="track" id="thetaTrack" tabindex="0" role="slider" aria-label="Difference in shadow angle">
+          <div class="rail"></div>
+          <div class="fill" id="thetaFill"></div>
+          <div class="thumb" id="thetaThumb"></div>
+        </div>
+        <div class="track-range"><span>1&deg;</span><span class="mid">difference between the two shadows</span><span>20&deg;</span></div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Earth's diameter, estimated</div>
+      <div class="result-value"><span class="num mono" id="dValue"></span><span class="unit mono">km</span><span class="v" id="verdict"></span></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+      <div class="effort-line" id="effortLine"></div>
+      <div class="gauge" id="gauge">
+        <div class="track"></div>
+        <div class="reach" id="gReach"></div>
+        <div class="limit" id="gLimit"></div>
+        <div class="limitlabel" id="gLimitLabel">actual: 12,742 km</div>
+        <div class="mark" id="gMark"></div>
+        <div class="marklabel mono" id="gMarkLabel"></div>
+        <div id="gTicks"></div>
+        <div id="gLabels"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-p="eratosthenes">Eratosthenes' Egypt</button>
+    <button class="preset" data-p="ten">10&deg; of latitude</button>
+    <button class="preset" data-p="close">150 km apart</button>
+  </div>
+
+  <p class="note">Eratosthenes knew that at noon on the summer solstice, the sun sat directly overhead at Syene (near modern Aswan) &mdash; a vertical stick cast no shadow at all. On the same day, a stick in Alexandria, about 800 km north, cast a shadow 7.2&deg; off vertical. Since the sun's rays arrive essentially parallel (it's 150 million km away), that 7.2&deg; can only come from the ground itself curving between the two cities. A 7.2&deg; wedge is 1/50th of a full circle, so the whole circumference must be 50&times;800 km = 40,000 km &mdash; within a few tenths of a percent of the true value, using nothing but sticks and shadows. The diagram is schematic, not drawn to true curvature or scale; the small globe on the left shows the wedge these two sticks actually correspond to. This also assumes both sticks sit on the same meridian (line of longitude) and measure at the same solar noon, which Eratosthenes' setup approximated but didn't hit exactly &mdash; part of why his answer, while remarkably close, wasn't exact. Read more on <a href="https://en.wikipedia.org/wiki/Eratosthenes#Measurement_of_the_Earth's_circumference" target="_blank" rel="noopener">Wikipedia</a>.</p>
+
+</div>
+</main>
+<script>
+(function(){
+  var DMIN=100, DMAX=2000, TMIN=1, TMAX=20;
+  var TRUE_DIAM = 12742; // km, mean
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+  function fmtKm(n){ return Math.round(n).toLocaleString('en-US'); }
+
+  var NS='http://www.w3.org/2000/svg';
+  function polarTop(cx,cy,r,angDeg){
+    var a = (angDeg-90) * Math.PI/180; // 0deg = top, clockwise
+    return { x: cx + r*Math.cos(a), y: cy + r*Math.sin(a) };
+  }
+
+  var state = { d:800, theta:7.2, active:null, drag:null, ghostD:null };
+  var heroW = 0;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
+  var globeCircle=$('globeCircle'), globeWedge=$('globeWedge'), globeDot1=$('globeDot1'), globeDot2=$('globeDot2');
+  var fan1=$('fan1'), fan2=$('fan2');
+  var groundLine=$('groundLine');
+  var ray1=$('ray1'), stick1=$('stick1'), base1=$('base1');
+  var ray2=$('ray2'), rayVertGuide2=$('rayVertGuide2'), angleArc=$('angleArc'), stick2=$('stick2'), shadow2=$('shadow2'), base2=$('base2');
+  var dimBase=$('dimBase'), dimLeftV=$('dimLeftV'), dimRightV=$('dimRightV');
+  var lblD=$('lblD'), lblTheta=$('lblTheta'), lblGlobe=$('lblGlobe'), lblScale=$('lblScale');
+
+  function diameter(){ return 360*state.d/(Math.PI*state.theta); }
+  function circumference(){ return 360*state.d/state.theta; }
+
+  function geom(w){
+    var narrow = w < 620;
+    var vbH = narrow ? 300 : 260;
+    var groundY = narrow ? 210 : 178;
+    var stickH = narrow ? 58 : 68;
+    var globeR = narrow ? 40 : 52;
+    var globeCx = globeR + 20, globeCy = groundY - stickH*0.55;
+    var panelStartX = globeCx + globeR + (narrow?46:64);
+    var panelEndX = w - (narrow?22:34);
+    var stick1X = panelStartX + (narrow?30:46);
+    var maxStick2X = panelEndX - (narrow?26:40);
+    var minStick2X = stick1X + (narrow?90:140);
+    var frac = clamp((state.d-DMIN)/(DMAX-DMIN), 0, 1);
+    var stick2X = minStick2X + frac*(maxStick2X-minStick2X);
+    return { w:w, vbH:vbH, narrow:narrow, groundY:groundY, stickH:stickH,
+      globeR:globeR, globeCx:globeCx, globeCy:globeCy,
+      panelStartX:panelStartX, panelEndX:panelEndX, stick1X:stick1X, stick2X:stick2X };
+  }
+
+  function drawHero(){
+    var w = heroW || heroWrap.clientWidth || 1100;
+    var g = geom(w);
+    heroSvg.setAttribute('viewBox','0 0 '+w+' '+g.vbH);
+    heroSvg.setAttribute('preserveAspectRatio','none');
+
+    var thetaRad = state.theta*Math.PI/180;
+
+    // globe inset
+    globeCircle.setAttribute('cx', g.globeCx); globeCircle.setAttribute('cy', g.globeCy); globeCircle.setAttribute('r', g.globeR);
+    var p1 = polarTop(g.globeCx, g.globeCy, g.globeR, 0);
+    var p2 = polarTop(g.globeCx, g.globeCy, g.globeR, state.theta);
+    var largeArc = state.theta > 180 ? 1 : 0;
+    globeWedge.setAttribute('d', 'M '+g.globeCx+' '+g.globeCy+' L '+p1.x+' '+p1.y+' A '+g.globeR+' '+g.globeR+' 0 '+largeArc+' 1 '+p2.x+' '+p2.y+' Z');
+    globeDot1.setAttribute('cx', p1.x); globeDot1.setAttribute('cy', p1.y);
+    globeDot2.setAttribute('cx', p2.x); globeDot2.setAttribute('cy', p2.y);
+
+    var fanTopY = g.groundY - g.stickH - (g.narrow?34:44);
+    var fanBotY = g.groundY + 14;
+    fan1.setAttribute('x1', g.globeCx+g.globeR*0.75); fan1.setAttribute('y1', g.globeCy-g.globeR*0.6);
+    fan1.setAttribute('x2', g.panelStartX); fan1.setAttribute('y2', fanTopY);
+    fan2.setAttribute('x1', g.globeCx+g.globeR*0.75); fan2.setAttribute('y1', g.globeCy+g.globeR*0.5);
+    fan2.setAttribute('x2', g.panelStartX); fan2.setAttribute('y2', fanBotY);
+
+    // ground
+    groundLine.setAttribute('x1', g.panelStartX); groundLine.setAttribute('y1', g.groundY);
+    groundLine.setAttribute('x2', g.panelEndX); groundLine.setAttribute('y2', g.groundY);
+
+    // stick 1 (sun overhead, no shadow)
+    var tip1 = { x:g.stick1X, y:g.groundY-g.stickH };
+    stick1.setAttribute('x1', g.stick1X); stick1.setAttribute('y1', g.groundY);
+    stick1.setAttribute('x2', tip1.x); stick1.setAttribute('y2', tip1.y);
+    base1.setAttribute('cx', g.stick1X); base1.setAttribute('cy', g.groundY);
+    ray1.setAttribute('x1', tip1.x); ray1.setAttribute('y1', tip1.y-26);
+    ray1.setAttribute('x2', tip1.x); ray1.setAttribute('y2', tip1.y);
+
+    // stick 2 (vertical), shadow cast by ray arriving at angle theta from vertical
+    var tip2 = { x:g.stick2X, y:g.groundY-g.stickH };
+    stick2.setAttribute('x1', g.stick2X); stick2.setAttribute('y1', g.groundY);
+    stick2.setAttribute('x2', tip2.x); stick2.setAttribute('y2', tip2.y);
+    base2.setAttribute('cx', g.stick2X); base2.setAttribute('cy', g.groundY);
+
+    var shadowLen = g.stickH * Math.tan(thetaRad);
+    var shadowEndX = tip2.x + shadowLen;
+    shadow2.setAttribute('x1', g.stick2X); shadow2.setAttribute('y1', g.groundY);
+    shadow2.setAttribute('x2', shadowEndX); shadow2.setAttribute('y2', g.groundY);
+
+    var rayLen = 30;
+    var ray2Start = { x: tip2.x - rayLen*Math.sin(thetaRad), y: tip2.y - rayLen*Math.cos(thetaRad) };
+    ray2.setAttribute('x1', ray2Start.x); ray2.setAttribute('y1', ray2Start.y);
+    ray2.setAttribute('x2', tip2.x); ray2.setAttribute('y2', tip2.y);
+    rayVertGuide2.setAttribute('x1', tip2.x); rayVertGuide2.setAttribute('y1', tip2.y-24);
+    rayVertGuide2.setAttribute('x2', tip2.x); rayVertGuide2.setAttribute('y2', tip2.y);
+
+    var arcR = 18;
+    var arcStart = { x: tip2.x, y: tip2.y-arcR };
+    var arcEnd = { x: tip2.x - arcR*Math.sin(thetaRad), y: tip2.y - arcR*Math.cos(thetaRad) };
+    angleArc.setAttribute('d', 'M '+arcStart.x+' '+arcStart.y+' A '+arcR+' '+arcR+' 0 0 0 '+arcEnd.x+' '+arcEnd.y);
+
+    // distance dimension line
+    dimBase.setAttribute('x1', g.stick1X); dimBase.setAttribute('y1', g.groundY+18);
+    dimBase.setAttribute('x2', g.stick2X); dimBase.setAttribute('y2', g.groundY+18);
+    dimLeftV.setAttribute('x1', g.stick1X); dimLeftV.setAttribute('x2', g.stick1X);
+    dimLeftV.setAttribute('y1', g.groundY+12); dimLeftV.setAttribute('y2', g.groundY+24);
+    dimRightV.setAttribute('x1', g.stick2X); dimRightV.setAttribute('x2', g.stick2X);
+    dimRightV.setAttribute('y1', g.groundY+12); dimRightV.setAttribute('y2', g.groundY+24);
+
+    var px = function(x){ return (x/w*100)+'%'; };
+    var py = function(y){ return (y/g.vbH*100)+'%'; };
+    lblD.style.left = px((g.stick1X+g.stick2X)/2); lblD.style.top = py(g.groundY+30);
+    lblD.style.transform = 'translateX(-50%)';
+    lblD.textContent = 'd = '+fmtKm(state.d)+' km';
+    lblD.style.color = state.active==='d' ? 'var(--accent)' : 'var(--muted)';
+
+    lblTheta.style.left = px(tip2.x - arcR - 4); lblTheta.style.top = py(tip2.y - arcR - 16);
+    lblTheta.style.transform = 'translateX(-100%)';
+    lblTheta.textContent = 'Δθ = '+state.theta.toFixed(1)+'°';
+    lblTheta.style.color = state.active==='theta' ? 'var(--accent)' : 'var(--muted)';
+
+    lblGlobe.style.left = px(g.globeCx); lblGlobe.style.top = py(g.globeCy+g.globeR+10);
+    lblScale.style.left = px(g.panelEndX); lblScale.style.top = py(g.vbH-14);
+    lblScale.style.transform = 'translateX(-100%)';
+  }
+
+  // ---- equation + legend colouring ----
+  var accent = 'var(--accent)';
+  var dTerm=$('dTerm'), thetaTerm=$('thetaTerm');
+  var dLabel=$('dLabel'), thetaLabel=$('thetaLabel');
+  var legendEl = $('legend');
+
+  function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
+
+  function drawEquationAndLegend(){
+    dTerm.style.color = activeColor('d');
+    thetaTerm.style.color = activeColor('theta');
+    dLabel.style.color = activeColor('d');
+    thetaLabel.style.color = activeColor('theta');
+
+    var rows = [
+      {sym:'d', name:'distance between the sticks', val: fmtKm(state.d)+' km', key:'d'},
+      {sym:'Δθ', name:'difference in shadow angle', val: state.theta.toFixed(1)+'°', key:'theta'},
+      {sym:'D', name:"Earth's diameter (computed)", val: fmtKm(diameter())+' km', key:null}
+    ];
+    legendEl.innerHTML = '';
+    rows.forEach(function(row){
+      var div = document.createElement('div'); div.className='row';
+      var sym = document.createElement('em'); sym.className='sym'; sym.textContent = row.sym;
+      sym.style.color = row.key ? activeColor(row.key) : 'var(--fg)';
+      var name = document.createElement('span'); name.className='name'; name.textContent = row.name;
+      var val = document.createElement('span'); val.className='val mono'; val.textContent = row.val;
+      div.appendChild(sym); div.appendChild(name); div.appendChild(val);
+      legendEl.appendChild(div);
+    });
+  }
+
+  // ---- sliders ----
+  function makeSlider(key, track, fill, thumb, lo, hi, step){
+    var dragging = false;
+    function setFromClientX(x){
+      var r = track.getBoundingClientRect();
+      var f = clamp((x-r.left)/r.width, 0, 1);
+      var v = lo + f*(hi-lo);
+      v = clamp(Math.round(v/step)*step, lo, hi);
+      if(key==='d') state.d = v; else state.theta = Math.round(v*10)/10;
+      render();
+    }
+    track.addEventListener('pointerdown', function(e){
+      dragging = true;
+      if(track.setPointerCapture) track.setPointerCapture(e.pointerId);
+      state.drag = key; state.ghostD = diameter(); state.active = key;
+      setFromClientX(e.clientX);
+    });
+    track.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
+    function endDrag(){ if(dragging){ dragging=false; state.drag=null; render(); } }
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+    track.addEventListener('pointerenter', function(){ state.active = key; render(); });
+    track.addEventListener('keydown', function(e){
+      var bigStep = e.shiftKey ? step*10 : step;
+      var cur = key==='d' ? state.d : state.theta;
+      var v = null;
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown') v = cur-bigStep;
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = cur+bigStep;
+      else if(e.key==='Home') v = lo;
+      else if(e.key==='End') v = hi;
+      if(v!==null){ e.preventDefault(); v = clamp(Math.round(v/step)*step, lo, hi); if(key==='d') state.d=v; else state.theta=Math.round(v*10)/10; render(); }
+    });
+    return {
+      draw: function(){
+        var cur = key==='d' ? state.d : state.theta;
+        var pct = clamp((cur-lo)/(hi-lo)*100, 0, 100).toFixed(2)+'%';
+        fill.style.width = pct; thumb.style.left = pct;
+      }
+    };
+  }
+  var dSlider = makeSlider('d', $('dTrack'), $('dFill'), $('dThumb'), DMIN, DMAX, 10);
+  var thetaSlider = makeSlider('theta', $('thetaTrack'), $('thetaFill'), $('thetaThumb'), TMIN, TMAX, 0.1);
+
+  [$('dCtrl'), $('thetaCtrl')].forEach(function(box){
+    box.addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+  });
+
+  // ---- result box ----
+  var dValueEl=$('dValue'), verdictEl=$('verdict'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+  var gReach=$('gReach'), gLimit=$('gLimit'), gMark=$('gMark'), gMarkLabel=$('gMarkLabel');
+  var gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
+  var GMIN=6000, GMAX=20000;
+
+  function pos(v){ return clamp((v-GMIN)/(GMAX-GMIN), 0, 1)*100; }
+
+  function drawResult(){
+    var D = diameter();
+    var errPct = (D-TRUE_DIAM)/TRUE_DIAM*100;
+    var bad = Math.abs(errPct) > 15;
+    var resultColor = bad ? 'var(--bad)' : 'var(--fg)';
+
+    dValueEl.textContent = fmtKm(D);
+    dValueEl.style.color = resultColor;
+
+    verdictEl.textContent = (errPct>=0?'+':'')+errPct.toFixed(1)+'%';
+    verdictEl.style.color = resultColor;
+    verdictSubEl.textContent = 'off from Earth’s true mean diameter of 12,742 km.';
+    effortLineEl.textContent = 'implied circumference: '+fmtKm(circumference())+' km (actual: 40,075 km)';
+
+    var markPct = pos(D);
+    var limitPct = pos(TRUE_DIAM);
+    gReach.style.width = Math.min(markPct,limitPct).toFixed(2)+'%';
+    gLimit.style.left = limitPct.toFixed(2)+'%';
+    gMark.style.left = markPct.toFixed(2)+'%';
+    gMark.style.background = resultColor;
+    var labelPct = clamp(markPct,4,88);
+    gMarkLabel.style.left = labelPct.toFixed(2)+'%';
+    gMarkLabel.style.transform = markPct>72 ? 'translateX(-100%)' : markPct<20 ? 'translateX(0)' : 'translateX(-50%)';
+    gMarkLabel.style.color = resultColor;
+    gMarkLabel.textContent = fmtKm(D)+' km';
+
+    if(!gTicksEl.dataset.built){
+      var ticksHtml='', labelsHtml='';
+      for(var v=GMIN; v<=GMAX; v+=2000){
+        var left = pos(v).toFixed(2)+'%';
+        ticksHtml += '<div class="tick" style="left:'+left+'"></div>';
+        var tx = v===GMIN ? 'translateX(0)' : v>=GMAX-1000 ? 'translateX(-100%)' : 'translateX(-50%)';
+        labelsHtml += '<div class="ticklabel" style="left:'+left+';transform:'+tx+'">'+(v/1000)+'k</div>';
+      }
+      gTicksEl.innerHTML = ticksHtml; gTicksEl.dataset.built='1';
+      gLabelsEl.innerHTML = labelsHtml;
+    }
+  }
+
+  // ---- presets ----
+  document.querySelectorAll('.preset').forEach(function(b){
+    var presets = {
+      eratosthenes:{d:800,theta:7.2},
+      ten:{d:1112,theta:10},
+      close:{d:150,theta:1.35}
+    };
+    b.addEventListener('click', function(){
+      var p = presets[b.dataset.p];
+      state.d=p.d; state.theta=p.theta;
+      render();
+    });
+  });
+
+  // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
+  var STORAGE_KEY = 'eratosthenes-shadow-theme';
+  var themeToggle = $('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+
+  function measure(){
+    var w = heroWrap.clientWidth;
+    if(w && w !== heroW){ heroW = w; render(); }
+  }
+
+  function render(){
+    drawHero();
+    drawEquationAndLegend();
+    dSlider.draw(); thetaSlider.draw();
+    $('dReadout').textContent = fmtKm(state.d)+' km';
+    $('thetaReadout').textContent = state.theta.toFixed(1)+'°';
+    drawResult();
+  }
+
+  new ResizeObserver(measure).observe(heroWrap);
+  window.addEventListener('resize', measure);
+  [60,250,900].forEach(function(t){ setTimeout(measure, t); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  render();
+})();
+</script>

@@ -13,7 +13,9 @@ Simple_Viz/
 ├── STYLE_GUIDE.md               # the current, user-approved visual language — start new pages here
 ├── DESIGN_BRIEF_TEMPLATE.md     # fill-in template for requesting a new/redesigned page
 └── visualizations/
-    └── earth-moon-race.html   # speed-of-light concept, current iteration
+    ├── earth-moon-race.html      # speed-of-light concept
+    ├── straw-hose-flow.html      # style reference implementation
+    └── eratosthenes-shadow.html  # Earth's diameter from two shadows
 ```
 
 **Before starting a new page or a redesign, fill out
@@ -32,7 +34,29 @@ a browser, no server or build step needed. Naming is kebab-case and descriptive
 Shows four things crossing the real Earth–Moon distance (384,400 km) at their real speed:
 light, NASA's Parker Solar Probe, a rifle bullet, and a commercial jet.
 
-**Current design (as of this iteration):**
+**Migrated to the [STYLE_GUIDE.md](STYLE_GUIDE.md) skeleton (2026-08-14).** Now uses the
+standard topbar → topgrid (title/sub | `t = d/v` equation | legend) → hero → resultrow →
+note layout, cream/navy theme tokens with an explicit toggle, and the per-object accent
+colors (light/Parker/bullet/jet) kept as separate hex constants outside the shared token
+set since they're semantic (per CLAUDE.md's per-concept-color guidance). Two adaptations
+since this concept doesn't have interactive sliders like straw-hose-flow:
+- The **legend rows are hover-triggers, not slider-linked** — hovering a traveller's row
+  dims the other three lanes in the hero SVG (`.lane.dim`), rather than recoloring an
+  equation term (there's one `v` symbol shared by four different speeds, so no single
+  term to link).
+- The **speed multiplier** (previously a single cycling button) is now a discrete pill
+  picker (1×/2×/4×/8×/16×/32×), matching the sanctioned "discrete picker" component
+  pattern instead of a single button with hidden state.
+- The **result column** shows light's live position (km from Earth) with a simple
+  Earth→Moon reach gauge and a round-trip counter, replacing the old plain elapsed-time
+  readout — there's no "limit" concept here so the gauge has no red bad-line/mark-label
+  ghost machinery, just a track + moving mark.
+
+Play/Pause/Reset controls and the underlying real-time physics (light bounces
+continuously, Parker/bullet/jet crawl on a magnified 1,500 km ruler) are unchanged from
+the original.
+
+**Design history (pre-migration):**
 - Everything runs at true 1:1 real time — no time compression, no log scale.
 - Light is fast enough (1.28 s one-way) to animate directly on the full-scale track; it
   bounces Earth↔Moon continuously.
@@ -131,6 +155,86 @@ knowing even though its specific UI is gone:
   `left`/`width` instead of SVG, which *can* use a plain CSS `transition:left` — see
   STYLE_GUIDE.md's "Result readout" pattern.)
 
+### `eratosthenes-shadow.html` — "Two sticks measure a planet"
+
+Built directly to the [STYLE_GUIDE.md](STYLE_GUIDE.md) skeleton (2026-08-14), no earlier
+draft. Implements Eratosthenes' method: `D = 360°·d/(π·Δθ)`, where `d` is the distance
+between two sticks on the same meridian and `Δθ` is the difference in shadow angle between
+them at solar noon.
+
+- **Two sliders** (`d`: 100–2000 km, `Δθ`: 1–20°) drive the equation directly — both are
+  independent inputs, not one computed from the other, matching the "distance + angle in,
+  diameter out" shape of the real method. Standard hover-linkage into the equation/legend
+  terms, per the style guide.
+- **Hero diagram, two panels in one SVG**: a small full-Earth globe inset (left) with the
+  current `Δθ` shown as a highlighted wedge, connected via dashed fan lines (reusing
+  earth-moon-race's magnifying-lens convention) into a larger schematic ground-level scene
+  (right) — two vertical sticks, parallel dashed sun-ray guides from directly overhead, and
+  a highlighted shadow on the second stick sized by `h·tan(Δθ)`. The zoomed panel is
+  explicitly **not to scale** (labeled in-page) — stick spacing maps to `d` only
+  proportionally within a fixed panel width, not literally, since real `d` values (100s–1000s
+  of km) can't be drawn to true scale next to a stick a few centimeters tall.
+- **Physics note on the diagram's reference frame**: both sticks are drawn vertical (as real
+  gnomons are, locally perpendicular to the ground); the *sun ray* is drawn tilted by `Δθ` at
+  the second stick instead, rather than tilting the stick. This was a deliberate choice so the
+  angle shown between ray and stick directly matches "Δθ = shadow angle," and the shadow
+  length follows the standard `tan(Δθ)` relation — the equally-valid alternative (vertical sun
+  rays, tilted stick) gives a different, non-standard `sin(Δθ)` shadow length and doesn't match
+  how the effect is normally described.
+- **Result box**: computed diameter vs. Earth's true mean diameter (12,742 km) as a percent
+  error, plus a linear gauge (6,000–20,000 km) marking the true value as a reference line —
+  intentionally *not* framed as possible/impossible like straw-hose-flow's gauge, since any
+  `d`/`Δθ` pair is mathematically valid; the gauge here is purely "how close did this
+  particular pair land you."
+- **Presets**: Eratosthenes' actual historical numbers (800 km, 7.2° → 40,000 km, ~0.1% off);
+  a clean "10° of latitude" pair (1,112 km, 10° → lands almost exactly on 12,742 km); and a
+  "150 km apart" pair showing the same method still works at a much shorter baseline (chosen
+  to stay inside the sliders' own range — an earlier draft used 50 km, which fell below the
+  slider's 100 km floor and desynced the thumb position from the readout; fixed by moving the
+  preset inside range and clamping the slider's fill-percent math defensively for future
+  presets/edits).
+- No measurement-error model: the equation is exact for any `d`/`Δθ` input, so presets differ
+  only by which real numbers they use, not by correctness. The note explains, without
+  modeling it, why small baselines are harder in practice (angle measurement precision).
+
+### Style migration sweep (2026-08-14): `gravity-lab.html`, `mass-energy.html`, `planet-light-delay.html`
+
+All three were rewritten from their original sparse dark-first look to the
+[STYLE_GUIDE.md](STYLE_GUIDE.md) skeleton in one pass, at the user's request ("update all
+the other pages with the style"). Each keeps its original physics/data untouched — only the
+chrome, layout, and interaction pattern changed (native `<input type=range>` sliders became
+custom drag tracks, dropdown/button controls became discrete pill pickers, embedded SVG
+`<text>` became percentage-positioned HTML `.lbl` overlays, per the style guide).
+
+- **`gravity-lab.html`** ("The pull between worlds") — `F = Gm₁m₂/r²`. Kept the original's
+  log-scale mass/distance sliders and exact preset values (two people, Earth+Moon, Earth+Sun)
+  verbatim. Added a legend row for `G` (fixed constant) and `F` (computed, no slider). No
+  gauge — there's no natural possible/impossible framing for gravitational force, so the
+  result box instead translates the force into an "equivalent to lifting ___ kg on Earth"
+  comparison against everyday weight thresholds (paperclip/coin/person/car/cargo ship).
+  Force formatting needed unit prefixes out to `YN`/`ZN`/`EN`/`PN` (not just `kN`–`TN`) since
+  planet-scale forces land in the 10¹⁹–10²² N range; mass formatting needed a generic
+  scientific-notation fallback (`× 10ᵉ kg`) instead of the original's two fixed buckets
+  (10²⁰/10²⁴), which broke down for Sun-scale masses (~2×10³⁰ kg) — this was a real bug
+  caught during testing (garbled "1995262.31 × 10²⁴ kg" output), not a style preference.
+- **`mass-energy.html`** ("How much energy is in matter?") — `E = mc²`, single mass slider
+  (paperclip/coin/1 kg/100 kg presets, unchanged domain). Also no gauge, for the same
+  reason; result box keeps the original's two comparison lines (1 kW-heater runtime, TNT
+  equivalent) in the verdict-sub/effort-line slots. Fixed a formatting bug where very large
+  heater runtimes printed as raw days (e.g. "1040225901.3 days") instead of converting to
+  years past the 365-day mark.
+- **`planet-light-delay.html`** ("You are seeing the past") — the most involved port: `t =
+  d/c`, `s = vt`, shown as one combined `s = vd/c` equation. The `<select>` dropdown became a
+  7-item pill picker (Moon/Mars/Jupiter/Saturn/Neptune/Sun/Andromeda); the distance slider's
+  min/max now reconfigure per selected object, same as the original's per-planet near/far
+  range. Kept the original's icon-drawing logic (per-planet SVG shapes) and its
+  small-offset magnified inset (reused again as the established zoom-lens pattern) almost
+  verbatim, just re-themed onto CSS custom properties instead of hardcoded per-planet hex
+  colors. Fixed the same "huge number prints raw" class of bug for both light-travel time
+  (years past 1,000 now use `toLocaleString` instead of 2-decimal fixed notation) and
+  distance (light-years/AU past 1,000 likewise) — both surfaced clearly once Andromeda's
+  ~2.5-million-year/light-year numbers were run through the original two-decimal formatters.
+
 ## Roadmap
 
 A running list of future equation pages now lives directly in `index.html`, in a "What's
@@ -140,8 +244,8 @@ next` / `idea`). Update that list in `index.html` directly as pages move from id
 built (moving a built one out of the roadmap list and into the main `.grid` section with a
 numbered `.concept` card, per the existing pattern).
 
-Current top pick: **Earth's circumference from shadows** (Eratosthenes' method — two sticks,
-two shadow angles, one known distance between them, `C = 360°·d/Δθ`) — pick this up next.
+Current top pick: **Distance to the horizon** (why standing up lets you see farther out to
+sea, `d = √(2Rh)`) — pick this up next.
 
 Two new ideas added to the roadmap list in `index.html` (2026-08-13, both still `idea` status,
 not scoped yet): **all the salt in the sea** (dissolved ocean salt spread over dry land,
@@ -152,18 +256,17 @@ so its visual form needs more thought than the others).
 
 ## Open questions / next steps
 
-- A site index (`index.html`) now links five concepts. Three earlier self-contained
+- A site index (`index.html`) now links six concepts. Three earlier self-contained
   interactions were added: `planet-light-delay.html` (past vs current planetary position),
   `mass-energy.html` (E = mc² mass-energy comparison), and `gravity-lab.html` (Newtonian
-  gravitational attraction). `straw-hose-flow.html` (Hagen–Poiseuille flow resistance) was
-  added most recently. Each is intentionally a simplified explainer, with its approximation
-  stated in-page.
-- **Decided (2026-08-14):** every new visualization should share the visual language in
+  gravitational attraction). `straw-hose-flow.html` (Hagen–Poiseuille flow resistance) and
+  `eratosthenes-shadow.html` (Earth's diameter from two shadows) were added most recently.
+  Each is intentionally a simplified explainer, with its approximation stated in-page.
+- **Decided (2026-08-14):** every visualization should share the visual language in
   [STYLE_GUIDE.md](STYLE_GUIDE.md) — the user confirmed straw-hose-flow.html's v5 design as
-  the site's style going forward. The four earlier pages (`earth-moon-race.html`,
-  `gravity-lab.html`, `mass-energy.html`, `planet-light-delay.html`) predate this and haven't
-  been migrated — update them to match opportunistically when next touched, not as a
-  dedicated sweep unless the user asks.
+  the site's style going forward. `earth-moon-race.html` was migrated the same day, and
+  `gravity-lab.html`, `mass-energy.html`, and `planet-light-delay.html` followed in a
+  dedicated sweep later that day (see above) — every page on the site now shares this style.
 - The zoom window in `earth-moon-race.html` is a **fixed** 1,500 km (not auto-scaling to
   keep fast objects in frame) — deliberate simplification. If a future request wants the
   probe to stay visible the whole time, an auto-zoom-out camera is the next thing to try,

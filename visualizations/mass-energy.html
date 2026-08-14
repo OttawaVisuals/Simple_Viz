@@ -1,22 +1,385 @@
-<title>How Much Energy Is in Matter?</title>
+<title>How much energy is in matter</title>
 <style>
-  :root{--bg:#0b0d10;--fg:#e9edf0;--muted:#8a94a0;--line:#262d34;--mass:#8fa0ff;--energy:#ffcc55;--accent:#52d6c9}@media(prefers-color-scheme:light){:root{--bg:#fbfaf8;--fg:#1c2226;--muted:#6b7480;--line:#e0dfda;--mass:#4a5bc9;--energy:#b8790a;--accent:#0f8f82}}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif;padding:3.5rem 1.5rem 5rem;display:flex;justify-content:center}main{width:100%;max-width:820px}a{color:var(--muted);font:12px ui-monospace,monospace;text-decoration:none}a:hover{color:var(--fg)}h1{font-size:clamp(1.9rem,5vw,3.1rem);font-weight:400;letter-spacing:-.025em;margin:2rem 0 .8rem}.sub{color:var(--muted);font-size:1.06rem;line-height:1.6;max-width:62ch;margin:0 0 2.5rem}.sub b{color:var(--fg);font-weight:400}.mono{font-family:ui-monospace,"Cascadia Code",monospace;font-variant-numeric:tabular-nums}.equation{display:flex;align-items:center;gap:.65rem;font-size:clamp(2.1rem,8vw,4.5rem);margin:1rem 0 2rem}.equation span{color:var(--muted)}.equation strong{font-weight:400;color:var(--energy)}.controls{border-top:1px solid var(--line);padding-top:1.2rem;display:flex;gap:1.5rem;flex-wrap:wrap;align-items:end;font:13px system-ui,sans-serif}.controls label{display:grid;gap:.5rem;color:var(--muted)}input{accent-color:var(--accent);width:250px}.preset{border:0;border-bottom:1px solid var(--muted);background:none;color:var(--fg);font:inherit;padding:0;cursor:pointer;margin-right:.75rem}.preset:hover{border-color:var(--fg)}svg{display:block;width:100%;height:auto;margin-top:2.4rem}.label{font:14px ui-monospace,"Cascadia Code",monospace;fill:currentColor}.small{font:12px ui-monospace,"Cascadia Code",monospace;fill:var(--muted)}.note{margin-top:2rem;border-top:1px solid var(--line);padding-top:1rem;color:var(--muted);font:12px/1.55 system-ui,sans-serif}
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  .topgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
+
+  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqn{display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);font-size:clamp(30px,4vw,46px);line-height:1;font-weight:300}
+  .eqn .eq{color:var(--muted)}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .eqn sup{font-size:.55em;position:relative;top:-.6em}
+
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:1.6em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:8px 2px}
+  .legend .sym{font-size:17px;font-weight:300;transition:color .2s}
+  .legend .name{font-size:12.5px;color:var(--muted2)}
+  .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero svg{width:100%;height:auto;display:block}
+  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s,color .2s}
+
+  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
+
+  .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;transition:color .2s}
+  .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
+  .readout{font-family:ui-monospace,monospace;font-size:clamp(26px,2.8vw,34px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
+  .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
+  .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
+  .track .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
+  .track .thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
+  .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
+
+  .result{text-align:left}
+  .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
+  .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
+  .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
+  .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
+
+  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+  .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
+  .preset:hover{border-color:var(--accent);color:var(--accent)}
+
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;max-width:88ch;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
 </style>
 <main>
-  <a href="../index.html">&larr; Physics you can see</a>
-  <h1>How much energy is in matter?</h1>
-  <p class="sub">Einstein&rsquo;s equation says mass and energy are interchangeable. Move the mass slider to see the energy equivalent if <b>all</b> of that mass could be converted to energy.</p>
-  <div class="equation" aria-label="E equals m c squared"><strong>E</strong><span>=</span><strong>m</strong><span>c<sup>2</sup></span></div>
-  <p class="mono" style="color:var(--muted);font-size:13px;margin:-1.4rem 0 2rem">c = 299,792,458 m/s &nbsp; therefore &nbsp; E = m &times; 89,875,517,873,681,764 J/kg</p>
-  <div class="controls"><label>Mass <span class="mono" id="massReadout"></span><input id="mass" type="range" min="-6" max="3" step=".01" value="-3"></label><div>Try: <button class="preset" data-m="-3">paperclip</button><button class="preset" data-m="-1">coin</button><button class="preset" data-m="0">1 kg</button><button class="preset" data-m="2">100 kg</button></div></div>
-  <svg viewBox="0 0 820 320" role="img" aria-label="A mass object transformed into its mass energy equivalent, shown as electricity, TNT equivalent, and lightning strikes.">
-    <text x="35" y="55" class="small">MASS</text><circle id="massDot" cx="112" cy="145" r="34" fill="var(--mass)"/><text id="massSvg" x="112" y="205" text-anchor="middle" class="label">1 g</text>
-    <path d="M 175 145 L 330 145" stroke="currentColor" stroke-opacity=".35"/><polygon points="330,145 316,137 316,153" fill="currentColor" opacity=".5"/><text x="252" y="126" text-anchor="middle" class="small">&times; c²</text>
-    <text x="370" y="55" class="small">ENERGY EQUIVALENT</text><rect x="370" y="108" width="385" height="70" fill="none" stroke="currentColor" stroke-opacity=".2"/><rect id="energyBar" x="370" y="108" width="1" height="70" fill="var(--energy)" opacity=".85"/><text id="energyText" x="370" y="205" class="label">0 J</text>
-    <line x1="35" y1="260" x2="785" y2="260" stroke="currentColor" stroke-opacity=".2"/><text x="35" y="292" class="small" id="electricity">&nbsp;</text><text x="415" y="292" class="small" id="tnt">&nbsp;</text>
-  </svg>
-  <p class="note" id="note">&nbsp;</p>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../index.html">&larr; Physics you can see</a>
+    <div class="topbar-right">
+      <span>Mass&ndash;energy equivalence</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>How much energy <em>is in matter</em>?</h1>
+      <p class="sub">Einstein's equation says mass and energy are interchangeable. Drag the mass slider to see the energy equivalent if all of that mass could be converted to energy.</p>
+    </div>
+
+    <div class="eqnbox">
+      <div class="eqn">
+        <em>E</em>
+        <span class="eq">=</span>
+        <em id="mTerm">m</em>
+        <em>c<sup>2</sup></em>
+      </div>
+    </div>
+
+    <div class="legendbox">
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="hero" id="heroWrap">
+    <div class="lbl" id="lblMass" style="transform:translateX(-50%)"></div>
+    <div class="lbl" id="lblTimes" style="transform:translateX(-50%)">&times; c&sup2;</div>
+    <div class="lbl" id="lblEnergy"></div>
+    <svg id="heroSvg" role="img" aria-label="A mass shown as a circle, converted through c squared into an energy bar whose length grows with the mass.">
+      <circle id="massDot" fill="var(--fg)"></circle>
+      <line id="arrowLine" stroke="currentColor" stroke-opacity=".35"></line>
+      <polygon id="arrowTip" fill="currentColor" opacity=".5"></polygon>
+      <rect id="barTrack" fill="none" stroke="currentColor" stroke-opacity=".2"></rect>
+      <rect id="energyBar" fill="var(--accent)" opacity=".85"></rect>
+    </svg>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrls">
+      <div class="ctrl" id="mCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Mass <em id="mLabel">m</em></span>
+          <span class="ctrl-rel">m &prop; E</span>
+        </div>
+        <div class="readout mono" id="mReadout"></div>
+        <div class="track" id="mTrack" tabindex="0" role="slider" aria-label="Mass">
+          <div class="rail"></div>
+          <div class="fill" id="mFill"></div>
+          <div class="thumb" id="mThumb"></div>
+        </div>
+        <div class="track-range"><span>1 mg</span><span class="mid">paperclip &middot; coin &middot; kilogram</span><span>1000 kg</span></div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Energy equivalent</div>
+      <div class="result-value"><span class="num mono" id="eValue"></span><span class="unit mono" id="eUnit"></span></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+      <div class="effort-line" id="effortLine"></div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-m="-3">paperclip</button>
+    <button class="preset" data-m="-1">coin</button>
+    <button class="preset" data-m="0">1 kg</button>
+    <button class="preset" data-m="2">100 kg</button>
+  </div>
+
+  <p class="note">Einstein's <a href="https://en.wikipedia.org/wiki/Mass%E2%80%93energy_equivalence" target="_blank" rel="noopener">mass&ndash;energy equivalence</a>, E = mc&sup2;, with c = 299,792,458 m/s so that every kilogram of mass is worth 89,875,517,873,681,764 joules if converted completely. This is not a promise that an ordinary object can release all of this energy &mdash; complete conversion is a useful theoretical comparison, not something real processes achieve; nuclear fission converts only a tiny fraction of a percent of its fuel's mass, for instance.</p>
+
+</div>
 </main>
 <script>
-(function(){var mass=document.getElementById('mass'),massReadout=document.getElementById('massReadout'),massSvg=document.getElementById('massSvg'),energyText=document.getElementById('energyText'),energyBar=document.getElementById('energyBar'),massDot=document.getElementById('massDot'),electricity=document.getElementById('electricity'),tnt=document.getElementById('tnt'),note=document.getElementById('note');function fixed(n){return n>=1e12?(n/1e12).toFixed(2)+' TJ':n>=1e9?(n/1e9).toFixed(2)+' GJ':n>=1e6?(n/1e6).toFixed(2)+' MJ':n.toLocaleString(undefined,{maximumFractionDigits:0})+' J'}function draw(){var m=Math.pow(10,Number(mass.value)),E=m*299792458**2,kwh=E/3600000,tons=E/4.184e9;massReadout.textContent=m<.001?(m*1e6).toFixed(1)+' mg':m<1?(m*1000).toFixed(1)+' g':m.toFixed(2)+' kg';massSvg.textContent=massReadout.textContent;energyText.textContent=fixed(E);energyBar.setAttribute('width',Math.max(4,385*(Number(mass.value)+6)/9));massDot.setAttribute('r',18+(Number(mass.value)+6)*3);electricity.textContent='enough to run a 1 kW heater for '+(kwh<24?kwh.toFixed(1)+' hours':(kwh/24).toFixed(1)+' days');tnt.textContent='about '+(tons<1?(tons*1000).toFixed(1)+' kg':tons.toLocaleString(undefined,{maximumFractionDigits:0})+' tonnes')+' of TNT';note.textContent='This is mass–energy equivalence, not a promise that an ordinary object can release all of this energy. Complete conversion is a useful theoretical comparison; real processes convert only a fraction of mass.'}mass.oninput=draw;document.querySelectorAll('.preset').forEach(function(b){b.onclick=function(){mass.value=b.dataset.m;draw()}});draw()})();
+(function(){
+  var C = 299792458;
+  var MMIN=-6, MMAX=3;
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+  function fmtMass(kg){
+    if(kg < 0.000001) return (kg*1e9).toFixed(1)+' µg';
+    if(kg < 0.001) return (kg*1e6).toFixed(1)+' mg';
+    if(kg < 1) return (kg*1000).toFixed(1)+' g';
+    return kg.toFixed(kg<10?2:0)+' kg';
+  }
+  function fmtEnergy(j){
+    if(j>=1e15) return [(j/1e15).toPrecision(3),'PJ'];
+    if(j>=1e12) return [(j/1e12).toPrecision(3),'TJ'];
+    if(j>=1e9) return [(j/1e9).toPrecision(3),'GJ'];
+    if(j>=1e6) return [(j/1e6).toPrecision(3),'MJ'];
+    if(j>=1e3) return [(j/1e3).toPrecision(3),'kJ'];
+    return [j.toPrecision(3),'J'];
+  }
+
+  var state = { me:-3, active:null, drag:null };
+  var heroW = 0;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
+  var massDot=$('massDot'), arrowLine=$('arrowLine'), arrowTip=$('arrowTip'), barTrack=$('barTrack'), energyBar=$('energyBar');
+  var lblMass=$('lblMass'), lblTimes=$('lblTimes'), lblEnergy=$('lblEnergy');
+
+  function mass(){ return Math.pow(10, state.me); }
+  function energy(){ return mass()*C*C; }
+
+  function geom(w){
+    var narrow = w < 620;
+    var vbH = narrow ? 210 : 170;
+    var cy = vbH/2 - 4;
+    var dotX = narrow ? 60 : 90;
+    var barX = narrow ? 150 : 220;
+    var barW = Math.max(60, w - barX - (narrow?20:40));
+    var barH = narrow ? 28 : 36;
+    var frac = clamp((state.me-MMIN)/(MMAX-MMIN), 0, 1);
+    var dotR = 14 + frac*32;
+    return { w:w, vbH:vbH, cy:cy, dotX:dotX, barX:barX, barW:barW, barH:barH, dotR:dotR, frac:frac };
+  }
+
+  function drawHero(){
+    var w = heroW || heroWrap.clientWidth || 1100;
+    var g = geom(w);
+    heroSvg.setAttribute('viewBox','0 0 '+w+' '+g.vbH);
+    heroSvg.setAttribute('preserveAspectRatio','none');
+
+    massDot.setAttribute('cx', g.dotX); massDot.setAttribute('cy', g.cy); massDot.setAttribute('r', g.dotR);
+    massDot.setAttribute('fill', state.active==='m' ? 'var(--accent)' : 'var(--fg)');
+
+    var lineX1 = g.dotX + g.dotR + 14, lineX2 = g.barX - 14;
+    arrowLine.setAttribute('x1', lineX1); arrowLine.setAttribute('y1', g.cy);
+    arrowLine.setAttribute('x2', lineX2); arrowLine.setAttribute('y2', g.cy);
+    arrowTip.setAttribute('points', lineX2+','+g.cy+' '+(lineX2-12)+','+(g.cy-7)+' '+(lineX2-12)+','+(g.cy+7));
+
+    barTrack.setAttribute('x', g.barX); barTrack.setAttribute('y', g.cy-g.barH/2);
+    barTrack.setAttribute('width', g.barW); barTrack.setAttribute('height', g.barH);
+    var fillW = Math.max(3, g.barW*g.frac);
+    energyBar.setAttribute('x', g.barX); energyBar.setAttribute('y', g.cy-g.barH/2);
+    energyBar.setAttribute('width', fillW); energyBar.setAttribute('height', g.barH);
+    energyBar.setAttribute('fill', state.active==='m' ? 'var(--accent)' : 'var(--fg)');
+    energyBar.setAttribute('opacity', state.active==='m' ? .9 : .7);
+
+    var px = function(x){ return (x/w*100)+'%'; };
+    var py = function(y){ return (y/g.vbH*100)+'%'; };
+    lblMass.style.left = px(g.dotX); lblMass.style.top = py(g.cy + g.dotR + 14);
+    lblMass.textContent = 'mass: '+fmtMass(mass());
+    lblMass.style.color = state.active==='m' ? 'var(--accent)' : 'var(--muted)';
+    lblTimes.style.left = px((lineX1+lineX2)/2); lblTimes.style.top = py(g.cy - 22);
+    lblEnergy.style.left = px(g.barX); lblEnergy.style.top = py(g.cy - g.barH/2 - 22);
+    var ef = fmtEnergy(energy());
+    lblEnergy.textContent = 'energy: '+ef[0]+' '+ef[1];
+    lblEnergy.style.color = state.active==='m' ? 'var(--accent)' : 'var(--muted)';
+  }
+
+  // ---- equation + legend colouring ----
+  var accent = 'var(--accent)';
+  var mTerm=$('mTerm'), mLabel=$('mLabel');
+  var legendEl = $('legend');
+
+  function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
+
+  function drawEquationAndLegend(){
+    mTerm.style.color = activeColor('m');
+    mLabel.style.color = activeColor('m');
+
+    var ef = fmtEnergy(energy());
+    var rows = [
+      {sym:'m', name:'mass', val: fmtMass(mass()), key:'m'},
+      {sym:'c', name:'speed of light', val:'299,792,458 m/s', key:null},
+      {sym:'E', name:'energy (computed)', val: ef[0]+' '+ef[1], key:null}
+    ];
+    legendEl.innerHTML = '';
+    rows.forEach(function(row){
+      var div = document.createElement('div'); div.className='row';
+      var sym = document.createElement('em'); sym.className='sym'; sym.textContent = row.sym;
+      sym.style.color = row.key ? activeColor(row.key) : 'var(--fg)';
+      var name = document.createElement('span'); name.className='name'; name.textContent = row.name;
+      var val = document.createElement('span'); val.className='val mono'; val.textContent = row.val;
+      div.appendChild(sym); div.appendChild(name); div.appendChild(val);
+      legendEl.appendChild(div);
+    });
+  }
+
+  // ---- slider ----
+  function makeSlider(key, track, fill, thumb, lo, hi){
+    var dragging = false;
+    function setFromClientX(x){
+      var rr = track.getBoundingClientRect();
+      var f = clamp((x-rr.left)/rr.width, 0, 1);
+      var v = lo + f*(hi-lo);
+      v = clamp(Math.round(v*100)/100, lo, hi);
+      state.me = v;
+      render();
+    }
+    track.addEventListener('pointerdown', function(e){
+      dragging = true;
+      if(track.setPointerCapture) track.setPointerCapture(e.pointerId);
+      state.drag = key; state.active = key;
+      setFromClientX(e.clientX);
+    });
+    track.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
+    function endDrag(){ if(dragging){ dragging=false; state.drag=null; render(); } }
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+    track.addEventListener('pointerenter', function(){ state.active = key; render(); });
+    track.addEventListener('keydown', function(e){
+      var step = e.shiftKey ? 1 : 0.1;
+      var cur = state.me;
+      var v = null;
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown') v = cur-step;
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = cur+step;
+      else if(e.key==='Home') v = lo;
+      else if(e.key==='End') v = hi;
+      if(v!==null){ e.preventDefault(); v = clamp(Math.round(v*100)/100, lo, hi); state.me=v; render(); }
+    });
+    return {
+      draw: function(){
+        var pct = clamp((state.me-lo)/(hi-lo)*100, 0, 100).toFixed(2)+'%';
+        fill.style.width = pct; thumb.style.left = pct;
+      }
+    };
+  }
+  var mSlider = makeSlider('m', $('mTrack'), $('mFill'), $('mThumb'), MMIN, MMAX);
+  $('mCtrl').addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+
+  // ---- result box ----
+  var eValueEl=$('eValue'), eUnitEl=$('eUnit'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+
+  function drawResult(){
+    var E = energy();
+    var ef = fmtEnergy(E);
+    eValueEl.textContent = ef[0]; eUnitEl.textContent = ef[1];
+
+    var kwh = E/3600000, tons = E/4.184e9;
+    var days = kwh/24;
+    var heaterTime = kwh<24 ? kwh.toFixed(1)+' hours' : days<365 ? days.toFixed(1)+' days' : (days/365).toLocaleString(undefined,{maximumFractionDigits:0})+' years';
+    verdictSubEl.textContent = 'enough to run a 1 kW heater for ' + heaterTime + '.';
+    effortLineEl.textContent = 'about ' + (tons<1 ? (tons*1000).toFixed(1)+' kg' : tons.toLocaleString(undefined,{maximumFractionDigits:0})+' tonnes') + ' of TNT equivalent';
+  }
+
+  // ---- presets ----
+  document.querySelectorAll('.preset').forEach(function(b){
+    b.addEventListener('click', function(){
+      state.me = Number(b.dataset.m);
+      render();
+    });
+  });
+
+  // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
+  var STORAGE_KEY = 'mass-energy-theme';
+  var themeToggle = $('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+
+  function measure(){
+    var w = heroWrap.clientWidth;
+    if(w && w !== heroW){ heroW = w; render(); }
+  }
+
+  function render(){
+    drawHero();
+    drawEquationAndLegend();
+    mSlider.draw();
+    $('mReadout').textContent = fmtMass(mass());
+    drawResult();
+  }
+
+  new ResizeObserver(measure).observe(heroWrap);
+  window.addEventListener('resize', measure);
+  [60,250,900].forEach(function(t){ setTimeout(measure, t); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  render();
+})();
 </script>

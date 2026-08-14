@@ -452,6 +452,11 @@
   var themeToggle = $('themeToggle');
   function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
   function currentTheme(){
+    // Read the applied DOM state first. If localStorage is unavailable (sandboxed iframe,
+    // private browsing, blocked cookies) falling straight through to the system preference
+    // would pin the toggle to one direction and it could never switch back.
+    var applied = document.documentElement.getAttribute('data-theme');
+    if(applied) return applied;
     var stored = null;
     try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
     return stored || (systemPrefersDark() ? 'dark' : 'light');

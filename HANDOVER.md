@@ -295,10 +295,34 @@ A full review of all twelve pages plus `index.html`. Fixes applied:
 
 Known, **not** fixed (see the review notes for detail): sliders declare `role="slider"` but set
 no `aria-valuenow`/`valuemin`/`valuemax`/`valuetext`; only `earth-moon-race.html` honours
-`prefers-reduced-motion`; the `← Physics you can see` back link 404s when a page is published
-standalone as an Artifact; and `index.html` is still on its own pre-migration palette
-(near-black `#0b0d10`, its own `--light`/`--teal` tokens, no theme toggle) despite this file
-previously claiming every page shares the style guide.
+`prefers-reduced-motion`; and the `← Physics you can see` back link 404s when a page is
+published standalone as an Artifact.
+
+### `index.html` migrated to the style guide (2026-08-14)
+
+The index was the last page still on the original pre-migration look (near-black `#0b0d10`
+background, its own `--light`/`--teal`/`--blue` token set, no theme toggle) — the one page
+that didn't match, and the first one anyone sees. Rebuilt on the shared tokens, type scale,
+topbar and theme toggle, copied from `straw-hose-flow.html` rather than re-derived.
+
+It's a listing page, so the `topgrid → hero → resultrow` skeleton doesn't apply; what carries
+over is the token set, the serif/mono split, the topbar with its toggle, hairline rules with
+no card chrome, and `--accent` reserved for hover. Two deliberate deviations, both noted in
+the file: the `h1` is one step larger than a visualization page's (this is a cover, not a
+figure caption), and `.wrap` is 1040px rather than 1320px since there's no wide hero to fill.
+
+**A real bug surfaced while testing the migrated toggle, and it was in the shared pattern —
+so all 13 pages had it.** `currentTheme()` read `localStorage` and fell back to
+`prefers-color-scheme`. Where storage is *blocked* rather than merely empty — sandboxed
+iframe, private browsing, blocked cookies — the `catch` leaves `stored` null on every call, so
+the function keeps returning the system preference regardless of what the user clicked and the
+toggle only ever moves one direction. Verified: in a storage-blocked context the old code went
+dark→light→light→light; the fixed code alternates correctly. This matters because a sandboxed
+iframe is exactly how these render when published as Artifacts, which is the site's stated
+distribution channel. `currentTheme()` now reads the applied `data-theme` attribute first and
+only consults storage for the initial load; fixed in all 13 files and in
+[STYLE_GUIDE.md](STYLE_GUIDE.md)'s snippet, with the reasoning recorded there so the broken
+version doesn't get copied into the next page.
 
 ## Roadmap
 

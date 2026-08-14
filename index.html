@@ -4,12 +4,99 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Physics You Can See</title>
 <style>
-  :root{--bg:#0b0d10;--fg:#e9edf0;--muted:#8a94a0;--line:#262d34;--light:#ffcc55;--teal:#52d6c9;--blue:#8fa0ff;--red:#ff6b5e}:root[data-theme="light"]{--bg:#fbfaf8;--fg:#1c2226;--muted:#6b7480;--line:#e0dfda;--light:#b8790a;--teal:#0f8f82;--blue:#4a5bc9;--red:#c8402f}@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#fbfaf8;--fg:#1c2226;--muted:#6b7480;--line:#e0dfda;--light:#b8790a;--teal:#0f8f82;--blue:#4a5bc9;--red:#c8402f}}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif;padding:5rem 1.5rem}main{max-width:900px;margin:auto}h1{font-weight:400;font-size:clamp(2.4rem,7vw,5rem);letter-spacing:-.04em;margin:0 0 1rem}h2.roadmap-h{font-weight:400;font-size:1.4rem;margin:0 0 .3rem}p{max-width:58ch;color:var(--muted);font-size:1.12rem;line-height:1.65}.kicker,.meta{font:12px ui-monospace,"Cascadia Code",monospace;letter-spacing:.06em;text-transform:uppercase}.kicker{color:var(--light);margin-bottom:1.5rem}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 2.5rem;margin-top:5rem}.concept{display:block;color:inherit;text-decoration:none;padding:1.5rem 0 2.2rem;border-top:1px solid var(--line)}.concept:last-child{border-bottom:1px solid var(--line)}.concept h2{margin:0 0 .65rem;font-size:1.55rem;font-weight:400}.concept p{font-size:.96rem;margin:0}.concept .meta{display:block;margin-bottom:1.1rem;color:var(--teal)}.concept:hover h2{text-decoration:underline;text-underline-offset:.18em}.roadmap{margin-top:5rem}.roadmap ul{list-style:none;margin:1.5rem 0 0;padding:0}.roadmap li{padding:.85rem 0;border-top:1px solid var(--line);color:var(--muted);font-size:.98rem;line-height:1.55;display:flex;justify-content:space-between;gap:1.5rem}.roadmap li:last-child{border-bottom:1px solid var(--line)}.roadmap li b{color:var(--fg);font-weight:400}.roadmap .eq{font:12px ui-monospace,"Cascadia Code",monospace;color:var(--muted);white-space:nowrap;align-self:center}.roadmap .status{font:11px ui-monospace,"Cascadia Code",monospace;text-transform:uppercase;letter-spacing:.05em;color:var(--teal);white-space:nowrap;align-self:center}.foot{font:12px ui-monospace,"Cascadia Code",monospace;color:var(--muted);margin-top:4rem}@media(max-width:650px){body{padding-top:3rem}.grid{grid-template-columns:1fr;margin-top:3rem}.roadmap li{flex-direction:column;gap:.3rem}}
+  /* Tokens, type and topbar are the shared set from STYLE_GUIDE.md — kept byte-identical to
+     straw-hose-flow.html so the index reads as the same site as the pages it links to. */
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1040px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  /* Title block: the site's one "title + one subtitle paragraph", sized a step larger than a
+     visualization page's h1 since this is the cover rather than a figure caption. */
+  .head{margin:clamp(48px,9vw,104px) 0 clamp(40px,6vw,72px)}
+  h1{font-weight:300;font-size:clamp(2.2rem,5.4vw,3.6rem);line-height:1.02;letter-spacing:-.025em;margin:0}
+  .sub{font-size:clamp(.94rem,1.1vw,1.06rem);line-height:1.6;color:var(--muted2);max-width:56ch;margin:18px 0 0;text-wrap:pretty}
+
+  /* Concept list: hairline rules only, no cards. The number/topic tag is muted; --accent is
+     reserved for the hover state, per the style guide's "one saturated color" rule. */
+  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 clamp(28px,4vw,56px)}
+  .concept{display:block;color:inherit;text-decoration:none;padding:22px 0 30px;border-top:1px solid var(--line)}
+  .concept:nth-last-child(-n+2){border-bottom:1px solid var(--line)}
+  .meta{display:block;font:11px ui-monospace,"Cascadia Code",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+  .concept h2{margin:0 0 9px;font-size:clamp(1.12rem,1.7vw,1.36rem);font-weight:400;line-height:1.22;letter-spacing:-.01em}
+  .concept p{margin:0;font-size:.95rem;line-height:1.6;color:var(--muted2);text-wrap:pretty}
+  .concept:hover h2{color:var(--accent)}
+  .concept:hover .meta{color:var(--accent)}
+
+  /* Roadmap: same hairline list, with the equation in mono so it reads as data, not prose. */
+  .roadmap{margin-top:clamp(56px,8vw,96px)}
+  .kicker{font:11px ui-monospace,"Cascadia Code",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+  .roadmap h2{font-weight:300;font-size:clamp(1.3rem,2.4vw,1.7rem);letter-spacing:-.02em;margin:0}
+  .roadmap .lede{font-size:.98rem;line-height:1.6;color:var(--muted2);max-width:56ch;margin:12px 0 0;text-wrap:pretty}
+  .roadmap ul{list-style:none;margin:28px 0 0;padding:0}
+  .roadmap li{padding:14px 0;border-top:1px solid var(--line);color:var(--muted2);font-size:.95rem;line-height:1.55;display:flex;justify-content:space-between;align-items:baseline;gap:clamp(16px,3vw,40px)}
+  .roadmap li:last-child{border-bottom:1px solid var(--line)}
+  .roadmap li b{color:var(--fg);font-weight:400}
+  .roadmap .eq{font:12px ui-monospace,"Cascadia Code",monospace;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap;margin-left:auto}
+  .roadmap .status{font:11px ui-monospace,"Cascadia Code",monospace;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);white-space:nowrap;min-width:4.2em;text-align:right}
+
+  .note{margin:clamp(40px,5vw,64px) 0 0;max-width:88ch;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+
+  /* Below ~480px the three topbar items wrap onto two lines; the count is the expendable one. */
+  @media (max-width:480px){
+    .topbar .count{display:none}
+  }
+  @media (max-width:760px){
+    .grid{grid-template-columns:1fr}
+    .concept:nth-last-child(-n+2){border-bottom:0}
+    .concept:last-child{border-bottom:1px solid var(--line)}
+    .roadmap li{flex-wrap:wrap;gap:6px 16px}
+    .roadmap .eq{margin-left:0}
+    .roadmap .status{min-width:0;text-align:left}
+  }
 </style>
 <main>
-  <div class="kicker">Interactive physical ideas</div>
-  <h1>Physics you can see.</h1>
-  <p>Small, honest experiments for concepts that are usually hidden inside numbers. Each page starts with one question, then lets you move the quantities yourself.</p>
+<div class="wrap">
+
+  <div class="topbar">
+    <span>Physics you can see</span>
+    <div class="topbar-right">
+      <span class="count">Twelve equations</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="head">
+    <h1>Physics you can see.</h1>
+    <p class="sub">Small, honest experiments for concepts that are usually hidden inside numbers. Each page starts with one question, then lets you move the quantities yourself.</p>
+  </div>
+
   <section class="grid" aria-label="Concepts">
     <a class="concept" href="visualizations/earth-moon-race.html"><span class="meta">01 / Speed</span><h2>Earth to the Moon, at real speed</h2><p>Watch light cross the Earth&ndash;Moon gap, and magnify the tiny first part of the same journey for slower travellers.</p></a>
     <a class="concept" href="visualizations/planet-light-delay.html"><span class="meta">02 / Light and distance</span><h2>You are seeing the past</h2><p>Choose a planet and compare where its light began with where that planet is now.</p></a>
@@ -27,8 +114,8 @@
 
   <section class="roadmap" aria-label="Roadmap">
     <div class="kicker">What's next</div>
-    <h2 class="roadmap-h">More equations, waiting their turn.</h2>
-    <p>Ideas for future pages &mdash; each one an equation you can feel by dragging a slider, not just read.</p>
+    <h2>More equations, waiting their turn.</h2>
+    <p class="lede">Ideas for future pages &mdash; each one an equation you can feel by dragging a slider, not just read.</p>
     <ul>
       <li><span><b>Why the sky is blue</b> &mdash; and why sunsets turn red through the same scattering</span><span class="eq">I &prop; 1/&lambda;&#8308;</span><span class="status">idea</span></li>
       <li><span><b>Terminal velocity</b> &mdash; why a skydiver falls at a fixed top speed, belly-flop vs head-first</span><span class="eq">v = &radic;(2mg/&rho;AC<sub>d</sub>)</span><span class="status">idea</span></li>
@@ -42,5 +129,35 @@
     </ul>
   </section>
 
-  <div class="foot">Every visual is self-contained, approximate only where stated, and designed to be played with.</div>
+  <p class="note">Every visual is self-contained, approximate only where stated, and designed to be played with. Each page is a single HTML file with no build step and no external dependencies &mdash; open one directly in a browser and it works.</p>
+
+</div>
 </main>
+<script>
+(function(){
+  // Theme toggle: overrides prefers-color-scheme, remembers the choice. Same pattern as every
+  // visualization page (STYLE_GUIDE.md), with its own storage key.
+  var STORAGE_KEY = 'index-theme';
+  var themeToggle = document.getElementById('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    // Read the applied DOM state first. If localStorage is unavailable (sandboxed iframe,
+    // private browsing, blocked cookies) falling straight through to the system preference
+    // would pin the toggle to one direction and it could never switch back.
+    var applied = document.documentElement.getAttribute('data-theme');
+    if(applied) return applied;
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+})();
+</script>

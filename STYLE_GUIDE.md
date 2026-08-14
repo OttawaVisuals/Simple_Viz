@@ -116,12 +116,23 @@ Stack to a single column below ~700–820px; see the `@media` queries in
 monospace/uppercase style. Labels itself with the mode it will switch *to* ("Dark mode" /
 "Light mode"), not the current mode. Persist the explicit choice in `localStorage` so it
 survives reloads, and let the initial state still follow `prefers-color-scheme` until the
-user overrides it:
+user overrides it.
+
+**`currentTheme()` must read the applied DOM attribute before it reads storage.** The obvious
+version — go straight to `localStorage`, fall back to `prefers-color-scheme` — has a bug that
+only shows up where storage is blocked: a sandboxed iframe (which is how these render when
+published as Artifacts), Safari private browsing, or blocked cookies. There the `catch` leaves
+`stored` null on *every* call, so `currentTheme()` keeps returning the system preference no
+matter what the user clicked, and the toggle can only ever move in one direction. Reading the
+live `data-theme` attribute first makes the control work with storage entirely unavailable;
+storage then only carries the choice across reloads, which is all it was ever for.
 
 ```js
 var STORAGE_KEY = 'PAGE-NAME-theme'; // unique per page
 function systemPrefersDark(){ return matchMedia('(prefers-color-scheme: dark)').matches; }
 function currentTheme(){
+  var applied = document.documentElement.getAttribute('data-theme');
+  if(applied) return applied;                 // ← the live state wins; see note above
   var stored = null; try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
   return stored || (systemPrefersDark() ? 'dark' : 'light');
 }

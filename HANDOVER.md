@@ -248,6 +248,58 @@ Built in parallel directly to the [STYLE_GUIDE.md](STYLE_GUIDE.md) skeleton, no 
 
 All six were added to `index.html`'s main grid (numbered 07–12) and removed from the roadmap list in the same edit.
 
+### Correctness sweep (2026-08-14, after the six-page batch)
+
+A full review of all twelve pages plus `index.html`. Fixes applied:
+
+- **Missing document head, all 13 files.** None had a doctype, charset, viewport, or `lang` —
+  so every page rendered in quirks mode, all mobile CSS/`geom()` breakpoints were dead, and
+  the raw UTF-8 characters in the JS string literals were one missing HTTP header away from
+  mojibake. The required four-line head is now documented in
+  [STYLE_GUIDE.md](STYLE_GUIDE.md#required-document-head); start every new page with it.
+- **`gravity-lab.html`: the Earth + Moon preset was wrong by 5×.** `m2` was `10^22.17`
+  (1.48×10²² kg) instead of the Moon's 7.34×10²² kg (`10^22.866`), so the page reported
+  4.1×10¹⁹ N against a true 1.98×10²⁰ N. All three presets now carry 3-decimal exponents, and
+  the sliders were raised from 2 to 3 decimals to match — at 2 dp a log10 exponent can't
+  resolve better than ~2%, so the presets literally could not land on the real values without
+  desyncing the thumb from the readout (the same failure mode recorded under
+  `eratosthenes-shadow.html`). Earth+Moon and Earth+Sun now both land within 0.2%.
+- **`mass-energy.html`: the "100 kg" preset printed `8.99e+3 PJ`.** `fmtEnergy` stopped at PJ,
+  and `toPrecision(3)` flips to exponential notation once the exponent reaches the precision —
+  so it rendered scientific notation nested inside an already-scientific unit. Added EJ and ZJ
+  buckets (1 kg alone is 9×10¹⁶ J and the slider reaches 1,000 kg). The "coin" preset was also
+  100 g; now 7.9 g.
+- **`planet-light-delay.html`: the Sun used the wrong reference frame.** Its speed was 220 km/s,
+  the Sun's orbit around the *galactic centre* — but Earth is carried along with that, so it
+  cancels and can't produce apparent drift. Every other object uses a speed relative to Earth
+  (which is what the legend row claims). Now 29.78 km/s, Earth's own orbital speed. The note
+  and the Sun's result line both explain the frame explicitly, since this is exactly the kind
+  of thing that looks like a bigger, more impressive number if you don't think about it.
+- **`rocket-equation.html`: presets named after real vehicles carried invented mass ratios.**
+  "Saturn V, 1st stage" used R=10 → 6,908 m/s, when the S-IC's real 2,970 t → 893 t gives
+  R=3.33 → 3,609 m/s. "Dawn" used R=2.2 → 23,654 m/s against its real R=1.54 → 12,953 m/s.
+  "Shuttle main engine" is an *engine*, not a stage, so no mass ratio is well-defined for it at
+  all — replaced with the Centaur upper stage (23.2 t / 2.25 t, R=10.3). The corrected Saturn V
+  number is also a better story: one stage buys a third of the way to orbit, which is why it
+  needs two more above it.
+- **`horizon-distance.html`**: the note bounded the h² error "well under 1% even at airliner
+  altitude" but the slider runs to 500 km and the ISS preset sits at 408 km, where the figure
+  reads ~2% low against the sight line and the along-the-ground distance is 3% shorter again.
+  The note now states which distance `d` is and gives the numbers at the top of the range.
+- **`ocean-salt.html`**: removed a dead `ticksG.appendChild.bind(ticksG);` statement and two
+  unused arrays; `buildStaticHero()` was tearing down and rebuilding all tick/reference DOM on
+  every animation frame and is now gated on width; the rAF tween now parks itself when it
+  lands instead of holding a frame callback open for the life of the page.
+- **`keplers-third-law.html`**: the subtitle's "only about 78 times farther out" is measured
+  from Mercury, not Earth, which wasn't stated; reworded and the 690× period ratio added.
+
+Known, **not** fixed (see the review notes for detail): sliders declare `role="slider"` but set
+no `aria-valuenow`/`valuemin`/`valuemax`/`valuetext`; only `earth-moon-race.html` honours
+`prefers-reduced-motion`; the `← Physics you can see` back link 404s when a page is published
+standalone as an Artifact; and `index.html` is still on its own pre-migration palette
+(near-black `#0b0d10`, its own `--light`/`--teal` tokens, no theme toggle) despite this file
+previously claiming every page shares the style guide.
+
 ## Roadmap
 
 A running list of future equation pages now lives directly in `index.html`, in a "What's
@@ -275,7 +327,10 @@ single equation, so its visual form needs more thought than the others).
   [STYLE_GUIDE.md](STYLE_GUIDE.md) — the user confirmed straw-hose-flow.html's v5 design as
   the site's style going forward. `earth-moon-race.html` was migrated the same day, and
   `gravity-lab.html`, `mass-energy.html`, and `planet-light-delay.html` followed in a
-  dedicated sweep later that day (see above) — every page on the site now shares this style.
+  dedicated sweep later that day (see above) — every page in `visualizations/` now shares this
+  style. **`index.html` itself was never migrated** and is still on the original dark-first
+  palette with its own token set and no theme toggle; it's the one remaining page that doesn't
+  match, and it's the first one anyone sees.
 - The zoom window in `earth-moon-race.html` is a **fixed** 1,500 km (not auto-scaling to
   keep fast objects in frame) — deliberate simplification. If a future request wants the
   probe to stay visible the whole time, an auto-zoom-out camera is the next thing to try,

@@ -1,3 +1,7 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The pull between worlds</title>
 <style>
   :root{
@@ -241,7 +245,8 @@
 
   var NS='http://www.w3.org/2000/svg';
 
-  var state = { m1e:24.78, m2e:22.17, re:8.58, active:null, drag:null };
+  // exponents (base 10) of the SI values: Earth 5.97e24 kg, Moon 7.34e22 kg, mean separation 3.84e8 m
+  var state = { m1e:24.776, m2e:22.866, re:8.585, active:null, drag:null };
   var heroW = 0;
 
   var $ = function(id){ return document.getElementById(id); };
@@ -353,7 +358,9 @@
       var rr = track.getBoundingClientRect();
       var f = clamp((x-rr.left)/rr.width, 0, 1);
       var v = lo + f*(hi-lo);
-      v = clamp(Math.round(v*100)/100, lo, hi);
+      // 3 decimals, not 2: these are log10 exponents, so the last digit is worth ~0.2% of the
+      // value. At 2 dp the real-world presets couldn't land on their true masses.
+      v = clamp(Math.round(v*1000)/1000, lo, hi);
       if(key==='m1') state.m1e=v; else if(key==='m2') state.m2e=v; else state.re=v;
       render();
     }
@@ -376,7 +383,7 @@
       else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = cur+step;
       else if(e.key==='Home') v = lo;
       else if(e.key==='End') v = hi;
-      if(v!==null){ e.preventDefault(); v = clamp(Math.round(v*100)/100, lo, hi); if(key==='m1') state.m1e=v; else if(key==='m2') state.m2e=v; else state.re=v; render(); }
+      if(v!==null){ e.preventDefault(); v = clamp(Math.round(v*1000)/1000, lo, hi); if(key==='m1') state.m1e=v; else if(key==='m2') state.m2e=v; else state.re=v; render(); }
     });
     return {
       draw: function(){
@@ -420,8 +427,8 @@
   document.querySelectorAll('.preset').forEach(function(b){
     var presets = {
       people:{m1:2, m2:2, r:0},
-      earthmoon:{m1:24.78, m2:22.17, r:8.58},
-      earthsun:{m1:24.78, m2:30.3, r:11.17}
+      earthmoon:{m1:24.776, m2:22.866, r:8.585},
+      earthsun:{m1:24.776, m2:30.299, r:11.175}
     };
     b.addEventListener('click', function(){
       var p = presets[b.dataset.p];

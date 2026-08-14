@@ -1,3 +1,7 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>You are seeing the past</title>
 <style>
   :root{
@@ -196,7 +200,7 @@
     <button class="preset" data-p="andromeda">Andromeda galaxy</button>
   </div>
 
-  <p class="note" id="note">Light takes time t = d/c to cross the distance d; during that time, an object moving at speed v drifts s = vt from where its light shows it. The slider spans a representative near-to-far distance range for each object. Distance in the diagram is compressed so both bodies fit on screen, but the drift offset is drawn to the object's own diameter, honestly &mdash; when that offset is too small to see (Andromeda's proper motion barely moves it during ~2.5 million years of light-travel time relative to its own vast size), a magnified inset makes it legible.</p>
+  <p class="note" id="note">Light takes time t = d/c to cross the distance d; during that time, an object moving at speed v drifts s = vt from where its light shows it. The slider spans a representative near-to-far distance range for each object. Every speed here is a speed <em style="font-style:italic">relative to Earth</em>, which is what determines how far an object appears to have shifted &mdash; motion Earth shares doesn't count. That's why the Sun uses Earth's own 29.8&nbsp;km/s orbital speed rather than the Sun's 220&nbsp;km/s orbit around the galactic centre, which Earth is carried along with; for the planets, their orbital speed is a close enough stand-in for the full relative velocity. Distance in the diagram is compressed so both bodies fit on screen, but the drift offset is drawn to the object's own diameter, honestly &mdash; when that offset is too small to see (Andromeda's proper motion barely moves it during ~2.5 million years of light-travel time relative to its own vast size), a magnified inset makes it legible.</p>
 
 </div>
 </main>
@@ -209,7 +213,9 @@
     Jupiter:{min:4.203*AU, max:6.203*AU, speed:13.07, diameter:139820, icon:'jupiter'},
     Saturn:{min:8.537*AU, max:10.537*AU, speed:9.69, diameter:116460, icon:'saturn'},
     Neptune:{min:29.07*AU, max:31.07*AU, speed:5.43, diameter:49244, icon:'neptune'},
-    Sun:{min:147.1e6, max:152.1e6, speed:220, diameter:1392700, icon:'sun'},
+    // The Sun's 220 km/s orbit around the galactic centre is NOT usable here: Earth carries that
+    // motion too, so it cancels. Relative to Earth the Sun moves at Earth's own orbital speed.
+    Sun:{min:147.1e6, max:152.1e6, speed:29.78, diameter:1392700, icon:'sun'},
     Andromeda:{min:2.49e6*LY, max:2.55e6*LY, speed:110, diameter:220000*LY, icon:'galaxy'}
   };
   var ORDER = ['Moon','Mars','Jupiter','Saturn','Neptune','Sun','Andromeda'];
@@ -488,6 +494,8 @@
     verdictSubEl.textContent = 'the real '+state.obj+' moved '+fmtDist(driftKm())+' during the '+fmtTime(lightTime())+' its light spent crossing to Earth.';
     effortLineEl.textContent = state.obj==='Andromeda'
       ? 'Andromeda’s proper motion is simplified here as 110 km/s; its diameter is so vast that this offset stays tiny even across ~2.5 million years of light-travel time.'
+      : state.obj==='Sun'
+      ? 'every speed here is measured relative to Earth — the Sun’s 220 km/s orbit around the galaxy doesn’t count, since Earth is carried along with it.'
       : 'the object and its drift are drawn to consistent scale against each other; only the Earth–object gap is compressed to fit.';
   }
 

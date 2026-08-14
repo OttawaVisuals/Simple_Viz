@@ -19,6 +19,30 @@ with no external dependencies — that rules out a shared stylesheet the pages `
 This file exists to document the pattern in one place anyway; copy the relevant CSS/HTML/JS
 straight into each new page's own inline `<style>`/`<script>`.
 
+## Required document head
+
+**Every page must start with exactly these four lines, before `<title>`.** They were missing
+from all thirteen pages until 2026-08-14 and each omission was doing real damage:
+
+```html
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+```
+
+- **`<!doctype html>`** — without it browsers render in quirks mode (`document.compatMode`
+  returns `"BackCompat"`, verified). The layouts happen to survive it, but nothing here is
+  designed against quirks-mode box/inline rules and there is no reason to gamble.
+- **`<meta charset="utf-8">`** — these files are UTF-8 and carry raw `η`, `μ`, `Δ`, `ρ`,
+  `⁰¹²³⁴⁵⁶⁷⁸⁹`, `≈` and em dashes *inside JS string literals*, not just as HTML entities.
+  Served over HTTP with no charset declaration, Chrome falls back to windows-1252 in Western
+  locales and the legends and readouts turn to mojibake.
+- **`<meta name="viewport" ...>`** — without it mobile browsers lay out at a 980px viewport
+  and zoom out, which silently disables every `@media (max-width:…)` rule *and* every
+  `w < 620` narrow branch inside the `geom()` functions. All the mobile work was dead code.
+- **`<html lang="en">`** — screen reader pronunciation.
+
 ## Design tokens
 
 Every page defines the same CSS custom properties, with light as the default and dark as an

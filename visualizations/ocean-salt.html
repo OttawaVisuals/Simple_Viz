@@ -1,3 +1,7 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Draining the ocean's salt onto dry land</title>
 <style>
   :root{
@@ -233,13 +237,13 @@
 
   function y(h,g){ return g.plotBottom - pos(h)*g.plotH; }
 
-  var tickEls=[], tickLabelEls=[];
-  var refLineEls=[], refLabelEls=[];
+  // The axis ticks and reference lines depend only on the hero's width, so they are rebuilt on
+  // resize rather than on every animation frame of the column tween.
+  var builtW = null;
 
   function buildStaticHero(g){
     // decade ticks
-    ticksG.innerHTML=''; ticksG.appendChild.bind(ticksG);
-    tickEls=[]; tickLabelEls=[];
+    ticksG.innerHTML='';
     var decLabels = {1:'10 m',2:'100 m',3:'1 km',4:'10 km',5:'100 km'};
     for(var d=LOGMIN; d<=LOGMAX; d++){
       var ty = g.plotBottom - (d-LOGMIN)/(LOGMAX-LOGMIN)*g.plotH;
@@ -267,7 +271,7 @@
     heroSvg.setAttribute('viewBox','0 0 '+w+' '+g.vbH);
     heroSvg.setAttribute('preserveAspectRatio','none');
 
-    buildStaticHero(g);
+    if(builtW !== w){ buildStaticHero(g); builtW = w; }
 
     groundRect.setAttribute('x', g.colX-2); groundRect.setAttribute('y', g.plotBottom);
     groundRect.setAttribute('width', g.colW+4); groundRect.setAttribute('height', g.groundH);
@@ -405,18 +409,22 @@
   applyTheme(currentTheme());
 
   // ---- animation: tween the displayed hero height toward the target ----
+  // The tween parks itself once it lands on the target, instead of holding a frame callback
+  // open for the life of the page; picking a new area restarts it.
   var rafId = null;
   function tick(){
-    rafId = requestAnimationFrame(tick);
     var target = area().h;
     var diff = target - state.dispH;
     if(Math.abs(diff) < Math.max(0.5, target*0.001)){
+      rafId = null;
       if(state.dispH !== target){ state.dispH = target; drawHero(); }
       return;
     }
     state.dispH += diff*0.12;
     drawHero();
+    rafId = requestAnimationFrame(tick);
   }
+  function startTween(){ if(rafId === null) rafId = requestAnimationFrame(tick); }
 
   function measure(){
     var w = heroWrap.clientWidth;
@@ -428,6 +436,7 @@
     drawAreaButtons();
     drawResult();
     drawHero();
+    startTween();
   }
 
   new ResizeObserver(measure).observe(heroWrap);
@@ -436,6 +445,5 @@
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
 
   render();
-  rafId = requestAnimationFrame(tick);
 })();
 </script>

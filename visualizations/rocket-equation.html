@@ -1,3 +1,7 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Why one more passenger costs so much fuel</title>
 <style>
   :root{
@@ -204,11 +208,11 @@
   <div class="presets">
     <span class="presets-title">Try</span>
     <button class="preset" data-p="saturn">Saturn V, 1st stage</button>
-    <button class="preset" data-p="shuttle">Shuttle main engine</button>
+    <button class="preset" data-p="centaur">Centaur upper stage</button>
     <button class="preset" data-p="dawn">Dawn (in-space cruise)</button>
   </div>
 
-  <p class="note">The <a href="https://en.wikipedia.org/wiki/Tsiolkovsky_rocket_equation" target="_blank" rel="noopener">Tsiolkovsky rocket equation</a> says the velocity a rocket can gain, &Delta;v, is its exhaust velocity v<sub>e</sub> times the natural log of its mass ratio R = m&#8320;/m<sub>f</sub> (wet mass over dry mass). Because it's a <em style="font-style:italic">log</em>, not a straight line, each extra unit of &Delta;v costs proportionally more propellant than the last &mdash; this is the "tyranny of the rocket equation": fuel to carry fuel is itself mass, and that mass needs its own fuel to move, compounding exponentially. It's why a small increase in payload (or required speed) can demand a disproportionate increase in tank size. The reference line at 9.4&nbsp;km/s is the standard estimate for reaching low Earth orbit from the ground &mdash; it already bakes in gravity and aerodynamic drag losses on top of the roughly 7.8&nbsp;km/s of raw orbital velocity needed. The ion drive option shown here represents realistic in-space cruise &Delta;v budgets (like NASA's Dawn spacecraft), not launch capability: its thrust is far too low to lift a rocket off a planet's surface, so it only ever flies after a chemical rocket has already reached orbit.</p>
+  <p class="note">The <a href="https://en.wikipedia.org/wiki/Tsiolkovsky_rocket_equation" target="_blank" rel="noopener">Tsiolkovsky rocket equation</a> says the velocity a rocket can gain, &Delta;v, is its exhaust velocity v<sub>e</sub> times the natural log of its mass ratio R = m&#8320;/m<sub>f</sub> (wet mass over dry mass). Because it's a <em style="font-style:italic">log</em>, not a straight line, each extra unit of &Delta;v costs proportionally more propellant than the last &mdash; this is the "tyranny of the rocket equation": fuel to carry fuel is itself mass, and that mass needs its own fuel to move, compounding exponentially. It's why a small increase in payload (or required speed) can demand a disproportionate increase in tank size. The reference line at 9.4&nbsp;km/s is the standard estimate for reaching low Earth orbit from the ground &mdash; it already bakes in gravity and aerodynamic drag losses on top of the roughly 7.8&nbsp;km/s of raw orbital velocity needed. The ion drive option shown here represents realistic in-space cruise &Delta;v budgets (like NASA's Dawn spacecraft), not launch capability: its thrust is far too low to lift a rocket off a planet's surface, so it only ever flies after a chemical rocket has already reached orbit. The three presets use those vehicles' real wet and dry masses &mdash; the Saturn V's first stage moves a 2,970-tonne stack down to 893 tonnes and still only buys about 3.6&nbsp;km/s, roughly a third of the way to orbit, which is exactly why it needs two more stages above it. These are ideal &Delta;v figures: a real launch also spends 1&ndash;2&nbsp;km/s fighting gravity and drag, which is already accounted for in the 9.4&nbsp;km/s reference line.</p>
 
 </div>
 </main>
@@ -550,10 +554,14 @@
 
   // ---- presets ----
   document.querySelectorAll('.preset').forEach(function(b){
+    // Mass ratios are the real vehicles' wet/dry masses, not illustrative round numbers:
+    //  Saturn V S-IC — 2,970 t stack at liftoff / 893 t at S-IC burnout (2,077 t propellant)
+    //  Centaur III   — 23.2 t gross / 2.25 t dry, a clean single hydrolox stage
+    //  Dawn          — 1,218 kg launch / 793 kg dry (425 kg of xenon)
     var presets = {
-      saturn:{e:1,r:10},
-      shuttle:{e:2,r:6},
-      dawn:{e:3,r:2.2}
+      saturn:{e:1,r:3.33},
+      centaur:{e:2,r:10.3},
+      dawn:{e:3,r:1.54}
     };
     b.addEventListener('click', function(){
       var p = presets[b.dataset.p];

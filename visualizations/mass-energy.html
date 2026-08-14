@@ -1,3 +1,7 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>How much energy is in matter</title>
 <style>
   :root{
@@ -161,7 +165,7 @@
   <div class="presets">
     <span class="presets-title">Try</span>
     <button class="preset" data-m="-3">paperclip</button>
-    <button class="preset" data-m="-1">coin</button>
+    <button class="preset" data-m="-2.1">coin</button>
     <button class="preset" data-m="0">1 kg</button>
     <button class="preset" data-m="2">100 kg</button>
   </div>
@@ -183,6 +187,10 @@
     return kg.toFixed(kg<10?2:0)+' kg';
   }
   function fmtEnergy(j){
+    // buckets must run past PJ: 1 kg alone is 9e16 J, and the slider reaches 1,000 kg (9e19 J).
+    // Without ZJ/EJ, toPrecision(3) flips to exponential inside an already-scientific unit.
+    if(j>=1e21) return [(j/1e21).toPrecision(3),'ZJ'];
+    if(j>=1e18) return [(j/1e18).toPrecision(3),'EJ'];
     if(j>=1e15) return [(j/1e15).toPrecision(3),'PJ'];
     if(j>=1e12) return [(j/1e12).toPrecision(3),'TJ'];
     if(j>=1e9) return [(j/1e9).toPrecision(3),'GJ'];

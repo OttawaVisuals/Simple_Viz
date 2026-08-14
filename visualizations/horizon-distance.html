@@ -1,0 +1,481 @@
+<title>Why standing up lets you see farther</title>
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  .topgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
+
+  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqn{display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);font-size:clamp(30px,4vw,46px);line-height:1;font-weight:300}
+  .eqn .eq{color:var(--muted)}
+  .eqn .rad{display:inline-flex;align-items:center}
+  .eqn .radsign{font-size:1.1em;font-weight:300}
+  .eqn .radbar{border-top:1.5px solid var(--fg);padding:0 .12em 0 .06em}
+  .eqn .radinner{display:flex;align-items:center;gap:.1em;padding-top:.05em}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .eqn sup{font-size:.5em;position:relative;top:-.5em}
+
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:1.6em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:8px 2px}
+  .legend .sym{font-size:17px;font-weight:300;transition:color .2s}
+  .legend .name{font-size:12.5px;color:var(--muted2)}
+  .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero svg{width:100%;height:auto;display:block}
+  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
+
+  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
+
+  .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;transition:color .2s}
+  .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
+  .readout{font-family:ui-monospace,monospace;font-size:clamp(26px,2.8vw,34px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
+  .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
+  .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
+  .track .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
+  .track .thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
+  .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
+
+  .result{text-align:left}
+  .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
+  .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
+  .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
+  .gauge{position:relative;height:56px;margin-top:16px;max-width:420px}
+  .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
+  .gauge .reach{position:absolute;top:14px;height:10px;border-radius:2px 0 0 2px;background:color-mix(in srgb, var(--accent) 16%, transparent);left:0}
+  .gauge .tick{position:absolute;top:26px;width:1px;height:5px;background:var(--line2)}
+  .gauge .ticklabel{position:absolute;top:33px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
+  .gauge .limit{position:absolute;top:9px;height:20px;width:1px;background:var(--line2)}
+  .gauge .limitlabel{position:absolute;top:0;white-space:nowrap;font:400 9px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted2)}
+  .gauge .mark{position:absolute;top:12px;height:14px;width:3px;border-radius:2px;background:var(--accent);transition:left .12s linear}
+  .gauge .marklabel{position:absolute;top:-3px;white-space:nowrap;font:500 11px ui-monospace,monospace;color:var(--accent);transition:left .12s linear}
+
+  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+  .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
+  .preset:hover{border-color:var(--accent);color:var(--accent)}
+
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;max-width:88ch;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../index.html">&larr; Physics you can see</a>
+    <div class="topbar-right">
+      <span>Horizon distance</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>Why standing up lets you see <em>farther</em>.</h1>
+      <p class="sub">Earth curves away beneath you, so the higher your eyes are, the farther out that curve lets you see before it drops from view &mdash; from about 4.6 km standing on a beach to over 2,000 km from the ISS.</p>
+    </div>
+
+    <div class="eqnbox">
+      <div class="eqn">
+        <em>d</em>
+        <span class="eq">=</span>
+        <span class="rad">
+          <span class="radsign">&radic;</span>
+          <span class="radbar"><span class="radinner"><span>2</span><em id="RTerm">R</em><em id="hTerm">h</em></span></span>
+        </span>
+      </div>
+    </div>
+
+    <div class="legendbox">
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="hero" id="heroWrap">
+    <div class="lbl" id="lblH"></div>
+    <div class="lbl" id="lblD" style="font-weight:500;color:var(--muted2)"></div>
+    <div class="lbl" id="lblScale" style="color:var(--muted)"></div>
+    <svg id="heroSvg" role="img" aria-label="A side-view diagram of an observer at height h above Earth's curved surface, with a line of sight running to the horizon at distance d.">
+      <path id="earthArc" fill="none" stroke="var(--line2)" stroke-width="1.5"></path>
+      <path id="earthFill" fill="var(--bg)"></path>
+      <line id="sightLine" stroke="var(--accent)" stroke-width="1.25" stroke-dasharray="4 4"></line>
+      <line id="stalk" stroke="var(--line2)" stroke-width="1.25"></line>
+      <circle id="groundPt" r="2.5" fill="var(--line2)"></circle>
+      <circle id="eyePt" r="4.5" fill="var(--accent)"></circle>
+      <circle id="horizonPt" r="3.5" fill="var(--fg)"></circle>
+      <circle id="refDot" r="1.5" fill="var(--muted)"></circle>
+    </svg>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrls">
+      <div class="ctrl" id="hCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Eye height <em id="hLabel">h</em></span>
+          <span class="ctrl-rel">log scale</span>
+        </div>
+        <div class="readout mono" id="hReadout"></div>
+        <div class="track" id="hTrack" tabindex="0" role="slider" aria-label="Eye height above the surface">
+          <div class="rail"></div>
+          <div class="fill" id="hFill"></div>
+          <div class="thumb" id="hThumb"></div>
+        </div>
+        <div class="track-range"><span>1 m</span><span class="mid">sea level &middot; up to orbit</span><span>500 km</span></div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Horizon distance</div>
+      <div class="result-value"><span class="num mono" id="dValue"></span><span class="unit mono" id="dUnit"></span></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+      <div class="gauge" id="gauge">
+        <div class="track"></div>
+        <div class="reach" id="gReach"></div>
+        <div class="limit" id="gLimit"></div>
+        <div class="limitlabel" id="gLimitLabel">English Channel, 34 km</div>
+        <div class="mark" id="gMark"></div>
+        <div class="marklabel mono" id="gMarkLabel"></div>
+        <div id="gTicks"></div>
+        <div id="gLabels"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-p="beach">person standing</button>
+    <button class="preset" data-p="lighthouse">lighthouse</button>
+    <button class="preset" data-p="everest">summit of Everest</button>
+    <button class="preset" data-p="airplane">airplane cruising altitude</button>
+    <button class="preset" data-p="iss">the ISS</button>
+  </div>
+
+  <p class="note">Distance to the horizon uses the flat-horizon approximation <span class="mono">d = &radic;(2Rh)</span>, valid because eye height h is tiny compared to Earth's radius R (6,371 km) across almost this whole range. The exact formula is <span class="mono">d = &radic;(2Rh + h&sup2;)</span>; dropping the h&sup2; term changes the answer by well under 1% even at airliner altitude. This also ignores atmospheric refraction, which bends light slightly around the curve and extends the real visible horizon by roughly 7% beyond the geometric value calculated here. The hero diagram is a schematic, not to true scale &mdash; Earth's actual curvature over these heights is far too gentle to draw a visible arc at 1:1. See <a href="https://en.wikipedia.org/wiki/Horizon#Distance_to_the_horizon" target="_blank" rel="noopener">Wikipedia: Horizon &mdash; Distance to the horizon</a>.</p>
+
+</div>
+</main>
+<script>
+(function(){
+  var R = 6371000; // Earth's radius, m (fixed constant)
+  var HMIN = 1, HMAX = 500000;
+  var LOGMIN = Math.log10(HMIN), LOGMAX = Math.log10(HMAX);
+  var REF = { name:'English Channel', val:34000, txt:'34 km' };
+  var GLOGMIN = 3, GLOGMAX = 6.4; // gauge covers ~1 km .. ~2,500 km
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+
+  function distanceFor(h){ return Math.sqrt(2*R*h); }
+
+  function fmtH(h){
+    if(h < 1000) return [h < 10 ? h.toFixed(2) : h < 100 ? h.toFixed(1) : Math.round(h).toString(), 'm'];
+    return [(h/1000).toPrecision(h>=100000?4:3), 'km'];
+  }
+  function fmtD(d){
+    if(d < 1000) return [d.toFixed(0), 'm'];
+    return [(d/1000).toPrecision(d/1000>=100?5:4), 'km'];
+  }
+
+  var NS='http://www.w3.org/2000/svg';
+  function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+
+  var state = { he: Math.log10(1.7), active:null, drag:null };
+  var heroW = 0;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
+  var earthArc=$('earthArc'), earthFill=$('earthFill'), sightLine=$('sightLine'), stalk=$('stalk');
+  var groundPt=$('groundPt'), eyePt=$('eyePt'), horizonPt=$('horizonPt'), refDot=$('refDot');
+  var lblH=$('lblH'), lblD=$('lblD'), lblScale=$('lblScale');
+
+  function h(){ return Math.pow(10, state.he); }
+  function d(){ return distanceFor(h()); }
+
+  // ---- hero geometry ----
+  // Schematic side view: a shallow arc represents Earth's surface. Height above it is drawn
+  // on a compressed log-ish scale so the effect reads at both h=1m and h=500km. Not to true scale.
+  function geom(w, hv){
+    var vbH = w < 620 ? 240 : 210;
+    var baseY = vbH - 34;
+    var arcSpan = w - 40;
+    var x0 = 20, x1 = w - 20;
+    var arcRise = w < 620 ? 20 : 28; // how much the arc bows down at the edges, purely schematic
+    var cx = w/2, cy = baseY + arcRise*2.4; // large radius arc through (x0,baseY),(cx,baseY),(x1,baseY)
+    // quadratic bezier control for a shallow symmetric arc
+    var ctrlY = baseY + arcRise;
+    var eyeX = x0 + arcSpan*0.16;
+    // observer height mapped to pixels on a log scale between hmin..hmax
+    var t = (state.he - LOGMIN) / (LOGMAX - LOGMIN); // 0..1
+    var maxRise = w < 620 ? 100 : 130;
+    var minRise = 10;
+    var eyeRise = minRise + t*(maxRise-minRise);
+    var eyeY = baseY - eyeRise;
+    // horizon point travels along the arc toward the right edge as t grows
+    var horizT = 0.34 + t*0.62; // fraction along arc from left
+    var horizX = x0 + arcSpan*horizT;
+    // horizon point y sits on the quadratic bezier: B(t)=(1-t)^2*P0+2(1-t)t*Pc+t^2*P2
+    function arcY(frac){
+      var p0=baseY, pc=ctrlY, p2=baseY;
+      return (1-frac)*(1-frac)*p0 + 2*(1-frac)*frac*pc + frac*frac*p2;
+    }
+    var horizY = arcY(horizT);
+    var dTxt = fmtD(distanceFor(hv));
+    var hTxt = fmtH(hv);
+    return {
+      w:w, vbH:vbH, x0:x0, x1:x1, baseY:baseY, ctrlY:ctrlY,
+      eyeX:eyeX, eyeY:eyeY, horizX:horizX, horizY:horizY,
+      dTxt:dTxt.join(' '), hTxt:hTxt.join(' '),
+      arcPath: 'M'+x0+','+baseY+' Q'+cx+','+ctrlY+' '+x1+','+baseY,
+      fillPath: 'M'+x0+','+baseY+' Q'+cx+','+ctrlY+' '+x1+','+baseY+' L'+x1+','+vbH+' L'+x0+','+vbH+' Z',
+      refX: x0 + arcSpan*0.06, refY: baseY - 3
+    };
+  }
+
+  function measure(){
+    var w = heroWrap.clientWidth;
+    if(w && w !== heroW){ heroW = w; render(); }
+  }
+
+  function drawHero(){
+    var w = heroW || heroWrap.clientWidth || 1100;
+    var hv = h();
+    var g = geom(w, hv);
+
+    heroSvg.setAttribute('viewBox','0 0 '+w+' '+g.vbH);
+    heroSvg.setAttribute('preserveAspectRatio','none');
+
+    earthArc.setAttribute('d', g.arcPath);
+    earthFill.setAttribute('d', g.fillPath);
+    earthFill.setAttribute('opacity', 0.5);
+
+    stalk.setAttribute('x1', g.eyeX); stalk.setAttribute('x2', g.eyeX);
+    stalk.setAttribute('y1', g.baseY); stalk.setAttribute('y2', g.eyeY);
+
+    sightLine.setAttribute('x1', g.eyeX); sightLine.setAttribute('y1', g.eyeY);
+    sightLine.setAttribute('x2', g.horizX); sightLine.setAttribute('y2', g.horizY);
+
+    groundPt.setAttribute('cx', g.eyeX); groundPt.setAttribute('cy', g.baseY);
+    eyePt.setAttribute('cx', g.eyeX); eyePt.setAttribute('cy', g.eyeY);
+    horizonPt.setAttribute('cx', g.horizX); horizonPt.setAttribute('cy', g.horizY);
+    refDot.setAttribute('cx', g.refX); refDot.setAttribute('cy', g.refY);
+
+    var px = function(x){ return (x/w*100)+'%'; };
+    var py = function(y){ return (y/g.vbH*100)+'%'; };
+    lblH.style.left = px(g.eyeX+10); lblH.style.top = py(g.eyeY-6);
+    lblH.textContent = 'h = '+g.hTxt;
+    lblD.style.left = px((g.eyeX+g.horizX)/2); lblD.style.top = py((g.eyeY+g.horizY)/2-16);
+    lblD.style.transform = 'translateX(-50%)';
+    lblD.textContent = 'd = '+g.dTxt;
+    lblScale.style.left = px(g.x0); lblScale.style.top = py(g.vbH-14);
+    lblScale.textContent = 'schematic — not to true scale';
+  }
+
+  // ---- equation + legend ----
+  var accent = 'var(--accent)';
+  var RTerm=$('RTerm'), hTerm=$('hTerm'), hLabel=$('hLabel');
+  var legendEl = $('legend');
+
+  function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
+
+  function drawEquationAndLegend(){
+    RTerm.style.color = activeColor('R');
+    hTerm.style.color = activeColor('h');
+    hLabel.style.color = activeColor('h');
+
+    var hv = h();
+    var hTxt = fmtH(hv);
+    var rows = [
+      {sym:'R', name:'Earth’s radius (fixed)', val:'6,371 km', key:'R'},
+      {sym:'h', name:'eye height above surface', val: hTxt[0]+' '+hTxt[1], key:'h'}
+    ];
+    legendEl.innerHTML = '';
+    rows.forEach(function(row){
+      var div = document.createElement('div'); div.className='row';
+      var sym = document.createElement('em'); sym.className='sym'; sym.textContent = row.sym;
+      sym.style.color = activeColor(row.key);
+      var name = document.createElement('span'); name.className='name'; name.textContent = row.name;
+      var val = document.createElement('span'); val.className='val mono'; val.textContent = row.val;
+      div.appendChild(sym); div.appendChild(name); div.appendChild(val);
+      legendEl.appendChild(div);
+    });
+  }
+
+  // ---- slider (log scale on h) ----
+  function makeSlider(track, fill, thumb){
+    var dragging = false;
+    function setFromClientX(x){
+      var r = track.getBoundingClientRect();
+      var f = clamp((x-r.left)/r.width, 0, 1);
+      var v = LOGMIN + f*(LOGMAX-LOGMIN);
+      state.he = clamp(v, LOGMIN, LOGMAX);
+      render();
+    }
+    track.addEventListener('pointerdown', function(e){
+      dragging = true;
+      if(track.setPointerCapture) track.setPointerCapture(e.pointerId);
+      state.drag = 'h'; state.active = 'h';
+      setFromClientX(e.clientX);
+    });
+    track.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
+    function endDrag(){ if(dragging){ dragging=false; state.drag=null; render(); } }
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+    track.addEventListener('pointerenter', function(){ state.active='h'; render(); });
+    track.addEventListener('keydown', function(e){
+      var step = (LOGMAX-LOGMIN)/100 * (e.shiftKey ? 5 : 1);
+      var v = null;
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown') v = state.he-step;
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = state.he+step;
+      else if(e.key==='Home') v = LOGMIN;
+      else if(e.key==='End') v = LOGMAX;
+      if(v!==null){ e.preventDefault(); state.he = clamp(v, LOGMIN, LOGMAX); render(); }
+    });
+    return {
+      draw: function(){
+        var pct = ((state.he-LOGMIN)/(LOGMAX-LOGMIN)*100).toFixed(2)+'%';
+        fill.style.width = pct; thumb.style.left = pct;
+      }
+    };
+  }
+  var hSlider = makeSlider($('hTrack'), $('hFill'), $('hThumb'));
+
+  $('hCtrl').addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+
+  // ---- result box ----
+  var dValueEl=$('dValue'), dUnitEl=$('dUnit'), verdictSubEl=$('verdictSub');
+  var gReach=$('gReach'), gLimit=$('gLimit'), gLimitLabel=$('gLimitLabel'), gMark=$('gMark'), gMarkLabel=$('gMarkLabel');
+  var gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
+
+  function pos(v){ return clamp((Math.log10(Math.max(v,1)) - GLOGMIN)/(GLOGMAX-GLOGMIN), 0, 1)*100; }
+
+  function drawResult(){
+    var dv = d();
+    var fp = fmtD(dv);
+    dValueEl.textContent = fp[0]; dUnitEl.textContent = fp[1];
+
+    var ratio = dv / REF.val;
+    var relTxt;
+    if(ratio >= 1.05) relTxt = ratio.toFixed(ratio<10?1:0)+'× the width of the '+REF.name;
+    else if(ratio <= 0.95) relTxt = (1/ratio).toFixed(ratio>0.1?1:0)+'× short of the '+REF.name;
+    else relTxt = 'about the width of the '+REF.name;
+    verdictSubEl.textContent = relTxt+'.';
+
+    var markPct = pos(dv);
+    var limitPct = pos(REF.val);
+    gReach.style.width = Math.min(markPct,100).toFixed(2)+'%';
+    gLimit.style.left = limitPct.toFixed(2)+'%';
+    gLimitLabel.style.left = clamp(limitPct,8,72).toFixed(2)+'%';
+    gMark.style.left = markPct.toFixed(2)+'%';
+    var labelPct = clamp(markPct,4,88);
+    gMarkLabel.style.left = labelPct.toFixed(2)+'%';
+    gMarkLabel.style.transform = markPct>72 ? 'translateX(-100%)' : markPct<20 ? 'translateX(0)' : 'translateX(-50%)';
+    gMarkLabel.textContent = fp[0]+' '+fp[1];
+
+    if(!gTicksEl.dataset.built){
+      var ticksHtml='', labelsHtml='';
+      for(var dd=Math.ceil(GLOGMIN); dd<=Math.floor(GLOGMAX); dd++){
+        var left = ((dd-GLOGMIN)/(GLOGMAX-GLOGMIN)*100).toFixed(2)+'%';
+        ticksHtml += '<div class="tick" style="left:'+left+'"></div>';
+        var tv = fmtD(Math.pow(10,dd));
+        var tx = dd<=Math.ceil(GLOGMIN) ? 'translateX(0)' : dd>=Math.floor(GLOGMAX) ? 'translateX(-100%)' : 'translateX(-50%)';
+        labelsHtml += '<div class="ticklabel" style="left:'+left+';transform:'+tx+'">'+tv[0]+' '+tv[1]+'</div>';
+      }
+      gTicksEl.innerHTML = ticksHtml; gTicksEl.dataset.built='1';
+      gLabelsEl.innerHTML = labelsHtml;
+    }
+  }
+
+  // ---- presets ----
+  document.querySelectorAll('.preset').forEach(function(b){
+    var presets = {
+      beach:{h:1.7},
+      lighthouse:{h:30},
+      everest:{h:8849},
+      airplane:{h:10000},
+      iss:{h:408000}
+    };
+    b.addEventListener('click', function(){
+      var p = presets[b.dataset.p];
+      state.he = Math.log10(p.h);
+      render();
+    });
+  });
+
+  // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
+  var STORAGE_KEY = 'horizon-distance-theme';
+  var themeToggle = $('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+
+  function render(){
+    drawHero();
+    drawEquationAndLegend();
+    hSlider.draw();
+    var hTxt = fmtH(h());
+    $('hReadout').textContent = hTxt[0]+' '+hTxt[1];
+    drawResult();
+  }
+
+  new ResizeObserver(measure).observe(heroWrap);
+  window.addEventListener('resize', measure);
+  [60,250,900].forEach(function(t){ setTimeout(measure, t); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  render();
+})();
+</script>

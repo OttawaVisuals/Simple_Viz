@@ -1,0 +1,590 @@
+<title>Why speed quadruples your stopping distance</title>
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  .topgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
+
+  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqn{display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);font-size:clamp(30px,4vw,46px);line-height:1;font-weight:300}
+  .eqn .eq{color:var(--muted)}
+  .eqn .frac{display:inline-flex;flex-direction:column;align-items:center}
+  .eqn .frac .row{display:flex;gap:.16em;align-items:flex-start}
+  .eqn .frac .num{padding:0 .3em .06em}
+  .eqn .frac .den{padding:.06em .3em 0}
+  .eqn .frac .bar{height:1.5px;background:var(--fg);width:100%}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .eqn sup{font-size:.5em;position:relative;top:-.5em}
+
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:1.6em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:8px 2px}
+  .legend .sym{font-size:17px;font-weight:300;transition:color .2s}
+  .legend .name{font-size:12.5px;color:var(--muted2)}
+  .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero svg{width:100%;height:auto;display:block}
+  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
+
+  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
+
+  .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;transition:color .2s}
+  .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
+  .fluid-buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .fluid-buttons button{cursor:pointer;font-family:Georgia,serif;font-style:italic;font-size:15px;padding:6px 13px 7px;border-radius:999px;transition:all .18s ease;border:1px solid var(--border);background:transparent;color:var(--muted)}
+  .fluid-buttons button:hover{color:var(--fg)}
+  .fluid-note{margin-top:11px;font-size:13.5px;line-height:1.45;color:var(--muted)}
+  .readout{font-family:ui-monospace,monospace;font-size:clamp(26px,2.8vw,34px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
+  .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
+  .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
+  .track .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
+  .track .thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
+  .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
+
+  .result{text-align:left}
+  .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
+  .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
+  .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px}
+  .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
+  .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
+  .gauge{position:relative;height:56px;margin-top:16px;max-width:420px}
+  .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
+  .gauge .reach{position:absolute;top:14px;height:10px;border-radius:2px 0 0 2px;background:color-mix(in srgb, var(--accent) 16%, transparent);left:0}
+  .gauge .tick{position:absolute;top:26px;width:1px;height:5px;background:var(--line2)}
+  .gauge .ticklabel{position:absolute;top:33px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
+  .gauge .limit{position:absolute;top:9px;height:20px;width:1px;background:var(--muted2)}
+  .gauge .limitlabel{position:absolute;top:0;white-space:nowrap;font:400 9px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted2)}
+  .gauge .ghost{position:absolute;top:11px;height:16px;width:1px;background:var(--line2)}
+  .gauge .mark{position:absolute;top:12px;height:14px;width:3px;border-radius:2px;transition:left .12s linear}
+  .gauge .marklabel{position:absolute;top:-3px;white-space:nowrap;font:500 11px ui-monospace,monospace;transition:left .12s linear}
+
+  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+  .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
+  .preset:hover{border-color:var(--accent);color:var(--accent)}
+
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;max-width:88ch;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../index.html">&larr; Physics you can see</a>
+    <div class="topbar-right">
+      <span>Uniform deceleration</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>Why speed <em>quadruples</em> your stopping distance.</h1>
+      <p class="sub">Braking distance grows with the square of speed &mdash; double how fast you're going and you need four times the road to stop, not twice. At 100 km/h on dry asphalt that's about 49 m of braking alone; on ice, nearly 400 m.</p>
+    </div>
+
+    <div class="eqnbox">
+      <div class="eqn">
+        <em>d</em>
+        <span class="eq">=</span>
+        <span class="frac">
+          <span class="row num"><em id="vTerm">v</em><sup>2</sup></span>
+          <span class="bar"></span>
+          <span class="row den"><span>2</span><em id="muTerm">&mu;</em><em id="gTerm">g</em></span>
+        </span>
+      </div>
+    </div>
+
+    <div class="legendbox">
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="hero" id="heroWrap">
+    <div class="lbl" id="lblReact" style="transform:translateX(-50%)"></div>
+    <div class="lbl" id="lblBrake" style="transform:translateX(-50%)"></div>
+    <div class="lbl" id="lblPitch" style="transform:translateX(-50%)">&#9917; pitch &middot; 105 m</div>
+    <svg id="heroSvg" role="img" aria-label="A car travels a reaction-distance stretch at constant speed, then decelerates to a stop over the braking-distance stretch, colored by the selected road surface.">
+      <line id="roadFull" stroke="var(--line)" stroke-width="3" stroke-linecap="round"></line>
+      <line id="reactSeg" stroke="var(--muted2)" stroke-width="4" stroke-linecap="round" stroke-dasharray="2 6" opacity="0.85"></line>
+      <line id="brakeSeg" stroke-width="6" stroke-linecap="round"></line>
+      <line id="pitchLine" stroke="var(--line2)" stroke-width="1" stroke-dasharray="3 4"></line>
+      <line id="startTick" stroke="var(--line2)" stroke-width="1"></line>
+      <line id="endTick" stroke-width="1.5"></line>
+      <g id="carIcon">
+        <rect id="carBody" x="-20" y="-20" width="26" height="13" rx="3" fill="var(--fg)"></rect>
+        <rect id="carCabin" x="-14" y="-27" width="14" height="9" rx="2.5" fill="var(--fg)"></rect>
+        <circle id="wheel1" cx="-12" cy="-4" r="3.4" fill="var(--muted2)"></circle>
+        <circle id="wheel2" cx="1" cy="-4" r="3.4" fill="var(--muted2)"></circle>
+      </g>
+    </svg>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrls">
+      <div class="ctrl" id="speedCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Speed <em id="vLabel">v</em></span>
+          <span class="ctrl-rel">d &prop; v&sup2;</span>
+        </div>
+        <div class="readout mono" id="vReadout"></div>
+        <div class="track" id="vTrack" tabindex="0" role="slider" aria-label="Speed">
+          <div class="rail"></div>
+          <div class="fill" id="vFill"></div>
+          <div class="thumb" id="vThumb"></div>
+        </div>
+        <div class="track-range"><span>10 km/h</span><span class="mid">double v &middot; 4&times; the braking distance</span><span>200 km/h</span></div>
+      </div>
+
+      <div class="ctrl" id="surfCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Surface <em id="muLabel">&mu;</em></span>
+          <span class="ctrl-rel">1/&mu; &prop; d</span>
+        </div>
+        <div class="fluid-buttons" id="surfButtons"></div>
+        <div class="fluid-note" id="surfNote"></div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Braking distance</div>
+      <div class="result-value"><span class="num mono" id="dValue"></span><span class="unit mono" id="dUnit">m</span><span class="v" id="dRatio"></span></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+      <div class="effort-line" id="effortLine"></div>
+      <div class="gauge" id="gauge">
+        <div class="track"></div>
+        <div class="reach" id="gReach"></div>
+        <div class="limit" id="gLimit"></div>
+        <div class="limitlabel" id="gLimitLabel">football pitch &middot; 105 m</div>
+        <div class="ghost" id="gGhost"></div>
+        <div class="mark" id="gMark"></div>
+        <div class="marklabel mono" id="gMarkLabel"></div>
+        <div id="gTicks"></div>
+        <div id="gLabels"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-p="highway">highway, dry road</button>
+    <button class="preset" data-p="residential">residential, wet road</button>
+    <button class="preset" data-p="ice">black ice</button>
+    <button class="preset" data-p="double">double the speed, still dry</button>
+  </div>
+
+  <p class="note">Braking distance follows d = v&sup2;/(2&mu;g), from Newton's laws under a constant deceleration of &mu;g &mdash; see <a href="https://en.wikipedia.org/wiki/Braking_distance" target="_blank" rel="noopener">Braking distance</a> on Wikipedia. It assumes locked-wheel or ABS-optimal braking on a level, dry-modelled road, not any specific car's tires, load transfer, wear, or ABS tuning. The 1.5 s reaction time shown alongside it is a typical average: real reaction times vary by driver, and alcohol, fatigue, or a distraction like a phone can push it several times higher. Reaction distance plus braking distance gives total stopping distance &mdash; the number that actually matters on the road, not braking distance alone.</p>
+
+</div>
+</main>
+<script>
+(function(){
+  var SURF = [
+    {key:'dry', name:'Dry asphalt', mu:0.8, color:'#8A7A63',
+     note:'A well-maintained dry road, in good tires.'},
+    {key:'wet', name:'Wet asphalt', mu:0.4, color:'#4E7FC4',
+     note:'Rain cuts grip roughly in half.'},
+    {key:'snow', name:'Snow', mu:0.2, color:'#AFC6DB',
+     note:'Packed snow — grip drops to a quarter of dry asphalt.'},
+    {key:'ice', name:'Ice', mu:0.1, color:'#2AACB5',
+     note:'Black ice — almost no grip at all.'}
+  ];
+  var G = 9.81;
+  var REACTION_T = 1.5;
+  var VMIN = 10, VMAX = 200;
+  var GMAX = 400;      // gauge / hero scale ceiling, in meters
+  var PITCH_M = 105;   // football pitch reference length
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+  function fmtM(d){
+    if(!isFinite(d)) return '∞';
+    if(d < 10) return d.toFixed(1);
+    return Math.round(d).toLocaleString();
+  }
+
+  var NS='http://www.w3.org/2000/svg';
+
+  var state = { v:50, surface:0, active:null, drag:null, ghostD:null };
+
+  var $ = function(id){ return document.getElementById(id); };
+  var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
+  var roadFull=$('roadFull'), reactSeg=$('reactSeg'), brakeSeg=$('brakeSeg'), pitchLine=$('pitchLine');
+  var startTick=$('startTick'), endTick=$('endTick'), carIcon=$('carIcon');
+  var lblReact=$('lblReact'), lblBrake=$('lblBrake'), lblPitch=$('lblPitch');
+  var heroW = 0;
+
+  function surf(){ return SURF[state.surface]; }
+  function vms(){ return state.v/3.6; }
+  function brakingDistance(){ var v=vms(), s=surf(); return (v*v)/(2*s.mu*G); }
+  function reactionDistance(){ return vms()*REACTION_T; }
+  function brakingTime(){ var v=vms(), s=surf(); return v/(s.mu*G); }
+
+  // ---- animation: car eases along the reaction + braking stretch ----
+  var anim = { reactionPx:0, brakingPx:0, reactFracTime:0.3, t0:0, dur:1400 };
+  var lastTargetKey = null;
+  var lastGeom = null;
+  var rafId = null;
+
+  function startAnim(reactionPx, brakingPx, reactionTsec, brakingTsec){
+    anim.reactionPx = reactionPx; anim.brakingPx = brakingPx;
+    var totalT = reactionTsec + brakingTsec;
+    anim.reactFracTime = totalT > 0 ? clamp(reactionTsec/totalT, 0.12, 0.8) : 0.3;
+    anim.t0 = performance.now();
+    anim.dur = 1400;
+  }
+
+  function carOffsetPx(now){
+    var totalPx = anim.reactionPx + anim.brakingPx;
+    if(totalPx <= 0) return 0;
+    var t = clamp((now-anim.t0)/anim.dur, 0, 1);
+    var rf = anim.reactFracTime;
+    var distFrac;
+    if(t <= rf){
+      var lt = rf > 0 ? t/rf : 1;
+      distFrac = lt * (anim.reactionPx/totalPx);
+    } else {
+      var lf = (1-rf) > 0 ? (t-rf)/(1-rf) : 1;
+      var posFrac = lf*(2-lf); // matches constant-deceleration position curve
+      distFrac = (anim.reactionPx/totalPx) + (anim.brakingPx/totalPx)*posFrac;
+    }
+    return distFrac*totalPx;
+  }
+
+  function positionCar(){
+    if(!lastGeom) return;
+    var x = lastGeom.startX + carOffsetPx(performance.now());
+    carIcon.setAttribute('transform','translate('+x.toFixed(1)+','+lastGeom.roadY+')');
+  }
+
+  function tick(){ rafId = requestAnimationFrame(tick); positionCar(); }
+
+  // ---- hero geometry: viewBox width == measured CSS px width, so 1 unit = 1px ----
+  function geom(w, reactionD, brakingD){
+    var padR=8, startX=14;
+    var span = Math.max(80, w - padR - startX);
+    var pxPerM = span/GMAX;
+    var roadY = 62, vbH = 112;
+
+    var reactionPxRaw = reactionD*pxPerM;
+    var brakingPxRaw = brakingD*pxPerM;
+    var reactionPx = Math.min(reactionPxRaw, span);
+    var brakingPx = Math.min(brakingPxRaw, Math.max(0, span-reactionPx));
+    var overflow = (reactionPxRaw+brakingPxRaw) > span + 0.5;
+    var pitchPx = Math.min(PITCH_M*pxPerM, span);
+
+    return {
+      w:w, vbH:vbH, startX:startX, span:span, pxPerM:pxPerM, roadY:roadY,
+      reactionPx:reactionPx, brakingPx:brakingPx, overflow:overflow, pitchPx:pitchPx
+    };
+  }
+
+  function measure(){
+    var w = heroWrap.clientWidth;
+    if(w && w !== heroW){ heroW = w; render(); }
+  }
+
+  function drawHero(){
+    var w = heroW || heroWrap.clientWidth || 1100;
+    var reactionD = reactionDistance(), brakingD = brakingDistance();
+    var h = geom(w, reactionD, brakingD);
+    lastGeom = h;
+    var s = surf();
+
+    heroSvg.setAttribute('viewBox','0 0 '+w+' '+h.vbH);
+    heroSvg.setAttribute('preserveAspectRatio','none');
+
+    roadFull.setAttribute('x1', h.startX); roadFull.setAttribute('x2', h.startX+h.span);
+    roadFull.setAttribute('y1', h.roadY); roadFull.setAttribute('y2', h.roadY);
+
+    reactSeg.setAttribute('x1', h.startX); reactSeg.setAttribute('x2', h.startX+h.reactionPx);
+    reactSeg.setAttribute('y1', h.roadY); reactSeg.setAttribute('y2', h.roadY);
+
+    var brakeX1 = h.startX+h.reactionPx, brakeX2 = brakeX1+h.brakingPx;
+    brakeSeg.setAttribute('x1', brakeX1); brakeSeg.setAttribute('x2', brakeX2);
+    brakeSeg.setAttribute('y1', h.roadY); brakeSeg.setAttribute('y2', h.roadY);
+    brakeSeg.setAttribute('stroke', s.color);
+
+    var pitchX = h.startX+h.pitchPx;
+    pitchLine.setAttribute('x1', pitchX); pitchLine.setAttribute('x2', pitchX);
+    pitchLine.setAttribute('y1', h.roadY-16); pitchLine.setAttribute('y2', h.roadY+16);
+
+    startTick.setAttribute('x1', h.startX); startTick.setAttribute('x2', h.startX);
+    startTick.setAttribute('y1', h.roadY-14); startTick.setAttribute('y2', h.roadY+14);
+
+    endTick.setAttribute('x1', brakeX2); endTick.setAttribute('x2', brakeX2);
+    endTick.setAttribute('y1', h.roadY-14); endTick.setAttribute('y2', h.roadY+14);
+    endTick.setAttribute('stroke', s.color);
+
+    var px = function(x){ return (x/w*100)+'%'; };
+    var py = function(y){ return (y/h.vbH*100)+'%'; };
+
+    lblReact.style.left = px(h.startX+h.reactionPx/2); lblReact.style.top = py(h.roadY-34);
+    lblReact.textContent = 'reaction · '+fmtM(reactionD)+' m (1.5 s)';
+    lblReact.style.opacity = h.reactionPx < 30 ? 0 : 1;
+
+    lblBrake.style.left = px(brakeX1+h.brakingPx/2); lblBrake.style.top = py(h.roadY-34);
+    lblBrake.textContent = 'braking · '+fmtM(brakingD)+' m'+(h.overflow?' (off scale)':'');
+    lblBrake.style.opacity = h.brakingPx < 40 ? 0 : 1;
+
+    lblPitch.style.left = px(pitchX); lblPitch.style.top = py(h.roadY+20);
+
+    // (re)start the car's tween whenever the underlying distances change
+    var key = Math.round(reactionD*10)+'_'+Math.round(brakingD*10);
+    if(key !== lastTargetKey){
+      lastTargetKey = key;
+      startAnim(h.reactionPx, h.brakingPx, REACTION_T, brakingTime());
+    }
+    positionCar();
+  }
+
+  // ---- equation + legend colouring ----
+  var accent = 'var(--accent)';
+  var vTerm=$('vTerm'), muTerm=$('muTerm'), gTerm=$('gTerm');
+  var vLabel=$('vLabel'), muLabel=$('muLabel');
+  var legendEl = $('legend');
+
+  function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
+
+  function drawEquationAndLegend(){
+    vTerm.style.color = activeColor('v');
+    muTerm.style.color = activeColor('mu');
+    gTerm.style.color = 'var(--fg)';
+    vLabel.style.color = activeColor('v');
+    muLabel.style.color = activeColor('mu');
+
+    var s = surf();
+    var rows = [
+      {sym:'v', name:'speed', val: state.v.toFixed(0)+' km/h ('+vms().toFixed(1)+' m/s)', key:'v'},
+      {sym:'μ', name:'friction — '+s.name.toLowerCase(), val: s.mu.toFixed(2), key:'mu'},
+      {sym:'g', name:'gravity (fixed)', val:'9.81 m/s²', key:null}
+    ];
+    legendEl.innerHTML = '';
+    rows.forEach(function(row){
+      var div = document.createElement('div'); div.className='row';
+      var sym = document.createElement('em'); sym.className='sym'; sym.textContent = row.sym;
+      sym.style.color = row.key ? activeColor(row.key) : 'var(--fg)';
+      var name = document.createElement('span'); name.className='name'; name.textContent = row.name;
+      var val = document.createElement('span'); val.className='val mono'; val.textContent = row.val;
+      div.appendChild(sym); div.appendChild(name); div.appendChild(val);
+      legendEl.appendChild(div);
+    });
+  }
+
+  // ---- surface buttons ----
+  var surfButtons = $('surfButtons'), surfNote=$('surfNote');
+  SURF.forEach(function(s,i){
+    var b = document.createElement('button');
+    b.textContent = s.name;
+    b.addEventListener('click', function(){ state.surface=i; state.active='mu'; render(); });
+    b.addEventListener('pointerenter', function(){ state.active='mu'; render(); });
+    surfButtons.appendChild(b);
+  });
+  function drawSurfButtons(){
+    Array.prototype.forEach.call(surfButtons.children, function(b,i){
+      var s = SURF[i], active = i===state.surface;
+      b.style.background = active ? 'color-mix(in srgb, '+s.color+' 22%, var(--bg))' : 'transparent';
+      b.style.borderColor = active ? s.color : 'var(--border)';
+      b.style.color = active ? 'var(--fg)' : 'var(--muted)';
+    });
+    surfNote.textContent = surf().note;
+  }
+
+  // ---- speed slider ----
+  var vTrack=$('vTrack'), vFill=$('vFill'), vThumb=$('vThumb');
+  (function(){
+    var dragging = false;
+    function setFromClientX(x){
+      var r = vTrack.getBoundingClientRect();
+      var f = clamp((x-r.left)/r.width, 0, 1);
+      var v = VMIN + f*(VMAX-VMIN);
+      v = clamp(Math.round(v), VMIN, VMAX);
+      state.v = v;
+      render();
+    }
+    vTrack.addEventListener('pointerdown', function(e){
+      dragging = true;
+      if(vTrack.setPointerCapture) vTrack.setPointerCapture(e.pointerId);
+      state.drag='v'; state.active='v'; state.ghostD = brakingDistance()+reactionDistance();
+      setFromClientX(e.clientX);
+    });
+    vTrack.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
+    function endDrag(){ if(dragging){ dragging=false; state.drag=null; render(); } }
+    vTrack.addEventListener('pointerup', endDrag);
+    vTrack.addEventListener('pointercancel', endDrag);
+    vTrack.addEventListener('pointerenter', function(){ state.active='v'; render(); });
+    vTrack.addEventListener('keydown', function(e){
+      var step = e.shiftKey ? 10 : 1;
+      var v = null;
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown') v = state.v-step;
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = state.v+step;
+      else if(e.key==='Home') v = VMIN;
+      else if(e.key==='End') v = VMAX;
+      if(v!==null){ e.preventDefault(); state.v = clamp(Math.round(v), VMIN, VMAX); render(); }
+    });
+  })();
+  function drawSpeedSlider(){
+    var pct = ((state.v-VMIN)/(VMAX-VMIN)*100).toFixed(2)+'%';
+    vFill.style.width = pct; vThumb.style.left = pct;
+  }
+
+  [$('speedCtrl'), $('surfCtrl')].forEach(function(box){
+    box.addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+  });
+
+  // ---- result box ----
+  var dValueEl=$('dValue'), dRatioEl=$('dRatio'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+  var gReach=$('gReach'), gLimit=$('gLimit'), gLimitLabel=$('gLimitLabel'), gGhost=$('gGhost'), gMark=$('gMark'), gMarkLabel=$('gMarkLabel');
+  var gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
+
+  function pos(d){ return clamp(d/GMAX, 0, 1)*100; }
+
+  function drawResult(){
+    var s = surf();
+    var brakingD = brakingDistance(), reactionD = reactionDistance(), totalD = brakingD+reactionD;
+
+    dValueEl.textContent = fmtM(brakingD);
+    dValueEl.style.color = 'var(--fg)';
+
+    var baseline = (50/3.6)*(50/3.6)/(2*s.mu*G);
+    var ratio = brakingD/baseline;
+    if(Math.abs(state.v-50) < 0.5){
+      dRatioEl.textContent = '';
+    } else if(ratio >= 1){
+      dRatioEl.textContent = '×'+(ratio<10?ratio.toFixed(1):Math.round(ratio))+' vs 50 km/h';
+    } else {
+      dRatioEl.textContent = '×'+ratio.toFixed(2)+' vs 50 km/h';
+    }
+
+    verdictSubEl.textContent = 'Total stopping distance ≈ '+fmtM(totalD)+' m — '+fmtM(reactionD)+' m reacting + '+fmtM(brakingD)+' m braking.';
+    effortLineEl.textContent = '≈ '+(totalD/PITCH_M).toFixed(1)+' football pitches (105 m each)';
+
+    var limitPct = pos(PITCH_M);
+    gReach.style.width = limitPct.toFixed(2)+'%';
+    gLimit.style.left = limitPct.toFixed(2)+'%';
+    gLimitLabel.style.left = clamp(limitPct,8,80).toFixed(2)+'%';
+
+    var markPct = pos(totalD);
+    gMark.style.left = markPct.toFixed(2)+'%';
+    gMark.style.background = s.color;
+    var labelPct = clamp(markPct,4,88);
+    gMarkLabel.style.left = labelPct.toFixed(2)+'%';
+    gMarkLabel.style.transform = markPct>72 ? 'translateX(-100%)' : markPct<20 ? 'translateX(0)' : 'translateX(-50%)';
+    gMarkLabel.style.color = s.color;
+    gMarkLabel.textContent = fmtM(totalD)+' m total';
+
+    if(state.drag && state.ghostD){
+      gGhost.style.opacity = 1;
+      gGhost.style.left = pos(state.ghostD).toFixed(2)+'%';
+    } else {
+      gGhost.style.opacity = 0;
+    }
+
+    if(!gTicksEl.dataset.built){
+      var ticksHtml='', labelsHtml='';
+      var steps = [0,100,200,300,400];
+      steps.forEach(function(d){
+        var left = pos(d).toFixed(2)+'%';
+        ticksHtml += '<div class="tick" style="left:'+left+'"></div>';
+        var tx = d===0 ? 'translateX(0)' : d===GMAX ? 'translateX(-100%)' : 'translateX(-50%)';
+        labelsHtml += '<div class="ticklabel" style="left:'+left+';transform:'+tx+'">'+d+' m</div>';
+      });
+      gTicksEl.innerHTML = ticksHtml; gTicksEl.dataset.built='1';
+      gLabelsEl.innerHTML = labelsHtml;
+    }
+  }
+
+  // ---- presets ----
+  document.querySelectorAll('.preset').forEach(function(b){
+    var presets = {
+      highway:{v:100, s:0},
+      residential:{v:50, s:1},
+      ice:{v:50, s:3},
+      double:{v:200, s:0}
+    };
+    b.addEventListener('click', function(){
+      var p = presets[b.dataset.p];
+      state.v=p.v; state.surface=p.s; state.active=null;
+      render();
+    });
+  });
+
+  // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
+  var STORAGE_KEY = 'braking-distance-theme';
+  var themeToggle = $('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+
+  function render(){
+    drawHero();
+    drawEquationAndLegend();
+    drawSurfButtons();
+    drawSpeedSlider();
+    $('vReadout').textContent = state.v.toFixed(0)+' km/h';
+    drawResult();
+  }
+
+  new ResizeObserver(measure).observe(heroWrap);
+  window.addEventListener('resize', measure);
+  [60,250,900].forEach(function(t){ setTimeout(measure, t); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  render();
+  rafId = requestAnimationFrame(tick);
+})();
+</script>

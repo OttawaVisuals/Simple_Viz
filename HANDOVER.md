@@ -235,6 +235,19 @@ custom drag tracks, dropdown/button controls became discrete pill pickers, embed
   distance (light-years/AU past 1,000 likewise) — both surfaced clearly once Andromeda's
   ~2.5-million-year/light-year numbers were run through the original two-decimal formatters.
 
+### Six-page batch (2026-08-14): `horizon-distance.html`, `lightning-distance.html`,  `braking-distance.html`, `rocket-equation.html`, `keplers-third-law.html`, `ocean-salt.html`
+
+Built in parallel directly to the [STYLE_GUIDE.md](STYLE_GUIDE.md) skeleton, no earlier drafts — each agent was given exact reference numbers up front (rather than deriving physics itself) and instructed to read `straw-hose-flow.html` and copy its CSS/component patterns near-verbatim. All six pass a structural check (balanced `<script>`/`<style>`/`<div>`/`<svg>` tags, only the approved `--bg/--fg/--muted/--muted2/--line/--line2/--border/--accent/--bad/--track` CSS custom properties, no invented tokens).
+
+- **`horizon-distance.html`** ("Why standing up lets you see farther") — `d = √(2Rh)`, R=6,371 km fixed, single **log-scale** height slider (1 m–500 km) since the effect spans person-height to ISS-altitude. Hero diagram is an explicitly-labeled schematic (not to true scale, per CLAUDE.md's honest-device guidance) since h ranges over 5+ orders of magnitude vs R. Gauge compares against English Channel width. Presets: beach/standing/lighthouse/airplane/ISS.
+- **`lightning-distance.html`** ("How far away was that lightning?") — `d = v·Δt`, v=343 m/s fixed, single linear Δt slider (0–60s). Hero has a play button that animates a sound wavefront outward at a timing proportional to real Δt (60s maps to ~4s of animation). Linear (not log) gauge flags the ~15–20 km real-world thunder-audibility limit, well short of what the raw formula alone would suggest at high Δt. Confirms the folk "5 seconds per mile" rule.
+- **`braking-distance.html`** ("Why speed quadruples your stopping distance") — `d = v²/(2μg)`, speed slider (10–200 km/h) + surface pill-picker (dry/wet/snow/ice μ values). Also computes and displays reaction distance (1.5s typical reaction time) alongside pure braking distance, so the result reflects real stopping-distance charts rather than just the idealized equation. Car animation uses a two-phase tween (linear during reaction, quadratic ease-out during braking) matching constant-deceleration kinematics.
+- **`rocket-equation.html`** ("Why one more passenger costs so much fuel") — Tsiolkovsky `Δv = vₑ·ln(m₀/mf)`, log-scale mass-ratio slider (1.1–30) + engine pill-picker (solid/kerosene-LOX/hydrogen-LOX/ion). Gauge marks 9,400 m/s as the Δv needed to reach LEO (includes gravity/drag losses, not just orbital velocity). Ion drive is hard-coded to always show "Can't launch." regardless of its Δv number, since real ion engines can't produce enough thrust to lift off a planet even though their high exhaust velocity makes the raw Δv figure look sufficient — a case where the honest caveat had to override the naive gauge comparison.
+- **`keplers-third-law.html`** ("Why Mercury's year is 88 days") — simplified solar-system form `T = a^1.5` (T in years, a in AU), sourced from the general `T² = 4π²a³/GM` and stated as such in the note. Log-scale semi-major-axis slider (0.2–50 AU), 9 presets (8 planets + Pluto). Gauge places the current period among real planets' periods on a log scale rather than using possible/impossible framing.
+- **`ocean-salt.html`** ("Draining the ocean's salt onto dry land") — `h = m/(ρ·A)`, m=4.725×10¹⁹ kg (ocean salt mass, fixed) and ρ=2,170 kg/m³ (rock salt density, fixed) both constants, single interactive variable is a 4-option area pill-picker (world land/USA/Texas/France) since the picker itself already serves as the "try real values" mechanism — deliberately has no separate presets row, noted as intentional in-page. World-land case (~146 m) roughly matches the commonly-cited "~500 ft" trivia figure. Hero uses a log-scale vertical axis (depths span 146 m–39 km depending on area) with reference lines (Eiffel Tower, Burj Khalifa, Everest, cruising altitude).
+
+All six were added to `index.html`'s main grid (numbered 07–12) and removed from the roadmap list in the same edit.
+
 ## Roadmap
 
 A running list of future equation pages now lives directly in `index.html`, in a "What's
@@ -244,24 +257,20 @@ next` / `idea`). Update that list in `index.html` directly as pages move from id
 built (moving a built one out of the roadmap list and into the main `.grid` section with a
 numbered `.concept` card, per the existing pattern).
 
-Current top pick: **Distance to the horizon** (why standing up lets you see farther out to
-sea, `d = √(2Rh)`) — pick this up next.
+**Distance to the horizon**, **how far away was that lightning**, **braking distance vs
+speed**, **the rocket equation**, **Kepler's third law**, and **all the salt in the sea** were
+all built in the 2026-08-14 six-page batch above and moved out of this list.
 
-Two new ideas added to the roadmap list in `index.html` (2026-08-13, both still `idea` status,
-not scoped yet): **all the salt in the sea** (dissolved ocean salt spread over dry land,
-`h = m/(ρ·A)` — likely lands on the "spread over land ~500 ft deep" framing, needs a real
-figure check) and **the weight of all animal life** (humans vs livestock vs wild mammals by
-total biomass, not headcount — a Fermi-style comparison rather than a clean single equation,
-so its visual form needs more thought than the others).
+Remaining idea, not yet scoped: **the weight of all animal life** (humans vs livestock vs
+wild mammals by total biomass, not headcount — a Fermi-style comparison rather than a clean
+single equation, so its visual form needs more thought than the others).
 
 ## Open questions / next steps
 
-- A site index (`index.html`) now links six concepts. Three earlier self-contained
-  interactions were added: `planet-light-delay.html` (past vs current planetary position),
-  `mass-energy.html` (E = mc² mass-energy comparison), and `gravity-lab.html` (Newtonian
-  gravitational attraction). `straw-hose-flow.html` (Hagen–Poiseuille flow resistance) and
-  `eratosthenes-shadow.html` (Earth's diameter from two shadows) were added most recently.
-  Each is intentionally a simplified explainer, with its approximation stated in-page.
+- A site index (`index.html`) now links twelve concepts, most recently the six-page batch
+  above (horizon distance, lightning distance, braking distance, the rocket equation,
+  Kepler's third law, ocean salt). Each is intentionally a simplified explainer, with its
+  approximation stated in-page.
 - **Decided (2026-08-14):** every visualization should share the visual language in
   [STYLE_GUIDE.md](STYLE_GUIDE.md) — the user confirmed straw-hose-flow.html's v5 design as
   the site's style going forward. `earth-moon-race.html` was migrated the same day, and

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" role="img" aria-labelledby="title desc">
+  <title id="title">Person drinking through a very long straw</title>
+  <desc id="desc">A simple person drinking from a cup through a long looping straw.</desc>
+  <g fill="none" stroke="#1f2933" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Cup -->
+    <path d="M94 355H190L178 450H106Z" fill="#ffbd59"/>
+    <path d="M94 355H190"/>
+
+    <!-- Comically long straw -->
+    <path d="M144 355V145C144 102 182 83 215 103C247 123 239 171 202 171H139C91 171 71 128 94 94C119 58 180 65 196 105C216 155 184 218 132 227C73 238 45 182 68 139C99 81 195 77 258 116C350 172 350 284 453 284C534 284 555 208 506 177C458 147 408 177 416 223C425 269 488 279 559 252C642 221 705 149 790 155C832 158 854 190 844 230L837 261" stroke="#5d74d8" stroke-width="22"/>
+
+    <!-- Person -->
+    <circle cx="840" cy="250" r="64" fill="#e9aa83"/>
+    <path d="M785 241C786 184 820 162 860 173C899 185 919 221 902 253C883 224 850 219 823 226C805 230 794 242 785 254Z" fill="#334755"/>
+    <path d="M812 255H824M856 255H868" stroke-width="5"/>
+    <path d="M830 285Q841 293 852 285" stroke-width="5"/>
+    <path d="M840 314V333"/>
+    <path d="M760 480V372C760 334 792 310 840 310C886 310 915 336 915 372V480" fill="#d8e7d2"/>
+    <path d="M781 480L765 492H908L894 480" fill="#526577"/>
+  </g>
+</svg>

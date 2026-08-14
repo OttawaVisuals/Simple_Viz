@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0}
+  body{background:#F7F5F0;color:#1B1A17;-webkit-font-smoothing:antialiased}
+  *{box-sizing:border-box}
+  a{color:#1B1A17;text-decoration-color:rgba(27,26,23,.3);text-underline-offset:3px}
+  a:hover{color:#2F6BD8;text-decoration-color:#2F6BD8}
+  ::selection{background:rgba(47,107,216,.18)}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:#F7F5F0;font-family:Newsreader,Georgia,serif;padding:clamp(22px,3.5vw,54px) clamp(18px,4vw,64px) 96px">
+<div style="max-width:1460px;margin:0 auto">
+
+  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:20px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6E675D">
+    <a href="../index.html" style="text-decoration:none;color:inherit">← Physics you can see</a>
+    <span>Hagen–Poiseuille</span>
+  </div>
+
+  <h1 style="font-weight:300;font-size:clamp(2.4rem,6.4vw,5.2rem);line-height:.98;letter-spacing:-.03em;margin:clamp(26px,4vw,52px) 0 0;max-width:16ch">Why the straw <em style="font-weight:300">gives up</em>.</h1>
+
+  <p style="font-size:clamp(1.02rem,1.35vw,1.28rem);line-height:1.62;color:#4A463F;max-width:62ch;margin:22px 0 0;text-wrap:pretty">Push a fluid through a tube and it fights back with viscous drag — enough that on <em>Taskmaster</em>, Tim Vine couldn't blow a candle out through drinking straws taped end to end, while a garden hose of similar length worked fine. Here's the equation behind that.</p>
+
+  <div ref="{{ heroRef }}" style="position:relative;width:100%;margin:clamp(30px,4.5vw,58px) 0 0">
+    <div style="position:absolute;font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#6E675D;white-space:nowrap;transition:opacity .2s;left:{{ h.pctTubeX }};top:{{ h.pctDiamTop }};opacity:{{ h.labelOpacity }}">⌀ {{ diamLabel }}</div>
+    <div style="position:absolute;font:400 11px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#6E675D;white-space:nowrap;transition:opacity .2s;left:{{ h.pctTubeX }};top:{{ h.pctFlowTop }};opacity:{{ h.labelOpacity }}">{{ h.flowLabel }}</div>
+    <div style="position:absolute;transform:translateX(-50%);font:500 12px 'IBM Plex Mono',monospace;color:#5C5750;white-space:nowrap;left:{{ h.pctDimCx }};top:{{ h.pctDimTextTop }}">{{ lenLabel }}</div>
+    <div style="position:absolute;transform:translateX(-100%);font:400 11px 'IBM Plex Mono',monospace;color:#6E675D;white-space:nowrap;left:{{ h.pctRulerEnd }};top:{{ h.pctRulerTextTop }}">10 m</div>
+    <svg viewBox="{{ h.vb }}" style="width:100%;height:auto;display:block">
+      <polygon points="{{ h.glassPts }}" fill="#FFFFFF" stroke="#C9C3B6" stroke-width="1.25"></polygon>
+      <polygon points="{{ h.liqPts }}" fill="{{ h.liqColor }}" opacity="{{ h.liqOpacity }}"></polygon>
+      <rect x="{{ h.tubeX }}" y="{{ h.tubeY }}" width="{{ h.tubeW }}" height="{{ h.tubeH }}" rx="{{ h.tubeR }}" fill="{{ h.tubeFill }}" stroke="{{ h.tubeStroke }}" stroke-width="1.25"></rect>
+      <line ref="{{ dashRef }}" x1="{{ h.dashX1 }}" y1="{{ h.cy }}" x2="{{ h.dashX2 }}" y2="{{ h.cy }}" stroke="{{ h.dashColor }}" stroke-width="{{ h.dashW }}" stroke-dasharray="{{ h.dashArray }}" opacity="{{ h.dashOpacity }}"></line>
+      <polygon points="{{ h.glassPts }}" fill="none" stroke="#C9C3B6" stroke-width="1.25"></polygon>
+      <line x1="{{ h.tubeX }}" y1="{{ h.dimY }}" x2="{{ h.rulerEnd }}" y2="{{ h.dimY }}" stroke="#E4DFD4" stroke-width="1"></line>
+      <sc-for list="{{ h.rulerTicks }}" as="t" hint-placeholder-count="11">
+        <line x1="{{ t.x }}" y1="{{ t.y1 }}" x2="{{ t.x }}" y2="{{ t.y2 }}" stroke="{{ t.c }}" stroke-width="1"></line>
+      </sc-for>
+      <line x1="{{ h.tubeX }}" y1="{{ h.dimTop }}" x2="{{ h.tubeX }}" y2="{{ h.dimBot }}" stroke="#C1BAAC" stroke-width="1"></line>
+      <line x1="{{ h.dimX2 }}" y1="{{ h.dimTop }}" x2="{{ h.dimX2 }}" y2="{{ h.dimBot }}" stroke="#C1BAAC" stroke-width="1"></line>
+      <line x1="{{ h.tubeX }}" y1="{{ h.dimY }}" x2="{{ h.dimGapL }}" y2="{{ h.dimY }}" stroke="#C1BAAC" stroke-width="1"></line>
+      <line x1="{{ h.dimGapR }}" y1="{{ h.dimY }}" x2="{{ h.dimX2 }}" y2="{{ h.dimY }}" stroke="#C1BAAC" stroke-width="1"></line>
+    </svg>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(272px,100%),1fr));gap:clamp(24px,3vw,48px);margin-top:clamp(26px,3vw,44px);border-top:1px solid #E2DDD2;padding-top:clamp(22px,2.6vw,34px)">
+
+    <div onPointerEnter="{{ hoverEta }}" onPointerLeave="{{ hoverNone }}">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+        <span style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#6E675D">Fluid <em style="font-family:Newsreader,serif;font-size:16px;letter-spacing:0;text-transform:none;color:{{ etaC }}">η</em></span>
+        <span style="font:400 11px 'IBM Plex Mono',monospace;color:#6E675D">η ∝ ΔP</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px">
+        <sc-for list="{{ fluids }}" as="f" hint-placeholder-count="4">
+          <button onClick="{{ f.onClick }}" style="cursor:pointer;font-family:Newsreader,serif;font-size:16px;padding:7px 15px 8px;border-radius:999px;transition:all .18s ease;border:1px solid {{ f.border }};background:{{ f.bg }};color:{{ f.fg }}">{{ f.name }}</button>
+        </sc-for>
+      </div>
+      <div style="margin-top:14px;font-size:15px;line-height:1.5;color:#6B655C">{{ fluidNote }}</div>
+    </div>
+
+    <div onPointerEnter="{{ hoverL }}" onPointerLeave="{{ hoverNone }}">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+        <span style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#6E675D">Length <em style="font-family:Newsreader,serif;font-size:16px;letter-spacing:0;text-transform:none;color:{{ LC }}">L</em></span>
+        <span style="font:400 11px 'IBM Plex Mono',monospace;color:#6E675D">L ∝ ΔP</span>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:clamp(30px,3.2vw,40px);font-weight:400;letter-spacing:-.02em;margin:6px 0 2px;font-variant-numeric:tabular-nums">{{ lenLabel }}</div>
+      <div tabindex="0" role="slider" onPointerDown="{{ len.down }}" onPointerMove="{{ len.move }}" onPointerUp="{{ len.up }}" onKeyDown="{{ len.key }}" style="position:relative;height:34px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:6px">
+        <div style="position:absolute;left:0;right:0;height:3px;background:#E2DDD2;border-radius:2px"></div>
+        <div style="position:absolute;left:0;height:3px;border-radius:2px;background:{{ accent }};width:{{ len.pct }}%"></div>
+        <div style="position:absolute;top:50%;width:20px;height:20px;border-radius:50%;background:#F7F5F0;border:1.5px solid {{ accent }};box-shadow:0 1px 3px rgba(0,0,0,.12);transform:translate(-50%,-50%);left:{{ len.pct }}%"></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 14px;font:400 11px 'IBM Plex Mono',monospace;color:#6E675D">
+        <span>0.1 m</span><span style="flex:1 1 auto;text-align:center;min-width:0">double L · double the effort</span><span>10 m</span>
+      </div>
+    </div>
+
+    <div onPointerEnter="{{ hoverR }}" onPointerLeave="{{ hoverNone }}">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+        <span style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#6E675D">Diameter <em style="font-family:Newsreader,serif;font-size:16px;letter-spacing:0;text-transform:none;color:{{ rC }}">r</em></span>
+        <span style="font:400 11px 'IBM Plex Mono',monospace;color:#6E675D">r⁻⁴ ∝ ΔP</span>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:clamp(30px,3.2vw,40px);font-weight:400;letter-spacing:-.02em;margin:6px 0 2px;font-variant-numeric:tabular-nums">{{ diamLabel }}</div>
+      <div tabindex="0" role="slider" onPointerDown="{{ dia.down }}" onPointerMove="{{ dia.move }}" onPointerUp="{{ dia.up }}" onKeyDown="{{ dia.key }}" style="position:relative;height:34px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:6px">
+        <div style="position:absolute;left:0;right:0;height:3px;background:#E2DDD2;border-radius:2px"></div>
+        <div style="position:absolute;left:0;height:3px;border-radius:2px;background:{{ accent }};width:{{ dia.pct }}%"></div>
+        <div style="position:absolute;top:50%;width:20px;height:20px;border-radius:50%;background:#F7F5F0;border:1.5px solid {{ accent }};box-shadow:0 1px 3px rgba(0,0,0,.12);transform:translate(-50%,-50%);left:{{ dia.pct }}%"></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 14px;font:400 11px 'IBM Plex Mono',monospace;color:#6E675D">
+        <span>1.5 mm</span><span style="flex:1 1 auto;text-align:center;min-width:0">halve r · 16× the effort</span><span>10 mm</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 18px;margin-top:clamp(22px,2.4vw,30px);font-size:16px;color:#6E675D">
+    <span style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase">Try</span>
+    <sc-for list="{{ presets }}" as="p" hint-placeholder-count="3">
+      <button onClick="{{ p.onClick }}" style="cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Newsreader,serif;font-size:17px;color:#1B1A17;border-bottom:1px solid #C1BAAC">{{ p.name }}</button>
+    </sc-for>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr));gap:clamp(30px,4vw,72px);margin-top:clamp(38px,4.5vw,68px);border-top:1px solid #E2DDD2;padding-top:clamp(30px,3.4vw,44px)">
+
+    <div>
+      <div style="display:flex;align-items:center;gap:clamp(12px,1.6vw,22px);font-size:clamp(34px,4.4vw,60px);line-height:1;font-weight:300">
+        <span>Δ<em style="font-weight:300">P</em></span>
+        <span style="color:#6E675D">=</span>
+        <span style="display:inline-flex;flex-direction:column;align-items:center">
+          <span style="display:flex;gap:.16em;padding:0 .34em .08em"><span>8</span><em style="font-weight:300;transition:color .2s;color:{{ etaC }}">η</em><em style="font-weight:300;transition:color .2s;color:{{ LC }}">L</em><em style="font-weight:300">Q</em></span>
+          <span style="height:1.5px;background:#1B1A17;width:100%"></span>
+          <span style="display:flex;gap:.16em;padding:.08em .34em 0;align-items:flex-start"><em style="font-weight:300">π</em><em style="font-weight:300;transition:color .2s;color:{{ rC }}">r</em><span style="font-size:.5em;padding-top:.18em">4</span></span>
+        </span>
+      </div>
+
+      <div style="margin-top:clamp(26px,3vw,38px);display:grid;gap:1px;background:#E2DDD2;border-top:1px solid #E2DDD2;border-bottom:1px solid #E2DDD2">
+        <sc-for list="{{ legend }}" as="row" hint-placeholder-count="4">
+          <div style="display:grid;grid-template-columns:2.2em 1fr auto;align-items:baseline;gap:14px;background:#F7F5F0;padding:11px 2px">
+            <em style="font-size:20px;font-weight:300;color:{{ row.color }}">{{ row.sym }}</em>
+            <span style="font-size:15px;color:#6B655C">{{ row.name }}</span>
+            <span style="font:500 13px 'IBM Plex Mono',monospace;color:#1B1A17;font-variant-numeric:tabular-nums">{{ row.val }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div>
+      <div style="font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#6E675D">Pressure needed</div>
+      <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-top:8px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:clamp(42px,6vw,72px);line-height:1;letter-spacing:-.035em;font-variant-numeric:tabular-nums;color:{{ resultColor }}">{{ paValue }}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:clamp(17px,2vw,22px);color:#6E675D">{{ paUnit }}</span>
+      </div>
+      <div style="font-size:clamp(1.05rem,1.5vw,1.3rem);line-height:1.5;margin-top:14px;color:#4A463F;text-wrap:pretty"><span style="color:{{ resultColor }}">{{ verdict }}</span> {{ verdictSub }}</div>
+      <div style="font-size:15px;color:#6E675D;margin-top:6px;min-height:1.5em">{{ effortLine }} · {{ comparison }}</div>
+
+      <div style="position:relative;height:96px;margin-top:clamp(24px,3vw,36px)">
+        <div style="position:absolute;left:0;right:0;top:38px;height:16px;background:#EBE6DB;border-radius:2px"></div>
+        <div style="position:absolute;top:38px;height:16px;border-radius:2px 0 0 2px;background:rgba(47,107,216,.16);left:0;width:{{ g.reachPct }}%"></div>
+        <sc-for list="{{ g.ticks }}" as="t" hint-placeholder-count="10">
+          <div style="position:absolute;top:54px;width:1px;height:6px;background:#C1BAAC;left:{{ t.left }}"></div>
+        </sc-for>
+        <sc-for list="{{ g.labels }}" as="t" hint-placeholder-count="4">
+          <div style="position:absolute;top:64px;white-space:nowrap;font:400 11px 'IBM Plex Mono',monospace;color:#6E675D;left:{{ t.left }};transform:{{ t.tx }}">{{ t.text }}</div>
+        </sc-for>
+        <div style="position:absolute;top:30px;height:32px;width:1px;background:#A83D2A;left:{{ g.limitPct }}%"></div>
+        <div style="position:absolute;top:78px;transform:translateX(-50%);white-space:nowrap;font:400 11px 'IBM Plex Mono',monospace;letter-spacing:.06em;color:#A83D2A;left:{{ g.limitLabelPct }}%">mouth limit</div>
+        <div style="position:absolute;top:34px;height:24px;width:1px;background:#BDB5A6;opacity:{{ g.ghostOpacity }};left:{{ g.ghostPct }}%"></div>
+        <div style="position:absolute;top:36px;height:20px;width:3px;border-radius:2px;transition:left .12s linear;background:{{ resultColor }};left:{{ g.markPct }}%"></div>
+        <div style="position:absolute;top:8px;white-space:nowrap;font:500 12px 'IBM Plex Mono',monospace;transition:left .12s linear;color:{{ resultColor }};left:{{ g.labelPct }}%;transform:{{ g.labelTx }}">{{ g.deltaText }}</div>
+      </div>
+    </div>
+  </div>
+
+  <p style="margin:clamp(46px,5vw,80px) 0 0;border-top:1px solid #E2DDD2;padding-top:18px;max-width:88ch;font-size:14px;line-height:1.7;color:#6E675D;text-wrap:pretty">Hagen–Poiseuille law for slow, steady (laminar) flow through a round tube, where <em>η</em> is viscosity, <em>L</em> is length, <em>r</em> is inner radius (half the diameter set above), and <em>Q</em> is a fixed, representative flow rate. The scale's limits are rough estimates of what a person can sustain by mouth, not hard numbers. This models horizontal flow only — a straw held upright also fights gravity, and no amount of suction can lift water more than about 10 m, since that alone needs a full atmosphere of pressure difference. Real chained drinking straws also kink at their joints, choking flow by a mechanism this equation doesn't capture — likely a bigger factor in Tim Vine's attempt than viscosity alone.</p>
+
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#2F6BD8&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#2F6BD8&quot;,&quot;#0F8F82&quot;,&quot;#B4531C&quot;,&quot;#5B4BC4&quot;]},&quot;animateFlow&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behaviour&quot;},&quot;comparisonUnit&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;cm of water&quot;,&quot;atmospheres&quot;,&quot;psi&quot;],&quot;default&quot;:&quot;cm of water&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Behaviour&quot;}}">
+const LIQ = [
+  {key:'air',name:'Air',eta:1.81e-5,etaTxt:'1.8 × 10⁻⁵ Pa·s',Q:3e-4,qTxt:'0.3 L/s',verb:'blow',color:'#8FA3B8',tint:'#DDE4EB',easy:5000,limit:20000,
+   note:'Barely viscous — but you have to move a lot of it, fast.'},
+  {key:'water',name:'Water',eta:1.0e-3,etaTxt:'1.0 × 10⁻³ Pa·s',Q:5e-6,qTxt:'5 mL/s',verb:'suck',color:'#4E7FC4',tint:'#D6E2F2',easy:4000,limit:10000,
+   note:'The baseline: 55 times thicker than air.'},
+  {key:'shake',name:'Milkshake',eta:0.3,etaTxt:'3.0 × 10⁻¹ Pa·s',Q:5e-6,qTxt:'5 mL/s',verb:'suck',color:'#C48AA8',tint:'#F0DCE5',easy:4000,limit:10000,
+   note:'Three hundred times thicker than water.'},
+  {key:'honey',name:'Honey',eta:5,etaTxt:'5.0 Pa·s',Q:5e-6,qTxt:'5 mL/s',verb:'suck',color:'#C89A3F',tint:'#F1E3C6',easy:4000,limit:10000,
+   note:'Five thousand times thicker than water.'}
+];
+const LMIN=0.1, LMAX=10, DMIN=1.5, DMAX=10;
+const LOGMIN=-1, LOGMAX=8;
+const SUP='⁰¹²³⁴⁵⁶⁷⁸⁹';
+
+function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+function sup(n){ return String(n).split('').map(c=>c==='-'?'⁻':SUP[+c]).join(''); }
+function sci(x){
+  if(!isFinite(x)) return '∞';
+  if(x<10) return x.toFixed(1)+'×';
+  if(x<1000) return Math.round(x)+'×';
+  const e=Math.floor(Math.log10(x));
+  return (x/Math.pow(10,e)).toFixed(1)+' × 10'+sup(e)+'×';
+}
+function fmtPa(pa){
+  if(pa>=1e9) return [(pa/1e9).toPrecision(3),'GPa'];
+  if(pa>=1e6) return [(pa/1e6).toPrecision(3),'MPa'];
+  if(pa>=1e3) return [(pa/1e3).toPrecision(3),'kPa'];
+  if(pa>=1) return [pa.toPrecision(3),'Pa'];
+  return [pa.toPrecision(2),'Pa'];
+}
+
+class Component extends DCLogic {
+  state = { fluid:1, L:2, D:3, w:0, active:null, drag:null, ghostPa:null };
+  heroRef = React.createRef();
+  dashRef = React.createRef();
+
+  measure = () => {
+    const el = this.heroNode;
+    if(!el) return;
+    const w = el.clientWidth;
+    if(w && w !== this.state.w) this.setState({ w });
+  };
+  setHero = (node) => {
+    if(this.ro){ this.ro.disconnect(); this.ro = null; }
+    this.heroNode = node;
+    if(node && window.ResizeObserver){
+      this.ro = new ResizeObserver(this.measure);
+      this.ro.observe(node);
+    }
+    this.measure();
+  };
+  componentDidMount(){
+    window.addEventListener('resize', this.measure);
+    this.measure();
+    [60,250,900].forEach(t => setTimeout(this.measure, t));
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(this.measure);
+    this.off = 0;
+    let f = 0;
+    const tick = () => {
+      this.raf = requestAnimationFrame(tick);
+      if((++f % 12) === 0) this.measure();
+      const n = this.dashRef.current;
+      if(!n) return;
+      this.off += (this.flowSpeed || 0);
+      n.style.strokeDashoffset = this.off.toFixed(2) + 'px';
+    };
+    this.raf = requestAnimationFrame(tick);
+  }
+  componentDidUpdate(){ this.measure(); }
+  componentWillUnmount(){ if(this.ro) this.ro.disconnect(); window.removeEventListener('resize', this.measure); cancelAnimationFrame(this.raf); }
+
+  liq(){ return LIQ[this.state.fluid]; }
+  pressure(s){
+    s = s || this.state;
+    const l = LIQ[s.fluid], r = (s.D/2)/1000;
+    return 8*l.eta*s.L*l.Q/(Math.PI*Math.pow(r,4));
+  }
+
+  setVal(key,v){
+    if(key==='L') this.setState({ L: clamp(Math.round(v*10)/10, LMIN, LMAX) });
+    else this.setState({ D: clamp(Math.round(v*10)/10, DMIN, DMAX) });
+  }
+  fromX(key,x){
+    const r = this.track.getBoundingClientRect();
+    const f = clamp((x - r.left)/r.width, 0, 1);
+    this.setVal(key, key==='L' ? LMIN+f*(LMAX-LMIN) : DMIN+f*(DMAX-DMIN));
+  }
+  slider(key){
+    return {
+      down: (e) => {
+        this.track = e.currentTarget;
+        if(e.currentTarget.setPointerCapture) e.currentTarget.setPointerCapture(e.pointerId);
+        this.setState({ drag:key, ghostPa:this.pressure(), active: key==='L'?'L':'r' });
+        this.fromX(key, e.clientX);
+      },
+      move: (e) => { if(this.state.drag===key) this.fromX(key, e.clientX); },
+      up: () => this.setState({ drag:null }),
+      key: (e) => {
+        const step = e.shiftKey ? 1 : 0.1;
+        const cur = key==='L' ? this.state.L : this.state.D;
+        const lo = key==='L'?LMIN:DMIN, hi = key==='L'?LMAX:DMAX;
+        let v = null;
+        if(e.key==='ArrowLeft'||e.key==='ArrowDown') v = cur-step;
+        else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = cur+step;
+        else if(e.key==='Home') v = lo;
+        else if(e.key==='End') v = hi;
+        if(v!==null){ e.preventDefault(); this.setVal(key,v); }
+      }
+    };
+  }
+
+  geom(){
+    const w = this.state.w || 1100;
+    const narrow = w < 620;
+    const l = this.liq(), L = this.state.L, D = this.state.D;
+    const glassW = narrow?48:70, glassH = narrow?64:88;
+    const startX = 14, padR = 8;
+    const span = Math.max(70, w - padR - startX - glassW*0.55);
+    const tubeW = Math.max(18, span*(L/LMAX));
+    const tubeH = 7 + (D-DMIN)/(DMAX-DMIN)*(narrow?21:28);
+    const cy = narrow?52:58;
+    const tubeY = cy - tubeH/2;
+    const gx = startX + tubeW - Math.min(glassW*0.55, tubeW*0.45);
+    const gTop = cy - 20, gBot = gTop + glassH;
+    const inset = glassW*0.11;
+    const lvl = gTop + glassH*0.36, t = 0.36, li = inset*t;
+    const dimY = gBot + 28;
+    const lenLabel = L.toFixed(1)+' m';
+    const halfText = lenLabel.length*3.7 + 9;
+    const dimCx = startX + tubeW/2;
+    const air = l.key==='air';
+    const rulerTicks = [];
+    for(let i=0;i<=10;i++){
+      const x = startX + span*(i/10);
+      const on = i <= L;
+      rulerTicks.push({ x, y1: dimY, y2: dimY + (i%5===0?7:4), c: on ? '#C1BAAC' : '#E4DFD4' });
+    }
+    const vbH = dimY+30;
+    const px = (x) => (x/w*100).toFixed(3)+'%';
+    const py = (y) => (y/vbH*100).toFixed(3)+'%';
+    return {
+      vb: '0 0 '+w+' '+vbH,
+      pctTubeX: px(startX), pctDimCx: px(dimCx), pctRulerEnd: px(startX+span),
+      pctDiamTop: py(tubeY-24), pctFlowTop: py(tubeY+tubeH+8), pctDimTextTop: py(dimY-8), pctRulerTextTop: py(dimY+10),
+      cy, tubeX:startX, tubeY, tubeW, tubeH, tubeR: tubeH/2,
+      tubeFill: air ? '#FFFFFF' : '#FFFFFF',
+      tubeStroke: '#C9C3B6',
+      dashX1: startX+3, dashX2: startX+tubeW-3,
+      dashW: Math.max(2, tubeH-3.5),
+      dashColor: l.color,
+      dashOpacity: air ? 0.35 : 0.85,
+      dashArray: air ? '3 16' : '11 13',
+      liqColor: l.color, liqOpacity: air ? 0.16 : 0.6,
+      glassPts: [gx+','+gTop, (gx+glassW)+','+gTop, (gx+glassW-inset)+','+gBot, (gx+inset)+','+gBot].join(' '),
+      liqPts: [(gx+li)+','+lvl, (gx+glassW-li)+','+lvl, (gx+glassW-inset)+','+gBot, (gx+inset)+','+gBot].join(' '),
+      diamTop: tubeY-24,
+      flowTop: tubeY+tubeH+8,
+      labelOpacity: tubeW < 145 ? 0 : 1,
+      flowLabel: air ? (l.qTxt+' →') : ('← '+l.qTxt),
+      dimY, dimTop: dimY-5, dimBot: dimY+5, dimX2: startX+tubeW,
+      dimGapL: Math.max(startX, dimCx-halfText), dimGapR: Math.min(startX+tubeW, dimCx+halfText),
+      dimCx, dimTextTop: dimY-8,
+      rulerTicks, rulerEnd: startX+span, rulerTextTop: dimY+10
+    };
+  }
+
+  renderVals(){
+    const accent = this.props.accent ?? '#2F6BD8';
+    const RED = '#A83D2A';
+    const l = this.liq(), s = this.state;
+    const pa = this.pressure();
+    const over = pa > l.limit;
+    const active = s.active;
+    const h = this.geom();
+
+    // flow speed in px/frame, from mean velocity v = Q / (π r²)
+    const r = (s.D/2)/1000;
+    const v = l.Q/(Math.PI*r*r);
+    const dir = l.key==='air' ? -1 : 1;
+    this.flowSpeed = (this.props.animateFlow ?? true) && !over ? dir*clamp(Math.sqrt(v)*1.6, 0.25, 5.5) : 0;
+
+    const [paValue, paUnit] = fmtPa(pa);
+    const pos = (p) => clamp((Math.log10(Math.max(p,1e-6)) - LOGMIN)/(LOGMAX-LOGMIN), 0, 1)*100;
+    const ticks = [], labels = [];
+    for(let d=LOGMIN; d<=LOGMAX; d++){
+      const left = ((d-LOGMIN)/(LOGMAX-LOGMIN)*100).toFixed(2)+'%';
+      ticks.push({ left });
+      if((d-LOGMIN)%3===0){
+        const [tv,tu] = fmtPa(Math.pow(10,d));
+        const tx = d===LOGMIN ? 'translateX(0)' : d>=LOGMAX-2 ? 'translateX(-100%)' : 'translateX(-50%)';
+        labels.push({ left, text: (+tv)+' '+tu, tx });
+      }
+    }
+    const markPct = pos(pa);
+    const ratio = s.drag && s.ghostPa ? pa/s.ghostPa : 1;
+    let deltaText = paValue+' '+paUnit;
+    if(s.drag && Math.abs(Math.log(ratio))>0.02) deltaText = (ratio>1 ? sci(ratio)+' harder' : sci(1/ratio)+' easier');
+
+    const unit = this.props.comparisonUnit ?? 'cm of water';
+    let conv;
+    if(unit==='psi') conv = [pa/6894.76,'psi'];
+    else if(unit==='atmospheres') conv = [pa/101325,'atm'];
+    else conv = pa/98.07 >= 1000 ? [pa/9807,'m of water'] : [pa/98.07,'cm of water'];
+    const cv = conv[0];
+    const comparison = '≈ ' + (cv>=1e6 ? sci(cv).slice(0,-1) : cv>=100 ? Math.round(cv).toLocaleString() : cv.toPrecision(2)) + ' ' + conv[1];
+
+    let verdictSub;
+    if(!over) verdictSub = 'A mouth can manage that.';
+    else if(l.verb==='blow') verdictSub = 'by mouth — an air compressor could still push it through.';
+    else {
+      const dev = [{n:'A household vacuum cleaner',p:20000},{n:'A shop-vac',p:30000},{n:'An industrial vacuum pump',p:90000}].find(d=>d.p>=pa);
+      verdictSub = dev ? 'by mouth. '+dev.n+' could still do it.' : 'for anything short of a hydraulic pump.';
+    }
+
+    return {
+      accent,
+      h,
+      heroRef: this.setHero,
+      dashRef: this.dashRef,
+      etaC: active==='eta' ? accent : '#1B1A17',
+      LC: active==='L' ? accent : '#1B1A17',
+      rC: active==='r' ? accent : '#1B1A17',
+      hoverEta: () => this.setState({active:'eta'}),
+      hoverL: () => this.setState({active:'L'}),
+      hoverR: () => this.setState({active:'r'}),
+      hoverNone: () => { if(!this.state.drag) this.setState({active:null}); },
+      fluids: LIQ.map((f,i) => ({
+        name: f.name,
+        onClick: () => this.setState({ fluid:i, active:'eta' }),
+        bg: i===s.fluid ? f.tint : 'transparent',
+        fg: i===s.fluid ? '#1B1A17' : '#5C5750',
+        border: i===s.fluid ? f.color : '#D7D1C4'
+      })),
+      fluidNote: l.note,
+      lenLabel: s.L.toFixed(1)+' m',
+      diamLabel: s.D.toFixed(1)+' mm',
+      len: Object.assign(this.slider('L'), { pct: ((s.L-LMIN)/(LMAX-LMIN)*100).toFixed(2) }),
+      dia: Object.assign(this.slider('D'), { pct: ((s.D-DMIN)/(DMAX-DMIN)*100).toFixed(2) }),
+      presets: [
+        {name:"Tim Vine's straws", onClick: () => this.setState({fluid:0,L:1.5,D:1.5})},
+        {name:'garden hose', onClick: () => this.setState({fluid:0,L:10,D:10})},
+        {name:'milkshake straw', onClick: () => this.setState({fluid:2,L:2,D:3})}
+      ],
+      legend: [
+        {sym:'η', name:'viscosity of '+l.name.toLowerCase(), val:l.etaTxt, color: active==='eta'?accent:'#1B1A17'},
+        {sym:'L', name:'tube length', val:s.L.toFixed(1)+' m', color: active==='L'?accent:'#1B1A17'},
+        {sym:'r', name:'inner radius', val:(s.D/2).toFixed(2)+' mm', color: active==='r'?accent:'#1B1A17'},
+        {sym:'Q', name:'flow rate (held fixed)', val:l.qTxt, color:'#1B1A17'}
+      ],
+      paValue, paUnit,
+      resultColor: over ? RED : '#1B1A17',
+      verdict: over ? 'Impossible' : 'Possible.',
+      verdictSub,
+      effortLine: over ? ('needs '+sci(pa/l.limit).replace(/×$/,'')+(pa/l.limit>=1000?' times':'×')+' the mouth limit') : Math.max(1,Math.round(pa/l.limit*100))+'% of the mouth limit',
+      comparison,
+      g: {
+        ticks, labels,
+        reachPct: pos(l.limit).toFixed(2),
+        limitPct: pos(l.limit).toFixed(2),
+        limitLabelPct: clamp(pos(l.limit),8,92).toFixed(2),
+        markPct: markPct.toFixed(2),
+        labelPct: clamp(markPct,2,98).toFixed(2),
+        labelTx: markPct>72 ? 'translateX(-100%)' : markPct<28 ? 'translateX(0)' : 'translateX(-50%)',
+        ghostPct: (s.drag && s.ghostPa ? pos(s.ghostPa) : 0).toFixed(2),
+        ghostOpacity: s.drag && s.ghostPa ? 1 : 0,
+        deltaText
+      }
+    };
+  }
+}
+
+</script>
+</body>
+</html>

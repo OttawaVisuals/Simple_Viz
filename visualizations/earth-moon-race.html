@@ -1,0 +1,308 @@
+<title>Earth to the Moon, at Real Speed</title>
+<style>
+  :root{
+    --bg:#0a0c0f;
+    --fg:#eceef0;
+    --muted:#828b96;
+    --hairline:#1f252b;
+    --accent-light:#f2b84e;
+    --accent-parker:#6fb3bf;
+    --accent-bullet:#c98a7e;
+    --accent-jet:#8891b8;
+    --earth-ocean:#3a72ab;
+    --earth-ocean-2:#204b7d;
+    --earth-land:#5c9468;
+    --moon-fill:#9b9489;
+  }
+  :root[data-theme="light"]{
+    --bg:#fbfaf7;
+    --fg:#20242a;
+    --muted:#767f8a;
+    --hairline:#e7e4dd;
+    --accent-light:#a8720c;
+    --accent-parker:#187e88;
+    --accent-bullet:#a8493a;
+    --accent-jet:#4d58a0;
+    --earth-ocean:#3f7dc4;
+    --earth-ocean-2:#2a5d99;
+    --earth-land:#4f8f5b;
+    --moon-fill:#8f887d;
+  }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){
+      --bg:#fbfaf7; --fg:#20242a; --muted:#767f8a; --hairline:#e7e4dd;
+      --accent-light:#a8720c; --accent-parker:#187e88; --accent-bullet:#a8493a; --accent-jet:#4d58a0;
+      --earth-ocean:#3f7dc4; --earth-ocean-2:#2a5d99; --earth-land:#4f8f5b; --moon-fill:#8f887d;
+    }
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:var(--bg); color:var(--fg);
+    font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif;
+    padding:4.5rem 1.5rem 5rem;
+    display:flex; justify-content:center;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{
+    font-family:ui-monospace,"SF Mono","Cascadia Code","Consolas",monospace;
+    font-variant-numeric:tabular-nums;
+  }
+  main{ width:100%; max-width:760px; }
+
+  h1{
+    margin:0 0 1rem;
+    font-size:clamp(1.7rem,4vw,2.3rem);
+    font-weight:400;
+    letter-spacing:-0.015em;
+    line-height:1.15;
+  }
+  .sub{
+    margin:0 0 3rem;
+    max-width:60ch;
+    color:var(--muted);
+    font-size:1.05rem;
+    line-height:1.65;
+  }
+  .sub b{ color:var(--fg); font-weight:600; }
+
+  figure{ margin:0; }
+  svg.scene{ display:block; width:100%; height:auto; overflow:visible; }
+  figcaption{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    font-size:.82rem; color:var(--muted); line-height:1.6;
+    margin-top:1.1rem; max-width:62ch;
+  }
+
+  .controls{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    display:flex; align-items:center; gap:1.5rem;
+    margin:2rem 0 0; padding-top:1.1rem;
+    border-top:1px solid var(--hairline);
+    font-size:.82rem;
+  }
+  .controls button{
+    background:none; border:none; padding:0 0 2px;
+    color:var(--fg); font:inherit; cursor:pointer;
+    border-bottom:1px solid transparent;
+    box-shadow:inset 0 -1px 0 var(--muted);
+    transition:box-shadow .18s ease, color .18s ease, opacity .18s ease;
+  }
+  .controls button:hover{ box-shadow:inset 0 -1px 0 var(--fg); }
+  .controls button:focus-visible{ outline:2px solid var(--accent-light); outline-offset:3px; }
+  .controls .sep{ color:var(--hairline); }
+  .controls .elapsed{ color:var(--muted); margin-left:auto; font-variant-numeric:tabular-nums; }
+
+  .eq{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    color:var(--muted); font-size:.78rem; margin:1.4rem 0 0;
+  }
+  .fn{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    color:var(--muted); font-size:.78rem; line-height:1.6; margin-top:1.6rem;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .controls button.is-hidden-motion{ display:none; }
+  }
+</style>
+
+<main>
+  <h1>Earth to the Moon, at real speed</h1>
+  <p class="sub">
+    A beam of light crosses the <b>384,400&nbsp;km</b> to the Moon in about 1.3 seconds &mdash; fast enough to watch,
+    bouncing back and forth below in true, unsped-up time. NASA's <b>Parker Solar Probe</b>, a rifle bullet, and a
+    jet airliner move at their real speed too, just far too slowly to see against that same distance &mdash; so the
+    first 1,500&nbsp;km near Earth is magnified underneath.
+  </p>
+
+  <figure>
+    <svg class="scene" viewBox="0 0 1200 420" role="img" aria-label="A beam of light bouncing in real time across the Earth-Moon distance. A small region near Earth expands into a shared ruler showing the Parker Solar Probe, a rifle bullet, and a jet moving at their true relative speeds.">
+      <defs>
+        <radialGradient id="earthGrad" cx="35%" cy="30%" r="75%">
+          <stop offset="0%" stop-color="var(--earth-ocean)"/>
+          <stop offset="100%" stop-color="var(--earth-ocean-2)"/>
+        </radialGradient>
+        <radialGradient id="moonGrad" cx="38%" cy="34%" r="70%">
+          <stop offset="0%" stop-color="var(--moon-fill)"/>
+          <stop offset="100%" stop-color="var(--moon-fill)" stop-opacity="0.72"/>
+        </radialGradient>
+        <filter id="glow" x="-200%" y="-200%" width="500%" height="500%">
+          <feGaussianBlur stdDeviation="5" result="b"/>
+          <feMerge>
+            <feMergeNode in="b"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- ===== overview: full 384,400 km, light bounces here ===== -->
+      <circle cx="86" cy="78" r="30" fill="url(#earthGrad)"/>
+      <ellipse cx="73" cy="67" rx="11" ry="7" fill="var(--earth-land)" opacity="0.8" transform="rotate(-18 73 67)"/>
+      <ellipse cx="97" cy="89" rx="8" ry="5.5" fill="var(--earth-land)" opacity="0.8" transform="rotate(12 97 89)"/>
+      <text x="86" y="128" text-anchor="middle" class="mono" font-size="10.5" fill="currentColor" opacity="0.45">EARTH</text>
+
+      <circle cx="1132" cy="78" r="11.5" fill="url(#moonGrad)"/>
+      <text x="1132" y="128" text-anchor="middle" class="mono" font-size="10.5" fill="currentColor" opacity="0.45">MOON</text>
+
+      <line x1="128" y1="78" x2="1110" y2="78" stroke="currentColor" stroke-opacity="0.12"/>
+      <text x="619" y="42" text-anchor="middle" class="mono" font-size="13" fill="var(--accent-light)" opacity="0.9">384,400 km &middot; light arrives in 1.28 s</text>
+
+      <line id="light-trail" x1="128" y1="78" x2="128" y2="78" stroke="var(--accent-light)" stroke-width="3" opacity="0.45" stroke-linecap="round"/>
+      <circle id="mk-light" cx="128" cy="78" r="5.5" fill="var(--accent-light)" filter="url(#glow)"/>
+
+      <!-- lens callout, softened to a curved sweep instead of a hard trapezoid -->
+      <rect x="136" y="66" width="32" height="22" rx="3" fill="none" stroke="currentColor" stroke-opacity="0.4" stroke-dasharray="2.5 3"/>
+      <text x="176" y="61" class="mono" font-size="10.5" fill="currentColor" opacity="0.45">1,500 km, magnified</text>
+      <path d="M 136 88 Q 90 140 80 176" fill="none" stroke="currentColor" stroke-opacity="0.16"/>
+      <path d="M 168 88 Q 700 140 1120 176" fill="none" stroke="currentColor" stroke-opacity="0.16"/>
+
+      <!-- ===== zoom: first 1,500 km, one shared ruler ===== -->
+      <text x="80" y="204" class="mono" font-size="10.5" fill="currentColor" opacity="0.4">THE FIRST 1,500 KM OF THE TRIP</text>
+
+      <text x="80" y="236" class="mono" font-size="13" font-weight="600" fill="var(--accent-parker)">PARKER SOLAR PROBE</text>
+      <text x="1120" y="236" text-anchor="end" class="mono" font-size="11" fill="var(--accent-parker)" opacity="0.85">192 km/s &middot; 33.4 min to Moon</text>
+      <polygon id="mk-parker" points="-7,0 6,-5.5 6,5.5" fill="var(--accent-parker)" transform="translate(80,254)"/>
+      <text id="readout-parker" x="94" y="258" class="mono" font-size="11" fill="currentColor" opacity="0.6">0 km</text>
+
+      <text x="80" y="290" class="mono" font-size="13" font-weight="600" fill="var(--accent-bullet)">RIFLE BULLET</text>
+      <text x="1120" y="290" text-anchor="end" class="mono" font-size="11" fill="var(--accent-bullet)" opacity="0.85">1 km/s &middot; 4.45 days to Moon</text>
+      <rect id="mk-bullet" x="-7" y="-3" width="14" height="6" rx="3" fill="var(--accent-bullet)" transform="translate(80,308)"/>
+      <text id="readout-bullet" x="94" y="312" class="mono" font-size="11" fill="currentColor" opacity="0.6">0 km</text>
+
+      <text x="80" y="344" class="mono" font-size="13" font-weight="600" fill="var(--accent-jet)">JET AIRLINER</text>
+      <text x="1120" y="344" text-anchor="end" class="mono" font-size="11" fill="var(--accent-jet)" opacity="0.85">0.25 km/s &middot; 17.8 days to Moon</text>
+      <polygon id="mk-jet" points="-7,-4 7,0 -7,4 -2,0" fill="var(--accent-jet)" transform="translate(80,362)"/>
+      <text id="readout-jet" x="94" y="366" class="mono" font-size="11" fill="currentColor" opacity="0.6">0 km</text>
+
+      <line x1="80" y1="384" x2="1120" y2="384" stroke="currentColor" stroke-opacity="0.16"/>
+      <g class="mono" font-size="10.5" fill="currentColor" opacity="0.4">
+        <text x="80" y="404" text-anchor="middle">0</text>
+        <text x="427" y="404" text-anchor="middle">500 km</text>
+        <text x="773" y="404" text-anchor="middle">1,000 km</text>
+        <text x="1120" y="404" text-anchor="end">1,500 km</text>
+      </g>
+    </svg>
+    <figcaption>Every marker moves at its true speed. The lower ruler is not a second trip: it is the first 1,500&nbsp;km of the route above, magnified so the slower travellers can be seen moving at all.</figcaption>
+  </figure>
+
+  <div class="controls">
+    <button id="playBtn" type="button">Pause</button>
+    <span class="sep">&middot;</span>
+    <button id="speedBtn" type="button">1&times; speed</button>
+    <span class="sep">&middot;</span>
+    <button id="resetBtn" type="button">Reset</button>
+    <span class="elapsed mono" id="clockReadout">0.0 s elapsed</span>
+  </div>
+
+  <p class="eq mono">t = d / v &nbsp;&middot;&nbsp; light: 384,400 km &divide; 299,792 km/s = 1.28 s</p>
+  <p class="fn">
+    Distance is the Moon's average distance from Earth. Parker Solar Probe's speed is its record closest-approach
+    speed near the Sun, not one it reaches near Earth &mdash; treated here as our fastest machine, hypothetically
+    let loose on this trip. The speed control multiplies every clock equally; nothing is warped relative to anything
+    else.
+  </p>
+</main>
+
+<script>
+(function(){
+  var D = 384400, TRACK_X0 = 128, TRACK_X1 = 1110, T_LIGHT = 1.2822;
+  var ZOOM_KM = 1500, ZOOM_X0 = 80, ZOOM_X1 = 1120;
+  var lanes = {
+    parker: { speed: 192,  y: 254 },
+    bullet: { speed: 1,    y: 308 },
+    jet:    { speed: 0.25, y: 362 }
+  };
+
+  var playBtn = document.getElementById('playBtn');
+  var speedBtn = document.getElementById('speedBtn');
+  var resetBtn = document.getElementById('resetBtn');
+  var clockReadout = document.getElementById('clockReadout');
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var SPEEDS = [1,2,4,8,16,32];
+  var speedIdx = 0;
+  var simSeconds = 0;
+  var playing = !reduceMotion;
+  var lastTs = null;
+  var rafId = null;
+
+  function formatDuration(s){
+    if (s < 60) return s.toFixed(1) + ' s';
+    if (s < 3600){ var m = Math.floor(s/60); return m + 'm ' + Math.round(s - m*60) + 's'; }
+    if (s < 86400){ var h = Math.floor(s/3600); return h + 'h ' + Math.floor((s - h*3600)/60) + 'm'; }
+    return (s/86400).toFixed(2) + ' days';
+  }
+  function formatKm(km){
+    if (km < 1) return Math.round(km*1000) + ' m';
+    if (km < 1000) return km.toFixed(1) + ' km';
+    return Math.round(km).toLocaleString() + ' km';
+  }
+
+  function renderLight(t){
+    var phase = t % (2*T_LIGHT);
+    var frac = phase <= T_LIGHT ? phase/T_LIGHT : 1 - (phase - T_LIGHT)/T_LIGHT;
+    var x = TRACK_X0 + frac * (TRACK_X1 - TRACK_X0);
+    document.getElementById('mk-light').setAttribute('cx', x);
+    var trail = document.getElementById('light-trail');
+    var tailLen = 36;
+    trail.setAttribute('x1', phase <= T_LIGHT ? Math.max(TRACK_X0, x - tailLen) : Math.min(TRACK_X1, x + tailLen));
+    trail.setAttribute('x2', x);
+  }
+
+  function renderLane(key){
+    var lane = lanes[key];
+    var distanceKm = Math.min(D, lane.speed * simSeconds);
+    var exited = distanceKm >= ZOOM_KM;
+    var x = ZOOM_X0 + Math.min(1, distanceKm/ZOOM_KM) * (ZOOM_X1 - ZOOM_X0);
+
+    document.getElementById('mk-' + key).setAttribute('transform', 'translate(' + x + ',' + lane.y + ')');
+    var readout = document.getElementById('readout-' + key);
+    readout.textContent = exited ? formatKm(distanceKm) + ' — off-scale' : formatKm(distanceKm);
+    readout.setAttribute('x', exited ? 1120 : x + 14);
+    readout.setAttribute('text-anchor', exited ? 'end' : 'start');
+  }
+
+  function render(){
+    clockReadout.textContent = formatDuration(simSeconds) + ' elapsed';
+    renderLight(simSeconds);
+    renderLane('parker');
+    renderLane('bullet');
+    renderLane('jet');
+  }
+
+  function tick(now){
+    if (!playing) return;
+    if (lastTs === null) lastTs = now;
+    simSeconds += (now - lastTs)/1000 * SPEEDS[speedIdx];
+    lastTs = now;
+    render();
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function setPlaying(next){
+    playing = next;
+    playBtn.textContent = playing ? 'Pause' : 'Play';
+    if (playing){ lastTs = null; rafId = requestAnimationFrame(tick); }
+    else if (rafId){ cancelAnimationFrame(rafId); rafId = null; }
+  }
+
+  playBtn.addEventListener('click', function(){ setPlaying(!playing); });
+  speedBtn.addEventListener('click', function(){
+    speedIdx = (speedIdx + 1) % SPEEDS.length;
+    speedBtn.textContent = SPEEDS[speedIdx] + '× speed';
+  });
+  resetBtn.addEventListener('click', function(){ simSeconds = 0; lastTs = null; render(); });
+
+  render();
+
+  if (reduceMotion){
+    playBtn.classList.add('is-hidden-motion');
+    playBtn.textContent = 'Play';
+    playBtn.title = 'Autoplay disabled (reduced motion)';
+  } else {
+    rafId = requestAnimationFrame(tick);
+  }
+})();
+</script>

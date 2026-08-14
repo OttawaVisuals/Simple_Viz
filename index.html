@@ -1,0 +1,42 @@
+<title>Physics You Can See</title>
+<style>
+  :root{--bg:#0b0d10;--fg:#e9edf0;--muted:#8a94a0;--line:#262d34;--light:#ffcc55;--teal:#52d6c9;--blue:#8fa0ff;--red:#ff6b5e}:root[data-theme="light"]{--bg:#fbfaf8;--fg:#1c2226;--muted:#6b7480;--line:#e0dfda;--light:#b8790a;--teal:#0f8f82;--blue:#4a5bc9;--red:#c8402f}@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#fbfaf8;--fg:#1c2226;--muted:#6b7480;--line:#e0dfda;--light:#b8790a;--teal:#0f8f82;--blue:#4a5bc9;--red:#c8402f}}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif;padding:5rem 1.5rem}main{max-width:900px;margin:auto}h1{font-weight:400;font-size:clamp(2.4rem,7vw,5rem);letter-spacing:-.04em;margin:0 0 1rem}h2.roadmap-h{font-weight:400;font-size:1.4rem;margin:0 0 .3rem}p{max-width:58ch;color:var(--muted);font-size:1.12rem;line-height:1.65}.kicker,.meta{font:12px ui-monospace,"Cascadia Code",monospace;letter-spacing:.06em;text-transform:uppercase}.kicker{color:var(--light);margin-bottom:1.5rem}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 2.5rem;margin-top:5rem}.concept{display:block;color:inherit;text-decoration:none;padding:1.5rem 0 2.2rem;border-top:1px solid var(--line)}.concept:last-child{border-bottom:1px solid var(--line)}.concept h2{margin:0 0 .65rem;font-size:1.55rem;font-weight:400}.concept p{font-size:.96rem;margin:0}.concept .meta{display:block;margin-bottom:1.1rem;color:var(--teal)}.concept:hover h2{text-decoration:underline;text-underline-offset:.18em}.roadmap{margin-top:5rem}.roadmap ul{list-style:none;margin:1.5rem 0 0;padding:0}.roadmap li{padding:.85rem 0;border-top:1px solid var(--line);color:var(--muted);font-size:.98rem;line-height:1.55;display:flex;justify-content:space-between;gap:1.5rem}.roadmap li:last-child{border-bottom:1px solid var(--line)}.roadmap li b{color:var(--fg);font-weight:400}.roadmap .eq{font:12px ui-monospace,"Cascadia Code",monospace;color:var(--muted);white-space:nowrap;align-self:center}.roadmap .status{font:11px ui-monospace,"Cascadia Code",monospace;text-transform:uppercase;letter-spacing:.05em;color:var(--teal);white-space:nowrap;align-self:center}.foot{font:12px ui-monospace,"Cascadia Code",monospace;color:var(--muted);margin-top:4rem}@media(max-width:650px){body{padding-top:3rem}.grid{grid-template-columns:1fr;margin-top:3rem}.roadmap li{flex-direction:column;gap:.3rem}}
+</style>
+<main>
+  <div class="kicker">Interactive physical ideas</div>
+  <h1>Physics you can see.</h1>
+  <p>Small, honest experiments for concepts that are usually hidden inside numbers. Each page starts with one question, then lets you move the quantities yourself.</p>
+  <section class="grid" aria-label="Concepts">
+    <a class="concept" href="visualizations/earth-moon-race.html"><span class="meta">01 / Speed</span><h2>Earth to the Moon, at real speed</h2><p>Watch light cross the Earth&ndash;Moon gap, and magnify the tiny first part of the same journey for slower travellers.</p></a>
+    <a class="concept" href="visualizations/planet-light-delay.html"><span class="meta">02 / Light and distance</span><h2>You are seeing the past</h2><p>Choose a planet and compare where its light began with where that planet is now.</p></a>
+    <a class="concept" href="visualizations/mass-energy.html"><span class="meta">03 / Mass and energy</span><h2>How much energy is in matter?</h2><p>Turn an ordinary amount of mass into the energy hidden in E = mc<sup>2</sup>.</p></a>
+    <a class="concept" href="visualizations/gravity-lab.html"><span class="meta">04 / Gravity</span><h2>The pull between worlds</h2><p>Change mass and distance to feel Newton&rsquo;s inverse-square law take effect.</p></a>
+    <a class="concept" href="visualizations/straw-hose-flow.html"><span class="meta">05 / Fluid flow</span><h2>Why the straw gives up</h2><p>See why a long drink straw becomes impossible to sip through while a much longer garden hose stays effortless.</p></a>
+  </section>
+
+  <section class="roadmap" aria-label="Roadmap">
+    <div class="kicker">What's next</div>
+    <h2 class="roadmap-h">More equations, waiting their turn.</h2>
+    <p>Ideas for future pages &mdash; each one an equation you can feel by dragging a slider, not just read.</p>
+    <ul>
+      <li><span><b>Earth's circumference from shadows</b> &mdash; two sticks, two shadow angles, one distance between them</span><span class="eq">C = 360&deg;&middot;d/&Delta;&theta;</span><span class="status">up next</span></li>
+      <li><span><b>Distance to the horizon</b> &mdash; why standing up lets you see so much farther out to sea</span><span class="eq">d = &radic;(2Rh)</span><span class="status">idea</span></li>
+      <li><span><b>Why the sky is blue</b> &mdash; and why sunsets turn red through the same scattering</span><span class="eq">I &prop; 1/&lambda;&#8308;</span><span class="status">idea</span></li>
+      <li><span><b>How far away was that lightning?</b> &mdash; timing the gap between flash and thunder</span><span class="eq">d = 340&middot;&Delta;t</span><span class="status">idea</span></li>
+      <li><span><b>Terminal velocity</b> &mdash; why a skydiver falls at a fixed top speed, belly-flop vs head-first</span><span class="eq">v = &radic;(2mg/&rho;AC<sub>d</sub>)</span><span class="status">idea</span></li>
+      <li><span><b>Pendulum period</b> &mdash; why a swing's rhythm barely depends on how hard you push it</span><span class="eq">T = 2&pi;&radic;(L/g)</span><span class="status">idea</span></li>
+      <li><span><b>Braking distance vs speed</b> &mdash; why doubling your speed quadruples your stopping distance</span><span class="eq">d = v&sup2;/2&mu;g</span><span class="status">idea</span></li>
+      <li><span><b>The rocket equation</b> &mdash; why one more passenger costs far more fuel than it looks like it should</span><span class="eq">&Delta;v = v<sub>e</sub>ln(m&#8320;/m<sub>f</sub>)</span><span class="status">idea</span></li>
+      <li><span><b>Why ships float</b> &mdash; and exactly how much cargo it takes to sink one</span><span class="eq">F = &rho;Vg</span><span class="status">idea</span></li>
+      <li><span><b>Doppler shift</b> &mdash; why a passing siren drops in pitch, driven by a car you can steer</span><span class="eq">f&prime; = f(v&plusmn;v<sub>o</sub>)/(v&plusmn;v<sub>s</sub>)</span><span class="status">idea</span></li>
+      <li><span><b>Decibels are logarithmic</b> &mdash; why &ldquo;twice as loud&rdquo; isn't what you'd guess</span><span class="eq">dB = 10log&#8321;&#8320;(I/I&#8320;)</span><span class="status">idea</span></li>
+      <li><span><b>Kepler's third law</b> &mdash; why Mercury's year is 88 days and Neptune's is 165 years</span><span class="eq">T&sup2; &prop; a&sup3;</span><span class="status">idea</span></li>
+      <li><span><b>Escape velocity</b> &mdash; why the Moon lost its atmosphere and Earth kept its own</span><span class="eq">v = &radic;(2GM/r)</span><span class="status">idea</span></li>
+      <li><span><b>Radioactive half-life</b> &mdash; how carbon dating reads a bone's age off its isotope ratio</span><span class="eq">N = N&#8320;e<sup>-&lambda;t</sup></span><span class="status">idea</span></li>
+      <li><span><b>All the salt in the sea</b> &mdash; drain the ocean's dissolved salt and spread it over dry land, how deep does it pile up</span><span class="eq">h = m/(&rho;&middot;A)</span><span class="status">idea</span></li>
+      <li><span><b>The weight of all animal life</b> &mdash; humans, livestock, and wild mammals stacked by total mass, not headcount</span><span class="eq">M = &Sigma;(n&middot;m)</span><span class="status">idea</span></li>
+    </ul>
+  </section>
+
+  <div class="foot">Every visual is self-contained, approximate only where stated, and designed to be played with.</div>
+</main>

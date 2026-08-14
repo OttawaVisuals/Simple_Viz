@@ -1,0 +1,625 @@
+<title>Why the straw gives up (and the hose doesn't)</title>
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  .topgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
+
+  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqn{display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);font-size:clamp(30px,4vw,46px);line-height:1;font-weight:300}
+  .eqn .eq{color:var(--muted)}
+  .eqn .frac{display:inline-flex;flex-direction:column;align-items:center}
+  .eqn .frac .row{display:flex;gap:.16em;align-items:flex-start}
+  .eqn .frac .num{padding:0 .3em .06em}
+  .eqn .frac .den{padding:.06em .3em 0}
+  .eqn .frac .bar{height:1.5px;background:var(--fg);width:100%}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .eqn sup{font-size:.5em;position:relative;top:-.5em}
+
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:1.6em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:8px 2px}
+  .legend .sym{font-size:17px;font-weight:300;transition:color .2s}
+  .legend .name{font-size:12.5px;color:var(--muted2)}
+  .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero svg{width:100%;height:auto;display:block}
+  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
+
+  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
+
+  .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;transition:color .2s}
+  .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
+  .fluid-buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .fluid-buttons button{cursor:pointer;font-family:Georgia,serif;font-style:italic;font-size:15px;padding:6px 13px 7px;border-radius:999px;transition:all .18s ease;border:1px solid var(--border);background:transparent;color:var(--muted)}
+  .fluid-buttons button:hover{color:var(--fg)}
+  .fluid-note{margin-top:11px;font-size:13.5px;line-height:1.45;color:var(--muted)}
+  .readout{font-family:ui-monospace,monospace;font-size:clamp(26px,2.8vw,34px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
+  .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
+  .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
+  .track .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
+  .track .thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
+  .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
+
+  .result{text-align:left}
+  .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
+  .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
+  .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px}
+  .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
+  .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
+  .gauge{position:relative;height:56px;margin-top:16px;max-width:420px}
+  .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
+  .gauge .reach{position:absolute;top:14px;height:10px;border-radius:2px 0 0 2px;background:color-mix(in srgb, var(--accent) 16%, transparent);left:0}
+  .gauge .tick{position:absolute;top:26px;width:1px;height:5px;background:var(--line2)}
+  .gauge .ticklabel{position:absolute;top:33px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
+  .gauge .limit{position:absolute;top:9px;height:20px;width:1px;background:var(--bad)}
+  .gauge .limitlabel{position:absolute;top:0;white-space:nowrap;font:400 9px ui-monospace,monospace;letter-spacing:.05em;color:var(--bad)}
+  .gauge .ghost{position:absolute;top:11px;height:16px;width:1px;background:var(--line2)}
+  .gauge .mark{position:absolute;top:12px;height:14px;width:3px;border-radius:2px;transition:left .12s linear}
+  .gauge .marklabel{position:absolute;top:-3px;white-space:nowrap;font:500 11px ui-monospace,monospace;transition:left .12s linear}
+
+  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+  .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
+  .preset:hover{border-color:var(--accent);color:var(--accent)}
+
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;max-width:88ch;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../index.html">&larr; Physics you can see</a>
+    <div class="topbar-right">
+      <span>Hagen&ndash;Poiseuille</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>Why the straw <em>gives up</em>.</h1>
+      <p class="sub">Push a fluid through a tube and it fights back with viscous drag. Here's the equation behind that &mdash; and why one setup below famously failed on live TV.</p>
+    </div>
+
+    <div class="eqnbox">
+      <div class="eqn">
+        <span>&Delta;<em>P</em></span>
+        <span class="eq">=</span>
+        <span class="frac">
+          <span class="row num"><span>8</span><em id="etaTerm">&eta;</em><em id="LTerm">L</em><em>Q</em></span>
+          <span class="bar"></span>
+          <span class="row den"><em>&pi;</em><em id="rTerm">r</em><sup>4</sup></span>
+        </span>
+      </div>
+    </div>
+
+    <div class="legendbox">
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="hero" id="heroWrap">
+    <div class="lbl" id="lblDiam"></div>
+    <div class="lbl" id="lblFlow"></div>
+    <div class="lbl" id="lblLen" style="transform:translateX(-50%);font-weight:500;color:var(--muted2)"></div>
+    <div class="lbl" id="lblRuler" style="transform:translateX(-100%)">10 m</div>
+    <svg id="heroSvg" role="img" aria-label="A tube carrying the selected fluid from a glass, whose length and diameter change with the sliders below.">
+      <polygon id="glassBg" fill="var(--bg)" stroke="var(--line2)" stroke-width="1.25"></polygon>
+      <polygon id="liqPoly"></polygon>
+      <rect id="tubeRect"></rect>
+      <line id="dashLine" stroke-linecap="round"></line>
+      <polygon id="glassOutline" fill="none" stroke="var(--line2)" stroke-width="1.25"></polygon>
+      <line id="dimBase" stroke="var(--line)" stroke-width="1"></line>
+      <g id="rulerTicks"></g>
+      <line id="dimLeftV" stroke="var(--line2)" stroke-width="1"></line>
+      <line id="dimRightV" stroke="var(--line2)" stroke-width="1"></line>
+      <line id="dimGapL" stroke="var(--line2)" stroke-width="1"></line>
+      <line id="dimGapR" stroke="var(--line2)" stroke-width="1"></line>
+    </svg>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrls">
+      <div class="ctrl" id="fluidCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Fluid <em id="etaLabel">&eta;</em></span>
+          <span class="ctrl-rel">&eta; &prop; &Delta;P</span>
+        </div>
+        <div class="fluid-buttons" id="fluidButtons"></div>
+        <div class="fluid-note" id="fluidNote"></div>
+      </div>
+
+      <div class="ctrl" id="lengthCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Length <em id="LLabel">L</em></span>
+          <span class="ctrl-rel">L &prop; &Delta;P</span>
+        </div>
+        <div class="readout mono" id="lenReadout"></div>
+        <div class="track" id="lenTrack" tabindex="0" role="slider" aria-label="Tube length">
+          <div class="rail"></div>
+          <div class="fill" id="lenFill"></div>
+          <div class="thumb" id="lenThumb"></div>
+        </div>
+        <div class="track-range"><span>0.1 m</span><span class="mid">double L &middot; double the effort</span><span>10 m</span></div>
+      </div>
+
+      <div class="ctrl" id="diamCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Diameter <em id="rLabel">r</em></span>
+          <span class="ctrl-rel">r&#8315;&#8308; &prop; &Delta;P</span>
+        </div>
+        <div class="readout mono" id="diamReadout"></div>
+        <div class="track" id="diamTrack" tabindex="0" role="slider" aria-label="Tube diameter">
+          <div class="rail"></div>
+          <div class="fill" id="diamFill"></div>
+          <div class="thumb" id="diamThumb"></div>
+        </div>
+        <div class="track-range"><span>1.5 mm</span><span class="mid">halve r &middot; 16&times; the effort</span><span>10 mm</span></div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Pressure needed</div>
+      <div class="result-value"><span class="num mono" id="paValue"></span><span class="unit mono" id="paUnit"></span><span class="v" id="verdict"></span></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+      <div class="effort-line" id="effortLine"></div>
+      <div class="gauge" id="gauge">
+        <div class="track"></div>
+        <div class="reach" id="gReach"></div>
+        <div class="limit" id="gLimit"></div>
+        <div class="limitlabel" id="gLimitLabel">mouth limit</div>
+        <div class="ghost" id="gGhost"></div>
+        <div class="mark" id="gMark"></div>
+        <div class="marklabel mono" id="gMarkLabel"></div>
+        <div id="gTicks"></div>
+        <div id="gLabels"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-p="timvine">Tim Vine's straws</button>
+    <button class="preset" data-p="hose">garden hose</button>
+    <button class="preset" data-p="shake">milkshake straw</button>
+  </div>
+
+  <p class="note">The <a href="https://en.wikipedia.org/wiki/Hagen%E2%80%93Poiseuille_equation" target="_blank" rel="noopener">Hagen&ndash;Poiseuille equation</a> describes slow, steady (laminar) flow through a round tube, where &eta; is viscosity, L is length, r is inner radius (half the diameter set above), and Q is a fixed, representative flow rate. The scale's limits are rough estimates of what a person can sustain by mouth, not hard numbers. This models horizontal flow only &mdash; a straw held upright also fights gravity, and no amount of suction can lift water more than about 10 m, since that alone needs a full atmosphere of pressure difference. It's also the reason a long drinking straw is so much harder to use than a garden hose of similar length: on <em style="font-style:italic">Taskmaster</em>, comedian Tim Vine taped a chain of drinking straws together and couldn't blow a candle out through them, while a garden hose of the same length worked fine &mdash; try both presets above. Real chained drinking straws also kink at their joints, choking flow by a mechanism this equation doesn't capture, likely a bigger factor in Tim Vine's attempt than viscosity alone.</p>
+
+</div>
+</main>
+<script>
+(function(){
+  var LIQ = [
+    {key:'air',name:'Air',eta:1.81e-5,etaTxt:'1.8 × 10⁻⁵ Pa·s',Q:3e-4,qTxt:'0.3 L/s',verb:'blow',color:'#8FA3B8',easy:5000,limit:20000,
+     note:'Barely viscous — but you have to move a lot of it, fast.'},
+    {key:'water',name:'Water',eta:1.0e-3,etaTxt:'1.0 × 10⁻³ Pa·s',Q:5e-6,qTxt:'5 mL/s',verb:'suck',color:'#4E7FC4',easy:4000,limit:10000,
+     note:'The baseline: 55 times thicker than air.'},
+    {key:'shake',name:'Milkshake',eta:0.3,etaTxt:'3.0 × 10⁻¹ Pa·s',Q:5e-6,qTxt:'5 mL/s',verb:'suck',color:'#C48AA8',easy:4000,limit:10000,
+     note:'Three hundred times thicker than water.'},
+    {key:'honey',name:'Honey',eta:5,etaTxt:'5.0 Pa·s',Q:5e-6,qTxt:'5 mL/s',verb:'suck',color:'#C89A3F',easy:4000,limit:10000,
+     note:'Five thousand times thicker than water.'}
+  ];
+  var LMIN=0.1, LMAX=10, DMIN=1.5, DMAX=10;
+  var LOGMIN=-1, LOGMAX=8;
+  var SUP='⁰¹²³⁴⁵⁶⁷⁸⁹';
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+  function sup(n){ return String(n).split('').map(function(c){ return c==='-'?'⁻':SUP[+c]; }).join(''); }
+  function sci(x){
+    if(!isFinite(x)) return '∞';
+    if(x<10) return x.toFixed(1)+'×';
+    if(x<1000) return Math.round(x)+'×';
+    var e=Math.floor(Math.log10(x));
+    return (x/Math.pow(10,e)).toFixed(1)+' × 10'+sup(e)+'×';
+  }
+  function fmtPa(pa){
+    if(pa>=1e9) return [(pa/1e9).toPrecision(3),'GPa'];
+    if(pa>=1e6) return [(pa/1e6).toPrecision(3),'MPa'];
+    if(pa>=1e3) return [(pa/1e3).toPrecision(3),'kPa'];
+    if(pa>=1) return [pa.toPrecision(3),'Pa'];
+    return [pa.toPrecision(2),'Pa'];
+  }
+
+  var NS='http://www.w3.org/2000/svg';
+  function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+
+  var state = { fluid:1, L:2, D:3, active:null, drag:null, ghostPa:null };
+  var heroW = 0;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
+  var glassBg=$('glassBg'), liqPoly=$('liqPoly'), tubeRect=$('tubeRect'), dashLine=$('dashLine'), glassOutline=$('glassOutline');
+  var dimBase=$('dimBase'), rulerTicksG=$('rulerTicks'), dimLeftV=$('dimLeftV'), dimRightV=$('dimRightV'), dimGapL=$('dimGapL'), dimGapR=$('dimGapR');
+  var lblDiam=$('lblDiam'), lblFlow=$('lblFlow'), lblLen=$('lblLen'), lblRuler=$('lblRuler');
+
+  var tickEls=[];
+  for(var i=0;i<=10;i++){ var l=el('line',{'stroke-width':1}); rulerTicksG.appendChild(l); tickEls.push(l); }
+
+  function liq(){ return LIQ[state.fluid]; }
+  function pressureFor(L,D,fluidIdx){
+    var l = LIQ[fluidIdx], r=(D/2)/1000;
+    return 8*l.eta*L*l.Q/(Math.PI*Math.pow(r,4));
+  }
+  function pressure(){ return pressureFor(state.L, state.D, state.fluid); }
+
+  // ---- hero geometry: viewBox width == measured CSS px width, so 1 unit = 1px ----
+  function geom(w,L,D,l){
+    var narrow = w < 620;
+    var glassW = narrow?48:70, glassH = narrow?64:88;
+    var startX = 14, padR = 8;
+    var span = Math.max(70, w - padR - startX - glassW*0.55);
+    var tubeW = Math.max(18, span*(L/LMAX));
+    var tubeH = 7 + (D-DMIN)/(DMAX-DMIN)*(narrow?21:28);
+    var cy = narrow?52:58;
+    var tubeY = cy - tubeH/2;
+    var gx = startX + tubeW - Math.min(glassW*0.55, tubeW*0.45);
+    var gTop = cy - 20, gBot = gTop + glassH;
+    var inset = glassW*0.11;
+    var lvl = gTop + glassH*0.36, tt = 0.36, li = inset*tt;
+    var dimY = gBot + 28;
+    var lenLabel = L.toFixed(1)+' m';
+    var halfText = lenLabel.length*3.7 + 9;
+    var dimCx = startX + tubeW/2;
+    var air = l.key==='air';
+    var rulerTicks = [];
+    for(var i=0;i<=10;i++){
+      var x = startX + span*(i/10);
+      var on = i <= L;
+      rulerTicks.push({ x:x, y1:dimY, y2: dimY + (i%5===0?7:4), on: on });
+    }
+    var vbH = dimY+30;
+    return {
+      w:w, vbH:vbH,
+      startX:startX, span:span, tubeX:startX, tubeY:tubeY, tubeW:tubeW, tubeH:tubeH, tubeR: tubeH/2, cy:cy,
+      dashX1: startX+3, dashX2: startX+tubeW-3, dashW: Math.max(2, tubeH-3.5),
+      dashColor: l.color, dashOpacity: air ? 0.4 : 0.85, dashArray: air ? '3 16' : '11 13',
+      liqColor: l.color, liqOpacity: air ? 0.16 : 0.55,
+      glassPts: [gx+','+gTop, (gx+glassW)+','+gTop, (gx+glassW-inset)+','+gBot, (gx+inset)+','+gBot].join(' '),
+      liqPts: [(gx+li)+','+lvl, (gx+glassW-li)+','+lvl, (gx+glassW-inset)+','+gBot, (gx+inset)+','+gBot].join(' '),
+      diamTop: tubeY-24, flowTop: tubeY+tubeH+8,
+      labelOpacity: tubeW < 145 ? 0 : 1,
+      flowLabel: air ? (l.qTxt+' →') : ('← '+l.qTxt),
+      dimY:dimY, dimTop: dimY-5, dimBot: dimY+5, dimX2: startX+tubeW,
+      dimGapL: Math.max(startX, dimCx-halfText), dimGapR: Math.min(startX+tubeW, dimCx+halfText),
+      dimCx:dimCx, dimTextTop: dimY-8,
+      rulerTicks: rulerTicks, rulerEnd: startX+span, rulerTextTop: dimY+10, lenLabel: lenLabel
+    };
+  }
+
+  var flowSpeed = 0, dashOff = 0, rafId = null;
+  function tick(){
+    rafId = requestAnimationFrame(tick);
+    dashOff += flowSpeed;
+    dashLine.style.strokeDashoffset = dashOff.toFixed(2)+'px';
+  }
+
+  function measure(){
+    var w = heroWrap.clientWidth;
+    if(w && w !== heroW){ heroW = w; render(); }
+  }
+
+  function drawHero(){
+    var w = heroW || heroWrap.clientWidth || 1100;
+    var l = liq();
+    var h = geom(w, state.L, state.D, l);
+
+    heroSvg.setAttribute('viewBox','0 0 '+w+' '+h.vbH);
+    heroSvg.setAttribute('preserveAspectRatio','none');
+
+    glassBg.setAttribute('points', h.glassPts);
+    glassOutline.setAttribute('points', h.glassPts);
+    liqPoly.setAttribute('points', h.liqPts);
+    liqPoly.setAttribute('fill', h.liqColor);
+    liqPoly.setAttribute('opacity', h.liqOpacity);
+
+    tubeRect.setAttribute('x', h.tubeX); tubeRect.setAttribute('y', h.tubeY);
+    tubeRect.setAttribute('width', h.tubeW); tubeRect.setAttribute('height', h.tubeH);
+    tubeRect.setAttribute('rx', h.tubeR);
+    tubeRect.setAttribute('fill', 'var(--bg)'); tubeRect.setAttribute('stroke', 'var(--line2)'); tubeRect.setAttribute('stroke-width', 1.25);
+
+    dashLine.setAttribute('x1', h.dashX1); dashLine.setAttribute('x2', h.dashX2);
+    dashLine.setAttribute('y1', h.cy); dashLine.setAttribute('y2', h.cy);
+    dashLine.setAttribute('stroke', h.dashColor); dashLine.setAttribute('stroke-width', h.dashW);
+    dashLine.setAttribute('stroke-dasharray', h.dashArray); dashLine.setAttribute('opacity', h.dashOpacity);
+
+    dimBase.setAttribute('x1', h.tubeX); dimBase.setAttribute('y1', h.dimY); dimBase.setAttribute('x2', h.rulerEnd); dimBase.setAttribute('y2', h.dimY);
+    h.rulerTicks.forEach(function(t,i){ var e=tickEls[i]; e.setAttribute('x1',t.x); e.setAttribute('x2',t.x); e.setAttribute('y1',t.y1); e.setAttribute('y2',t.y2); e.setAttribute('stroke', t.on ? 'var(--line2)' : 'var(--line)'); });
+
+    dimLeftV.setAttribute('x1', h.tubeX); dimLeftV.setAttribute('x2', h.tubeX); dimLeftV.setAttribute('y1', h.dimTop); dimLeftV.setAttribute('y2', h.dimBot);
+    dimRightV.setAttribute('x1', h.dimX2); dimRightV.setAttribute('x2', h.dimX2); dimRightV.setAttribute('y1', h.dimTop); dimRightV.setAttribute('y2', h.dimBot);
+    dimGapL.setAttribute('x1', h.tubeX); dimGapL.setAttribute('x2', h.dimGapL); dimGapL.setAttribute('y1', h.dimY); dimGapL.setAttribute('y2', h.dimY);
+    dimGapR.setAttribute('x1', h.dimGapR); dimGapR.setAttribute('x2', h.dimX2); dimGapR.setAttribute('y1', h.dimY); dimGapR.setAttribute('y2', h.dimY);
+
+    var px = function(x){ return (x/w*100)+'%'; };
+    var py = function(y){ return (y/h.vbH*100)+'%'; };
+    lblDiam.style.left = px(h.tubeX); lblDiam.style.top = py(h.diamTop); lblDiam.style.opacity = h.labelOpacity;
+    lblDiam.textContent = '⌀ '+state.D.toFixed(1)+' mm';
+    lblFlow.style.left = px(h.tubeX); lblFlow.style.top = py(h.flowTop); lblFlow.style.opacity = h.labelOpacity;
+    lblFlow.textContent = h.flowLabel;
+    lblLen.style.left = px(h.dimCx); lblLen.style.top = py(h.dimTextTop);
+    lblLen.textContent = h.lenLabel;
+    lblRuler.style.left = px(h.rulerEnd); lblRuler.style.top = py(h.rulerTextTop);
+
+    // flow speed: mean velocity v = Q/(pi r^2), used to drive dash animation
+    var r = (state.D/2)/1000;
+    var v = l.Q/(Math.PI*r*r);
+    var dir = l.key==='air' ? -1 : 1;
+    var pa = pressure();
+    var over = pa > l.limit;
+    flowSpeed = !over ? dir*clamp(Math.sqrt(v)*1.6, 0.25, 5.5) : 0;
+  }
+
+  // ---- equation + legend colouring ----
+  var accent = 'var(--accent)';
+  var etaTerm=$('etaTerm'), LTerm=$('LTerm'), rTerm=$('rTerm');
+  var etaLabel=$('etaLabel'), LLabel=$('LLabel'), rLabel=$('rLabel');
+  var legendEl = $('legend');
+
+  function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
+
+  function drawEquationAndLegend(){
+    etaTerm.style.color = activeColor('eta');
+    LTerm.style.color = activeColor('L');
+    rTerm.style.color = activeColor('r');
+    etaLabel.style.color = activeColor('eta');
+    LLabel.style.color = activeColor('L');
+    rLabel.style.color = activeColor('r');
+
+    var l = liq();
+    var rows = [
+      {sym:'η', name:'viscosity of '+l.name.toLowerCase(), val:l.etaTxt, key:'eta'},
+      {sym:'L', name:'tube length', val: state.L.toFixed(1)+' m', key:'L'},
+      {sym:'r', name:'inner radius', val:(state.D/2).toFixed(2)+' mm', key:'r'},
+      {sym:'Q', name:'flow rate (held fixed)', val:l.qTxt, key:null}
+    ];
+    legendEl.innerHTML = '';
+    rows.forEach(function(row){
+      var div = document.createElement('div'); div.className='row';
+      var sym = document.createElement('em'); sym.className='sym'; sym.textContent = row.sym;
+      sym.style.color = row.key ? activeColor(row.key) : 'var(--fg)';
+      var name = document.createElement('span'); name.className='name'; name.textContent = row.name;
+      var val = document.createElement('span'); val.className='val mono'; val.textContent = row.val;
+      div.appendChild(sym); div.appendChild(name); div.appendChild(val);
+      legendEl.appendChild(div);
+    });
+  }
+
+  // ---- fluid buttons ----
+  var fluidButtons = $('fluidButtons'), fluidNote=$('fluidNote');
+  LIQ.forEach(function(f,i){
+    var b = document.createElement('button');
+    b.textContent = f.name;
+    b.addEventListener('click', function(){ state.fluid=i; state.active='eta'; render(); });
+    b.addEventListener('pointerenter', function(){ state.active='eta'; render(); });
+    fluidButtons.appendChild(b);
+  });
+  function drawFluidButtons(){
+    Array.prototype.forEach.call(fluidButtons.children, function(b,i){
+      var f = LIQ[i], active = i===state.fluid;
+      b.style.background = active ? 'color-mix(in srgb, '+f.color+' 22%, var(--bg))' : 'transparent';
+      b.style.borderColor = active ? f.color : 'var(--border)';
+      b.style.color = active ? 'var(--fg)' : 'var(--muted)';
+    });
+    fluidNote.textContent = liq().note;
+  }
+
+  // ---- sliders ----
+  function makeSlider(key, track, fill, thumb, lo, hi){
+    var dragging = false;
+    function setFromClientX(x){
+      var r = track.getBoundingClientRect();
+      var f = clamp((x-r.left)/r.width, 0, 1);
+      var v = lo + f*(hi-lo);
+      v = clamp(Math.round(v*10)/10, lo, hi);
+      if(key==='L') state.L = v; else state.D = v;
+      render();
+    }
+    track.addEventListener('pointerdown', function(e){
+      dragging = true;
+      if(track.setPointerCapture) track.setPointerCapture(e.pointerId);
+      state.drag = key; state.ghostPa = pressure(); state.active = key==='L' ? 'L' : 'r';
+      setFromClientX(e.clientX);
+    });
+    track.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
+    function endDrag(){ if(dragging){ dragging=false; state.drag=null; render(); } }
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+    track.addEventListener('pointerenter', function(){ state.active = key==='L' ? 'L' : 'r'; render(); });
+    track.addEventListener('keydown', function(e){
+      var step = e.shiftKey ? 1 : 0.1;
+      var cur = key==='L' ? state.L : state.D;
+      var v = null;
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown') v = cur-step;
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = cur+step;
+      else if(e.key==='Home') v = lo;
+      else if(e.key==='End') v = hi;
+      if(v!==null){ e.preventDefault(); v = clamp(Math.round(v*10)/10, lo, hi); if(key==='L') state.L=v; else state.D=v; render(); }
+    });
+    return {
+      draw: function(){
+        var cur = key==='L' ? state.L : state.D;
+        var pct = ((cur-lo)/(hi-lo)*100).toFixed(2)+'%';
+        fill.style.width = pct; thumb.style.left = pct;
+      }
+    };
+  }
+  var lenSlider = makeSlider('L', $('lenTrack'), $('lenFill'), $('lenThumb'), LMIN, LMAX);
+  var diamSlider = makeSlider('D', $('diamTrack'), $('diamFill'), $('diamThumb'), DMIN, DMAX);
+
+  [$('fluidCtrl'), $('lengthCtrl'), $('diamCtrl')].forEach(function(box, idx){
+    box.addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+  });
+
+  // ---- result box ----
+  var paValueEl=$('paValue'), paUnitEl=$('paUnit'), verdictEl=$('verdict'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+  var gReach=$('gReach'), gLimit=$('gLimit'), gLimitLabel=$('gLimitLabel'), gGhost=$('gGhost'), gMark=$('gMark'), gMarkLabel=$('gMarkLabel');
+  var gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
+
+  function pos(p){ return clamp((Math.log10(Math.max(p,1e-6)) - LOGMIN)/(LOGMAX-LOGMIN), 0, 1)*100; }
+
+  function drawResult(){
+    var l = liq();
+    var pa = pressure();
+    var over = pa > l.limit;
+    var RED = 'var(--bad)';
+    var resultColor = over ? RED : 'var(--fg)';
+
+    var fp = fmtPa(pa);
+    paValueEl.textContent = fp[0]; paUnitEl.textContent = fp[1];
+    paValueEl.style.color = resultColor; paUnitEl.style.color = resultColor;
+
+    verdictEl.textContent = over ? 'Impossible' : 'Possible.';
+    verdictEl.style.color = resultColor;
+    var verdictSub;
+    if(!over) verdictSub = 'A mouth can manage that.';
+    else if(l.verb==='blow') verdictSub = 'by mouth — an air compressor could still push it through.';
+    else {
+      var devices=[{n:'A household vacuum cleaner',p:20000},{n:'A shop-vac',p:30000},{n:'An industrial vacuum pump',p:90000}];
+      var dev = devices.find(function(d){ return d.p>=pa; });
+      verdictSub = dev ? 'by mouth. '+dev.n+' could still do it.' : 'for anything short of a hydraulic pump.';
+    }
+    verdictSubEl.textContent = verdictSub;
+
+    effortLineEl.textContent = over
+      ? ('needs '+sci(pa/l.limit).replace(/×$/,'')+(pa/l.limit>=1000?' times':'×')+' the mouth limit')
+      : (Math.max(1,Math.round(pa/l.limit*100))+'% of the mouth limit');
+
+    // gauge
+    var markPct = pos(pa);
+    var limitPct = pos(l.limit);
+    gReach.style.width = limitPct.toFixed(2)+'%';
+    gLimit.style.left = limitPct.toFixed(2)+'%';
+    gLimitLabel.style.left = clamp(limitPct,8,80).toFixed(2)+'%';
+    gMark.style.left = markPct.toFixed(2)+'%';
+    gMark.style.background = resultColor;
+    var labelPct = clamp(markPct,4,88);
+    gMarkLabel.style.left = labelPct.toFixed(2)+'%';
+    gMarkLabel.style.transform = markPct>72 ? 'translateX(-100%)' : markPct<20 ? 'translateX(0)' : 'translateX(-50%)';
+    gMarkLabel.style.color = resultColor;
+
+    var ratio = state.drag && state.ghostPa ? pa/state.ghostPa : 1;
+    var deltaText = fp[0]+' '+fp[1];
+    if(state.drag && Math.abs(Math.log(ratio))>0.02) deltaText = (ratio>1 ? sci(ratio)+' harder' : sci(1/ratio)+' easier');
+    gMarkLabel.textContent = deltaText;
+
+    if(state.drag && state.ghostPa){
+      gGhost.style.opacity = 1;
+      gGhost.style.left = pos(state.ghostPa).toFixed(2)+'%';
+    } else {
+      gGhost.style.opacity = 0;
+    }
+
+    if(!gTicksEl.dataset.built){
+      var ticksHtml='', labelsHtml='';
+      for(var d=LOGMIN; d<=LOGMAX; d++){
+        var left = ((d-LOGMIN)/(LOGMAX-LOGMIN)*100).toFixed(2)+'%';
+        ticksHtml += '<div class="tick" style="left:'+left+'"></div>';
+        if((d-LOGMIN)%3===0){
+          var tv = fmtPa(Math.pow(10,d));
+          var tx = d===LOGMIN ? 'translateX(0)' : d>=LOGMAX-2 ? 'translateX(-100%)' : 'translateX(-50%)';
+          labelsHtml += '<div class="ticklabel" style="left:'+left+';transform:'+tx+'">'+(+tv[0])+' '+tv[1]+'</div>';
+        }
+      }
+      gTicksEl.innerHTML = ticksHtml; gTicksEl.dataset.built='1';
+      gLabelsEl.innerHTML = labelsHtml;
+    }
+  }
+
+  // ---- presets ----
+  document.querySelectorAll('.preset').forEach(function(b){
+    var presets = {
+      timvine:{f:0,l:1.5,d:1.5},
+      hose:{f:0,l:10,d:10},
+      shake:{f:2,l:2,d:3}
+    };
+    b.addEventListener('click', function(){
+      var p = presets[b.dataset.p];
+      state.fluid=p.f; state.L=p.l; state.D=p.d;
+      render();
+    });
+  });
+
+  // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
+  var STORAGE_KEY = 'straw-hose-flow-theme';
+  var themeToggle = $('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+
+  function render(){
+    drawHero();
+    drawEquationAndLegend();
+    drawFluidButtons();
+    lenSlider.draw(); diamSlider.draw();
+    $('lenReadout').textContent = state.L.toFixed(1)+' m';
+    $('diamReadout').textContent = state.D.toFixed(1)+' mm';
+    drawResult();
+  }
+
+  new ResizeObserver(measure).observe(heroWrap);
+  window.addEventListener('resize', measure);
+  [60,250,900].forEach(function(t){ setTimeout(measure, t); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  render();
+  rafId = requestAnimationFrame(tick);
+})();
+</script>

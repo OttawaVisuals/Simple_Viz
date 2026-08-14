@@ -7,9 +7,18 @@ from reading paragraphs.
 
 ## Design principles
 
-- **Simple and elegant, not a dashboard.** No card/panel chrome, no rounded colored pill
-  buttons, no drop shadows, no "eyebrow + badge" cliché. Content sits directly on the page
-  background; use thin hairline rules sparingly to separate sections.
+**See [STYLE_GUIDE.md](STYLE_GUIDE.md) for the current, user-approved visual language** —
+design tokens (colors, type), page skeleton, and component patterns (theme toggle, equation,
+sliders, etc.), all extracted from [`visualizations/straw-hose-flow.html`](visualizations/straw-hose-flow.html),
+the reference implementation. Start new pages from that file's `<style>` block rather than
+designing from scratch. The principles below still apply; STYLE_GUIDE.md is how they're
+currently expressed in code.
+
+- **Simple and elegant, not a dashboard.** No card/panel chrome, no drop shadows, no
+  "eyebrow + badge" cliché. Content sits directly on the page background; use thin hairline
+  rules sparingly to separate sections. (Outlined, transparent pill-shaped buttons *are* now
+  sanctioned, but only for small discrete-option selectors — see STYLE_GUIDE.md — not for
+  primary actions or navigation.)
 - **Format: title + one subtitle paragraph + figure.** The subtitle states the real numbers
   and the concept in one breath. Everything after that is the diagram. Avoid stacking
   multiple boxed sections (data tables, notes, controls) each in their own card — keep them
@@ -27,7 +36,8 @@ from reading paragraphs.
   chrome.
 - **Theme-aware.** Every visualization must render correctly in both light and dark mode
   (`prefers-color-scheme` plus a `data-theme` override), since these get published as
-  Artifacts viewed in either.
+  Artifacts viewed in either. Dark mode uses a dark blue background, never black. Include an
+  explicit in-page toggle (see STYLE_GUIDE.md) rather than relying on system preference alone.
 
 ## Technical constraints
 

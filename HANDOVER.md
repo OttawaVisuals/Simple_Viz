@@ -10,6 +10,7 @@ tool can pick up mid-stream without re-reading the whole chat history.
 Simple_Viz/
 ├── CLAUDE.md                    # design + technical rules for this project
 ├── HANDOVER.md                  # this file
+├── STYLE_GUIDE.md               # the current, user-approved visual language — start new pages here
 ├── DESIGN_BRIEF_TEMPLATE.md     # fill-in template for requesting a new/redesigned page
 └── visualizations/
     └── earth-moon-race.html   # speed-of-light concept, current iteration
@@ -69,74 +70,66 @@ garden hose stays effortless, via the Hagen–Poiseuille law: ΔP = 8ηLQ/(πr�
 scales linearly with tube length but with the *inverse fourth power* of radius, so radius
 dominates.
 
-- Interactive tube: sliders for radius (1.5–40 mm, spans coffee stirrer → fire hose) and
-  length (0.1–30 m), plus a liquid picker (air/water/milkshake, each with a real viscosity
-  and a representative target flow rate). A gauge needle shows the suction pressure required,
-  color-coded against a red line at ~10 kPa — a rough estimate of sustained human mouth
-  suction, stated as approximate in the footnote.
-- Animated flow dots move at the tube's real average velocity (Q/πr²), so a wider tube at
-  the same flow rate visibly moves slower — a physically accurate detail, not just flavor.
-  Dots freeze and the tube outline turns red when the required pressure exceeds the human
-  limit.
-- A small comparison line under the controls directly demonstrates the asymmetry: doubling
-  length always doubles ΔP; doubling radius always cuts it to 1/16.
+**v5 (current) is the canonical style reference for the whole site — see
+[STYLE_GUIDE.md](STYLE_GUIDE.md).** The user liked a hand-designed draft
+(`Drafts/Why the straw gives up.dc.html`, built in an external tool with a React-like
+component framework) enough to say "this is the style" and ask for it recorded as the
+default going forward. This page is that draft ported to a self-contained, dependency-free
+HTML/CSS/vanilla-JS file (no Google Fonts, no framework — see CLAUDE.md's technical
+constraints), then iterated with the user across several rounds:
+- Cream/navy (never black) theme with an explicit toggle button, serif+mono type contrast,
+  and equation terms/legend rows that recolor to the accent color when the matching slider
+  is hovered or dragged — the style's signature detail.
+- Layout, current: topbar (back link + law name + theme toggle) → 3-column header (title+sub
+  | equation, centered both axes | legend table, one line per row) → full-width animated
+  hero diagram → 2-column row (sliders 2/3 | result+gauge 1/3) → one-line "Try" presets →
+  closing note with a source link and the page's narrative hook.
+- Interactive tube: sliders for length (0.1–10 m) and diameter (1.5–10 mm), plus a fluid
+  picker (air/water/milkshake/honey, each a real viscosity and representative flow rate). A
+  compact gauge shows required pressure on a log scale against a "mouth limit" line; while
+  dragging a slider, the gauge's ghost marker + label switch to a relative "3.2× harder"
+  readout instead of an absolute value.
+- Numeric result *is* shown (kPa, unlike the v4 experiment below) with a "Possible."/
+  "Impossible" verdict inline right after it on the same line; when impossible, names a real
+  device that could still do it (household vacuum → shop-vac → industrial pump).
+- Animated flow dashes move at the tube's real mean velocity (Q/πr²), freezing when the
+  required pressure exceeds the human limit.
 - Deliberately scoped to horizontal flow only (pure viscous drag). The much better-known
-  "you can't suck water up more than ~10m" limit is a *different* phenomenon (hydrostatic —
-  fighting atmospheric pressure, not viscosity) and is only mentioned as a footnote caveat,
-  not modeled, to avoid conflating two separate mechanisms in one equation.
+  "you can't suck water up more than ~10 m" limit is a *different* phenomenon (hydrostatic —
+  fighting atmospheric pressure, not viscosity) and is only mentioned as a note caveat, not
+  modeled, to avoid conflating two separate mechanisms in one equation.
 - Reference numbers used: η(air) 1.81×10⁻⁵ Pa·s, η(water) 1.0×10⁻³ Pa·s, η(milkshake) 0.3
   Pa·s, η(honey) 5 Pa·s (representative values, not fixed constants); target flow 5 mL/s for
-  liquids, 0.3 L/s for air.
+  liquids, 0.3 L/s for air; human-limit zones: sucking easy <4 kPa / impossible >10 kPa,
+  blowing easy <5 kPa / impossible >20 kPa (rough estimates, stated as such in-page); device
+  suction estimates: household vacuum ≈20 kPa, shop-vac ≈30 kPa, industrial pump ≈90 kPa.
 
-**Revision history (v2 and v3 both superseded by v4, current):** v2 added an illustrated
-scene, top-positioned controls, and tick-marked sliders after the user liked that direction
-in principle — but the actual layout was guessed from a verbal description and didn't match
-what the user had in mind. v3 tried again against a PowerPoint mockup of the intended layout
-(person icon → straw → glass above three selectors, arrows into a big equation, gauge below)
-— closer, but a static mockup still couldn't convey *behavior* (what recolors vs resizes vs
-swaps, what's animated vs static, what each piece of text's job is), so it still missed. This
-is what prompted [DESIGN_BRIEF_TEMPLATE.md](DESIGN_BRIEF_TEMPLATE.md) — see that file's
-"Why this exists" section. **v4 (current) was built directly from a filled-out design brief**
-(preserved in `Drafts/Straw_Design.md`) and matched on the first pass. Key specifics from
-that brief, worth reusing as patterns:
-- **Icons show magnitude, not just identity.** Length and diameter icons are a single outline
-  at the control's max value with an inner shape that fills *linearly* with the slider's own
-  raw position (not log-mapped) — a visual "how much of the max is this" readout. The fluid
-  icon (a droplet) is the one exception: since viscosity spans ~5 orders of magnitude across
-  the four fluids, filling it by the *raw* value would make three of the four fluids look
-  identically empty next to honey — it fills by the fluids' evenly-spaced *position*
-  (0/33/66/100%) instead, colored to the selected fluid. Flagging this pattern: when a
-  linear-fill icon's underlying values span multiple orders of magnitude, fill by position
-  among the options, not by the raw value.
-- **The hero scene doesn't animate** — it's a static recompute on every change (straw recolors
-  to the fluid, fills to the selected length, and shows a dashed tick + red overflow past the
-  longest length still humanly feasible for the current fluid+diameter). The *only* motion
-  anywhere on the page is a one-shot marker sliding across the bar chart on change, no loop.
-- **Bar chart scale is per-fluid and logarithmic.** Its ceiling/floor are the worst/best case
-  reachable within the sliders' own range for the *selected* fluid (max length + min diameter
-  / min length + max diameter), mapped via a log scale — tried linear first and the human
-  suction/blow zones (a few kPa) were an invisible sliver next to a viscous fluid's worst case
-  (which reaches into MPa); log mapping keeps the zones legibly sized regardless of which
-  fluid is picked.
-- **Numbers were deliberately dropped from the primary readout** in favor of a plain
-  "Possible"/"Impossible" verdict, since kPa doesn't mean much to most readers; when
-  impossible, it names a real device that could still do it (household vacuum → shop-vac →
-  industrial pump, by ascending suction capability) rather than just saying no.
-- **Equation term arrows require measured layout, not hardcoded coordinates** — the ΔP
-  formula is laid out character-by-character via `getComputedTextLength()` at runtime so the
-  numerator/denominator can be measured and centered exactly, with arrows anchored to the
-  measured centers of η, L, and r. Hardcoding pixel positions for text this precise doesn't
-  survive a font/size change.
-- **Gotcha: CSS `transition`/`transform` on SVG elements didn't animate in testing** (`x1`/`x2`
-  aren't CSS-animatable, and even wrapping in a `<g>` with `transform: translateX()` produced
-  no visible motion in this environment) — the marker slide is done with a plain
-  `requestAnimationFrame` tween instead, which is portable everywhere. Prefer JS-driven tweens
-  over CSS transitions for SVG geometry animation on this project going forward.
-- Real numbers used: η(air) 1.81×10⁻⁵ Pa·s · η(water) 1.0×10⁻³ Pa·s · η(milkshake) 0.3 Pa·s ·
-  η(honey) 5 Pa·s; Q = 5 mL/s for liquids, 0.3 L/s for air; human-limit zones: sucking easy
-  <4 kPa / hard 4–10 kPa / impossible >10 kPa, blowing easy <5 kPa / hard 5–20 kPa /
-  impossible >20 kPa (all rough estimates, stated as such in-page); device suction estimates:
-  household vacuum ≈20 kPa, shop-vac ≈30 kPa, industrial vacuum pump ≈90 kPa.
+**Revision history (v2–v4, all superseded):** v2 added an illustrated scene, top-positioned
+controls, and tick-marked sliders after the user liked that direction in principle — but the
+layout was guessed from a verbal description and didn't match what the user had in mind. v3
+tried again against a PowerPoint mockup (person icon → straw → glass above three selectors,
+arrows into a big equation, gauge below) — closer, but a static mockup still couldn't convey
+*behavior*, so it still missed. This is what prompted
+[DESIGN_BRIEF_TEMPLATE.md](DESIGN_BRIEF_TEMPLATE.md). v4 was built directly from a filled-out
+brief (`Drafts/Straw_Design.md`) and matched on the first pass, but was itself later replaced
+wholesale by v5 once the user supplied the hand-designed draft above. Patterns from v4 worth
+knowing even though its specific UI is gone:
+- **Icon magnitude pattern** (not currently used in v5, but worth reusing if a future page
+  wants linear-fill icons): fill an icon by the control's raw slider position, *except* when
+  the underlying values span multiple orders of magnitude (like viscosity across the four
+  fluids) — then fill by the options' evenly-spaced *position* instead, or the smaller values
+  all look identically empty next to the largest.
+- **Equation-arrow layout via `getComputedTextLength()`** — superseded in v5 by a plain HTML
+  flex/fraction layout (see STYLE_GUIDE.md's "Equation" pattern), which is simpler and just
+  as legible; no more runtime text measurement needed for the equation itself.
+- **Gotcha, still relevant: CSS `transition`/`transform` on SVG elements didn't animate in
+  testing** (`x1`/`x2` aren't CSS-animatable, and even wrapping in a `<g>` with
+  `transform: translateX()` produced no visible motion in this environment) — use a plain
+  `requestAnimationFrame` tween instead, which is portable everywhere. Prefer JS-driven
+  tweens over CSS transitions for SVG geometry animation on this project going forward. (v5's
+  gauge sidesteps this entirely by using absolutely-positioned HTML `<div>`s with percentage
+  `left`/`width` instead of SVG, which *can* use a plain CSS `transition:left` — see
+  STYLE_GUIDE.md's "Result readout" pattern.)
 
 ## Roadmap
 
@@ -165,10 +158,12 @@ so its visual form needs more thought than the others).
   gravitational attraction). `straw-hose-flow.html` (Hagen–Poiseuille flow resistance) was
   added most recently. Each is intentionally a simplified explainer, with its approximation
   stated in-page.
-- Whether every future visualization should share this exact visual language (serif title,
-  monospace data, magnifying-lens device for scale disparities) or whether each concept
-  should get its own distinct treatment — not yet decided by the user. Current default:
-  reuse this language unless a concept clearly calls for something else.
+- **Decided (2026-08-14):** every new visualization should share the visual language in
+  [STYLE_GUIDE.md](STYLE_GUIDE.md) — the user confirmed straw-hose-flow.html's v5 design as
+  the site's style going forward. The four earlier pages (`earth-moon-race.html`,
+  `gravity-lab.html`, `mass-energy.html`, `planet-light-delay.html`) predate this and haven't
+  been migrated — update them to match opportunistically when next touched, not as a
+  dedicated sweep unless the user asks.
 - The zoom window in `earth-moon-race.html` is a **fixed** 1,500 km (not auto-scaling to
   keep fast objects in frame) — deliberate simplification. If a future request wants the
   probe to stay visible the whole time, an auto-zoom-out camera is the next thing to try,

@@ -16,7 +16,7 @@ Simple_Viz/
     ├── earth-moon-race.html      # speed-of-light concept
     ├── straw-hose-flow.html      # style reference implementation
     ├── eratosthenes-shadow.html  # Earth's diameter from two shadows
-    └── ...                       # fifteen pages in all; see index.html for the full list
+    └── ...                       # seventeen pages in all; see index.html for the full list
 ```
 
 **Before starting a new page or a redesign, fill out
@@ -492,6 +492,83 @@ shadow.
   straw-hose-flow r→R bug above) — checked and confirmed correct here (θ, not uppercased) as
   part of building the page, not a later fix.
 
+### `pendulum-period.html` — "A swing keeps its own time" (2026-08-15)
+
+Built to the [STYLE_GUIDE.md](STYLE_GUIDE.md) skeleton, no earlier draft. T = 2π√(L/g), the
+small-angle pendulum period, deliberately shown with **no amplitude term at all** — that
+absence is the whole point of the page. Two sliders (length 0.1–5 m, release angle 5–120°)
+plus a gravity picker (Earth/Moon/Mars/Jupiter, real surface values). Card 15, under **Fun
+physics**, right after straw-hose-flow.
+
+- **The number shown and animated is not the equation above it.** The equation is the
+  small-angle approximation; the readout and the swinging bob both use the *exact* period,
+  found by integrating the pendulum's real equation of motion (θ″ = −(g/L)sinθ) rather than
+  the formula. The two agree closely at small angles and visibly diverge past a threshold —
+  which is the honest way to show that the small-angle formula is an approximation without
+  ever putting a wrong number in the big readout.
+- **That divergence threshold is computed, not guessed.** The exact/small-angle period ratio
+  reduces to a complete elliptic integral of the first kind, K(sin(θ₀/2)), computed via the
+  arithmetic–geometric mean (a few iterations converge to machine precision — no series
+  truncation or lookup table). The angle at which the ratio first exceeds 1% is then found by
+  bisection against that same relation, once, at script load — landed on 23°, close to the
+  commonly-quoted "~23°" figure, but derived from the page's own formula rather than
+  hardcoded, so it can't silently drift out of sync with it.
+- **A genuinely animated pendulum**, unlike most of this site's static-per-render pages: the
+  bob swings in real time via a small-step semi-implicit Euler integration of the exact
+  nonlinear equation (8 substeps per frame), so a large-amplitude release visibly lingers near
+  the top of its swing the way a real pendulum does — not a sinusoid scaled to amplitude. Real
+  time, no compression needed: even the shortest/fastest case in the slider range (L=0.1 m,
+  Jupiter's g) has a period of ~0.4 s, well within comfortable viewing speed.
+- **Play/Pause/"Release again" controls**, copied from `earth-moon-race.html`'s playback
+  pattern (`playing = !reduceMotion` at load, so it still starts moving for most visitors but
+  respects reduced motion by defaulting to paused) — this is the "animation is the content"
+  category from the style guide, not a decorative loop, since watching the swing *is* how the
+  period-independence claim gets tested.
+- **A same-day bug, caught in testing, not shipped**: `lblAmp` (and the same-shaped `lblPos`
+  label on `terminal-velocity.html`, built right after) were positioned at a horizontal
+  *centre* point with no `translateX(-50%)` centring transform — harmless for short text, but
+  their actual contents ("±120° release angle", "Arms out · A=0.7 m² · C_d=0.62") are long
+  enough to overflow past the right edge of a 375px viewport. Both fixed by adding the
+  transform; worth checking any new `.lbl` overlay anchored at a *centre* x (as opposed to a
+  true left or right edge) for the same issue before shipping.
+- Presets: a seconds pendulum (L≈0.994 m, the real length that gives exactly T=2 s on Earth,
+  historically used as a length standard), a playground swing (2.5 m, 60°), pushed too far
+  (1 m, 118°, well past the 23° threshold), on the Moon (1 m, 30°, g=1.62).
+
+### `terminal-velocity.html` — "Falling as fast as the air allows" (2026-08-15)
+
+Built to the [STYLE_GUIDE.md](STYLE_GUIDE.md) skeleton, no earlier draft. v = √(2mg/(ρACd)).
+One mass slider (40–120 kg) plus a 4-option body-position picker (arms out / feet-first /
+head-down / under canopy), each with representative frontal-area and drag-coefficient values.
+Card 16, under **Fun physics**, right after the new pendulum page.
+
+- **The subtitle's real hook is that mass matters at all.** In a vacuum, acceleration is
+  mass-independent (the textbook "everything falls at the same rate" result) — but drag
+  depends on frontal area, not mass, while weight does depend on mass, so in air two people in
+  the same position genuinely fall at different terminal speeds if one is heavier. The
+  "heavier falls faster" preset (same arms-out position, 120 kg instead of 80 kg) makes this
+  concrete: 195.6 → 239.6 km/h, same shape, same equation, only the mass changed.
+- **Body-position numbers are back-derived, not measured**, same honest-value treatment as
+  straw-hose-flow's viscosities: real, well-cited terminal velocities for an ~80 kg skydiver
+  (arms-out ≈195 km/h, head-down ≈257 km/h) were used to solve for a plausible (A, Cd) pair
+  reproducing that number, since individually-measured A and Cd for a human body in freefall
+  aren't standardized figures the way, say, water's viscosity is. The note says so explicitly.
+  A canopy-open comparison was added as the fourth option specifically because it's an
+  order-of-magnitude change (≈20 km/h) rather than the ~30% spread between body positions —
+  showing both scales of effect on one page was worth the extra picker option.
+  Values used: arms-out A=0.70 m² Cd=0.62, feet-first A=0.50 Cd=0.72, head-down A=0.35 Cd=0.72,
+  canopy A=25 m² Cd=1.7 (a modern ram-air canopy), air density ρ=1.225 kg/m³ fixed at sea
+  level — the note states explicitly that this models the steady-state balance point only, not
+  an actual skydive's descent through changing air density.
+- **Airflow streaks are a continuous decorative loop** (no pause control), so — unlike the
+  pendulum page built the same session — it follows the more common site pattern: gated behind
+  `prefers-reduced-motion` at the top-level `if(!reduceMotion) rafId = ...` rather than
+  defaulting to playing-but-pausable. The distinction matters: here the streaks only restate
+  the already-shown numeric speed, so losing them under reduced motion costs nothing, whereas
+  the pendulum's swing *is* the evidence for its own claim and needed to stay interactive.
+- Same `lblPos` centring-transform bug described under `pendulum-period.html` above — fixed
+  here too, in the same testing pass that caught it on the pendulum page.
+
 ### Categories, and a much longer roadmap (2026-08-15)
 
 `index.html` now groups both the built pages and the roadmap under **three categories**,
@@ -507,17 +584,17 @@ knowing before editing that file:
   bike gears → Everyday maths, speed of light → Discoveries, the straw → Fun physics. That is
   why `earth-moon-race.html` sits under Discoveries even though its payoff is magnitude rather
   than derivation.
-- **The split is 5 / 8 / 2** (3 / 7 / 2 before `bike-gears.html`, then 4 / 7 / 2, then 4 / 8 / 2
-  once `snells-law.html` landed ahead of `shelf-sag.html` in the same batch). Discoveries
-  dominating is a true fact about what's been built, not a flaw in the categories; the roadmap
-  below is deliberately weighted the other way (8 / 9 / 11 after both entries were removed
-  from it).
+- **The split is 5 / 8 / 4** (3 / 7 / 2 before `bike-gears.html`, then 4 / 7 / 2, then 4 / 8 / 2
+  once `snells-law.html` landed ahead of `shelf-sag.html`, then 5 / 8 / 2, then 5 / 8 / 4 once
+  `pendulum-period.html` and `terminal-velocity.html` landed). Fun physics catching up to
+  Everyday maths is new — every prior update in this file noted Discoveries as the largest
+  group, which is still true, but the gap has narrowed with each batch.
 - **Cards are renumbered on every addition** so the numbers still ascend down the page. Any
   older note in this file referring to earlier ranges means a *previous* numbering. Current
-  order, after `shelf-sag.html` and `snells-law.html` landed: 01 horizon, 02 lightning,
-  03 braking, 04 bike-gears, 05 shelf-sag · 06 earth-moon, 07 planet-light-delay, 08 mass-
-  energy, 09 gravity-lab, 10 eratosthenes, 11 snells-law, 12 rocket, 13 kepler · 14 straw-
-  hose-flow, 15 ocean-salt.
+  order, after `pendulum-period.html` and `terminal-velocity.html` landed: 01 horizon,
+  02 lightning, 03 braking, 04 bike-gears, 05 shelf-sag · 06 earth-moon, 07 planet-light-delay,
+  08 mass-energy, 09 gravity-lab, 10 eratosthenes, 11 snells-law, 12 rocket, 13 kepler ·
+  14 straw-hose-flow, 15 pendulum-period, 16 terminal-velocity, 17 ocean-salt.
 - **Categories live on `index.html` only.** The visualization pages' topbars still carry just
   the back link + law name + theme toggle; no category label was added there, since the
   right-hand slot is already occupied and a page reached as a standalone Artifact has no
@@ -538,8 +615,10 @@ Two CSS changes were needed to support per-category grids, both worth preserving
 `concept — hook · equation · status`. Three were tagged `up next` rather than `idea`: **bike
 gears**, **a shelf that sags** (`δ = PL³/48EI`), and **why the straw looks bent** (Snell,
 `n₁sinθ₁ = n₂sinθ₂`) — picked as the strongest single-equation pages with clean slider shapes.
-All three were built the same day (see the entries above) and are now out of the list, leaving
-27. Notes on the remaining entries:
+All three were built the same day (see the entries above), and **pendulum period** and
+**terminal velocity** (both plain `idea` entries, not `up next`) followed in a second batch
+the same day too. All five are now out of the list, leaving 25. Notes on the remaining
+entries:
 
 - **Fourier** was deliberately reduced from "the Fourier transform" (not a two-sliders-one-
   number page) to **building a square wave from harmonics** — slider = number of terms, and the
@@ -574,7 +653,7 @@ all built in the 2026-08-14 six-page batch above and moved out of this list.
 
 ## Open questions / next steps
 
-- A site index (`index.html`) now links fifteen concepts, grouped into the three categories
+- A site index (`index.html`) now links seventeen concepts, grouped into the three categories
   described above (Everyday maths / Discoveries / Fun physics). Each is intentionally a
   simplified explainer, with its approximation stated in-page.
 - **Decided (2026-08-14):** every visualization should share the visual language in

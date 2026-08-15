@@ -101,7 +101,7 @@
 <div class="wrap">
 
   <div class="topbar">
-    <a href="../index.html">&larr; Physics you can see</a>
+    <a href="../index.html" id="backLink">&larr; Physics you can see</a>
     <div class="topbar-right">
       <span>Mass conservation</span>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
@@ -413,9 +413,24 @@
   });
   applyTheme(currentTheme());
 
+  // The relative "../index.html" link only resolves when this file is sitting in
+  // Simple_Viz/visualizations/ next to the site index. Published standalone (e.g. as an
+  // Artifact) there's no sibling index to reach, so fall back to the GitHub repo instead of
+  // leaving a link that 404s.
+  (function(){
+    var backLink = document.getElementById('backLink');
+    if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
+      backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
+      backLink.target = '_blank';
+      backLink.rel = 'noopener';
+      backLink.textContent = 'Simple Viz on GitHub ↗';
+    }
+  })();
+
   // ---- animation: tween the displayed hero height toward the target ----
   // The tween parks itself once it lands on the target, instead of holding a frame callback
   // open for the life of the page; picking a new area restarts it.
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var rafId = null;
   function tick(){
     var target = area().h;
@@ -429,7 +444,10 @@
     drawHero();
     rafId = requestAnimationFrame(tick);
   }
-  function startTween(){ if(rafId === null) rafId = requestAnimationFrame(tick); }
+  function startTween(){
+    if(reduceMotion){ state.dispH = area().h; drawHero(); return; }
+    if(rafId === null) rafId = requestAnimationFrame(tick);
+  }
 
   function measure(){
     var w = heroWrap.clientWidth;

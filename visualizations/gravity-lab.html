@@ -102,7 +102,7 @@
 <div class="wrap">
 
   <div class="topbar">
-    <a href="../index.html">&larr; Physics you can see</a>
+    <a href="../index.html" id="backLink">&larr; Physics you can see</a>
     <div class="topbar-right">
       <span>Newton's law of gravitation</span>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
@@ -390,6 +390,13 @@
         var cur = key==='m1' ? state.m1e : key==='m2' ? state.m2e : state.re;
         var pct = clamp((cur-lo)/(hi-lo)*100, 0, 100).toFixed(2)+'%';
         fill.style.width = pct; thumb.style.left = pct;
+        // These are log10 exponents, meaningless to a screen reader on their own — valuenow
+        // still carries the raw exponent (so min/now/max stay numerically consistent), but
+        // valuetext overrides what gets announced with the real mass or distance.
+        track.setAttribute('aria-valuemin', lo);
+        track.setAttribute('aria-valuemax', hi);
+        track.setAttribute('aria-valuenow', cur);
+        track.setAttribute('aria-valuetext', key==='r' ? fmtDist(r()) : fmtMass(key==='m1' ? m1() : m2()));
       }
     };
   }
@@ -460,6 +467,20 @@
     applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
   });
   applyTheme(currentTheme());
+
+  // The relative "../index.html" link only resolves when this file is sitting in
+  // Simple_Viz/visualizations/ next to the site index. Published standalone (e.g. as an
+  // Artifact) there's no sibling index to reach, so fall back to the GitHub repo instead of
+  // leaving a link that 404s.
+  (function(){
+    var backLink = document.getElementById('backLink');
+    if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
+      backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
+      backLink.target = '_blank';
+      backLink.rel = 'noopener';
+      backLink.textContent = 'Simple Viz on GitHub ↗';
+    }
+  })();
 
   function measure(){
     var w = heroWrap.clientWidth;

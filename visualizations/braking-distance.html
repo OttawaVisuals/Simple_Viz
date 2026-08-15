@@ -117,7 +117,7 @@
 <div class="wrap">
 
   <div class="topbar">
-    <a href="../index.html">&larr; Physics you can see</a>
+    <a href="../index.html" id="backLink">&larr; Physics you can see</a>
     <div class="topbar-right">
       <span>Uniform deceleration</span>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
@@ -267,6 +267,7 @@
   function brakingTime(){ var v=vms(), s=surf(); return v/(s.mu*G); }
 
   // ---- animation: car eases along the reaction + braking stretch ----
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var anim = { reactionPx:0, brakingPx:0, reactFracTime:0.3, t0:0, dur:1400 };
   var lastTargetKey = null;
   var lastGeom = null;
@@ -277,7 +278,9 @@
     var totalT = reactionTsec + brakingTsec;
     anim.reactFracTime = totalT > 0 ? clamp(reactionTsec/totalT, 0.12, 0.8) : 0.3;
     anim.t0 = performance.now();
-    anim.dur = 1400;
+    // Under reduced motion, snap to the final position instead of easing over 1.4s — the car's
+    // resting spot is the information; the tween there is just decoration.
+    anim.dur = reduceMotion ? 1 : 1400;
   }
 
   function carOffsetPx(now){
@@ -472,6 +475,10 @@
   function drawSpeedSlider(){
     var pct = ((state.v-VMIN)/(VMAX-VMIN)*100).toFixed(2)+'%';
     vFill.style.width = pct; vThumb.style.left = pct;
+    vTrack.setAttribute('aria-valuemin', VMIN);
+    vTrack.setAttribute('aria-valuemax', VMAX);
+    vTrack.setAttribute('aria-valuenow', state.v);
+    vTrack.setAttribute('aria-valuetext', state.v.toFixed(0)+' km/h');
   }
 
   [$('speedCtrl'), $('surfCtrl')].forEach(function(box){
@@ -578,6 +585,20 @@
     applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
   });
   applyTheme(currentTheme());
+
+  // The relative "../index.html" link only resolves when this file is sitting in
+  // Simple_Viz/visualizations/ next to the site index. Published standalone (e.g. as an
+  // Artifact) there's no sibling index to reach, so fall back to the GitHub repo instead of
+  // leaving a link that 404s.
+  (function(){
+    var backLink = document.getElementById('backLink');
+    if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
+      backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
+      backLink.target = '_blank';
+      backLink.rel = 'noopener';
+      backLink.textContent = 'Simple Viz on GitHub ↗';
+    }
+  })();
 
   function render(){
     drawHero();

@@ -112,7 +112,7 @@
 <div class="wrap">
 
   <div class="topbar">
-    <a href="../index.html">&larr; Physics you can see</a>
+    <a href="../index.html" id="backLink">&larr; Physics you can see</a>
     <div class="topbar-right">
       <span>Tsiolkovsky rocket equation</span>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
@@ -288,6 +288,7 @@
     };
   }
 
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var flowSpeed = 0, dashOff = 0, rafId = null;
   function tick(){
     rafId = requestAnimationFrame(tick);
@@ -467,6 +468,10 @@
         var lg = Math.log10(state.R);
         var pct = ((lg-loLog)/(hiLog-loLog)*100).toFixed(2)+'%';
         fill.style.width = pct; thumb.style.left = pct;
+        track.setAttribute('aria-valuemin', RMIN);
+        track.setAttribute('aria-valuemax', RMAX);
+        track.setAttribute('aria-valuenow', state.R);
+        track.setAttribute('aria-valuetext', 'mass ratio '+fmtR(state.R));
       }
     };
   }
@@ -594,6 +599,20 @@
   });
   applyTheme(currentTheme());
 
+  // The relative "../index.html" link only resolves when this file is sitting in
+  // Simple_Viz/visualizations/ next to the site index. Published standalone (e.g. as an
+  // Artifact) there's no sibling index to reach, so fall back to the GitHub repo instead of
+  // leaving a link that 404s.
+  (function(){
+    var backLink = document.getElementById('backLink');
+    if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
+      backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
+      backLink.target = '_blank';
+      backLink.rel = 'noopener';
+      backLink.textContent = 'Simple Viz on GitHub ↗';
+    }
+  })();
+
   function render(){
     drawHero();
     drawEquationAndLegend();
@@ -609,6 +628,8 @@
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
 
   render();
-  rafId = requestAnimationFrame(tick);
+  // The exhaust plume's scrolling dashes are purely decorative and run continuously with no
+  // way to pause them, so under reduced motion just leave the dashes static.
+  if(!reduceMotion) rafId = requestAnimationFrame(tick);
 })();
 </script>

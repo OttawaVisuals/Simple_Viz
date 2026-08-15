@@ -293,10 +293,11 @@ A full review of all twelve pages plus `index.html`. Fixes applied:
 - **`keplers-third-law.html`**: the subtitle's "only about 78 times farther out" is measured
   from Mercury, not Earth, which wasn't stated; reworded and the 690× period ratio added.
 
-Known, **not** fixed (see the review notes for detail): sliders declare `role="slider"` but set
-no `aria-valuenow`/`valuemin`/`valuemax`/`valuetext`; only `earth-moon-race.html` honours
-`prefers-reduced-motion`; and the `← Physics you can see` back link 404s when a page is
-published standalone as an Artifact.
+Known, **not** fixed at this point (see the review notes for detail): sliders declare
+`role="slider"` but set no `aria-valuenow`/`valuemin`/`valuemax`/`valuetext`; only
+`earth-moon-race.html` honours `prefers-reduced-motion`; and the `← Physics you can see` back
+link 404s when a page is published standalone as an Artifact. **All three were fixed in the
+next pass — see below.**
 
 ### `index.html` migrated to the style guide (2026-08-14)
 
@@ -323,6 +324,48 @@ distribution channel. `currentTheme()` now reads the applied `data-theme` attrib
 only consults storage for the initial load; fixed in all 13 files and in
 [STYLE_GUIDE.md](STYLE_GUIDE.md)'s snippet, with the reasoning recorded there so the broken
 version doesn't get copied into the next page.
+
+### Accessibility pass: slider ARIA, reduced motion, and the back-link 404 (2026-08-14)
+
+The three items left open by the correctness sweep above, all fixed in the same session.
+
+- **Slider `aria-value*` attributes.** All ten custom sliders across the site (fourteen
+  tracks total — `gravity-lab.html` and `straw-hose-flow.html` each have more than one) now
+  set `aria-valuemin`/`aria-valuemax`/`aria-valuenow`/`aria-valuetext` inside the same draw
+  function that already positions the fill and thumb, so they can't drift out of sync with
+  what's on screen. For the log-scale sliders (`gravity-lab.html`'s mass/distance, which store
+  a log10 *exponent* as state — see the gravity-lab fix above — plus `horizon-distance.html`,
+  `keplers-third-law.html`, `mass-energy.html`, `rocket-equation.html`), `aria-valuenow` stays
+  the raw slider value so it's numerically consistent with min/max, while `aria-valuetext`
+  carries the real-world value and unit a screen reader should actually announce — reusing
+  each page's existing `fmt*()` formatter rather than writing a second one. Full pattern in
+  [STYLE_GUIDE.md](STYLE_GUIDE.md#component-patterns).
+- **`prefers-reduced-motion`.** Previously only `earth-moon-race.html` checked it. Two shapes
+  of animation needed it, treated differently:
+  - Continuous, no-pause-control loops — the orbiting planet in `keplers-third-law.html`
+    (which, unlike every other animated page, has no play/pause at all and was just spinning
+    from page load) and the scrolling exhaust/flow dashes in `rocket-equation.html` and
+    `straw-hose-flow.html` — now simply don't start their `requestAnimationFrame` loop under
+    reduced motion. The page is still fully correct at rest; it just doesn't move on its own.
+  - Bounded tweens triggered by interaction — the car easing along the road in
+    `braking-distance.html` and the salt column easing to height in `ocean-salt.html` — now
+    snap straight to the end state instead of easing over ~1.4s / ~12%-per-frame. `earth-moon-
+    race.html`'s bouncing light and `lightning-distance.html`'s "play it out" button were left
+    alone: those animations are the content the user asked to see by pressing play, not
+    decoration layered on top of a static result.
+  - `mass-energy.html`, `gravity-lab.html`, `horizon-distance.html`, `eratosthenes-
+    shadow.html`, and `planet-light-delay.html` have no continuous or auto-triggered
+    animation (confirmed: no `requestAnimationFrame` in any of them) and needed no change.
+- **Back-link 404 on standalone Artifacts.** The relative `../index.html` link only resolves
+  when the file is physically sitting in `visualizations/` next to the site index — true for
+  the primary "open the file directly" use case, false when published standalone. Every page
+  now checks `location.pathname` against `/\/visualizations\/[^\/]+\.html?$/i` on load; when
+  it doesn't match, the link is repointed to the GitHub repo (`OttawaVisuals/Simple_Viz`,
+  opened in a new tab) instead of staying dead. Deliberately not a `fetch` probe — `fetch` to
+  a relative path from a `file://` page is blocked by CORS in Chrome, which would have broken
+  detection on exactly the primary use case it needs to preserve. Verified: this browser
+  tooling's own preview pane serves local files through a `data:` URL wrapper rather than real
+  `file://` navigation, which happens to be a second real case the fallback correctly catches.
 
 ## Roadmap
 

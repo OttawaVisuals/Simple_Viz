@@ -111,7 +111,7 @@
 <div class="wrap">
 
   <div class="topbar">
-    <a href="../index.html">&larr; Physics you can see</a>
+    <a href="../index.html" id="backLink">&larr; Physics you can see</a>
     <div class="topbar-right">
       <span>d = v&middot;&Delta;t</span>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
@@ -420,6 +420,11 @@
     var pct = ((state.dt-DTMIN)/(DTMAX-DTMIN)*100).toFixed(2)+'%';
     $('dtFill').style.width = pct; $('dtThumb').style.left = pct;
     $('dtReadout').textContent = state.dt.toFixed(1)+' s';
+    var track = $('dtTrack');
+    track.setAttribute('aria-valuemin', DTMIN);
+    track.setAttribute('aria-valuemax', DTMAX);
+    track.setAttribute('aria-valuenow', state.dt);
+    track.setAttribute('aria-valuetext', state.dt.toFixed(1)+' seconds');
   }
 
   // ---- play / animate ----
@@ -546,6 +551,20 @@
   }
   themeToggle.addEventListener('click', function(){ applyTheme(currentTheme()==='dark'?'light':'dark'); });
   applyTheme(currentTheme());
+
+  // The relative "../index.html" link only resolves when this file is sitting in
+  // Simple_Viz/visualizations/ next to the site index. Published standalone (e.g. as an
+  // Artifact) there's no sibling index to reach, so fall back to the GitHub repo instead of
+  // leaving a link that 404s.
+  (function(){
+    var backLink = document.getElementById('backLink');
+    if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
+      backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
+      backLink.target = '_blank';
+      backLink.rel = 'noopener';
+      backLink.textContent = 'Simple Viz on GitHub ↗';
+    }
+  })();
 
   function measure(){
     var w = heroWrap.clientWidth;

@@ -183,6 +183,25 @@ arrow-key/Home/End support on the track element for keyboard accessibility. Hove
 dragging a slider sets an `active` key in page state, which both the slider's own label and
 the linked equation term/legend row read to decide whether to render in `--accent`.
 
+**`role="slider"` needs its `aria-value*` attributes set too, or a screen reader announces a
+slider with no value.** This was missing on all ten sliders across the site until 2026-08-14.
+Set all four on every render, inside the same function that already positions the fill and
+thumb — don't add a separate update path that can drift out of sync:
+
+```js
+track.setAttribute('aria-valuemin', lo);
+track.setAttribute('aria-valuemax', hi);
+track.setAttribute('aria-valuenow', cur);      // the raw slider value, for min/now/max consistency
+track.setAttribute('aria-valuetext', fmt(cur)); // the value a listener should actually hear
+```
+
+`aria-valuenow` should stay numerically consistent with `aria-valuemin`/`aria-valuemax` — for
+a log-scale slider (or a gravity-lab-style log10-exponent slider) that means the raw slider
+position, not the real-world value, since the two can't both anchor the same min/max pair.
+`aria-valuetext` is what actually gets announced and always overrides `aria-valuenow` for
+that purpose, so it's the one that should carry the honest real-world value and unit — reuse
+whatever `fmt*()` function the readout already calls, don't write a second formatter.
+
 **Result readout** — big mono number + smaller muted unit, with the verdict text
 (e.g. "Possible." / "Impossible") inline immediately after on the same line, not on its own
 line below. A secondary explanatory line follows underneath in `--muted2`. Below that, an
@@ -193,6 +212,30 @@ a resize observer).
 
 **Presets row** — text-styled buttons (no border/background, just an underline), each
 setting the full interactive state to a named real-world example in one click.
+
+**Back link** — `<a href="../index.html" id="backLink">&larr; Physics you can see</a>` in the
+topbar only resolves when the file is actually sitting in `visualizations/` next to the site
+index — true when opened straight from the repo (the primary use case per CLAUDE.md) or from
+a real deployment at the same relative layout, but not when the page is published standalone
+(e.g. as an Artifact), where there's no sibling `index.html` to reach and the link 404s. Every
+page detects this and falls back to the GitHub repo instead of leaving a dead link — add this
+right after the theme-toggle's `applyTheme(currentTheme());` call:
+
+```js
+(function(){
+  var backLink = document.getElementById('backLink');
+  if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
+    backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
+    backLink.target = '_blank';
+    backLink.rel = 'noopener';
+    backLink.textContent = 'Simple Viz on GitHub ↗';
+  }
+})();
+```
+
+The check is a pure `location.pathname` regex — no `fetch` probe, since `fetch` to a relative
+path on a `file://` page is blocked by CORS in Chrome and would false-negative on exactly the
+"open the file directly" case this is meant to protect.
 
 ## JS architecture notes
 
@@ -207,3 +250,20 @@ setting the full interactive state to a named real-world example in one click.
 - Prefer JS-driven `requestAnimationFrame` tweens over CSS `transition`/`transform` for any
   SVG geometry animation — see the "gotcha" note in [HANDOVER.md](HANDOVER.md) under
   `straw-hose-flow.html`'s history.
+- **Any animation that runs on its own — with no user action ending it — must check
+  `prefers-reduced-motion` before it starts.** Two shapes of this on the site:
+  - A **continuous decorative loop** with no pause control (the orbiting planet in
+    `keplers-third-law.html`, the scrolling exhaust/flow dashes in `rocket-equation.html` and
+    `straw-hose-flow.html`): just don't call the initial `requestAnimationFrame(tick)` when
+    `matchMedia('(prefers-reduced-motion: reduce)').matches` — the page still renders
+    correctly at rest, it simply doesn't move on its own.
+  - A **bounded tween triggered by interaction** (the car easing along the road in
+    `braking-distance.html`, the column height easing to its target in `ocean-salt.html`):
+    snap straight to the end state instead of easing — either set the tween's duration to
+    ~0 or skip the loop and assign the final value directly. The end state is what carries
+    the information; the easing there is decoration, unlike `earth-moon-race.html`'s bouncing
+    light or `lightning-distance.html`'s "play it out" wavefront, where the animation *is*
+    the content the user asked to see by pressing play — leave a genuinely user-initiated,
+    bounded animation alone.
+  - Compute `reduceMotion` once at the top of the page's IIFE, next to the other constants —
+    don't re-query `matchMedia` inside the render loop.

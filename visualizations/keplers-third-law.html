@@ -103,7 +103,7 @@
 <div class="wrap">
 
   <div class="topbar">
-    <a href="../index.html">&larr; Physics you can see</a>
+    <a href="../index.html" id="backLink">&larr; Physics you can see</a>
     <div class="topbar-right">
       <span>Kepler's third law</span>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
@@ -303,6 +303,7 @@
   // animation: map real period T (years) to a fixed number of animation seconds per "year"
   // so a slow Neptune-like orbit still visibly completes within a reasonable time.
   var SECONDS_PER_YEAR = 1.4; // 1 simulated year of orbital period = 1.4 real seconds
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var lastT = null;
   function tick(ts){
     requestAnimationFrame(tick);
@@ -386,6 +387,10 @@
         var f = (Math.log10(state.a)-logLo)/(logHi-logLo);
         var pct = (clamp(f,0,1)*100).toFixed(2)+'%';
         fill.style.width = pct; thumb.style.left = pct;
+        track.setAttribute('aria-valuemin', AMIN);
+        track.setAttribute('aria-valuemax', AMAX);
+        track.setAttribute('aria-valuenow', state.a);
+        track.setAttribute('aria-valuetext', state.a.toFixed(2)+' AU');
       }
     };
   }
@@ -488,6 +493,20 @@
   });
   applyTheme(currentTheme());
 
+  // The relative "../index.html" link only resolves when this file is sitting in
+  // Simple_Viz/visualizations/ next to the site index. Published standalone (e.g. as an
+  // Artifact) there's no sibling index to reach, so fall back to the GitHub repo instead of
+  // leaving a link that 404s.
+  (function(){
+    var backLink = document.getElementById('backLink');
+    if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
+      backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
+      backLink.target = '_blank';
+      backLink.rel = 'noopener';
+      backLink.textContent = 'Simple Viz on GitHub ↗';
+    }
+  })();
+
   function render(){
     drawHeroDynamic();
     drawEquationAndLegend();
@@ -503,6 +522,9 @@
 
   drawHeroStatic();
   render();
-  requestAnimationFrame(tick);
+
+  // This page has no play/pause of its own — the orbit just spins continuously from load, so
+  // reduced motion means not starting it at all rather than relabeling a control.
+  if(!reduceMotion) requestAnimationFrame(tick);
 })();
 </script>

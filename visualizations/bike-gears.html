@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Same legs, different gear</title>
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  .topgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
+
+  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqn{display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);font-size:clamp(28px,3.6vw,42px);line-height:1;font-weight:300}
+  .eqn .eq{color:var(--muted)}
+  .eqn .frac{display:inline-flex;flex-direction:column;align-items:center}
+  .eqn .frac .row{display:flex;gap:.16em;align-items:flex-start}
+  .eqn .frac .num{padding:0 .3em .06em}
+  .eqn .frac .den{padding:.06em .3em 0}
+  .eqn .frac .bar{height:1.5px;background:var(--fg);width:100%}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .eqn sub{font-size:.5em;position:relative;bottom:-.22em;font-style:italic}
+
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:2.1em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:8px 2px}
+  .legend .sym{font-size:17px;font-weight:300;transition:color .2s}
+  .legend .sym sub{font-size:.55em;position:relative;bottom:-.2em}
+  .legend .name{font-size:12.5px;color:var(--muted2)}
+  .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero svg{width:100%;height:auto;display:block}
+
+  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
+
+  .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  /* text-transform:none, unlike straw-hose-flow: the symbols here are case-bearing (f is not F,
+     and N_c is not N_C), so the uppercasing the topbar-style label applies must stop at the em. */
+  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;text-transform:none;transition:color .2s}
+  .ctrl-title em sub{font-size:.6em;position:relative;bottom:-.2em}
+  .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
+  .pick-buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .pick-buttons button{cursor:pointer;font-family:Georgia,serif;font-style:italic;font-size:15px;padding:6px 13px 7px;border-radius:999px;transition:all .18s ease;border:1px solid var(--border);background:transparent;color:var(--muted)}
+  .pick-buttons button:hover{color:var(--fg)}
+  .pick-note{margin-top:11px;font-size:13.5px;line-height:1.45;color:var(--muted)}
+  .readout{font-family:ui-monospace,monospace;font-size:clamp(26px,2.8vw,34px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
+  .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
+  .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
+  .track .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
+  .track .thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
+  .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
+
+  .result{text-align:left}
+  .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
+  .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
+  .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px}
+  .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
+  .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
+  /* The big number is the equation's output (speed); the gauge below measures what that speed
+     costs your legs, so unlike straw-hose-flow it needs its own caption to say what it plots. */
+  .gauge-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:22px;display:block}
+  .gauge{position:relative;height:66px;margin-top:10px;max-width:420px}
+  .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
+  .gauge .reach{position:absolute;top:14px;height:10px;border-radius:2px 0 0 2px;background:color-mix(in srgb, var(--accent) 16%, transparent);left:0}
+  .gauge .tick{position:absolute;top:26px;width:1px;height:5px;background:var(--line2)}
+  .gauge .ticklabel{position:absolute;top:33px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
+  .gauge .limit{position:absolute;top:9px;height:20px;width:1px;background:var(--bad)}
+  /* Below the axis, not above it: the marker pins to the right-hand end whenever the gear is
+     unturnable, which is exactly when its own label would land on top of this one. */
+  .gauge .limitlabel{position:absolute;top:47px;white-space:nowrap;font:400 9px ui-monospace,monospace;letter-spacing:.05em;color:var(--bad);transform:translateX(-50%)}
+  .gauge .ghost{position:absolute;top:11px;height:16px;width:1px;background:var(--line2)}
+  .gauge .mark{position:absolute;top:12px;height:14px;width:3px;border-radius:2px;transition:left .12s linear}
+  .gauge .marklabel{position:absolute;top:-3px;white-space:nowrap;font:500 11px ui-monospace,monospace;transition:left .12s linear}
+
+  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+  .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
+  .preset:hover{border-color:var(--accent);color:var(--accent)}
+
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;max-width:88ch;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../index.html" id="backLink">&larr; Physics you can see</a>
+    <div class="topbar-right">
+      <span>Development</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>Same legs, <em>different gear</em>.</h1>
+      <p class="sub">Turn the pedals at one steady rate and the gear decides what that becomes &mdash; sixty-odd kilometres an hour on the flat, or a force your leg simply cannot push up a hill. You never get both.</p>
+    </div>
+
+    <div class="eqnbox">
+      <div class="eqn">
+        <span><em>v</em></span>
+        <span class="eq">=</span>
+        <span>&pi;<em>D</em></span>
+        <span class="frac">
+          <span class="row num"><em id="ncTerm">N<sub>c</sub></em></span>
+          <span class="bar"></span>
+          <span class="row den"><em id="nsTerm">N<sub>s</sub></em></span>
+        </span>
+        <span><em id="fTerm">f</em></span>
+      </div>
+    </div>
+
+    <div class="legendbox">
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="hero" id="heroWrap">
+    <svg id="heroSvg" role="img" aria-label="A magnified view of a bicycle chainring, chain and rear sprocket beside a scale bar showing how far one turn of the pedals carries the bike along the road.">
+      <g id="gRuler"></g>
+      <g id="gBike"></g>
+      <g id="gWheelR"></g>
+      <g id="gWheelF"></g>
+      <g id="gLens"></g>
+      <g id="gPanel"></g>
+      <path id="chainPath" fill="none"></path>
+      <g id="gSprMark"></g>
+      <g id="gCrank"></g>
+      <g id="gPanelText"></g>
+    </svg>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrls">
+      <div class="ctrl" id="ncCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Chainring <em id="ncLabel">N<sub>c</sub></em></span>
+          <span class="ctrl-rel">N<sub>c</sub> &prop; v</span>
+        </div>
+        <div class="readout mono" id="ncReadout"></div>
+        <div class="track" id="ncTrack" tabindex="0" role="slider" aria-label="Chainring teeth">
+          <div class="rail"></div>
+          <div class="fill" id="ncFill"></div>
+          <div class="thumb" id="ncThumb"></div>
+        </div>
+        <div class="track-range"><span>28t</span><span class="mid">more teeth &middot; taller gear</span><span>53t</span></div>
+      </div>
+
+      <div class="ctrl" id="nsCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Sprocket <em id="nsLabel">N<sub>s</sub></em></span>
+          <span class="ctrl-rel">1/N<sub>s</sub> &prop; v</span>
+        </div>
+        <div class="readout mono" id="nsReadout"></div>
+        <div class="track" id="nsTrack" tabindex="0" role="slider" aria-label="Rear sprocket teeth">
+          <div class="rail"></div>
+          <div class="fill" id="nsFill"></div>
+          <div class="thumb" id="nsThumb"></div>
+        </div>
+        <div class="track-range"><span>11t</span><span class="mid">more teeth &middot; easier gear</span><span>36t</span></div>
+      </div>
+
+      <div class="ctrl" id="rpmCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Cadence <em id="fLabel">f</em></span>
+          <span class="ctrl-rel">f &prop; v</span>
+        </div>
+        <div class="readout mono" id="rpmReadout"></div>
+        <div class="track" id="rpmTrack" tabindex="0" role="slider" aria-label="Pedalling cadence">
+          <div class="rail"></div>
+          <div class="fill" id="rpmFill"></div>
+          <div class="thumb" id="rpmThumb"></div>
+        </div>
+        <div class="track-range"><span>40 rpm</span><span class="mid">how fast your legs go round</span><span>130 rpm</span></div>
+      </div>
+
+      <div class="ctrl" id="gradeCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Road</span>
+          <span class="ctrl-rel">&rarr; pedal force</span>
+        </div>
+        <div class="pick-buttons" id="gradeButtons"></div>
+        <div class="pick-note" id="gradeNote"></div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Speed</div>
+      <div class="result-value"><span class="num mono" id="spdValue"></span><span class="unit mono">km/h</span><span class="v" id="verdict"></span></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+      <div class="effort-line" id="effortLine"></div>
+      <span class="gauge-label">Force on the pedal</span>
+      <div class="gauge" id="gauge">
+        <div class="track"></div>
+        <div class="reach" id="gReach"></div>
+        <div class="limit" id="gLimit"></div>
+        <div class="limitlabel" id="gLimitLabel">your body weight</div>
+        <div class="ghost" id="gGhost"></div>
+        <div class="mark" id="gMark"></div>
+        <div class="marklabel mono" id="gMarkLabel"></div>
+        <div id="gTicks"></div>
+        <div id="gLabels"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-p="cruise">steady cruise</button>
+    <button class="preset" data-p="sprint">sprinting flat out</button>
+    <button class="preset" data-p="climb">climbing a wall</button>
+    <button class="preset" data-p="wrong">the wrong gear</button>
+  </div>
+
+  <p class="note">A bicycle gear is a ratio, not a mechanism you can cheat: the chainring turns the sprocket <span class="mono" id="noteRatio">3.33</span> times for every turn of the pedals, so one pedal stroke carries you that many wheel turns down the road &mdash; and divides the force you push into the road by exactly the same number. <a href="https://en.wikipedia.org/wiki/Bicycle_gearing" target="_blank" rel="noopener">Bicycle gearing</a> calls that distance the <em style="font-style:italic">development</em>. Numbers used: a 700&times;25c wheel, rolling circumference 2,105 mm (so D = 670 mm); chain pitch 12.7 mm, which sets the tooth spacing drawn above; 172.5 mm cranks; a 75 kg rider on an 8 kg bike; rolling resistance coefficient 0.005; drag area C<sub>d</sub>A = 0.35 m&sup2; in air of density 1.225 kg/m&sup3;; 97% drivetrain efficiency. The pedal force is the <em style="font-style:italic">average</em> tangential force over a whole revolution, worked back from the power needed to hold that speed &mdash; a real pedal stroke is lumpy, peaking at roughly twice the average near the top of the downstroke, so the worst moment is harder than the number shown. Force is the thing the gear ratio actually sets, which is why it gets the gauge; whether you could <em style="font-style:italic">keep</em> pushing it is a question about power instead, so that number sits beside it (a fit amateur holds something like 250 W for an hour, a sprinter well over 1,000 W for a few seconds). The gauge's reference line is the rider's own weight, 736 N, which is about all you can put through one pedal by standing on it without hauling up on the bars. Steady speed only: no wind, no drafting, and nothing here covers accelerating.</p>
+
+</div>
+</main>
+<script>
+(function(){
+  // ---- real constants ----
+  var CHAIN_PITCH = 12.7;              // mm, half-inch chain
+  var WHEEL_CIRC  = 2.105;             // m, rolling circumference of a 700x25c wheel
+  var WHEEL_D     = WHEEL_CIRC/Math.PI;// m, 0.670
+  var CRANK_MM    = 172.5;
+  var CHAINSTAY_MM= 410;
+  var BBDROP_MM   = 70;                // bottom bracket sits this far below the rear axle
+  var RIDER_KG    = 75, BIKE_KG = 8;
+  var TOTAL_KG    = RIDER_KG + BIKE_KG;
+  var G           = 9.81;
+  var CRR         = 0.005;             // rolling resistance, good tyres on asphalt
+  var CDA         = 0.35;              // m^2, hands on the hoods
+  var RHO         = 1.225;             // kg/m^3
+  var DRIVE_EFF   = 0.97;
+  var BODY_N      = RIDER_KG*G;        // 735.8 N — the gauge's reference line
+  var GAUGE_MAX   = 1200;              // N
+
+  var NC_MIN=28, NC_MAX=53, NS_MIN=11, NS_MAX=36, RPM_MIN=40, RPM_MAX=130;
+
+  // Per-concept colours: these identify a road, not theme chrome, so they sit outside the
+  // token set (see STYLE_GUIDE.md). Ordered easy to brutal, avoiding --bad's red so a steep
+  // road never reads as an "impossible" verdict.
+  var GRADES = [
+    {name:'Flat',    g:0,    color:'#6E93B8', label:'flat road', note:'Only rolling resistance and the air to beat.'},
+    {name:'Rolling', g:0.03, color:'#6E9B6A', label:'3% rise',   note:'A gentle drag &mdash; the kind you barely name.'},
+    {name:'Steep',   g:0.08, color:'#C0913F', label:'8% climb',  note:'A serious road climb. Gearing starts to matter.'},
+    {name:'Wall',    g:0.15, color:'#8A6FA8', label:'15% climb', note:'A wall. This is the reason a 34&times;34 exists.'}
+  ];
+
+  // The bands describe the push, not how long you could keep it up: force is what the gear
+  // ratio actually sets, while stamina answers to power, which the effort line reports beside it.
+  var BANDS = [
+    {max:120,          word:'Easy.',          sub:'A light push you would barely register.'},
+    {max:320,          word:'Steady.',        sub:'A firm, even push — the everyday pedalling feel.'},
+    {max:BODY_N,       word:'Hard.',          sub:'Heavy enough that you would want to stand up.'},
+    {max:1.5*BODY_N,   word:'Sprint only.',   sub:'More than your own weight on one pedal — seconds, not minutes.'},
+    {max:Infinity,     word:"Can't turn it.", sub:'Past what you could push standing up and hauling on the bars.'}
+  ];
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+  function ratioTxt(x){
+    if(x<10) return x.toFixed(1)+'×';
+    if(x<1000) return Math.round(x)+'×';
+    return Math.round(x).toLocaleString()+'×';
+  }
+
+  var NS='http://www.w3.org/2000/svg';
+  function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+  function clear(g){ while(g.firstChild) g.removeChild(g.firstChild); }
+
+  var state = { nc:50, ns:15, rpm:90, grade:0, active:null, drag:null, ghostF:null };
+  var heroW = 0, H = null;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
+  var gRuler=$('gRuler'), gBike=$('gBike'), gWheelR=$('gWheelR'), gWheelF=$('gWheelF');
+  var gLens=$('gLens'), gPanel=$('gPanel'), gPanelText=$('gPanelText');
+  var chainPath=$('chainPath'), gSprMark=$('gSprMark'), gCrank=$('gCrank');
+
+  // ---- physics ----
+  function grade(){ return GRADES[state.grade]; }
+  function ratio(){ return state.nc/state.ns; }
+  function devel(){ return WHEEL_CIRC*ratio(); }          // metres per pedal revolution
+  function speed(){ return devel()*state.rpm/60; }        // m/s
+  function wheelPower(v,g){
+    var th = Math.atan(g);
+    var resist = TOTAL_KG*G*(Math.sin(th) + CRR*Math.cos(th));
+    return v*resist + 0.5*RHO*CDA*v*v*v;                  // W delivered at the tyre
+  }
+  function pedalForce(){
+    var pw = wheelPower(speed(), grade().g)/DRIVE_EFF;    // W at the crank
+    var omega = state.rpm*2*Math.PI/60;
+    return pw/omega/(CRANK_MM/1000);                      // N, averaged over the stroke
+  }
+  function band(f){ for(var i=0;i<BANDS.length;i++) if(f<=BANDS[i].max) return BANDS[i]; return BANDS[BANDS.length-1]; }
+
+  // ---- hero geometry: viewBox width == measured CSS px width, so 1 unit = 1px ----
+  // Two registers side by side (stacked when narrow): the drivetrain, magnified enough to
+  // count teeth, and the road at true scale showing how far one pedal turn carries you.
+  // They are at wildly different scales, so the magnified panel carries its factor in a
+  // caption and connects to the bike by the site's dashed lens-box convention.
+  function geom(w){
+    var narrow = w < 760;
+    var PAD = 14;
+    var RULER_M = 11;   // one pedal turn tops out at 53/11 × 2.105 m = 10.14 m
+
+    var rcMaxMM = NC_MAX*CHAIN_PITCH/(2*Math.PI);   // 107.1
+    var rsMaxMM = NS_MAX*CHAIN_PITCH/(2*Math.PI);   //  72.8
+    // Scale from the *widest* possible parts, not the current ones, so the panel keeps a
+    // fixed scale (and a fixed magnification caption) while the sliders move.
+    var blockMM = rsMaxMM + CHAINSTAY_MM + Math.max(rcMaxMM, CRANK_MM) + 16;
+    var panelW  = narrow ? (w - 2*PAD) : Math.min(470, w*0.42);
+    var S1 = panelW/blockMM;
+
+    var crankPx = CRANK_MM*S1, dropPx = BBDROP_MM*S1;
+    var rc = state.nc*CHAIN_PITCH/(2*Math.PI)*S1;
+    var rs = state.ns*CHAIN_PITCH/(2*Math.PI)*S1;
+
+    // Rear hub on the left, bottom bracket on the right — the bike faces right, same as the
+    // silhouette on the road below, so the two views can't read as mirror images.
+    var hx = PAD + rsMaxMM*S1;
+    var hy = 12 + Math.max(crankPx - dropPx, rsMaxMM*S1);
+    var bx = hx + CHAINSTAY_MM*S1, by = hy + dropPx;
+    var panelBot = by + crankPx + 8;
+    var capY = panelBot + 16;
+
+    var rulerX, roadY, pxPerM, vbH, blockUp;
+    if(narrow){
+      rulerX = PAD;
+      pxPerM = (w - 2*PAD)/RULER_M;
+      blockUp = Math.round(0.95*pxPerM) + 24;
+      roadY  = capY + blockUp + 30;
+      vbH    = roadY + 34;
+    } else {
+      rulerX = PAD + panelW + 60;
+      pxPerM = Math.max(8, (w - PAD - rulerX)/RULER_M);
+      vbH    = Math.max(capY + 12, 230);
+      // The development bracket has to clear the bike's saddle, which sets how tall the ruler
+      // block is; centre that block against the taller drivetrain panel beside it.
+      blockUp = Math.round(0.95*pxPerM) + 24;
+      roadY  = clamp(Math.round((vbH + blockUp - 25)/2), blockUp + 12, vbH - 30);
+    }
+    var brkY = roadY - blockUp + 10;
+
+    // chain: the two external tangents between chainring and sprocket
+    var dx = bx-hx, dy = by-hy, L = Math.hypot(dx,dy), a = Math.atan2(dy,dx);
+    var b = Math.acos(clamp((rc-rs)/L, -1, 1));
+    var d0 = devel();
+
+    return {
+      w:w, vbH:vbH, narrow:narrow, S1:S1, pxPerM:pxPerM,
+      hx:hx, hy:hy, bx:bx, by:by, rc:rc, rs:rs, crankPx:crankPx,
+      chainA:a, chainB:b, capY:capY, panelBot:panelBot, panelW:panelW, panelL:PAD,
+      mag: S1/(pxPerM/1000),
+      rulerX:rulerX, roadY:roadY, brkY:brkY, rulerM:RULER_M, rulerPx:pxPerM*RULER_M,
+      devPx: d0*pxPerM, wheelPx: WHEEL_CIRC*pxPerM, dev:d0
+    };
+  }
+
+  // ---- static drawing ----
+  function teeth(g, cx, cy, r, n){
+    // The teeth are drawn at their real pitch spacing but held still: a real chainring turns
+    // its teeth past ~80 per second, which no 60 fps redraw can show without aliasing into a
+    // slow backwards crawl. The crank arm and the chain carry the motion instead.
+    var body = el('circle',{cx:cx, cy:cy, r:Math.max(1,r-2.2), fill:'none', stroke:'var(--line2)', 'stroke-width':1.2});
+    g.appendChild(body);
+    for(var i=0;i<n;i++){
+      var th = i/n*2*Math.PI;
+      var c=Math.cos(th), s=Math.sin(th);
+      g.appendChild(el('line',{x1:cx+c*(r-2.2), y1:cy+s*(r-2.2), x2:cx+c*(r+1.6), y2:cy+s*(r+1.6),
+        stroke:'var(--muted2)', 'stroke-width':1, 'stroke-linecap':'butt'}));
+    }
+    g.appendChild(el('circle',{cx:cx, cy:cy, r:3, fill:'var(--fg)'}));
+  }
+
+  function chainD(h){
+    // Sample the loop rather than fight SVG arc flags: two straight runs plus the wrap arcs.
+    var pts=[], i, th;
+    var p1 = h.chainA + h.chainB, p2 = h.chainA - h.chainB;
+    pts.push([h.bx + h.rc*Math.cos(p1), h.by + h.rc*Math.sin(p1)]);
+    pts.push([h.hx + h.rs*Math.cos(p1), h.hy + h.rs*Math.sin(p1)]);
+    for(i=1;i<=40;i++){ th = p1 - (p1-p2)*i/40; pts.push([h.hx + h.rs*Math.cos(th), h.hy + h.rs*Math.sin(th)]); }
+    pts.push([h.bx + h.rc*Math.cos(p2), h.by + h.rc*Math.sin(p2)]);
+    var sweep = 2*Math.PI - 2*h.chainB;
+    for(i=1;i<=40;i++){ th = p2 - sweep*i/40; pts.push([h.bx + h.rc*Math.cos(th), h.by + h.rc*Math.sin(th)]); }
+    return 'M' + pts.map(function(p){ return p[0].toFixed(2)+','+p[1].toFixed(2); }).join('L') + 'Z';
+  }
+
+  function txt(g, x, y, s, opt){
+    var o = opt||{};
+    var t = el('text',{x:x, y:y, fill:o.fill||'var(--muted)', 'font-size':o.size||10.5,
+      'font-family':'ui-monospace,"Cascadia Code",monospace', 'text-anchor':o.anchor||'middle'});
+    if(o.weight) t.setAttribute('font-weight', o.weight);
+    t.textContent = s; g.appendChild(t); return t;
+  }
+
+  function bikePath(g, x0, y0, m, gr){
+    // Side view at true scale on the ruler, facing right. Metres, measured from the rear
+    // contact patch; the rear axle sits one wheel-radius up from the road.
+    var R = WHEEL_D/2;
+    var P = function(mx,my){ return [x0+mx*m, y0-my*m]; };
+    var rear=P(0,R), front=P(1.02,R), bb=P(0.405,0.27), seat=P(0.35,0.76), head=P(0.90,0.79);
+    var line = function(p,q,wd){ g.appendChild(el('line',{x1:p[0],y1:p[1],x2:q[0],y2:q[1],
+      stroke:'var(--muted2)','stroke-width':wd||1.4,'stroke-linecap':'round'})); };
+    line(rear,bb); line(bb,seat); line(seat,head); line(bb,head); line(rear,seat);
+    line(head,front);
+    line(P(0.24,0.80),P(0.44,0.80));                       // saddle
+    line(P(0.86,0.84),P(1.00,0.84));                       // bar
+    g.appendChild(el('circle',{cx:bb[0], cy:bb[1], r:Math.max(1.5,state.nc*CHAIN_PITCH/(2*Math.PI)/1000*m),
+      fill:'none', stroke:gr.color, 'stroke-width':1.2}));
+    return {rear:rear, front:front, R:R*m};
+  }
+
+  function wheel(g, cx, cy, r, gr){
+    g.appendChild(el('circle',{cx:cx, cy:cy, r:r, fill:'none', stroke:'var(--fg)', 'stroke-width':1.6}));
+    for(var i=0;i<3;i++){
+      var th = i/3*2*Math.PI;
+      g.appendChild(el('line',{x1:cx, y1:cy, x2:cx+r*Math.cos(th), y2:cy+r*Math.sin(th),
+        stroke:'var(--line2)', 'stroke-width':1}));
+    }
+    g.appendChild(el('circle',{cx:cx, cy:cy, r:1.6, fill:gr.color}));
+  }
+
+  function drawHero(){
+    var w = heroW || heroWrap.clientWidth || 1100;
+    var h = geom(w); H = h;
+    var gr = grade();
+
+    heroSvg.setAttribute('viewBox','0 0 '+w+' '+h.vbH);
+
+    // --- magnified drivetrain ---
+    clear(gPanel); clear(gPanelText); clear(gCrank); clear(gSprMark);
+    teeth(gPanel, h.hx, h.hy, h.rs, state.ns);
+    teeth(gPanel, h.bx, h.by, h.rc, state.nc);
+    chainPath.setAttribute('d', chainD(h));
+    chainPath.setAttribute('stroke','var(--muted2)');
+    chainPath.setAttribute('stroke-width', Math.max(1.4, 3*h.S1));
+    chainPath.setAttribute('stroke-dasharray', (CHAIN_PITCH*h.S1*0.5).toFixed(2)+' '+(CHAIN_PITCH*h.S1*0.5).toFixed(2));
+
+    gCrank.appendChild(el('line',{x1:h.bx, y1:h.by, x2:h.bx+h.crankPx, y2:h.by,
+      stroke:'var(--fg)', 'stroke-width':Math.max(3,7*h.S1), 'stroke-linecap':'round'}));
+    var pedal = el('g'); pedal.setAttribute('id','gPedal');
+    pedal.appendChild(el('rect',{x:h.bx+h.crankPx-3, y:h.by-9, width:6, height:18, rx:2,
+      fill:'var(--bg)', stroke:'var(--fg)', 'stroke-width':1.4}));
+    gCrank.appendChild(pedal);
+    gSprMark.appendChild(el('line',{x1:h.hx, y1:h.hy, x2:h.hx, y2:h.hy-Math.max(3,h.rs-3),
+      stroke:'var(--fg)', 'stroke-width':1.6, 'stroke-linecap':'round'}));
+
+    txt(gPanelText, h.hx, h.hy - h.rs - 9, state.ns+'t', {fill:'var(--fg)', size:12, weight:500});
+    txt(gPanelText, h.bx, h.by - h.rc - 9, state.nc+'t', {fill:'var(--fg)', size:12, weight:500});
+    // Ratio label inside the chain loop, between the two circles, where nothing else is drawn.
+    txt(gPanelText, (h.hx+h.bx)/2, (h.hy+h.by)/2 + 5, ratioTxt(ratio()),
+      {fill:'var(--muted2)', size:14, weight:500});
+    txt(gPanelText, h.panelL, h.capY, 'drivetrain, magnified '+Math.round(h.mag)+'×',
+      {anchor:'start', size:10.5});
+
+    // --- road, ruler, bike ---
+    clear(gRuler); clear(gBike); clear(gWheelR); clear(gWheelF); clear(gLens);
+    var X0 = h.rulerX, Y0 = h.roadY, m = h.pxPerM;
+    gRuler.appendChild(el('line',{x1:X0, y1:Y0, x2:X0+h.rulerPx, y2:Y0,
+      stroke:gr.color, 'stroke-width':2, 'stroke-linecap':'round'}));
+    var lastMajor = h.rulerM - (h.rulerM % 2);   // the ruler runs to 11 m, so 10 carries the unit
+    for(var s=0;s<=h.rulerM;s++){
+      var x = X0 + s*m, major = s%2===0;
+      gRuler.appendChild(el('line',{x1:x, y1:Y0+2, x2:x, y2:Y0+(major?8:5),
+        stroke:'var(--line2)', 'stroke-width':1}));
+      if(major) txt(gRuler, x, Y0+21, s===lastMajor ? s+' m' : String(s), {size:10});
+    }
+    txt(gRuler, X0+h.rulerPx, Y0-10, gr.label, {anchor:'end', size:10.5, fill:gr.color, weight:500});
+
+    // the development bracket: one turn of the pedals, measured along the same ruler. It rides
+    // above the bike's saddle rather than down at the road, or the left end cap would be drawn
+    // straight through the rider's seat tube.
+    var BY = h.brkY, dpx = Math.min(h.devPx, h.rulerPx);
+    gRuler.appendChild(el('line',{x1:X0, y1:BY, x2:X0+dpx, y2:BY, stroke:'var(--accent)', 'stroke-width':1.4}));
+    gRuler.appendChild(el('line',{x1:X0, y1:BY-5, x2:X0, y2:BY+6, stroke:'var(--accent)', 'stroke-width':1}));
+    gRuler.appendChild(el('line',{x1:X0+dpx, y1:BY-5, x2:X0+dpx, y2:BY+6, stroke:'var(--accent)', 'stroke-width':1}));
+    for(var k=1;k*h.wheelPx < dpx-1; k++){
+      gRuler.appendChild(el('line',{x1:X0+k*h.wheelPx, y1:BY-3, x2:X0+k*h.wheelPx, y2:BY+3,
+        stroke:'var(--accent)', 'stroke-width':1, opacity:.55}));
+    }
+    var lbl = 'one pedal turn · '+h.dev.toFixed(2)+' m · '+ratio().toFixed(2)+' wheel turns';
+    var wide = dpx > 8.2*lbl.length;
+    txt(gRuler, wide ? X0+dpx/2 : X0, BY-10, lbl,
+      {anchor: wide?'middle':'start', size:11, fill:'var(--accent)', weight:500});
+
+    var bk = bikePath(gBike, X0, Y0, m, gr);
+    wheel(gWheelR, bk.rear[0], bk.rear[1], bk.R, gr);
+    wheel(gWheelF, bk.front[0], bk.front[1], bk.R, gr);
+
+    // lens box round the real drivetrain, fanning out to the magnified panel
+    var lx = X0-5, ly = Y0-0.46*m, lw = 0.52*m+8, lh = 0.36*m;
+    gLens.appendChild(el('rect',{x:lx, y:ly, width:lw, height:lh, rx:3, fill:'none',
+      stroke:'var(--line2)', 'stroke-width':1, 'stroke-dasharray':'3 3'}));
+    // Stacked layout puts the panel directly above the bike with the caption and the bracket
+    // label in between, so connector lines would only cut across that text — the caption does
+    // the linking there instead.
+    var fan = h.narrow ? []
+      : [[lx, ly, h.panelL+h.panelW-2, 14], [lx, ly+lh, h.panelL+h.panelW-2, h.panelBot]];
+    fan.forEach(function(f){
+      gLens.appendChild(el('line',{x1:f[0], y1:f[1], x2:f[2], y2:f[3],
+        stroke:'var(--line2)', 'stroke-width':1, 'stroke-dasharray':'2 4'}));
+    });
+
+    applyRot();
+  }
+
+  // ---- animation ----
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var crankAng=0, wheelAng=0, chainOff=0, lastTs=0, rafId=null;
+
+  function applyRot(){
+    if(!H) return;
+    gCrank.setAttribute('transform','rotate('+crankAng.toFixed(2)+' '+H.bx.toFixed(2)+' '+H.by.toFixed(2)+')');
+    var pedalG = document.getElementById('gPedal');
+    if(pedalG) pedalG.setAttribute('transform','rotate('+(-crankAng).toFixed(2)+' '+(H.bx+H.crankPx).toFixed(2)+' '+H.by.toFixed(2)+')');
+    gSprMark.setAttribute('transform','rotate('+wheelAng.toFixed(2)+' '+H.hx.toFixed(2)+' '+H.hy.toFixed(2)+')');
+    var bkR = H.rulerX, R = WHEEL_D/2*H.pxPerM;
+    gWheelR.setAttribute('transform','rotate('+wheelAng.toFixed(2)+' '+bkR.toFixed(2)+' '+(H.roadY-R).toFixed(2)+')');
+    gWheelF.setAttribute('transform','rotate('+wheelAng.toFixed(2)+' '+(bkR+1.02*H.pxPerM).toFixed(2)+' '+(H.roadY-R).toFixed(2)+')');
+    chainPath.style.strokeDashoffset = chainOff.toFixed(2)+'px';
+  }
+
+  function tick(ts){
+    rafId = requestAnimationFrame(tick);
+    var dt = lastTs ? Math.min((ts-lastTs)/1000, 0.05) : 0; lastTs = ts;
+    var crankRps = state.rpm/60;
+    crankAng += 360*crankRps*dt;
+    // The wheel is capped at 7 rev/s on screen: three spokes can only be read unambiguously
+    // below about half a spoke-spacing per frame, and the true rate passes that in top gear.
+    wheelAng += 360*Math.min(crankRps*ratio(), 7)*dt;
+    if(H){
+      // Chain link speed is real but scaled down — at true speed the links pass faster than
+      // the frame rate and turn into a static blur.
+      var chainPxPerSec = crankRps*state.nc*CHAIN_PITCH*H.S1;
+      chainOff -= clamp(chainPxPerSec*0.25, 8, 160)*dt;
+    }
+    applyRot();
+  }
+
+  function measure(){
+    var w = heroWrap.clientWidth;
+    if(w && w !== heroW){ heroW = w; render(); }
+  }
+
+  // ---- equation + legend ----
+  var accent='var(--accent)';
+  var ncTerm=$('ncTerm'), nsTerm=$('nsTerm'), fTerm=$('fTerm');
+  var ncLabel=$('ncLabel'), nsLabel=$('nsLabel'), fLabel=$('fLabel');
+  var legendEl=$('legend');
+  function activeColor(k){ return state.active===k ? accent : 'var(--fg)'; }
+
+  function drawEquationAndLegend(){
+    ncTerm.style.color = activeColor('nc'); nsTerm.style.color = activeColor('ns'); fTerm.style.color = activeColor('f');
+    ncLabel.style.color = activeColor('nc'); nsLabel.style.color = activeColor('ns'); fLabel.style.color = activeColor('f');
+
+    var rows = [
+      {sym:'D',   sub:'',  name:'wheel diameter',                val:Math.round(WHEEL_D*1000)+' mm', key:null},
+      {sym:'N',   sub:'c', name:'chainring teeth',               val:state.nc+' teeth',             key:'nc'},
+      {sym:'N',   sub:'s', name:'sprocket teeth',                val:state.ns+' teeth',             key:'ns'},
+      {sym:'f',   sub:'',  name:'cadence',                       val:state.rpm+' rpm',              key:'f'}
+    ];
+    legendEl.innerHTML = '';
+    rows.forEach(function(row){
+      var div=document.createElement('div'); div.className='row';
+      var sym=document.createElement('em'); sym.className='sym';
+      sym.textContent = row.sym;
+      if(row.sub){ var sb=document.createElement('sub'); sb.textContent=row.sub; sym.appendChild(sb); }
+      sym.style.color = row.key ? activeColor(row.key) : 'var(--fg)';
+      var name=document.createElement('span'); name.className='name'; name.textContent=row.name;
+      var val=document.createElement('span'); val.className='val mono'; val.textContent=row.val;
+      div.appendChild(sym); div.appendChild(name); div.appendChild(val);
+      legendEl.appendChild(div);
+    });
+  }
+
+  // ---- gradient picker ----
+  var gradeButtons=$('gradeButtons'), gradeNote=$('gradeNote');
+  GRADES.forEach(function(gr,i){
+    var b=document.createElement('button');
+    b.textContent = gr.name;
+    b.addEventListener('click', function(){ state.grade=i; render(); });
+    gradeButtons.appendChild(b);
+  });
+  function drawGradeButtons(){
+    Array.prototype.forEach.call(gradeButtons.children, function(b,i){
+      var gr=GRADES[i], on = i===state.grade;
+      b.style.background = on ? 'color-mix(in srgb, '+gr.color+' 22%, var(--bg))' : 'transparent';
+      b.style.borderColor = on ? gr.color : 'var(--border)';
+      b.style.color = on ? 'var(--fg)' : 'var(--muted)';
+    });
+    gradeNote.innerHTML = grade().note;
+  }
+
+  // ---- sliders ----
+  function makeSlider(cfg){
+    var track=$(cfg.id+'Track'), fill=$(cfg.id+'Fill'), thumb=$(cfg.id+'Thumb'), dragging=false;
+    function setFromClientX(x){
+      var r = track.getBoundingClientRect();
+      var f = clamp((x-r.left)/r.width, 0, 1);
+      cfg.set(clamp(Math.round(cfg.lo + f*(cfg.hi-cfg.lo)), cfg.lo, cfg.hi));
+      render();
+    }
+    track.addEventListener('pointerdown', function(e){
+      dragging=true;
+      if(track.setPointerCapture) track.setPointerCapture(e.pointerId);
+      state.drag=cfg.key; state.ghostF=pedalForce(); state.active=cfg.key;
+      setFromClientX(e.clientX);
+    });
+    track.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
+    function endDrag(){ if(dragging){ dragging=false; state.drag=null; render(); } }
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+    track.addEventListener('pointerenter', function(){ state.active=cfg.key; render(); });
+    track.addEventListener('keydown', function(e){
+      var step = e.shiftKey ? cfg.big : 1, cur = cfg.get(), v = null;
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown') v = cur-step;
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = cur+step;
+      else if(e.key==='Home') v = cfg.lo;
+      else if(e.key==='End') v = cfg.hi;
+      if(v!==null){ e.preventDefault(); cfg.set(clamp(Math.round(v), cfg.lo, cfg.hi)); render(); }
+    });
+    return { draw: function(){
+      var cur = cfg.get();
+      var pct = (clamp((cur-cfg.lo)/(cfg.hi-cfg.lo),0,1)*100).toFixed(2)+'%';
+      fill.style.width = pct; thumb.style.left = pct;
+      track.setAttribute('aria-valuemin', cfg.lo);
+      track.setAttribute('aria-valuemax', cfg.hi);
+      track.setAttribute('aria-valuenow', cur);
+      track.setAttribute('aria-valuetext', cfg.say(cur));
+      $(cfg.id+'Readout').textContent = cfg.read(cur);
+    }};
+  }
+  var sliders = [
+    makeSlider({id:'nc', key:'nc', lo:NC_MIN, hi:NC_MAX, big:5,
+      get:function(){return state.nc;}, set:function(v){state.nc=v;},
+      read:function(v){return v+'t';}, say:function(v){return v+' teeth';}}),
+    makeSlider({id:'ns', key:'ns', lo:NS_MIN, hi:NS_MAX, big:5,
+      get:function(){return state.ns;}, set:function(v){state.ns=v;},
+      read:function(v){return v+'t';}, say:function(v){return v+' teeth';}}),
+    makeSlider({id:'rpm', key:'f', lo:RPM_MIN, hi:RPM_MAX, big:10,
+      get:function(){return state.rpm;}, set:function(v){state.rpm=v;},
+      read:function(v){return v+' rpm';}, say:function(v){return v+' revolutions per minute';}})
+  ];
+  [$('ncCtrl'), $('nsCtrl'), $('rpmCtrl')].forEach(function(box){
+    box.addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+  });
+
+  // ---- result ----
+  var spdValue=$('spdValue'), verdictEl=$('verdict'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+  var gReach=$('gReach'), gLimit=$('gLimit'), gLimitLabel=$('gLimitLabel'), gGhost=$('gGhost');
+  var gMark=$('gMark'), gMarkLabel=$('gMarkLabel'), gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
+  var noteRatio=$('noteRatio');
+
+  function pos(f){ return clamp(f/GAUGE_MAX, 0, 1)*100; }
+
+  function drawResult(){
+    var v = speed()*3.6, f = pedalForce(), bd = band(f);
+    var over = f > BODY_N;
+    var col = over ? 'var(--bad)' : 'var(--fg)';
+
+    spdValue.textContent = v.toFixed(1);
+    verdictEl.textContent = bd.word; verdictEl.style.color = col;
+    verdictSubEl.textContent = bd.sub;
+    var weightTxt = f >= BODY_N
+      ? (f/BODY_N).toFixed(2)+'× your body weight'
+      : Math.max(1,Math.round(f/BODY_N*100))+'% of your body weight';
+    effortLineEl.textContent = weightTxt + ' · ' + Math.round(wheelPower(speed(), grade().g)/DRIVE_EFF).toLocaleString() + ' W at the pedals';
+    noteRatio.textContent = ratio().toFixed(2);
+
+    var markPct = pos(f), limitPct = pos(BODY_N);
+    gReach.style.width = limitPct.toFixed(2)+'%';
+    gLimit.style.left = limitPct.toFixed(2)+'%';
+    gLimitLabel.style.left = limitPct.toFixed(2)+'%';
+    gMark.style.left = markPct.toFixed(2)+'%';
+    gMark.style.background = col;
+    var labelPct = clamp(markPct,4,88);
+    gMarkLabel.style.left = labelPct.toFixed(2)+'%';
+    gMarkLabel.style.transform = markPct>72 ? 'translateX(-100%)' : markPct<20 ? 'translateX(0)' : 'translateX(-50%)';
+    gMarkLabel.style.color = col;
+
+    var rel = state.drag && state.ghostF ? f/state.ghostF : 1;
+    var text = Math.round(f)+' N';
+    if(state.drag && Math.abs(Math.log(rel))>0.02) text = rel>1 ? ratioTxt(rel)+' harder' : ratioTxt(1/rel)+' easier';
+    gMarkLabel.textContent = text;
+
+    if(state.drag && state.ghostF){ gGhost.style.opacity=1; gGhost.style.left=pos(state.ghostF).toFixed(2)+'%'; }
+    else gGhost.style.opacity = 0;
+
+    if(!gTicksEl.dataset.built){
+      var t='', l='';
+      for(var n=0;n<=GAUGE_MAX;n+=200){
+        var left = (n/GAUGE_MAX*100).toFixed(2)+'%';
+        t += '<div class="tick" style="left:'+left+'"></div>';
+        if(n%400===0){
+          var tx = n===0 ? 'translateX(0)' : n===GAUGE_MAX ? 'translateX(-100%)' : 'translateX(-50%)';
+          l += '<div class="ticklabel" style="left:'+left+';transform:'+tx+'">'+n+(n===GAUGE_MAX?' N':'')+'</div>';
+        }
+      }
+      gTicksEl.innerHTML=t; gTicksEl.dataset.built='1'; gLabelsEl.innerHTML=l;
+    }
+  }
+
+  // ---- presets ----
+  var PRESETS = {
+    cruise:{nc:50, ns:17, rpm:90,  grade:0},
+    sprint:{nc:53, ns:11, rpm:110, grade:0},
+    climb: {nc:34, ns:32, rpm:65,  grade:3},
+    wrong: {nc:53, ns:11, rpm:65,  grade:3}
+  };
+  document.querySelectorAll('.preset').forEach(function(b){
+    b.addEventListener('click', function(){
+      var p = PRESETS[b.dataset.p];
+      state.nc=p.nc; state.ns=p.ns; state.rpm=p.rpm; state.grade=p.grade;
+      render();
+    });
+  });
+
+  // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
+  var STORAGE_KEY = 'bike-gears-theme';
+  var themeToggle = $('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    // Read the applied DOM state first. If localStorage is unavailable (sandboxed iframe,
+    // private browsing, blocked cookies) falling straight through to the system preference
+    // would pin the toggle to one direction and it could never switch back.
+    var applied = document.documentElement.getAttribute('data-theme');
+    if(applied) return applied;
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+
+  // The relative "../index.html" link only resolves when this file is sitting in
+  // Simple_Viz/visualizations/ next to the site index. Published standalone (e.g. as an
+  // Artifact) there's no sibling index to reach, so fall back to the GitHub repo instead of
+  // leaving a link that 404s.
+  (function(){
+    var backLink = document.getElementById('backLink');
+    if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
+      backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
+      backLink.target = '_blank';
+      backLink.rel = 'noopener';
+      backLink.textContent = 'Simple Viz on GitHub ↗';
+    }
+  })();
+
+  function render(){
+    drawHero();
+    drawEquationAndLegend();
+    drawGradeButtons();
+    sliders.forEach(function(s){ s.draw(); });
+    drawResult();
+  }
+
+  new ResizeObserver(measure).observe(heroWrap);
+  window.addEventListener('resize', measure);
+  [60,250,900].forEach(function(t){ setTimeout(measure, t); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  render();
+  // The crank, wheels and chain turn continuously with no pause control, so under reduced
+  // motion they simply never start — the diagram is complete and correct at rest.
+  if(!reduceMotion) rafId = requestAnimationFrame(tick);
+})();
+</script>

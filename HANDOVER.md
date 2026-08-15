@@ -15,7 +15,8 @@ Simple_Viz/
 └── visualizations/
     ├── earth-moon-race.html      # speed-of-light concept
     ├── straw-hose-flow.html      # style reference implementation
-    └── eratosthenes-shadow.html  # Earth's diameter from two shadows
+    ├── eratosthenes-shadow.html  # Earth's diameter from two shadows
+    └── ...                       # thirteen pages in all; see index.html for the full list
 ```
 
 **Before starting a new page or a redesign, fill out
@@ -367,6 +368,55 @@ The three items left open by the correctness sweep above, all fixed in the same 
   tooling's own preview pane serves local files through a `data:` URL wrapper rather than real
   `file://` navigation, which happens to be a second real case the fallback correctly catches.
 
+### `bike-gears.html` — "Same legs, different gear" (2026-08-15)
+
+Built to the [STYLE_GUIDE.md](STYLE_GUIDE.md) skeleton, no earlier draft. `v = πD·(N_c/N_s)·f`
+— wheel diameter times gear ratio times cadence. Three integer sliders (chainring 28–53t,
+sprocket 11–36t, cadence 40–130 rpm) plus a four-option road picker (flat / 3% / 8% / 15%).
+First page in the **Everyday maths** category; index card 04.
+
+- **The result box shows a different quantity from the gauge, deliberately.** The big number
+  is the equation's own output (speed in km/h); the gauge underneath measures what that speed
+  costs — average tangential force on the pedal, against the rider's own body weight (736 N) as
+  the reference line. That's the page's whole point: the ratio buys speed *by* dividing force,
+  so showing only one of the two would hide the trade. Because the two differ, the gauge needed
+  a caption of its own (`.gauge-label`), which straw-hose-flow's does not.
+- **Force bands describe the push, not how long you could hold it.** An earlier wording ("an
+  endurance pace you could hold for hours") was wrong: force is what the *gear* sets, but
+  stamina answers to power, and the two come apart at different cadences — 268 N at 65 rpm is
+  315 W, while the same 268 N at 90 rpm is 435 W. The bands were reworded to describe the push
+  only, and the required crank power now prints beside the body-weight percentage so the honest
+  picture is on the page.
+- **Hero: two registers at two very different scales.** A magnified drivetrain (chainring,
+  chain, sprocket, rotating crank) beside the road at true scale, with the bike as a small
+  silhouette and a bracket showing how far one pedal turn carries it. Real geometry throughout —
+  chain pitch 12.7 mm sets the tooth spacing, chainstay 410 mm the centre distance, 172.5 mm
+  cranks. The two registers differ by about 10×, so they are joined by the site's dashed
+  lens-box-and-fan-lines convention and the panel carries a computed "magnified 13×" caption.
+  The panel's scale is fixed off the *largest* sprocket/chainring, not the current ones, so it
+  doesn't rescale (and the magnification caption doesn't flicker) while a slider moves.
+- **Three animation rates had to be faked, all for aliasing, none of them a displayed number.**
+  The teeth are drawn at true pitch but held *still*: a chainring passes ~80 teeth per second,
+  which at 60 fps reads as a slow backwards crawl. The crank arm carries the rotation instead
+  and runs at the true cadence. Wheel spin is capped at 7 rev/s because three spokes can only be
+  read unambiguously below about half a spoke-spacing per frame. Chain-link speed is scaled to a
+  quarter of real, for the same reason as the teeth. Everything actually *stated* on the page is
+  exact.
+- **The gauge's limit label sits below the axis, not above it** like straw-hose-flow's. The
+  marker pins to the right-hand end whenever the gear is unturnable, which is precisely when its
+  own label would land on top of the limit label; moving one to the row under the ticks
+  separates them for good rather than clamping around the collision.
+- `.ctrl-title em` sets `text-transform:none`, deviating from straw-hose-flow, whose
+  `.ctrl-title` uppercases its symbol. That is harmless for `η`/`L` but not here: it rendered
+  `f` as `F` and `N_c` as `N_C`, contradicting the equation directly above. Worth copying the
+  fix into straw-hose-flow (it currently shows `R` where the equation says `r`).
+- Reference numbers: 700×25c wheel, rolling circumference 2,105 mm (D = 670 mm); chain pitch
+  12.7 mm; cranks 172.5 mm; chainstay 410 mm, bottom-bracket drop 70 mm; 75 kg rider + 8 kg
+  bike; C_rr 0.005; C_dA 0.35 m²; air 1.225 kg/m³; drivetrain efficiency 97%. Presets: steady
+  cruise (50×17, 90 rpm, flat → 33.4 km/h, 216 W), sprinting flat out (53×11, 110 rpm, flat →
+  66.9 km/h, 1,499 W, just over body weight), climbing a wall (34×32, 65 rpm, 15% → 8.7 km/h,
+  315 W), and the wrong gear (53×11, 65 rpm, 15% → 1.98× body weight, "Can't turn it").
+
 ### Categories, and a much longer roadmap (2026-08-15)
 
 `index.html` now groups both the built pages and the roadmap under **three categories**,
@@ -382,14 +432,14 @@ knowing before editing that file:
   bike gears → Everyday maths, speed of light → Discoveries, the straw → Fun physics. That is
   why `earth-moon-race.html` sits under Discoveries even though its payoff is magnitude rather
   than derivation.
-- **The split is currently 3 / 7 / 2.** Discoveries dominating is a true fact about what's
-  been built, not a flaw in the categories; the roadmap below is deliberately weighted the
-  other way (9 / 10 / 11).
-- **Cards were renumbered 01–12 in the new reading order**, so the numbers still ascend down
-  the page. Any older note in this file referring to "pages 07–12" means the *previous*
-  numbering. Current order: 01 horizon, 02 lightning, 03 braking · 04 earth-moon, 05 planet-
-  light-delay, 06 mass-energy, 07 gravity-lab, 08 eratosthenes, 09 rocket, 10 kepler · 11
-  straw-hose-flow, 12 ocean-salt.
+- **The split is 4 / 7 / 2** (3 / 7 / 2 before `bike-gears.html`). Discoveries dominating is a
+  true fact about what's been built, not a flaw in the categories; the roadmap below is
+  deliberately weighted the other way (8 / 10 / 11).
+- **Cards are renumbered on every addition** so the numbers still ascend down the page. Any
+  older note in this file referring to "pages 07–12" means the *previous* numbering. Current
+  order, after `bike-gears.html` landed: 01 horizon, 02 lightning, 03 braking, 04 bike-gears ·
+  05 earth-moon, 06 planet-light-delay, 07 mass-energy, 08 gravity-lab, 09 eratosthenes,
+  10 rocket, 11 kepler · 12 straw-hose-flow, 13 ocean-salt.
 - **Categories live on `index.html` only.** The visualization pages' topbars still carry just
   the back link + law name + theme toggle; no category label was added there, since the
   right-hand slot is already occupied and a page reached as a standalone Artifact has no
@@ -406,11 +456,11 @@ Two CSS changes were needed to support per-category grids, both worth preserving
   would add a stray empty row. This is self-maintaining — add or remove a card and the filler
   follows — which is why it's a `:has()` selector rather than a hand-placed filler element.
 
-**Roadmap is now 30 entries** (was 9), grouped by the same three categories, each still
-`concept — hook · equation · status`. Three are tagged `up next` rather than `idea`: **bike
-gears** (`v = πd(N₁/N₂)·rpm`), **a shelf that sags** (`δ = PL³/48EI`), and **why the straw
-looks bent** (Snell, `n₁sinθ₁ = n₂sinθ₂`) — picked as the strongest single-equation pages with
-clean slider shapes. Notes on individual entries:
+**Roadmap went from 9 entries to 30**, grouped by the same three categories, each still
+`concept — hook · equation · status`. Three were tagged `up next` rather than `idea`: **bike
+gears** (built the same day — see above, and now out of the list, leaving 29), **a shelf that
+sags** (`δ = PL³/48EI`), and **why the straw looks bent** (Snell, `n₁sinθ₁ = n₂sinθ₂`) — picked
+as the strongest single-equation pages with clean slider shapes. Notes on individual entries:
 
 - **Fourier** was deliberately reduced from "the Fourier transform" (not a two-sliders-one-
   number page) to **building a square wave from harmonics** — slider = number of terms, and the
@@ -445,7 +495,7 @@ all built in the 2026-08-14 six-page batch above and moved out of this list.
 
 ## Open questions / next steps
 
-- A site index (`index.html`) now links twelve concepts, grouped into the three categories
+- A site index (`index.html`) now links thirteen concepts, grouped into the three categories
   described above (Everyday maths / Discoveries / Fun physics). Each is intentionally a
   simplified explainer, with its approximation stated in-page.
 - **Decided (2026-08-14):** every visualization should share the visual language in

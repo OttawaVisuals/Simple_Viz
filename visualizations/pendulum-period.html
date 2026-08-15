@@ -46,8 +46,9 @@
   .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
   .eqn{display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);font-size:clamp(28px,3.6vw,42px);line-height:1;font-weight:300}
   .eqn .eq{color:var(--muted)}
-  .eqn .rad{display:inline-flex;align-items:center}
-  .eqn .radsign{font-size:1.1em;font-weight:300}
+  .eqn .rad{display:inline-flex;align-items:stretch}
+  .eqn .radsign{position:relative;width:.5em}
+  .eqn .radsign::before{content:"";position:absolute;left:.08em;bottom:8%;width:.18em;height:46%;border-left:1.5px solid var(--fg);border-bottom:1.5px solid var(--fg);transform:rotate(-40deg);transform-origin:bottom left}
   .eqn .radbar{border-top:1.5px solid var(--fg);padding:.1em .12em 0 .06em}
   .eqn .radinner{display:flex;align-items:center;gap:.1em;padding-top:.08em}
   .eqn .frac{display:inline-flex;flex-direction:column;align-items:center}
@@ -113,7 +114,7 @@
   .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
   .preset:hover{border-color:var(--accent);color:var(--accent)}
 
-  .note{margin:clamp(30px,3.4vw,46px) 0 0;max-width:88ch;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
   .note a{color:var(--muted2);text-decoration-color:var(--line2)}
   .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
 </style>
@@ -140,7 +141,7 @@
         <span class="eq">=</span>
         <span class="eq">2&pi;</span>
         <span class="rad">
-          <span class="radsign">&radic;</span>
+          <span class="radsign"></span>
           <span class="radbar"><span class="radinner">
             <span class="frac">
               <span class="row"><em id="lTerm">L</em></span>

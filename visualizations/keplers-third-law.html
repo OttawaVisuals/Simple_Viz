@@ -44,10 +44,13 @@
   .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
 
   .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
-  .eqn{display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);font-size:clamp(30px,4vw,46px);line-height:1;font-weight:300}
+  .eqn{display:flex;align-items:center;flex-wrap:wrap;gap:clamp(6px,1vw,12px);font-size:clamp(22px,2.6vw,34px);line-height:1;font-weight:300}
   .eqn .eq{color:var(--muted)}
   .eqn em{font-style:italic;font-weight:300;transition:color .2s}
   .eqn sup{font-size:.5em;position:relative;top:-.5em}
+  .eqn .radical{display:inline-flex;align-items:flex-start}
+  .eqn .radical .sign{font-size:1.2em;color:var(--muted);transform:scaleY(1.15) translateY(.02em)}
+  .eqn .radical .body{border-top:1.6px solid var(--line2);padding:1px 2px 0 3px;display:inline-flex;align-items:center;gap:.15em}
 
   .legendbox{padding-top:2px;align-self:center}
   .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
@@ -56,9 +59,18 @@
   .legend .name{font-size:12.5px;color:var(--muted2)}
   .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
 
-  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
-  .hero svg{width:100%;height:auto;display:block}
-  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
+  .heroRow{display:flex;gap:clamp(16px,2.4vw,32px);align-items:flex-start;margin:clamp(20px,3vw,36px) 0 0}
+  .heroMain{position:relative;flex:1 1 auto;min-width:0}
+  .heroMain svg{width:100%;height:auto;display:block}
+  .heroInset{position:relative;flex:0 0 clamp(160px,22vw,240px)}
+  .heroInset .inset-inner{border-left:1px solid var(--line);padding-left:clamp(14px,2vw,24px)}
+  .heroInset svg{width:100%;height:auto;display:block}
+  .inset-title{font:500 10px ui-monospace,monospace;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+  @media (max-width:820px){
+    .heroRow{flex-direction:column}
+    .heroInset{flex-basis:auto;width:60%;max-width:280px;margin:4px 0 0 auto}
+    .heroInset .inset-inner{border-left:none;border-top:1px solid var(--line);padding-left:0;padding-top:14px}
+  }
 
   .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
   @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
@@ -95,7 +107,7 @@
   .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
   .preset:hover{border-color:var(--accent);color:var(--accent)}
 
-  .note{margin:clamp(30px,3.4vw,46px) 0 0;max-width:88ch;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
   .note a{color:var(--muted2);text-decoration-color:var(--line2)}
   .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
 </style>
@@ -120,7 +132,11 @@
       <div class="eqn">
         <em id="TTerm">T</em>
         <span class="eq">=</span>
-        <em id="aTerm">a</em><sup>1.5</sup>
+        <span class="eq">2&pi;</span>
+        <span class="radical">
+          <span class="sign">&radic;</span>
+          <span class="body"><em id="aTerm">a</em><sup>3</sup><span class="eq">/</span><span class="eq">(</span><em id="GTerm" class="eq">G</em><span class="eq">(</span><em id="MTerm">M</em><span class="eq">+</span><em id="mTerm">m</em><span class="eq">))</span></span>
+        </span>
       </div>
     </div>
 
@@ -129,15 +145,29 @@
     </div>
   </div>
 
-  <div class="hero" id="heroWrap">
-    <div class="lbl" id="lblScale" style="left:0;top:0">log-compressed radial scale &mdash; not to true linear distance</div>
-    <svg id="heroSvg" role="img" aria-label="A schematic top-down view of the solar system, with the Sun at the center and the selected orbit's radius set by the semi-major axis slider, on a compressed radial scale.">
-      <g id="refOrbits"></g>
-      <circle id="curOrbit" fill="none"></circle>
-      <circle id="sun"></circle>
-      <circle id="planet"></circle>
-      <g id="refLabels"></g>
-    </svg>
+  <div class="heroRow" id="heroRow">
+    <div class="heroMain" id="heroWrap">
+      <svg id="heroSvg" role="img" aria-label="A top-down view of the solar system at true linear scale, Sun at the center, with the selected orbit's radius set by the semi-major axis slider. The four inner planets cluster close to the Sun; a dashed circle marks the region magnified in the inset.">
+        <g id="refOrbits"></g>
+        <circle id="insetBoundary" fill="none"></circle>
+        <circle id="curOrbit" fill="none"></circle>
+        <circle id="sun"></circle>
+        <circle id="planet"></circle>
+        <g id="refLabels"></g>
+      </svg>
+    </div>
+    <div class="heroInset" id="heroInsetWrap">
+      <div class="inset-inner">
+        <div class="inset-title mono" id="insetTitle">Inner solar system</div>
+        <svg id="insetSvg" role="img" aria-label="A magnified, true-linear-scale view of the inner solar system, from the Sun out to just past Mars.">
+          <g id="insetRefOrbits"></g>
+          <circle id="insetCurOrbit" fill="none"></circle>
+          <circle id="insetSun"></circle>
+          <circle id="insetPlanet"></circle>
+          <g id="insetRefLabels"></g>
+        </svg>
+      </div>
+    </div>
   </div>
 
   <div class="resultrow">
@@ -155,12 +185,27 @@
         </div>
         <div class="track-range"><span>0.2 AU</span><span class="mid">log scale &middot; double a &middot; 2.83&times; the period</span><span>50 AU</span></div>
       </div>
+
+      <div class="ctrl" id="mCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Orbiting body's mass <em id="mLabel">m</em></span>
+          <span class="ctrl-rel mono" id="mCompare"></span>
+        </div>
+        <div class="readout mono" id="mReadout"></div>
+        <div class="track" id="mTrack" tabindex="0" role="slider" aria-label="Orbiting body's mass, in solar masses">
+          <div class="rail"></div>
+          <div class="fill" id="mFill"></div>
+          <div class="thumb" id="mThumb"></div>
+        </div>
+        <div class="track-range"><span>~Mars</span><span class="mid">log scale &middot; M fixed at 1 M&#9737; (the Sun)</span><span>= the Sun</span></div>
+      </div>
     </div>
 
     <div class="result">
       <div class="result-label">Orbital period</div>
       <div class="result-value"><span class="num mono" id="tValue"></span><span class="unit mono" id="tUnit"></span></div>
       <div class="verdict-sub" id="verdictSub"></div>
+      <div class="verdict-sub" id="massEffect"></div>
       <div class="gauge" id="gauge">
         <div class="track"></div>
         <div class="reach" id="gReach"></div>
@@ -185,29 +230,37 @@
     <button class="preset" data-p="pluto">Pluto</button>
   </div>
 
-  <p class="note">Kepler's third law states that the square of a body's orbital period is proportional to the cube of its semi-major axis: T&sup2; &prop; a&sup3;, or precisely T&sup2; = 4&pi;&sup2;a&sup3;/(GM) for a body orbiting a much larger mass M, where G is the gravitational constant. For anything orbiting the Sun, with T measured in Earth years and a in astronomical units (1 AU = Earth's average distance from the Sun), the constants 4&pi;&sup2;/(GM&#9737;) collapse to 1 &mdash; leaving the tidy special case used above, T = a<sup>1.5</sup>. That simplification is specific to the Sun's mass and to AU/year units; a moon orbiting a planet, or a planet orbiting a different star, would need the general form rescaled with that body's own GM. The orbit diagram above uses a log-compressed radial scale, not true linear distance, since Mercury (0.39 AU) to Neptune and beyond (30&ndash;50 AU) span nearly two orders of magnitude and wouldn't otherwise fit in one honest view. See the <a href="https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion#Third_law" target="_blank" rel="noopener">Wikipedia article on Kepler's laws of planetary motion</a> for the full derivation.</p>
+  <p class="note">Kepler's third law states that the square of a body's orbital period is proportional to the cube of its semi-major axis: T&sup2; &prop; a&sup3;, or precisely T = 2&pi;&radic;(a&sup3;/(G(M+m))), where G is the gravitational constant, M is the central body's mass, and m is the orbiting body's own mass &mdash; strictly it's the sum M+m that belongs in the denominator, not M alone. The m slider above lets you drag the orbiting body's mass from planet-sized toward star-sized to see when that matters: for anything actually orbiting the Sun, m is so much smaller than M that it barely moves the answer, which is also why the constants collapse so tidily. The equation above is the full, unit-agnostic law; what makes the numbers below simple is a choice of units &mdash; measuring T in Earth years, a in astronomical units (1 AU = Earth's average distance from the Sun), and mass in multiples of the Sun's own mass makes G's numeric value exactly 1, so it drops out of the arithmetic (not the physics). That trick is specific to AU/year/M&#9737; units; a moon orbiting a planet, or a planet orbiting a different star, would need the same general form worked out in that system's own units. The orbit diagram above is drawn at true linear scale, so Mercury through Mars sit almost on top of the Sun the way they really do &mdash; the small inset alongside it re-renders just that inner region at a much larger scale so those four close orbits are still visible individually, rather than compressing all nine planets onto a log scale that flatters the truth. See the <a href="https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion#Third_law" target="_blank" rel="noopener">Wikipedia article on Kepler's laws of planetary motion</a> for the full derivation.</p>
 
 </div>
 </main>
 <script>
 (function(){
   var PLANETS = [
-    {key:'mercury',name:'Mercury',a:0.387,color:'#B8A08A'},
-    {key:'venus',name:'Venus',a:0.723,color:'#D9B36C'},
-    {key:'earth',name:'Earth',a:1.000,color:'#4E7FC4'},
-    {key:'mars',name:'Mars',a:1.524,color:'#C0553A'},
-    {key:'jupiter',name:'Jupiter',a:5.203,color:'#C89A6A'},
-    {key:'saturn',name:'Saturn',a:9.537,color:'#D8C48A'},
-    {key:'uranus',name:'Uranus',a:19.19,color:'#8FCBD8'},
-    {key:'neptune',name:'Neptune',a:30.07,color:'#5C7CD8'},
-    {key:'pluto',name:'Pluto',a:39.48,color:'#A9A296'}
+    {key:'mercury',name:'Mercury',a:0.387,m:1.660e-7,color:'#B8A08A'},
+    {key:'venus',name:'Venus',a:0.723,m:2.448e-6,color:'#D9B36C'},
+    {key:'earth',name:'Earth',a:1.000,m:3.003e-6,color:'#4E7FC4'},
+    {key:'mars',name:'Mars',a:1.524,m:3.227e-7,color:'#C0553A'},
+    {key:'jupiter',name:'Jupiter',a:5.203,m:9.546e-4,color:'#C89A6A'},
+    {key:'saturn',name:'Saturn',a:9.537,m:2.858e-4,color:'#D8C48A'},
+    {key:'uranus',name:'Uranus',a:19.19,m:4.365e-5,color:'#8FCBD8'},
+    {key:'neptune',name:'Neptune',a:30.07,m:5.150e-5,color:'#5C7CD8'},
+    {key:'pluto',name:'Pluto',a:39.48,m:6.55e-9,color:'#A9A296'}
   ];
   var AMIN=0.2, AMAX=50;
   var LOGAMIN=Math.log10(AMIN), LOGAMAX=Math.log10(AMAX);
 
+  // orbiting-body mass, in solar masses (M_sun = 1, fixed). Range spans roughly Mars up to a
+  // star of the Sun's own mass, so the M+m correction goes from utterly negligible to huge.
+  var MMIN=1e-6, MMAX=1;
+  var LOGMMIN=Math.log10(MMIN), LOGMMAX=Math.log10(MMAX);
+  var MASS_JUPITER = 9.5458e-4; // solar masses
+
   function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
 
-  function periodYears(a){ return Math.pow(a,1.5); }
+  // T^2 = a^3 / (M + m); with M fixed at 1 (solar masses, AU, years) this is
+  // T = a^1.5 * (1+m)^-0.5 — the m=0 case is the page's original simplified T = a^1.5.
+  function periodYears(a, m){ return Math.pow(a,1.5) / Math.sqrt(1 + (m||0)); }
 
   function fmtT(tYears){
     if(tYears < 1){
@@ -218,20 +271,60 @@
     return [tYears.toFixed(0), 'yr'];
   }
 
+  var SUPER_MAP = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻','+':''};
+  function toSuper(s){ return s.split('').map(function(c){ return SUPER_MAP[c]!==undefined ? SUPER_MAP[c] : c; }).join(''); }
+
+  function fmtMass(m){
+    if(m >= 0.01) return (m>=0.1 ? m.toFixed(2) : m.toFixed(3)) + ' M☉';
+    var parts = m.toExponential(2).split('e');
+    return parts[0] + '×10' + toSuper(parts[1]) + ' M☉';
+  }
+
+  var MASS_REFS = [
+    {name:'Mars', m:3.227e-7},
+    {name:'Earth', m:3.003e-6},
+    {name:'Neptune', m:5.15e-5},
+    {name:'Saturn', m:2.857e-4},
+    {name:'Jupiter', m:MASS_JUPITER},
+    {name:'the smallest stars', m:0.08},
+    {name:'the Sun', m:1}
+  ];
+  function massCompareText(m){
+    var best=null, bd=Infinity;
+    MASS_REFS.forEach(function(r){ var d=Math.abs(Math.log10(r.m)-Math.log10(m)); if(d<bd){ bd=d; best=r; } });
+    var ratio = m/best.m;
+    if(ratio>0.7 && ratio<1.4) return '≈ ' + best.name + '’s mass';
+    if(ratio>=1.4) return '≈ ' + (ratio<10?ratio.toFixed(1):ratio.toFixed(0)) + '× ' + best.name + '’s mass';
+    var inv = 1/ratio;
+    return '≈ 1/' + (inv<10?inv.toFixed(1):inv.toFixed(0)) + ' of ' + best.name + '’s mass';
+  }
+
+  function fmtPct(p){
+    if(p < 0.001) return p.toPrecision(2) + '%';
+    if(p < 1) return p.toPrecision(3) + '%';
+    return p.toFixed(2) + '%';
+  }
+
   var NS='http://www.w3.org/2000/svg';
   function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
 
-  // log-compressed radial mapping: AU -> [0,1]
-  function rFrac(a){
-    return clamp((Math.log10(clamp(a,AMIN,AMAX)) - LOGAMIN)/(LOGAMAX-LOGAMIN), 0, 1);
+  // Both views are true linear scale: the main view spans 0..AMAX_LINEAR AU, the inset
+  // re-renders just 0..INSET_AMAX AU (out to just past Mars) at a much larger px-per-AU.
+  var AMAX_LINEAR = AMAX;
+  var INSET_AMAX = 1.7;
+  var INNER_PLANETS = PLANETS.filter(function(p){ return p.a <= INSET_AMAX; });
+
+  function radiusLinear(a, amax, g){
+    return g.minR + (clamp(a,0,amax)/amax)*(g.maxR - g.minR);
   }
 
-  var state = { a: 1.0, active: null, drag: null, angle: 0 };
-  var heroW = 0;
+  var state = { a: 1.0, m: MASS_JUPITER, active: null, drag: null, angle: 0 };
+  var mainW = 0, insetW = 0, mg = null, ig = null;
 
   var $ = function(id){ return document.getElementById(id); };
-  var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
-  var refOrbitsG=$('refOrbits'), refLabelsG=$('refLabels'), curOrbit=$('curOrbit'), sunEl=$('sun'), planetEl=$('planet');
+  var heroRow=$('heroRow'), heroWrap=$('heroWrap'), heroSvg=$('heroSvg'), heroInsetWrap=$('heroInsetWrap'), insetSvg=$('insetSvg');
+  var refOrbitsG=$('refOrbits'), refLabelsG=$('refLabels'), curOrbit=$('curOrbit'), sunEl=$('sun'), planetEl=$('planet'), insetBoundary=$('insetBoundary');
+  var insetRefOrbitsG=$('insetRefOrbits'), insetRefLabelsG=$('insetRefLabels'), insetCurOrbit=$('insetCurOrbit'), insetSunEl=$('insetSun'), insetPlanetEl=$('insetPlanet');
 
   var refCircles=[], refLabelEls=[];
   PLANETS.forEach(function(p){
@@ -244,26 +337,44 @@
     refLabelEls.push(t);
   });
 
-  function geom(w){
+  var insetRefCircles=[], insetRefLabelEls=[];
+  INNER_PLANETS.forEach(function(p){
+    var c = el('circle',{fill:'none','stroke-width':1});
+    insetRefOrbitsG.appendChild(c);
+    insetRefCircles.push(c);
+    var t = el('text',{'font-size':7.5,'text-anchor':'middle'});
+    t.setAttribute('class','mono');
+    insetRefLabelsG.appendChild(t);
+    insetRefLabelEls.push(t);
+  });
+
+  function mainGeom(w){
     var h = Math.max(220, Math.min(420, w*0.42));
     var cx = w/2, cy = h/2;
     var maxR = Math.min(w,h)*0.5 - 26;
-    var minR = 16;
+    var minR = 9;
     return { w:w, h:h, cx:cx, cy:cy, maxR:maxR, minR:minR };
   }
 
-  function radiusFor(a, g){
-    return g.minR + rFrac(a)*(g.maxR - g.minR);
+  function insetGeom(w){
+    var h = Math.max(150, Math.min(260, w));
+    var cx = w/2, cy = h/2;
+    var maxR = Math.min(w,h)*0.5 - 16;
+    var minR = 6;
+    return { w:w, h:h, cx:cx, cy:cy, maxR:maxR, minR:minR };
   }
 
   function measure(){
-    var w = heroWrap.clientWidth;
-    if(w && w !== heroW){ heroW = w; drawHeroStatic(); }
+    var w1 = heroWrap.clientWidth, w2 = heroInsetWrap.clientWidth;
+    var changed = false;
+    if(w1 && w1 !== mainW){ mainW = w1; changed = true; }
+    if(w2 && w2 !== insetW){ insetW = w2; changed = true; }
+    if(changed){ drawMainStatic(); drawInsetStatic(); }
   }
 
-  function drawHeroStatic(){
-    var w = heroW || heroWrap.clientWidth || 1100;
-    var g = geom(w);
+  function drawMainStatic(){
+    var w = mainW || heroWrap.clientWidth || 1100;
+    var g = mg = mainGeom(w);
     heroSvg.setAttribute('viewBox', '0 0 '+g.w+' '+g.h);
     heroSvg.setAttribute('preserveAspectRatio','xMidYMid meet');
 
@@ -271,15 +382,22 @@
     sunEl.setAttribute('fill', '#E0A93B');
 
     PLANETS.forEach(function(p, i){
-      var r = radiusFor(p.a, g);
+      var r = radiusLinear(p.a, AMAX_LINEAR, g);
       var c = refCircles[i];
       c.setAttribute('cx', g.cx); c.setAttribute('cy', g.cy); c.setAttribute('r', r);
       c.setAttribute('stroke', 'var(--line2)'); c.setAttribute('opacity', 0.45);
       var t = refLabelEls[i];
+      // Inner planets overlap too tightly to label at this scale — the inset labels them instead.
+      if(p.a <= INSET_AMAX){ t.textContent = ''; return; }
       t.setAttribute('x', g.cx); t.setAttribute('y', g.cy - r - 5);
       t.setAttribute('fill', 'var(--muted)');
       t.textContent = p.name;
     });
+
+    var br = radiusLinear(INSET_AMAX, AMAX_LINEAR, g);
+    insetBoundary.setAttribute('cx', g.cx); insetBoundary.setAttribute('cy', g.cy); insetBoundary.setAttribute('r', br);
+    insetBoundary.setAttribute('stroke', 'var(--line2)'); insetBoundary.setAttribute('stroke-width', 1);
+    insetBoundary.setAttribute('stroke-dasharray', '3 3'); insetBoundary.setAttribute('opacity', 0.6);
 
     curOrbit.setAttribute('cx', g.cx); curOrbit.setAttribute('cy', g.cy);
     curOrbit.setAttribute('stroke', 'var(--accent)'); curOrbit.setAttribute('stroke-width', 1.5);
@@ -287,17 +405,65 @@
     planetEl.setAttribute('r', 6);
     planetEl.setAttribute('fill', 'var(--accent)');
 
-    drawHeroDynamic();
+    drawMainDynamic();
   }
 
-  function drawHeroDynamic(){
-    var w = heroW || heroWrap.clientWidth || 1100;
-    var g = geom(w);
-    var r = radiusFor(state.a, g);
+  function drawInsetStatic(){
+    var w = insetW || heroInsetWrap.clientWidth || 200;
+    var g = ig = insetGeom(w);
+    insetSvg.setAttribute('viewBox', '0 0 '+g.w+' '+g.h);
+    insetSvg.setAttribute('preserveAspectRatio','xMidYMid meet');
+
+    insetSunEl.setAttribute('cx', g.cx); insetSunEl.setAttribute('cy', g.cy); insetSunEl.setAttribute('r', 4);
+    insetSunEl.setAttribute('fill', '#E0A93B');
+
+    INNER_PLANETS.forEach(function(p, i){
+      var r = radiusLinear(p.a, INSET_AMAX, g);
+      var c = insetRefCircles[i];
+      c.setAttribute('cx', g.cx); c.setAttribute('cy', g.cy); c.setAttribute('r', r);
+      c.setAttribute('stroke', 'var(--line2)'); c.setAttribute('opacity', 0.55);
+      var t = insetRefLabelEls[i];
+      t.setAttribute('x', g.cx); t.setAttribute('y', g.cy - r - 4);
+      t.setAttribute('fill', 'var(--muted)');
+      t.textContent = p.name;
+    });
+
+    insetCurOrbit.setAttribute('cx', g.cx); insetCurOrbit.setAttribute('cy', g.cy);
+    insetCurOrbit.setAttribute('stroke', 'var(--accent)'); insetCurOrbit.setAttribute('stroke-width', 1.5);
+
+    insetPlanetEl.setAttribute('r', 4.5);
+    insetPlanetEl.setAttribute('fill', 'var(--accent)');
+
+    if(mg){
+      var pxPerAuMain = (mg.maxR - mg.minR)/AMAX_LINEAR;
+      var pxPerAuInset = (g.maxR - g.minR)/INSET_AMAX;
+      var mag = pxPerAuInset/pxPerAuMain;
+      $('insetTitle').textContent = 'Inner solar system — magnified ' + mag.toFixed(0) + '×';
+    }
+
+    drawInsetDynamic();
+  }
+
+  function drawMainDynamic(){
+    if(!mg) return;
+    var r = radiusLinear(state.a, AMAX_LINEAR, mg);
     curOrbit.setAttribute('r', r);
-    var x = g.cx + r*Math.cos(state.angle);
-    var y = g.cy + r*Math.sin(state.angle);
+    var x = mg.cx + r*Math.cos(state.angle);
+    var y = mg.cy + r*Math.sin(state.angle);
     planetEl.setAttribute('cx', x); planetEl.setAttribute('cy', y);
+  }
+
+  function drawInsetDynamic(){
+    if(!ig) return;
+    var visible = state.a <= INSET_AMAX;
+    insetCurOrbit.style.opacity = visible ? 1 : 0;
+    insetPlanetEl.style.opacity = visible ? 1 : 0;
+    if(!visible) return;
+    var r = radiusLinear(state.a, INSET_AMAX, ig);
+    insetCurOrbit.setAttribute('r', r);
+    var x = ig.cx + r*Math.cos(state.angle);
+    var y = ig.cy + r*Math.sin(state.angle);
+    insetPlanetEl.setAttribute('cx', x); insetPlanetEl.setAttribute('cy', y);
   }
 
   // animation: map real period T (years) to a fixed number of animation seconds per "year"
@@ -310,18 +476,19 @@
     if(lastT===null){ lastT = ts; return; }
     var dt = (ts - lastT)/1000;
     lastT = ts;
-    var T = periodYears(state.a);
+    var T = periodYears(state.a, state.m);
     var animSecondsPerOrbit = T*SECONDS_PER_YEAR;
     var angularSpeed = (2*Math.PI)/animSecondsPerOrbit;
     state.angle += angularSpeed*dt;
     if(state.angle > Math.PI*2) state.angle -= Math.PI*2;
-    drawHeroDynamic();
+    drawMainDynamic();
+    drawInsetDynamic();
   }
 
   // ---- equation + legend colouring ----
   var accent = 'var(--accent)';
-  var TTerm=$('TTerm'), aTerm=$('aTerm');
-  var aLabel=$('aLabel');
+  var TTerm=$('TTerm'), aTerm=$('aTerm'), MTerm=$('MTerm'), mTerm=$('mTerm');
+  var aLabel=$('aLabel'), mLabel=$('mLabel');
   var legendEl = $('legend');
 
   function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
@@ -329,12 +496,17 @@
   function drawEquationAndLegend(){
     aTerm.style.color = activeColor('a');
     aLabel.style.color = activeColor('a');
+    mTerm.style.color = activeColor('m');
+    mLabel.style.color = activeColor('m');
     TTerm.style.color = activeColor('T');
 
-    var T = periodYears(state.a);
+    var T = periodYears(state.a, state.m);
     var ft = fmtT(T);
     var rows = [
       {sym:'a', name:'semi-major axis', val: state.a.toFixed(2)+' AU', key:'a'},
+      {sym:'G', name:'gravitational constant', val: '≡ 1 in AU, yr, M☉ units', key:'G'},
+      {sym:'M', name:'central mass', val: '1 M☉ (fixed — the Sun)', key:'M'},
+      {sym:'m', name:'orbiting body’s mass', val: fmtMass(state.m), key:'m'},
       {sym:'T', name:'orbital period', val: ft[0]+' '+ft[1], key:'T'}
     ];
     legendEl.innerHTML = '';
@@ -350,56 +522,73 @@
   }
 
   // ---- slider (log scale) ----
-  function makeSlider(track, fill, thumb, logLo, logHi){
+  function makeSlider(opts){
+    // opts: track, fill, thumb, logLo, logHi, min, max, key, get(), set(v), round(v), ariaText(v)
+    var track=opts.track, fill=opts.fill, thumb=opts.thumb, logLo=opts.logLo, logHi=opts.logHi;
     var dragging = false;
     function setFromClientX(x){
       var r = track.getBoundingClientRect();
       var f = clamp((x-r.left)/r.width, 0, 1);
       var logV = logLo + f*(logHi-logLo);
       var v = Math.pow(10, logV);
-      v = clamp(Math.round(v*100)/100, AMIN, AMAX);
-      state.a = v;
+      v = clamp(opts.round(v), opts.min, opts.max);
+      opts.set(v);
       render();
     }
     track.addEventListener('pointerdown', function(e){
       dragging = true;
       if(track.setPointerCapture) track.setPointerCapture(e.pointerId);
-      state.drag = 'a'; state.active = 'a';
+      state.drag = opts.key; state.active = opts.key;
       setFromClientX(e.clientX);
     });
     track.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
     function endDrag(){ if(dragging){ dragging=false; state.drag=null; render(); } }
     track.addEventListener('pointerup', endDrag);
     track.addEventListener('pointercancel', endDrag);
-    track.addEventListener('pointerenter', function(){ state.active='a'; render(); });
+    track.addEventListener('pointerenter', function(){ state.active=opts.key; render(); });
     track.addEventListener('keydown', function(e){
-      var curLog = Math.log10(state.a);
+      var curLog = Math.log10(opts.get());
       var step = (e.shiftKey ? 0.1 : 0.02)*(logHi-logLo);
       var v = null;
       if(e.key==='ArrowLeft'||e.key==='ArrowDown') v = Math.pow(10, curLog-step);
       else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = Math.pow(10, curLog+step);
-      else if(e.key==='Home') v = AMIN;
-      else if(e.key==='End') v = AMAX;
-      if(v!==null){ e.preventDefault(); v = clamp(Math.round(v*100)/100, AMIN, AMAX); state.a=v; render(); }
+      else if(e.key==='Home') v = opts.min;
+      else if(e.key==='End') v = opts.max;
+      if(v!==null){ e.preventDefault(); v = clamp(opts.round(v), opts.min, opts.max); opts.set(v); render(); }
     });
     return {
       draw: function(){
-        var f = (Math.log10(state.a)-logLo)/(logHi-logLo);
+        var val = opts.get();
+        var f = (Math.log10(val)-logLo)/(logHi-logLo);
         var pct = (clamp(f,0,1)*100).toFixed(2)+'%';
         fill.style.width = pct; thumb.style.left = pct;
-        track.setAttribute('aria-valuemin', AMIN);
-        track.setAttribute('aria-valuemax', AMAX);
-        track.setAttribute('aria-valuenow', state.a);
-        track.setAttribute('aria-valuetext', state.a.toFixed(2)+' AU');
+        track.setAttribute('aria-valuemin', opts.min);
+        track.setAttribute('aria-valuemax', opts.max);
+        track.setAttribute('aria-valuenow', val);
+        track.setAttribute('aria-valuetext', opts.ariaText(val));
       }
     };
   }
-  var aSlider = makeSlider($('aTrack'), $('aFill'), $('aThumb'), LOGAMIN, LOGAMAX);
+  var aSlider = makeSlider({
+    track:$('aTrack'), fill:$('aFill'), thumb:$('aThumb'), logLo:LOGAMIN, logHi:LOGAMAX,
+    min:AMIN, max:AMAX, key:'a',
+    get: function(){ return state.a; }, set: function(v){ state.a = v; },
+    round: function(v){ return Math.round(v*100)/100; },
+    ariaText: function(v){ return v.toFixed(2)+' AU'; }
+  });
+  var mSlider = makeSlider({
+    track:$('mTrack'), fill:$('mFill'), thumb:$('mThumb'), logLo:LOGMMIN, logHi:LOGMMAX,
+    min:MMIN, max:MMAX, key:'m',
+    get: function(){ return state.m; }, set: function(v){ state.m = v; },
+    round: function(v){ return v; },
+    ariaText: function(v){ return fmtMass(v); }
+  });
 
   $('aCtrl').addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+  $('mCtrl').addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
 
   // ---- result box + gauge ----
-  var tValueEl=$('tValue'), tUnitEl=$('tUnit'), verdictSubEl=$('verdictSub');
+  var tValueEl=$('tValue'), tUnitEl=$('tUnit'), verdictSubEl=$('verdictSub'), massEffectEl=$('massEffect');
   var gReach=$('gReach'), gMark=$('gMark'), gMarkLabel=$('gMarkLabel');
   var gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
 
@@ -420,10 +609,16 @@
   }
 
   function drawResult(){
-    var T = periodYears(state.a);
+    var T = periodYears(state.a, state.m);
     var tDays = T*365.25;
     var ft = fmtT(T);
     tValueEl.textContent = ft[0]; tUnitEl.textContent = ft[1];
+
+    var T0 = periodYears(state.a, 0);
+    var pctShorter = (T0-T)/T0*100;
+    massEffectEl.textContent = pctShorter < 0.0005
+      ? 'Including m here changes the period by less than a thousandth of a percent — utterly negligible.'
+      : 'Counting the orbiting body’s own mass makes the period ' + fmtPct(pctShorter) + ' shorter than the Sun-alone estimate.';
 
     // "sits between X and Y" framing
     var sorted = PLANETS.slice().sort(function(x,y){ return x.a-y.a; });
@@ -450,7 +645,7 @@
     if(!gTicksEl.dataset.built){
       var ticksHtml='', labelsHtml='';
       PLANETS.forEach(function(p, i){
-        var tp = periodYears(p.a)*365.25;
+        var tp = periodYears(p.a, 0)*365.25;
         var left = gaugePos(tp).toFixed(2)+'%';
         ticksHtml += '<div class="tick" style="left:'+left+'"></div>';
         var tx = i===0 ? 'translateX(0)' : i===PLANETS.length-1 ? 'translateX(-100%)' : 'translateX(-50%)';
@@ -465,7 +660,7 @@
   document.querySelectorAll('.preset').forEach(function(b){
     b.addEventListener('click', function(){
       var p = PLANETS.filter(function(pl){ return pl.key===b.dataset.p; })[0];
-      if(p){ state.a = p.a; state.active='a'; render(); }
+      if(p){ state.a = p.a; state.m = clamp(p.m, MMIN, MMAX); state.active='a'; render(); }
     });
   });
 
@@ -508,19 +703,24 @@
   })();
 
   function render(){
-    drawHeroDynamic();
+    drawMainDynamic();
+    drawInsetDynamic();
     drawEquationAndLegend();
     aSlider.draw();
+    mSlider.draw();
     $('aReadout').textContent = state.a.toFixed(2)+' AU';
+    $('mReadout').textContent = fmtMass(state.m);
+    $('mCompare').textContent = massCompareText(state.m);
     drawResult();
   }
 
-  new ResizeObserver(measure).observe(heroWrap);
+  new ResizeObserver(measure).observe(heroRow);
   window.addEventListener('resize', measure);
   [60,250,900].forEach(function(t){ setTimeout(measure, t); });
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
 
-  drawHeroStatic();
+  drawMainStatic();
+  drawInsetStatic();
   render();
 
   // This page has no play/pause of its own — the orbit just spins continuously from load, so

@@ -16,7 +16,7 @@ Simple_Viz/
     ├── earth-moon-race.html      # speed-of-light concept
     ├── straw-hose-flow.html      # style reference implementation
     ├── eratosthenes-shadow.html  # Earth's diameter from two shadows
-    └── ...                       # thirteen pages in all; see index.html for the full list
+    └── ...                       # fifteen pages in all; see index.html for the full list
 ```
 
 **Before starting a new page or a redesign, fill out
@@ -417,6 +417,81 @@ First page in the **Everyday maths** category; index card 04.
   66.9 km/h, 1,499 W, just over body weight), climbing a wall (34×32, 65 rpm, 15% → 8.7 km/h,
   315 W), and the wrong gear (53×11, 65 rpm, 15% → 1.98× body weight, "Can't turn it").
 
+### `shelf-sag.html` — "A shelf that sags" (2026-08-15)
+
+Built to the [STYLE_GUIDE.md](STYLE_GUIDE.md) skeleton, no earlier draft. δ = PL³/(4Ebh³) —
+the standard δ = PL³/(48EI) with I = bh³/12 substituted in, so the h³ that does almost all
+the work is visible directly in the equation rather than hidden inside a symbol for I. Two
+sliders (load 5–100 kg, span 0.3–2.4 m) plus a Flat/On-edge orientation picker for a fixed
+real board. Card 05, under **Everyday maths**, right after bike-gears.
+
+- **Board and material are fixed, not sliders**: a standard "2×6" stud, actual dimensions
+  38×140 mm, in spruce–pine–fir framing lumber (E = 9.65 GPa, the NDS No. 2 grade design
+  value, ≈1.4 million psi). Flipping it from flat to on-edge swaps which dimension is h and
+  which is b, giving **≈13.6× stiffer** — a real, checkable number for this exact board,
+  used instead of the roundish "sixteen times" the roadmap entry had guessed before the page
+  existed.
+- **The hero draws the sag as a single stroked path**, not two parallel curved edges: the
+  standard simply-supported centre-load deflection shape y(x) = P·x(3L²−4x²)/(48EI) is
+  sampled at ~30 points and stroked with `stroke-width` set to the board's real height in
+  px — one path gets both the correct bowed shape and the correct relative thickness for
+  free. The true sag (µm to cm) is far too small to show at the same scale as a metre-long
+  span, so it's exaggerated by a magnification factor recomputed every render from the
+  current peak deflection (so the visible bow stays roughly constant size across the whole
+  slider range) and stated in-page ("sag shown magnified ~29× for visibility") next to the
+  real mm value — same honest-device shape as bike-gears' "magnified 13×" drivetrain
+  caption, just computed dynamically instead of from a fixed max.
+- **Gauge limit line moved below the axis from the start** (not retrofitted like bike-gears
+  and straw-hose-flow needed): the marker sits at or near the L/360 code-limit line for a
+  large fraction of the slider range, since crossing that line is the whole point of the
+  page, so the collision the other two pages hit had to be designed around up front rather
+  than patched after the fact.
+- **The extreme corner of the sliders is physically dishonest, and the note says so.** At
+  max span, max load, flat orientation, the linear formula predicts ~46 mm of sag (686% of
+  the limit) — a real board that thin would almost certainly crack long before bending that
+  far, since the equation has no failure model. The "the long span" preset deliberately lands
+  there and the note explains it directly, rather than narrowing the slider range to hide the
+  problem.
+- Presets: empty shelf (8 kg, within limit), a full bookshelf (60 kg flat, 103% of limit —
+  crosses the line), turned on edge (same 60 kg, edge orientation, 8% of limit — the direct
+  before/after), the long span (2.4 m, 100 kg flat, 686% — the dishonest-extreme case above).
+
+### `snells-law.html` — "Why the straw looks bent" (2026-08-15)
+
+Built to the [STYLE_GUIDE.md](STYLE_GUIDE.md) skeleton, no earlier draft. n₁sinθ₁ = n₂sinθ₂.
+One slider (angle of incidence, 0–90°) plus a 6-option picker covering both directions
+through three material pairs — Air↔Water, Air↔Glass, Air↔Diamond, plus the reverse of each
+(Water→Air, Glass→Air, Diamond→Air). Card 11, under **Discoveries**, after eratosthenes-
+shadow.
+
+- **One picker covers two different physical stories on purpose.** Light entering a denser
+  medium (any Air→X pair) always refracts — that's the bent-straw case named in the title.
+  Light exiting back into a less dense one (any X→Air pair) has a critical angle and can hit
+  **total internal reflection**, which the "entering" direction can never produce. Rather than
+  add a separate mode toggle, the six picker options just assign n₁/n₂ directly per pair, and
+  the same physics formula handles both behaviours without any branching — TIR falls out
+  naturally whenever sinθ₂ would have to exceed 1.
+- **No animation, unlike most of the site.** The ray diagram is fully redrawn from state on
+  every interaction; nothing plays on its own, so there was nothing to gate behind
+  `prefers-reduced-motion` — same category as gravity-lab, mass-energy, eratosthenes-shadow,
+  horizon-distance, and planet-light-delay per the correctness-sweep note above.
+- **Medium 1 is always drawn on top, medium 2 always on the bottom**, regardless of which
+  pair is selected — even for water→air, which draws water above and air below, the reverse
+  of a real fish tank. This is deliberate: it's a schematic ray diagram (the standard
+  textbook convention), not a literal scene, and re-orienting the artwork per pair would have
+  added real complexity for no gain in clarity. Labels on each half state the material and
+  its index directly so it's never ambiguous.
+- **Real numbers**: air 1.00, water 1.333, crown glass 1.52, diamond 2.42 (approximate,
+  visible light, room temperature — dispersion, the small wavelength-dependence that splits
+  white light into a prism's rainbow, is named as unmodelled in the note). Critical angles
+  computed live, not hardcoded, but check out against the well-known reference figures:
+  water→air 48.6° (matches the number this page's roadmap entry had already named before it
+  was built), glass→air 41.1°, diamond→air 24.4° — the last of these is a large part of why
+  cut diamonds throw back so much light.
+- `.ctrl-title em` carries `text-transform:none` from the start (see the bike-gears/
+  straw-hose-flow r→R bug above) — checked and confirmed correct here (θ, not uppercased) as
+  part of building the page, not a later fix.
+
 ### Categories, and a much longer roadmap (2026-08-15)
 
 `index.html` now groups both the built pages and the roadmap under **three categories**,
@@ -432,14 +507,17 @@ knowing before editing that file:
   bike gears → Everyday maths, speed of light → Discoveries, the straw → Fun physics. That is
   why `earth-moon-race.html` sits under Discoveries even though its payoff is magnitude rather
   than derivation.
-- **The split is 4 / 7 / 2** (3 / 7 / 2 before `bike-gears.html`). Discoveries dominating is a
-  true fact about what's been built, not a flaw in the categories; the roadmap below is
-  deliberately weighted the other way (8 / 10 / 11).
+- **The split is 5 / 8 / 2** (3 / 7 / 2 before `bike-gears.html`, then 4 / 7 / 2, then 4 / 8 / 2
+  once `snells-law.html` landed ahead of `shelf-sag.html` in the same batch). Discoveries
+  dominating is a true fact about what's been built, not a flaw in the categories; the roadmap
+  below is deliberately weighted the other way (8 / 9 / 11 after both entries were removed
+  from it).
 - **Cards are renumbered on every addition** so the numbers still ascend down the page. Any
-  older note in this file referring to "pages 07–12" means the *previous* numbering. Current
-  order, after `bike-gears.html` landed: 01 horizon, 02 lightning, 03 braking, 04 bike-gears ·
-  05 earth-moon, 06 planet-light-delay, 07 mass-energy, 08 gravity-lab, 09 eratosthenes,
-  10 rocket, 11 kepler · 12 straw-hose-flow, 13 ocean-salt.
+  older note in this file referring to earlier ranges means a *previous* numbering. Current
+  order, after `shelf-sag.html` and `snells-law.html` landed: 01 horizon, 02 lightning,
+  03 braking, 04 bike-gears, 05 shelf-sag · 06 earth-moon, 07 planet-light-delay, 08 mass-
+  energy, 09 gravity-lab, 10 eratosthenes, 11 snells-law, 12 rocket, 13 kepler · 14 straw-
+  hose-flow, 15 ocean-salt.
 - **Categories live on `index.html` only.** The visualization pages' topbars still carry just
   the back link + law name + theme toggle; no category label was added there, since the
   right-hand slot is already occupied and a page reached as a standalone Artifact has no
@@ -458,9 +536,10 @@ Two CSS changes were needed to support per-category grids, both worth preserving
 
 **Roadmap went from 9 entries to 30**, grouped by the same three categories, each still
 `concept — hook · equation · status`. Three were tagged `up next` rather than `idea`: **bike
-gears** (built the same day — see above, and now out of the list, leaving 29), **a shelf that
-sags** (`δ = PL³/48EI`), and **why the straw looks bent** (Snell, `n₁sinθ₁ = n₂sinθ₂`) — picked
-as the strongest single-equation pages with clean slider shapes. Notes on individual entries:
+gears**, **a shelf that sags** (`δ = PL³/48EI`), and **why the straw looks bent** (Snell,
+`n₁sinθ₁ = n₂sinθ₂`) — picked as the strongest single-equation pages with clean slider shapes.
+All three were built the same day (see the entries above) and are now out of the list, leaving
+27. Notes on the remaining entries:
 
 - **Fourier** was deliberately reduced from "the Fourier transform" (not a two-sliders-one-
   number page) to **building a square wave from harmonics** — slider = number of terms, and the
@@ -495,7 +574,7 @@ all built in the 2026-08-14 six-page batch above and moved out of this list.
 
 ## Open questions / next steps
 
-- A site index (`index.html`) now links thirteen concepts, grouped into the three categories
+- A site index (`index.html`) now links fifteen concepts, grouped into the three categories
   described above (Everyday maths / Discoveries / Fun physics). Each is intentionally a
   simplified explainer, with its approximation stated in-page.
 - **Decided (2026-08-14):** every visualization should share the visual language in

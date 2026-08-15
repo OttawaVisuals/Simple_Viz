@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why the straw looks bent</title>
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  .topgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
+
+  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqn{display:flex;align-items:baseline;flex-wrap:wrap;justify-content:center;gap:clamp(4px,.7vw,8px);font-size:clamp(22px,2.6vw,30px);line-height:1.15;font-weight:300}
+  .eqn .eq{color:var(--muted);font-size:.62em;font-style:italic}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .eqn sub{font-size:.55em;position:relative;bottom:-.3em}
+
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:2.1em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:8px 2px}
+  .legend .sym{font-size:17px;font-weight:300;transition:color .2s}
+  .legend .sym sub{font-size:.55em;position:relative;bottom:-.2em}
+  .legend .name{font-size:12.5px;color:var(--muted2)}
+  .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero svg{width:100%;height:auto;display:block}
+  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
+
+  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
+
+  .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;text-transform:none;transition:color .2s}
+  .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
+  .pick-buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .pick-buttons button{cursor:pointer;font-family:Georgia,serif;font-style:italic;font-size:14px;padding:6px 13px 7px;border-radius:999px;transition:all .18s ease;border:1px solid var(--border);background:transparent;color:var(--muted)}
+  .pick-buttons button:hover{color:var(--fg)}
+  .pick-note{margin-top:11px;font-size:13.5px;line-height:1.45;color:var(--muted)}
+  .readout{font-family:ui-monospace,monospace;font-size:clamp(26px,2.8vw,34px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
+  .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
+  .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
+  .track .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
+  .track .thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
+  .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
+
+  .result{text-align:left}
+  .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
+  .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
+  .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px}
+  .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
+  .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
+  .gauge{position:relative;height:66px;margin-top:16px;max-width:420px}
+  .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
+  .gauge .reach{position:absolute;top:14px;height:10px;border-radius:2px 0 0 2px;background:color-mix(in srgb, var(--accent) 16%, transparent);left:0}
+  .gauge .tick{position:absolute;top:26px;width:1px;height:5px;background:var(--line2)}
+  .gauge .ticklabel{position:absolute;top:33px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
+  .gauge .limit{position:absolute;top:9px;height:20px;width:1px;background:var(--bad)}
+  .gauge .limitlabel{position:absolute;top:47px;white-space:nowrap;font:400 9px ui-monospace,monospace;letter-spacing:.05em;color:var(--bad);transform:translateX(-50%)}
+  .gauge .mark{position:absolute;top:12px;height:14px;width:3px;border-radius:2px;transition:left .12s linear}
+  .gauge .marklabel{position:absolute;top:-3px;white-space:nowrap;font:500 11px ui-monospace,monospace;transition:left .12s linear}
+
+  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+  .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
+  .preset:hover{border-color:var(--accent);color:var(--accent)}
+
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;max-width:88ch;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../index.html" id="backLink">&larr; Physics you can see</a>
+    <div class="topbar-right">
+      <span>Snell's law</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>Why the straw <em>looks bent</em>.</h1>
+      <p class="sub">Light bends at the boundary between two materials &mdash; enough to make a straw look broken in a glass of water. Go the other way, past a certain angle, and it stops crossing over at all.</p>
+    </div>
+
+    <div class="eqnbox">
+      <div class="eqn">
+        <em id="n1Term">n<sub>1</sub></em>
+        <span class="eq">sin</span>
+        <em id="t1Term">&theta;<sub>1</sub></em>
+        <span class="eq">=</span>
+        <em id="n2Term">n<sub>2</sub></em>
+        <span class="eq">sin</span>
+        <em id="t2Term">&theta;<sub>2</sub></em>
+      </div>
+    </div>
+
+    <div class="legendbox">
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="hero" id="heroWrap">
+    <div class="lbl" id="lblM1" style="transform:translate(-50%,0)"></div>
+    <div class="lbl" id="lblM2" style="transform:translate(-50%,0)"></div>
+    <svg id="heroSvg" role="img" aria-label="A ray of light striking the boundary between two materials, bending as it crosses, or reflecting entirely when the angle is too shallow."></svg>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrls">
+      <div class="ctrl" id="angleCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Angle of incidence <em id="t1Label">&theta;<sub>1</sub></em></span>
+          <span class="ctrl-rel">&uarr; &theta;<sub>1</sub></span>
+        </div>
+        <div class="readout mono" id="angleReadout"></div>
+        <div class="track" id="angleTrack" tabindex="0" role="slider" aria-label="Angle of incidence">
+          <div class="rail"></div>
+          <div class="fill" id="angleFill"></div>
+          <div class="thumb" id="angleThumb"></div>
+        </div>
+        <div class="track-range"><span>0&deg;</span><span class="mid">measured from the normal, straight down</span><span>90&deg;</span></div>
+      </div>
+
+      <div class="ctrl" id="pairCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Interface</span>
+          <span class="ctrl-rel">n<sub>1</sub>, n<sub>2</sub></span>
+        </div>
+        <div class="pick-buttons" id="pairButtons"></div>
+        <div class="pick-note" id="pairNote"></div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Refraction angle</div>
+      <div class="result-value"><span class="num mono" id="t2Value"></span><span class="unit mono" id="t2Unit">&deg;</span><span class="v" id="verdict"></span></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+      <div class="effort-line" id="effortLine"></div>
+      <div class="gauge" id="gauge">
+        <div class="track"></div>
+        <div class="reach" id="gReach"></div>
+        <div class="limit" id="gLimit"></div>
+        <div class="limitlabel" id="gLimitLabel">critical angle</div>
+        <div class="mark" id="gMark"></div>
+        <div class="marklabel mono" id="gMarkLabel"></div>
+        <div id="gTicks"></div>
+        <div id="gLabels"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-p="straw">the bent straw</button>
+    <button class="preset" data-p="diamond">why diamonds sparkle</button>
+    <button class="preset" data-p="fish">the fish's view</button>
+    <button class="preset" data-p="through">straight through</button>
+  </div>
+
+  <p class="note"><a href="https://en.wikipedia.org/wiki/Snell%27s_law" target="_blank" rel="noopener">Snell's law</a> holds for any pair of transparent materials; refractive indices used here (at visible light, room temperature) are air&nbsp;1.00, water&nbsp;1.33, crown glass&nbsp;1.52, and diamond&nbsp;2.42. Going from a slower medium into a faster one (water or glass into air, say) has a <em style="font-style:italic">critical angle</em>: past it, sin&theta;<sub>2</sub> would have to exceed 1, which is impossible, so instead of crossing over the light reflects entirely &mdash; this is <a href="https://en.wikipedia.org/wiki/Total_internal_reflection" target="_blank" rel="noopener">total internal reflection</a>, the reason an optical fibre keeps its light and a big part of why a cut diamond throws so much light back at you. Real materials disperse &mdash; the index depends slightly on wavelength, which is what splits white light into a rainbow through a prism &mdash; not modelled here; one representative value is used per material instead.</p>
+
+</div>
+</main>
+<script>
+(function(){
+  // ---- real refractive indices (approximate, visible light, room temperature) ----
+  var AIR     = {name:'Air',     n:1.00,  color:'#8FA3B8'};
+  var WATER   = {name:'Water',   n:1.333, color:'#4E7FC4'};
+  var GLASS   = {name:'Glass',   n:1.52,  color:'#7FB0AC'};
+  var DIAMOND = {name:'Diamond', n:2.42,  color:'#B98AC4'};
+
+  var PAIRS = [
+    {key:'aw', m1:AIR,     m2:WATER,   label:'Air→Water',   note:'Why a straw looks broken where it enters the glass.'},
+    {key:'ag', m1:AIR,     m2:GLASS,   label:'Air→Glass',   note:'The bend that makes a window, or a lens, do anything at all.'},
+    {key:'ad', m1:AIR,     m2:DIAMOND, label:'Air→Diamond', note:'The same bend, much sharper — diamond slows light more than almost anything transparent.'},
+    {key:'wa', m1:WATER,   m2:AIR,     label:'Water→Air',   note:'A fish’s-eye view of the surface. Past the critical angle it turns to a mirror.'},
+    {key:'ga', m1:GLASS,   m2:AIR,     label:'Glass→Air',   note:'How an optical fibre keeps light from leaking out its sides.'},
+    {key:'da', m1:DIAMOND, m2:AIR,     label:'Diamond→Air', note:'A critical angle of just 24.4° — light struggles to leave, which is a good part of why diamond sparkles.'}
+  ];
+
+  var T1MIN=0, T1MAX=90;
+  var D2R = Math.PI/180, R2D = 180/Math.PI;
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+
+  var NS='http://www.w3.org/2000/svg';
+  function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+  function clear(g){ while(g.firstChild) g.removeChild(g.firstChild); }
+
+  var state = { t1:50, pair:0, active:null };
+  var heroW = 0;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
+  var lblM1=$('lblM1'), lblM2=$('lblM2');
+
+  function pair(){ return PAIRS[state.pair]; }
+  function physics(){
+    var p = pair(), t1r = state.t1*D2R;
+    var sinT2 = p.m1.n/p.m2.n*Math.sin(t1r);
+    var tir = sinT2 > 1;
+    var t2 = tir ? null : Math.asin(clamp(sinT2,-1,1))*R2D;
+    var hasCritical = p.m1.n > p.m2.n;
+    var tc = hasCritical ? Math.asin(clamp(p.m2.n/p.m1.n,-1,1))*R2D : null;
+    return { p:p, t1:state.t1, t2:t2, tir:tir, tc:tc };
+  }
+
+  // ---- hero geometry: viewBox width == measured CSS px width, so 1 unit = 1px ----
+  function geom(w){
+    var R = clamp(w*0.15, 88, 150);
+    var vbH = 2*R + 104;
+    var Ox = w/2, Oy = vbH/2;
+    var ph = physics();
+    var t1r = ph.t1*D2R;
+
+    var inPt  = [Ox - R*Math.sin(t1r), Oy - R*Math.cos(t1r)];
+    var outPt = ph.tir ? null : [Ox + R*Math.sin(ph.t2*D2R), Oy + R*Math.cos(ph.t2*D2R)];
+    var reflPt = ph.tir ? [Ox + R*Math.sin(t1r), Oy - R*Math.cos(t1r)] : null;
+
+    return { w:w, vbH:vbH, R:R, Ox:Ox, Oy:Oy, ph:ph, inPt:inPt, outPt:outPt, reflPt:reflPt };
+  }
+
+  function arrow(g, from, to, color, wd){
+    g.appendChild(el('line',{x1:from[0],y1:from[1],x2:to[0],y2:to[1], stroke:color, 'stroke-width':wd||2, 'stroke-linecap':'round'}));
+    var dx=to[0]-from[0], dy=to[1]-from[1], len=Math.hypot(dx,dy)||1, ux=dx/len, uy=dy/len;
+    var ah=8, aw=3.2;
+    var bx=to[0]-ux*ah, by=to[1]-uy*ah;
+    var px=-uy, py=ux;
+    g.appendChild(el('polygon',{points:
+      to[0]+','+to[1]+' '+(bx+px*aw)+','+(by+py*aw)+' '+(bx-px*aw)+','+(by-py*aw),
+      fill:color}));
+  }
+
+  function arcPath(Ox,Oy,r,angDeg,side,down){
+    // side: -1 for left/right sign on sin; down: true if the arc sweeps into the lower half.
+    var pts=[], N=16;
+    for(var i=0;i<=N;i++){
+      var a = (i/N)*angDeg*D2R;
+      var sx = side*Math.sin(a), sy = down ? Math.cos(a) : -Math.cos(a);
+      pts.push((Ox+r*sx).toFixed(2)+','+(Oy+r*sy).toFixed(2));
+    }
+    return 'M'+pts.join('L');
+  }
+
+  function txt(g, x, y, s, opt){
+    var o=opt||{};
+    var t=el('text',{x:x,y:y, fill:o.fill||'var(--muted)', 'font-size':o.size||11,
+      'font-family':'ui-monospace,"Cascadia Code",monospace', 'text-anchor':o.anchor||'middle'});
+    if(o.weight) t.setAttribute('font-weight', o.weight);
+    t.textContent=s; g.appendChild(t); return t;
+  }
+
+  function drawHero(){
+    var w = heroW || heroWrap.clientWidth || 1100;
+    var h = geom(w), ph = h.ph, p = ph.p;
+    clear(heroSvg);
+    heroSvg.setAttribute('viewBox','0 0 '+w+' '+h.vbH);
+
+    // medium washes
+    heroSvg.appendChild(el('rect',{x:0,y:0,width:w,height:h.Oy, fill:'color-mix(in srgb, '+p.m1.color+' 12%, var(--bg))'}));
+    heroSvg.appendChild(el('rect',{x:0,y:h.Oy,width:w,height:h.vbH-h.Oy, fill:'color-mix(in srgb, '+p.m2.color+' 12%, var(--bg))'}));
+    heroSvg.appendChild(el('line',{x1:0,y1:h.Oy,x2:w,y2:h.Oy, stroke:'var(--line2)', 'stroke-width':1.25}));
+
+    // normal
+    heroSvg.appendChild(el('line',{x1:h.Ox,y1:h.Oy-h.R-16,x2:h.Ox,y2:h.Oy+h.R+16,
+      stroke:'var(--line2)', 'stroke-width':1, 'stroke-dasharray':'2 4'}));
+
+    // incident ray (always drawn, arriving at O)
+    arrow(heroSvg, h.inPt, [h.Ox,h.Oy], p.m1.color, 2.2);
+    // angle arc for theta1 (upper side, left of normal)
+    var arc1 = arcPath(h.Ox,h.Oy, 30, ph.t1, -1, false);
+    heroSvg.appendChild(el('path',{d:arc1, fill:'none', stroke:p.m1.color, 'stroke-width':1.1, opacity:.8}));
+    if(ph.t1>6){
+      var am1 = ph.t1/2*D2R;
+      txt(heroSvg, h.Ox-40*Math.sin(am1), h.Oy-40*Math.cos(am1), Math.round(ph.t1)+'°', {fill:p.m1.color, size:11});
+    }
+
+    if(!ph.tir){
+      arrow(heroSvg, [h.Ox,h.Oy], h.outPt, p.m2.color, 2.2);
+      var arc2 = arcPath(h.Ox,h.Oy, 30, ph.t2, 1, true);
+      heroSvg.appendChild(el('path',{d:arc2, fill:'none', stroke:p.m2.color, 'stroke-width':1.1, opacity:.8}));
+      if(ph.t2>6){
+        var am2 = ph.t2/2*D2R;
+        txt(heroSvg, h.Ox+40*Math.sin(am2), h.Oy+40*Math.cos(am2), Math.round(ph.t2)+'°', {fill:p.m2.color, size:11});
+      }
+    } else {
+      arrow(heroSvg, [h.Ox,h.Oy], h.reflPt, p.m1.color, 2.2);
+      var arcR = arcPath(h.Ox,h.Oy, 30, ph.t1, 1, false);
+      heroSvg.appendChild(el('path',{d:arcR, fill:'none', stroke:p.m1.color, 'stroke-width':1.1, opacity:.8}));
+      // a faint ghost of the ray that would have crossed, had it been able to
+      heroSvg.appendChild(el('line',{x1:h.Ox,y1:h.Oy,x2:h.Ox,y2:h.Oy+h.R*0.6,
+        stroke:'var(--line2)', 'stroke-width':1.4, 'stroke-dasharray':'1 5', 'stroke-linecap':'round'}));
+    }
+
+    var px = function(x){ return (x/w*100)+'%'; };
+    var py = function(y){ return (y/h.vbH*100)+'%'; };
+    lblM1.style.left = px(h.Ox); lblM1.style.top = py(10);
+    lblM1.textContent = p.m1.name+' · n = '+p.m1.n.toFixed(2);
+    lblM1.style.color = p.m1.color;
+    lblM2.style.left = px(h.Ox); lblM2.style.top = py(h.vbH-22);
+    lblM2.textContent = p.m2.name+' · n = '+p.m2.n.toFixed(2);
+    lblM2.style.color = p.m2.color;
+  }
+
+  // ---- equation + legend colouring ----
+  var accent='var(--accent)';
+  var n1Term=$('n1Term'), t1Term=$('t1Term'), n2Term=$('n2Term'), t2Term=$('t2Term');
+  var t1Label=$('t1Label');
+  var legendEl=$('legend');
+  function activeColor(k){ return state.active===k ? accent : 'var(--fg)'; }
+
+  function drawEquationAndLegend(){
+    n1Term.style.color = activeColor('pair'); n2Term.style.color = activeColor('pair');
+    t1Term.style.color = activeColor('t1'); t1Label.style.color = activeColor('t1');
+    t2Term.style.color = 'var(--fg)';
+
+    var ph = physics(), p = ph.p;
+    var rows = [
+      {sym:'n', sub:'1', name:p.m1.name.toLowerCase(), val:p.m1.n.toFixed(3), key:'pair'},
+      {sym:'&theta;', sub:'1', name:'angle of incidence', val:ph.t1+'°', key:'t1'},
+      {sym:'n', sub:'2', name:p.m2.name.toLowerCase(), val:p.m2.n.toFixed(3), key:'pair'},
+      {sym:'&theta;', sub:'2', name:'angle of refraction', val: ph.tir ? '—' : ph.t2.toFixed(1)+'°', key:null}
+    ];
+    legendEl.innerHTML = '';
+    rows.forEach(function(row){
+      var div=document.createElement('div'); div.className='row';
+      var sym=document.createElement('em'); sym.className='sym'; sym.innerHTML=row.sym+'<sub>'+row.sub+'</sub>';
+      sym.style.color = row.key ? activeColor(row.key) : 'var(--fg)';
+      var name=document.createElement('span'); name.className='name'; name.textContent=row.name;
+      var val=document.createElement('span'); val.className='val mono'; val.textContent=row.val;
+      div.appendChild(sym); div.appendChild(name); div.appendChild(val);
+      legendEl.appendChild(div);
+    });
+  }
+
+  // ---- interface picker ----
+  var pairButtons=$('pairButtons'), pairNote=$('pairNote');
+  PAIRS.forEach(function(pr,i){
+    var b=document.createElement('button');
+    b.textContent = pr.label;
+    b.addEventListener('click', function(){ state.pair=i; state.active='pair'; render(); });
+    b.addEventListener('pointerenter', function(){ state.active='pair'; render(); });
+    pairButtons.appendChild(b);
+  });
+  function drawPairButtons(){
+    Array.prototype.forEach.call(pairButtons.children, function(b,i){
+      var pr=PAIRS[i], on=i===state.pair;
+      var col = pr.m2.color;
+      b.style.background = on ? 'color-mix(in srgb, '+col+' 20%, var(--bg))' : 'transparent';
+      b.style.borderColor = on ? col : 'var(--border)';
+      b.style.color = on ? 'var(--fg)' : 'var(--muted)';
+    });
+    pairNote.innerHTML = pair().note;
+  }
+
+  // ---- slider ----
+  var angleTrack=$('angleTrack'), angleFill=$('angleFill'), angleThumb=$('angleThumb');
+  (function(){
+    var dragging=false;
+    function setFromClientX(x){
+      var r=angleTrack.getBoundingClientRect();
+      var f=clamp((x-r.left)/r.width,0,1);
+      state.t1 = clamp(Math.round(T1MIN+f*(T1MAX-T1MIN)), T1MIN, T1MAX);
+      render();
+    }
+    angleTrack.addEventListener('pointerdown', function(e){
+      dragging=true; if(angleTrack.setPointerCapture) angleTrack.setPointerCapture(e.pointerId);
+      state.active='t1'; setFromClientX(e.clientX);
+    });
+    angleTrack.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
+    function endDrag(){ if(dragging){ dragging=false; render(); } }
+    angleTrack.addEventListener('pointerup', endDrag);
+    angleTrack.addEventListener('pointercancel', endDrag);
+    angleTrack.addEventListener('pointerenter', function(){ state.active='t1'; render(); });
+    angleTrack.addEventListener('keydown', function(e){
+      var step = e.shiftKey?10:1, v=null;
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown') v=state.t1-step;
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp') v=state.t1+step;
+      else if(e.key==='Home') v=T1MIN;
+      else if(e.key==='End') v=T1MAX;
+      if(v!==null){ e.preventDefault(); state.t1=clamp(v,T1MIN,T1MAX); render(); }
+    });
+  })();
+  $('angleCtrl').addEventListener('pointerleave', function(){ state.active=null; render(); });
+  $('pairCtrl').addEventListener('pointerleave', function(){ state.active=null; render(); });
+
+  function drawAngleSlider(){
+    var pct = ((state.t1-T1MIN)/(T1MAX-T1MIN)*100).toFixed(2)+'%';
+    angleFill.style.width=pct; angleThumb.style.left=pct;
+    angleTrack.setAttribute('aria-valuemin', T1MIN);
+    angleTrack.setAttribute('aria-valuemax', T1MAX);
+    angleTrack.setAttribute('aria-valuenow', state.t1);
+    angleTrack.setAttribute('aria-valuetext', state.t1+' degrees');
+    $('angleReadout').textContent = state.t1+'°';
+  }
+
+  // ---- result ----
+  var t2Value=$('t2Value'), t2Unit=$('t2Unit'), verdictEl=$('verdict'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+  var gReach=$('gReach'), gLimit=$('gLimit'), gLimitLabel=$('gLimitLabel'), gMark=$('gMark'), gMarkLabel=$('gMarkLabel');
+  var gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
+
+  function pos(deg){ return clamp(deg/90,0,1)*100; }
+
+  function drawResult(){
+    var ph = physics();
+    var col = ph.tir ? 'var(--bad)' : 'var(--fg)';
+
+    if(ph.tir){
+      t2Value.textContent='—'; t2Unit.style.opacity=0;
+    } else {
+      t2Value.textContent = ph.t2.toFixed(1); t2Unit.style.opacity=1;
+    }
+    t2Value.style.color = col;
+
+    verdictEl.textContent = ph.tir ? 'Total internal reflection.' : 'Refracts.';
+    verdictEl.style.color = col;
+    if(ph.tir){
+      verdictSubEl.textContent = 'Past the critical angle — none of the light gets through.';
+    } else if(ph.p.m1.n < ph.p.m2.n){
+      verdictSubEl.textContent = 'Bends toward the normal, entering the slower medium.';
+    } else if(ph.p.m1.n > ph.p.m2.n){
+      verdictSubEl.textContent = 'Bends away from the normal, entering the faster medium.';
+    } else {
+      verdictSubEl.textContent = 'No bend — same speed on both sides.';
+    }
+    effortLineEl.textContent = ph.tc!==null
+      ? 'critical angle for this pair: '+ph.tc.toFixed(1)+'°'
+      : 'no critical angle — this pair always refracts';
+
+    var markPct = pos(state.t1);
+    gMark.style.left = markPct.toFixed(2)+'%';
+    gMark.style.background = col;
+    var labelPct = clamp(markPct,4,88);
+    gMarkLabel.style.left = labelPct.toFixed(2)+'%';
+    gMarkLabel.style.transform = markPct>72 ? 'translateX(-100%)' : markPct<20 ? 'translateX(0)' : 'translateX(-50%)';
+    gMarkLabel.style.color = col;
+    gMarkLabel.textContent = state.t1+'°';
+
+    if(ph.tc!==null){
+      var limitPct = pos(ph.tc);
+      gLimit.style.opacity=1; gLimitLabel.style.opacity=1;
+      gReach.style.opacity=1; gReach.style.width = limitPct.toFixed(2)+'%';
+      gLimit.style.left = limitPct.toFixed(2)+'%';
+      gLimitLabel.style.left = limitPct.toFixed(2)+'%';
+      gLimitLabel.textContent = 'critical, '+ph.tc.toFixed(1)+'°';
+    } else {
+      gLimit.style.opacity=0; gLimitLabel.style.opacity=0; gReach.style.opacity=0;
+    }
+
+    if(!gTicksEl.dataset.built){
+      var t='',l='';
+      for(var d=0; d<=90; d+=10){
+        var left=(d/90*100).toFixed(2)+'%';
+        t+='<div class="tick" style="left:'+left+'"></div>';
+        if(d%30===0){
+          var tx = d===0?'translateX(0)':d===90?'translateX(-100%)':'translateX(-50%)';
+          l+='<div class="ticklabel" style="left:'+left+';transform:'+tx+'">'+d+'°</div>';
+        }
+      }
+      gTicksEl.innerHTML=t; gTicksEl.dataset.built='1'; gLabelsEl.innerHTML=l;
+    }
+  }
+
+  // ---- presets ----
+  var PRESETS = {
+    straw:   {pair:0, t1:50},
+    diamond: {pair:5, t1:35},
+    fish:    {pair:3, t1:60},
+    through: {pair:0, t1:0}
+  };
+  document.querySelectorAll('.preset').forEach(function(b){
+    b.addEventListener('click', function(){
+      var pr = PRESETS[b.dataset.p];
+      state.pair=pr.pair; state.t1=pr.t1;
+      render();
+    });
+  });
+
+  // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
+  var STORAGE_KEY = 'snells-law-theme';
+  var themeToggle = $('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    // Read the applied DOM state first. If localStorage is unavailable (sandboxed iframe,
+    // private browsing, blocked cookies) falling straight through to the system preference
+    // would pin the toggle to one direction and it could never switch back.
+    var applied = document.documentElement.getAttribute('data-theme');
+    if(applied) return applied;
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+
+  // The relative "../index.html" link only resolves when this file is sitting in
+  // Simple_Viz/visualizations/ next to the site index. Published standalone (e.g. as an
+  // Artifact) there's no sibling index to reach, so fall back to the GitHub repo instead of
+  // leaving a link that 404s.
+  (function(){
+    var backLink = document.getElementById('backLink');
+    if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
+      backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
+      backLink.target = '_blank';
+      backLink.rel = 'noopener';
+      backLink.textContent = 'Simple Viz on GitHub ↗';
+    }
+  })();
+
+  function measure(){
+    var w = heroWrap.clientWidth;
+    if(w && w !== heroW){ heroW = w; render(); }
+  }
+
+  function render(){
+    drawHero();
+    drawEquationAndLegend();
+    drawPairButtons();
+    drawAngleSlider();
+    drawResult();
+  }
+
+  new ResizeObserver(measure).observe(heroWrap);
+  window.addEventListener('resize', measure);
+  [60,250,900].forEach(function(t){ setTimeout(measure, t); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  render();
+  // No continuous or auto-triggered animation on this page — the ray diagram is redrawn from
+  // state on every interaction, so there's nothing that needs a prefers-reduced-motion check.
+})();
+</script>

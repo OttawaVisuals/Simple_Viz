@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page tracker — Simple Viz</title>
+<style>
+:root{
+  --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+  --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+  --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;background:var(--bg);color:var(--fg);
+  font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif;
+  padding:40px 24px 80px;
+}
+.mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums;}
+.wrap{max-width:960px;margin:0 auto;}
+.topbar{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:.8rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);
+  margin-bottom:28px;
+}
+.topbar a{color:var(--muted);text-decoration:none;}
+.topbar a:hover{color:var(--accent);}
+button.toggle{
+  font-family:inherit;font-size:inherit;letter-spacing:inherit;text-transform:inherit;
+  background:none;border:1px solid var(--border);color:var(--muted);
+  padding:4px 10px;border-radius:999px;cursor:pointer;
+}
+button.toggle:hover{color:var(--fg);border-color:var(--line2);}
+h1{font-size:1.7rem;margin:0 0 6px;font-weight:normal;}
+.sub{color:var(--muted2);margin:0 0 28px;max-width:640px;line-height:1.5;}
+.bar{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--line);
+}
+.bar button, .bar label.filebtn{
+  font-family:inherit;font-size:.78rem;letter-spacing:.03em;text-transform:uppercase;
+  background:none;border:1px solid var(--border);color:var(--muted);
+  padding:6px 12px;border-radius:999px;cursor:pointer;
+}
+.bar button:hover, .bar label.filebtn:hover{color:var(--fg);border-color:var(--line2);}
+.bar input[type=file]{display:none;}
+.bar .savedmsg{font-size:.75rem;color:var(--muted);margin-left:auto;}
+table{width:100%;border-collapse:collapse;}
+thead th{
+  text-align:left;font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--muted);font-weight:normal;padding:8px 10px;border-bottom:1px solid var(--line2);
+}
+tbody td{padding:10px 10px;border-bottom:1px solid var(--line);vertical-align:top;}
+tbody tr:last-child td{border-bottom:none;}
+td.name{white-space:nowrap;}
+td.name a{color:var(--fg);text-decoration:none;}
+td.name a:hover{color:var(--accent);}
+td.name .cat{display:block;font-size:.7rem;color:var(--muted);margin-top:2px;}
+select.status{
+  font-family:inherit;font-size:.85rem;background:var(--bg);color:var(--fg);
+  border:1px solid var(--border);border-radius:6px;padding:4px 6px;
+}
+select.status[data-status="to-start"]{color:var(--muted);}
+select.status[data-status="draft"]{color:var(--accent);}
+select.status[data-status="completed"]{color:var(--fg);}
+select.status[data-status="checked"]{color:#3E8E5B;}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) select.status[data-status="checked"]{color:#7FCB9C;}
+}
+:root[data-theme="dark"] select.status[data-status="checked"]{color:#7FCB9C;}
+textarea.notes{
+  width:100%;min-height:2.4em;resize:vertical;
+  font-family:inherit;font-size:.85rem;line-height:1.4;
+  background:none;border:1px solid transparent;color:var(--fg);
+  padding:4px 6px;border-radius:6px;
+}
+textarea.notes:hover, textarea.notes:focus{border-color:var(--border);}
+textarea.notes:focus{outline:none;}
+td.updated{color:var(--muted);font-size:.78rem;white-space:nowrap;}
+.note{margin-top:32px;font-size:.8rem;color:var(--muted);line-height:1.6;max-width:640px;}
+.note code{font-family:inherit;background:var(--line);padding:1px 5px;border-radius:4px;}
+</style>
+
+<div class="wrap">
+  <div class="topbar">
+    <a href="index.html">&larr; Simple Viz</a>
+    <span class="mono" style="letter-spacing:.08em;">page tracker</span>
+    <button class="toggle" id="themeToggle">Dark mode</button>
+  </div>
+
+  <h1>Page tracker</h1>
+  <p class="sub">One row per visualization. Status and notes save to this browser automatically.
+  Use <strong>Export</strong> to save a <code class="mono">status.json</code> you can commit to
+  the repo, and <strong>Import</strong> to load one back in (e.g. on a different machine).</p>
+
+  <div class="bar">
+    <button id="btnExport">Export status.json</button>
+    <label class="filebtn" for="fileImport">Import status.json</label>
+    <input type="file" id="fileImport" accept="application/json">
+    <span class="savedmsg mono" id="savedMsg"></span>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:26%">Page</th>
+        <th style="width:14%">Status</th>
+        <th>Notes</th>
+        <th style="width:14%">Updated</th>
+      </tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+
+  <p class="note">Data lives in this browser's <code>localStorage</code> only — it isn't
+  synced automatically. Export after a work session and commit <code>status.json</code>
+  if you want the record to travel with the repo and survive a cleared browser profile.</p>
+</div>
+
+<script>
+var PAGES = [
+  ["horizon-distance.html","Everyday maths"],
+  ["lightning-distance.html","Everyday maths"],
+  ["braking-distance.html","Everyday maths"],
+  ["bike-gears.html","Everyday maths"],
+  ["shelf-sag.html","Everyday maths"],
+  ["earth-moon-race.html","Discoveries"],
+  ["planet-light-delay.html","Discoveries"],
+  ["mass-energy.html","Discoveries"],
+  ["gravity-lab.html","Discoveries"],
+  ["eratosthenes-shadow.html","Discoveries"],
+  ["snells-law.html","Discoveries"],
+  ["rocket-equation.html","Discoveries"],
+  ["keplers-third-law.html","Discoveries"],
+  ["straw-hose-flow.html","Fun physics"],
+  ["pendulum-period.html","Fun physics"],
+  ["terminal-velocity.html","Fun physics"],
+  ["ocean-salt.html","Fun physics"]
+];
+var STATUSES = [
+  ["to-start","To start"],
+  ["draft","Draft"],
+  ["completed","Completed"],
+  ["checked","Checked"]
+];
+var STORE_KEY = 'simple-viz-tracker-v1';
+var THEME_KEY = 'simple-viz-tracker-theme';
+
+function load(){
+  try{ return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }catch(e){ return {}; }
+}
+function save(data){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(data)); }catch(e){}
+  var m = document.getElementById('savedMsg');
+  m.textContent = 'saved ' + new Date().toLocaleTimeString();
+}
+
+var data = load();
+
+function rowFor(file, cat){
+  var entry = data[file] || {status:'to-start', notes:'', updated:''};
+  var tr = document.createElement('tr');
+
+  var tdName = document.createElement('td');
+  tdName.className = 'name';
+  var a = document.createElement('a');
+  a.href = 'visualizations/' + file;
+  a.target = '_blank';
+  a.textContent = file;
+  var span = document.createElement('span');
+  span.className = 'cat mono';
+  span.textContent = cat;
+  tdName.appendChild(a); tdName.appendChild(span);
+
+  var tdStatus = document.createElement('td');
+  var sel = document.createElement('select');
+  sel.className = 'status';
+  STATUSES.forEach(function(s){
+    var opt = document.createElement('option');
+    opt.value = s[0]; opt.textContent = s[1];
+    if(s[0]===entry.status) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  sel.setAttribute('data-status', entry.status);
+  tdStatus.appendChild(sel);
+
+  var tdNotes = document.createElement('td');
+  var ta = document.createElement('textarea');
+  ta.className = 'notes';
+  ta.value = entry.notes;
+  ta.rows = 1;
+  tdNotes.appendChild(ta);
+
+  var tdUpdated = document.createElement('td');
+  tdUpdated.className = 'updated mono';
+  tdUpdated.textContent = entry.updated || '—';
+
+  function commit(){
+    entry.status = sel.value;
+    entry.notes = ta.value;
+    entry.updated = new Date().toISOString().slice(0,10);
+    sel.setAttribute('data-status', entry.status);
+    tdUpdated.textContent = entry.updated;
+    data[file] = entry;
+    save(data);
+  }
+  sel.addEventListener('change', commit);
+  ta.addEventListener('change', commit);
+  ta.addEventListener('blur', commit);
+
+  tr.appendChild(tdName); tr.appendChild(tdStatus); tr.appendChild(tdNotes); tr.appendChild(tdUpdated);
+  return tr;
+}
+
+var rows = document.getElementById('rows');
+PAGES.forEach(function(p){ rows.appendChild(rowFor(p[0], p[1])); });
+
+document.getElementById('btnExport').addEventListener('click', function(){
+  var out = {};
+  PAGES.forEach(function(p){ out[p[0]] = data[p[0]] || {status:'to-start', notes:'', updated:''}; });
+  var blob = new Blob([JSON.stringify(out, null, 2)], {type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'status.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('fileImport').addEventListener('change', function(e){
+  var file = e.target.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(){
+    try{
+      var imported = JSON.parse(reader.result);
+      data = imported;
+      save(data);
+      rows.innerHTML = '';
+      PAGES.forEach(function(p){ rows.appendChild(rowFor(p[0], p[1])); });
+    }catch(err){
+      alert('Could not read that file as JSON: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+// theme toggle, per STYLE_GUIDE.md pattern
+var themeToggle = document.getElementById('themeToggle');
+function systemPrefersDark(){ return matchMedia('(prefers-color-scheme: dark)').matches; }
+function currentTheme(){
+  var applied = document.documentElement.getAttribute('data-theme');
+  if(applied) return applied;
+  var stored = null; try { stored = localStorage.getItem(THEME_KEY); } catch(e){}
+  return stored || (systemPrefersDark() ? 'dark' : 'light');
+}
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+  try { localStorage.setItem(THEME_KEY, t); } catch(e){}
+}
+themeToggle.addEventListener('click', function(){ applyTheme(currentTheme()==='dark'?'light':'dark'); });
+applyTheme(currentTheme());
+</script>
+</html>

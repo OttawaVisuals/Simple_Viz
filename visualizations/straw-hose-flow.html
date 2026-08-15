@@ -71,7 +71,10 @@
   .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
   .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
   .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
-  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;transition:color .2s}
+  /* text-transform:none: .ctrl-title uppercases its label, but the em here carries a
+     case-bearing equation symbol (r, not R) — without this it rendered "R" and contradicted
+     the equation above it. Same fix as bike-gears.html. */
+  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;text-transform:none;transition:color .2s}
   .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
   .fluid-buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
   .fluid-buttons button{cursor:pointer;font-family:Georgia,serif;font-style:italic;font-size:15px;padding:6px 13px 7px;border-radius:999px;transition:all .18s ease;border:1px solid var(--border);background:transparent;color:var(--muted)}

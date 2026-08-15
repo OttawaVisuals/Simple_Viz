@@ -367,37 +367,94 @@ The three items left open by the correctness sweep above, all fixed in the same 
   tooling's own preview pane serves local files through a `data:` URL wrapper rather than real
   `file://` navigation, which happens to be a second real case the fallback correctly catches.
 
+### Categories, and a much longer roadmap (2026-08-15)
+
+`index.html` now groups both the built pages and the roadmap under **three categories**,
+proposed by the user: **Everyday maths**, **Discoveries**, **Fun physics**. Decisions worth
+knowing before editing that file:
+
+- **Three, not four.** A separate "scale" bucket (`ocean-salt.html`, and the queued animal-
+  biomass idea) was considered and rejected — it would have been a one-page category next to a
+  seven-page one. Scale-shock pages live under **Fun physics**, whose lede was widened to say
+  so ("oddities *and quantities too big to picture*"). If scale ever reaches three or four
+  built pages, splitting it back out is the obvious move.
+- **The user's own examples anchor the taxonomy** and should not be re-litigated silently:
+  bike gears → Everyday maths, speed of light → Discoveries, the straw → Fun physics. That is
+  why `earth-moon-race.html` sits under Discoveries even though its payoff is magnitude rather
+  than derivation.
+- **The split is currently 3 / 7 / 2.** Discoveries dominating is a true fact about what's
+  been built, not a flaw in the categories; the roadmap below is deliberately weighted the
+  other way (9 / 10 / 11).
+- **Cards were renumbered 01–12 in the new reading order**, so the numbers still ascend down
+  the page. Any older note in this file referring to "pages 07–12" means the *previous*
+  numbering. Current order: 01 horizon, 02 lightning, 03 braking · 04 earth-moon, 05 planet-
+  light-delay, 06 mass-energy, 07 gravity-lab, 08 eratosthenes, 09 rocket, 10 kepler · 11
+  straw-hose-flow, 12 ocean-salt.
+- **Categories live on `index.html` only.** The visualization pages' topbars still carry just
+  the back link + law name + theme toggle; no category label was added there, since the
+  right-hand slot is already occupied and a page reached as a standalone Artifact has no
+  category context to belong to.
+
+Two CSS changes were needed to support per-category grids, both worth preserving:
+
+- The closing hairline moved from `.concept:nth-last-child(-n+2)` onto `.grid` itself. The old
+  rule assumed one grid with an even card count; with a 3-card and a 7-card group it would have
+  drawn a bottom border under one card in the middle of a row.
+- `.grid:has(> .concept:last-child:nth-child(odd))::after` inserts an empty cell when a group
+  has an odd number of cards, so the rule above the final row spans the full width instead of
+  stopping halfway. It's suppressed under 760px, where the grid is single-column and the filler
+  would add a stray empty row. This is self-maintaining — add or remove a card and the filler
+  follows — which is why it's a `:has()` selector rather than a hand-placed filler element.
+
+**Roadmap is now 30 entries** (was 9), grouped by the same three categories, each still
+`concept — hook · equation · status`. Three are tagged `up next` rather than `idea`: **bike
+gears** (`v = πd(N₁/N₂)·rpm`), **a shelf that sags** (`δ = PL³/48EI`), and **why the straw
+looks bent** (Snell, `n₁sinθ₁ = n₂sinθ₂`) — picked as the strongest single-equation pages with
+clean slider shapes. Notes on individual entries:
+
+- **Fourier** was deliberately reduced from "the Fourier transform" (not a two-sliders-one-
+  number page) to **building a square wave from harmonics** — slider = number of terms, and the
+  Gibbs overshoot parking at ~9% is the payoff. The full time↔frequency page is a different,
+  larger job.
+- **"Why computers count in sixteens"** (binary/hex) is the weakest fit on the list and is
+  known to be: it's a converter with no equation, no computed result, and no gauge. Kept
+  because the user proposed it; the salvage is the *nibble* insight (one hex digit = four bits),
+  not the conversion itself.
+- **"A string you can actually hear"** would be the first page to use **Web Audio**, which is
+  native and therefore allowed under the no-external-dependencies rule. Nothing on the site
+  makes sound yet. It pairs naturally with the Fourier harmonics page.
+- **"The ten-metre ceiling"** (`h = P₀/ρg`) is the companion page that `straw-hose-flow.html`
+  explicitly scopes out — hydrostatic, not viscous. The two should cross-link if both exist.
+- Ideas raised in the same brainstorm but **not** added, as weaker or redundant: mortgage
+  amortization (overlaps compound interest), rain load on a roof (overlaps ocean salt's shape),
+  ladder friction angle, the ideal gas law, the Drake equation, and boiling point at altitude.
+
 ## Roadmap
 
 A running list of future equation pages now lives directly in `index.html`, in a "What's
 next" section below the built grid, so progress is visible on the site itself rather than
 only in this file. Each entry has the concept, its core equation, and a status tag (`up
-next` / `idea`). Update that list in `index.html` directly as pages move from idea → next →
-built (moving a built one out of the roadmap list and into the main `.grid` section with a
-numbered `.concept` card, per the existing pattern).
+next` / `idea`), under one of the three category headings. Update that list in `index.html`
+directly as pages move from idea → next → built (moving a built one out of the roadmap list
+and into the matching category's `.grid` section as a numbered `.concept` card, per the
+existing pattern — and renumbering the cards below it).
 
 **Distance to the horizon**, **how far away was that lightning**, **braking distance vs
 speed**, **the rocket equation**, **Kepler's third law**, and **all the salt in the sea** were
 all built in the 2026-08-14 six-page batch above and moved out of this list.
 
-Remaining idea, not yet scoped: **the weight of all animal life** (humans vs livestock vs
-wild mammals by total biomass, not headcount — a Fermi-style comparison rather than a clean
-single equation, so its visual form needs more thought than the others).
-
 ## Open questions / next steps
 
-- A site index (`index.html`) now links twelve concepts, most recently the six-page batch
-  above (horizon distance, lightning distance, braking distance, the rocket equation,
-  Kepler's third law, ocean salt). Each is intentionally a simplified explainer, with its
-  approximation stated in-page.
+- A site index (`index.html`) now links twelve concepts, grouped into the three categories
+  described above (Everyday maths / Discoveries / Fun physics). Each is intentionally a
+  simplified explainer, with its approximation stated in-page.
 - **Decided (2026-08-14):** every visualization should share the visual language in
   [STYLE_GUIDE.md](STYLE_GUIDE.md) — the user confirmed straw-hose-flow.html's v5 design as
   the site's style going forward. `earth-moon-race.html` was migrated the same day, and
   `gravity-lab.html`, `mass-energy.html`, and `planet-light-delay.html` followed in a
   dedicated sweep later that day (see above) — every page in `visualizations/` now shares this
-  style. **`index.html` itself was never migrated** and is still on the original dark-first
-  palette with its own token set and no theme toggle; it's the one remaining page that doesn't
-  match, and it's the first one anyone sees.
+  style. `index.html` followed in its own pass the same day, so every page on the site,
+  including the cover, is on the shared token set and has a theme toggle.
 - The zoom window in `earth-moon-race.html` is a **fixed** 1,500 km (not auto-scaling to
   keep fast objects in frame) — deliberate simplification. If a future request wants the
   probe to stay visible the whole time, an auto-zoom-out camera is the next thing to try,

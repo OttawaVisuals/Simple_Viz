@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Throwing a potato into a hole</title>
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+  :where(a,button,input,select,textarea,[tabindex]):focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+
+  .topgrid{display:grid;grid-template-columns:2fr 1.3fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.05;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
+
+  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqn{display:flex;flex-direction:column;gap:10px;font-size:clamp(16px,1.6vw,21px);line-height:1.3;font-weight:300}
+  .eqn .row{display:flex;align-items:baseline;justify-content:center;gap:.22em;flex-wrap:nowrap;white-space:nowrap}
+  .eqn .eq{color:var(--muted)}
+  .eqn .frac{display:inline-flex;flex-direction:column;align-items:center;font-size:.85em;margin:0 .05em}
+  .eqn .frac .num,.eqn .frac .den{padding:0 .2em}
+  .eqn .frac .bar{height:1.3px;background:var(--fg);width:100%}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .eqn sup{font-size:.6em;position:relative;top:-.6em}
+
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:1.6em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:7px 2px}
+  .legend .sym{font-size:16px;font-weight:300;transition:color .2s}
+  .legend .name{font-size:12px;color:var(--muted2)}
+  .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero svg{width:100%;height:auto;display:block}
+  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
+  .playbar{display:flex;align-items:center;gap:14px;margin-top:10px}
+  .playbtn{cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted2);border-radius:999px;padding:6px 16px;font:12px/1 ui-monospace,monospace;letter-spacing:.05em}
+  .playbtn:hover{color:var(--accent);border-color:var(--accent)}
+  .flighttxt{font:12px ui-monospace,monospace;color:var(--muted)}
+
+  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
+
+  .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;text-transform:none;transition:color .2s}
+  .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
+  .readout{font-family:ui-monospace,monospace;font-size:clamp(24px,2.6vw,32px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
+  .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
+  .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
+  .track .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
+  .track .thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
+  .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
+
+  .result{text-align:left}
+  .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
+  .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
+  .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px}
+  .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
+  .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
+  .gauge{position:relative;height:56px;margin-top:16px;max-width:420px}
+  .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
+  .gauge .zone{position:absolute;top:14px;height:10px;background:color-mix(in srgb, var(--accent) 26%, transparent);border-radius:2px}
+  .gauge .tick{position:absolute;top:26px;width:1px;height:5px;background:var(--line2)}
+  .gauge .ticklabel{position:absolute;top:33px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
+  .gauge .mark{position:absolute;top:11px;height:16px;width:3px;border-radius:2px;transition:left .12s linear}
+  .gauge .marklabel{position:absolute;top:-3px;white-space:nowrap;font:500 11px ui-monospace,monospace;transition:left .12s linear}
+
+  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+  .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
+  .preset:hover{border-color:var(--accent);color:var(--accent)}
+
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+
+  .feedback{margin-top:clamp(40px,4.6vw,64px);padding-top:20px;border-top:1px solid var(--line)}
+  .feedback-head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:20px}
+  .feedback-kicker{margin:0 0 5px;font:10px/1.3 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .feedback h2{margin:0;font-size:clamp(21px,2.2vw,28px);font-weight:400;letter-spacing:-.02em}
+  .feedback-copy{margin:5px 0 0;font:12px/1.6 ui-monospace,monospace;color:var(--muted)}
+  .feedback-choices{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+  .feedback-choice{appearance:none;border:1px solid var(--line2);border-radius:999px;background:transparent;color:var(--muted2);padding:7px 12px;font:12px/1 ui-monospace,monospace;cursor:pointer}
+  .feedback-choice:hover,.feedback-choice:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
+  .feedback-choice[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--bg))}
+  .feedback-form{margin-top:18px;max-width:760px}
+  .feedback-form[hidden]{display:none}
+  .feedback-form label{display:block;margin-bottom:7px;font:12px/1.5 ui-monospace,monospace;color:var(--muted2)}
+  .feedback-form label span{color:var(--muted)}
+  .feedback-form textarea{box-sizing:border-box;width:100%;min-height:84px;resize:vertical;border:1px solid var(--line2);border-radius:3px;background:transparent;color:var(--fg);padding:10px 11px;font:14px/1.5 Georgia,serif}
+  .feedback-form textarea:focus{border-color:var(--accent);outline:1px solid var(--accent);outline-offset:2px}
+  .feedback-actions{display:flex;align-items:baseline;gap:14px;margin-top:9px}
+  .feedback-send{appearance:none;border:0;border-bottom:1px solid var(--line2);background:transparent;color:var(--muted2);padding:2px 0;font:12px/1.4 ui-monospace,monospace;cursor:pointer}
+  .feedback-send:hover,.feedback-send:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+  .feedback-send:disabled{cursor:wait;opacity:.55}
+  .feedback-status{font:11px/1.5 ui-monospace,monospace;color:var(--muted)}
+  .feedback-trap{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}
+  .footer{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,40px);font:11.5px/1.7 ui-monospace,monospace;color:var(--muted)}
+  .footer a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .footer a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  @media (max-width:700px){.feedback-head{grid-template-columns:1fr}.feedback-choices{justify-content:flex-start}.footer{grid-template-columns:1fr;gap:10px}}
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../index.html" id="backLink">&larr; Physics you can see</a>
+    <div class="topbar-right">
+      <span>Projectile motion</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>Throwing a potato <em>into a hole</em>.</h1>
+      <p class="sub">Set a release height, a launch angle, and a speed, and see whether a 200&nbsp;g potato lands in a hole 3&nbsp;m away &mdash; the same shape of task <em style="font-style:italic">Taskmaster</em> loves to set contestants.</p>
+    </div>
+
+    <div class="eqnbox">
+      <div class="eqn">
+        <div class="row"><em>x</em><span class="eq">=</span><em data-k="v0">v&#8320;</em><span class="eq">cos</span><em data-k="theta">&theta;</em><span class="eq">&middot;</span><em>t</em></div>
+        <div class="row"><em>y</em><span class="eq">=</span><em data-k="h0">h&#8320;</em><span class="eq">+</span><em data-k="v0">v&#8320;</em><span class="eq">sin</span><em data-k="theta">&theta;</em><span class="eq">&middot;</span><em>t</em><span class="eq">&minus;</span><span class="frac"><span class="row num">1</span><span class="bar"></span><span class="row den">2</span></span><em>g</em><em>t</em><sup>2</sup></div>
+      </div>
+    </div>
+
+    <div class="legendbox">
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="hero" id="heroWrap">
+    <div class="lbl" id="lblH0" style="transform:translateX(-50%)"></div>
+    <div class="lbl" id="lblHole" style="transform:translateX(-50%)"></div>
+    <svg id="heroSvg" role="img" aria-label="Side view of a throw from a release height, arcing toward a hole in the ground 3 metres away."></svg>
+    <div class="playbar">
+      <button class="playbtn" id="throwBtn" type="button">&#9654; Throw</button>
+      <span class="flighttxt mono" id="flightTxt"></span>
+    </div>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrls">
+      <div class="ctrl" id="h0Ctrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Release height <em>h&#8320;</em></span>
+        </div>
+        <div class="readout mono" id="h0Readout"></div>
+        <div class="track" id="h0Track" tabindex="0" role="slider" aria-label="Release height">
+          <div class="rail"></div>
+          <div class="fill" id="h0Fill"></div>
+          <div class="thumb" id="h0Thumb"></div>
+        </div>
+        <div class="track-range"><span>0 m</span><span class="mid">ground level to overhead</span><span>2 m</span></div>
+      </div>
+
+      <div class="ctrl" id="angleCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Launch angle <em>&theta;</em></span>
+        </div>
+        <div class="readout mono" id="angleReadout"></div>
+        <div class="track" id="angleTrack" tabindex="0" role="slider" aria-label="Launch angle">
+          <div class="rail"></div>
+          <div class="fill" id="angleFill"></div>
+          <div class="thumb" id="angleThumb"></div>
+        </div>
+        <div class="track-range"><span>0&deg;</span><span class="mid">flat to steep</span><span>85&deg;</span></div>
+      </div>
+
+      <div class="ctrl" id="v0Ctrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Speed <em>v&#8320;</em></span>
+        </div>
+        <div class="readout mono" id="v0Readout"></div>
+        <div class="track" id="v0Track" tabindex="0" role="slider" aria-label="Launch speed">
+          <div class="rail"></div>
+          <div class="fill" id="v0Fill"></div>
+          <div class="thumb" id="v0Thumb"></div>
+        </div>
+        <div class="track-range"><span>1 m/s</span><span class="mid">gentle toss to a real throw</span><span>10 m/s</span></div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Landing distance</div>
+      <div class="result-value"><span class="num mono" id="distValue"></span><span class="unit mono">m</span><span class="v" id="verdict"></span></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+      <div class="effort-line" id="effortLine"></div>
+      <div class="gauge" id="gauge">
+        <div class="track"></div>
+        <div class="zone" id="gZone"></div>
+        <div class="mark" id="gMark"></div>
+        <div class="marklabel mono" id="gMarkLabel"></div>
+        <div id="gTicks"></div>
+        <div id="gLabels"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-p="straight">Straight in</button>
+    <button class="preset" data-p="lob">The lob, same hole</button>
+    <button class="preset" data-p="flat">Too flat</button>
+    <button class="preset" data-p="gentle">Too gentle</button>
+  </div>
+
+  <p class="note">Standard <a href="https://en.wikipedia.org/wiki/Projectile_motion" target="_blank" rel="noopener">projectile motion</a> with no air resistance &mdash; a real thrown potato is dense and slow enough that drag makes only a small difference over 3&nbsp;m, but it isn't modelled here. <em style="font-style:italic">g</em> is fixed at 9.81&nbsp;m/s&sup2;, the hole sits a fixed 3.00&nbsp;m away and is treated as 30&nbsp;cm wide, and the 200&nbsp;g potato mass only matters for the impact-energy figure &mdash; without drag, mass never affects the trajectory itself. The animated throw plays at 0.6&times; real speed, since some of the faster combinations land in well under a second. The &ldquo;lob&rdquo; preset shows a genuine property of this equation: on level ground, two different launch angles that add up to 90&deg; send something the same distance, just on a flatter or a higher arc &mdash; try it against &ldquo;Straight in&rdquo;. <em style="font-style:italic">Taskmaster</em> has run several tasks shaped exactly like this &mdash; throw an object a fixed distance into a target &mdash; which is what prompted this page, alongside <a href="straw-hose-flow.html">the straw-and-hose one</a>.</p>
+
+  <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
+    <div class="feedback-head">
+      <div>
+        <p class="feedback-kicker">Private feedback</p>
+        <h2 id="feedbackHeading">Was this clear?</h2>
+        <p class="feedback-copy">Your response is private and helps improve this page.</p>
+      </div>
+      <div class="feedback-choices" role="group" aria-label="Clarity rating">
+        <button class="feedback-choice" type="button" data-rating="clear" aria-pressed="false">Yes</button>
+        <button class="feedback-choice" type="button" data-rating="almost" aria-pressed="false">Almost</button>
+        <button class="feedback-choice" type="button" data-rating="not-yet" aria-pressed="false">Not yet</button>
+      </div>
+    </div>
+    <form class="feedback-form" hidden>
+      <label for="feedbackComment">What could be clearer? <span>Optional, 1,200 characters maximum.</span></label>
+      <textarea id="feedbackComment" name="comment" maxlength="1200" placeholder="A confusing step, a possible mistake, or an idea..."></textarea>
+      <label class="feedback-trap" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
+      <div class="feedback-actions">
+        <button class="feedback-send" type="submit">Send private feedback</button>
+        <span class="feedback-status" role="status" aria-live="polite"></span>
+      </div>
+    </form>
+  </section>
+
+  <div class="footer">
+    <span>Designed and maintained by Simon using AI-assisted development. Sources and approximations are stated on each page.</span>
+    <span>Spot a mistake or have an idea? Write to <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.</span>
+  </div>
+
+</div>
+</main>
+<script>
+(function(){
+  var G = 9.81, HOLE_D = 3.00, HOLE_R = 0.15, POTATO_M = 0.2;
+  var H0MIN=0, H0MAX=2, AMIN=0, AMAX=85, VMIN=1, VMAX=10;
+  var PLAYBACK_RATE = 0.6;
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+  function fmt(n,d){ return n.toFixed(d==null?2:d); }
+
+  var NS='http://www.w3.org/2000/svg';
+  function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+
+  var state = { h0:0.9, angle:42, v0:5.6, active:null, drag:null };
+  var anim = { playing:false, t:0, start:0, raf:null };
+  var heroW = 0;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
+  var lblH0=$('lblH0'), lblHole=$('lblHole');
+
+  function flightFor(h0, angleDeg, v0){
+    var th = angleDeg*Math.PI/180;
+    var vx = v0*Math.cos(th), vy0 = v0*Math.sin(th);
+    var tLand = (vy0 + Math.sqrt(vy0*vy0 + 2*G*h0)) / G;
+    var xLand = vx*tLand;
+    var vyImpact = vy0 - G*tLand;
+    var speedImpact = Math.sqrt(vx*vx + vyImpact*vyImpact);
+    var ke = 0.5*POTATO_M*speedImpact*speedImpact;
+    var apexT = vy0>0 ? vy0/G : 0;
+    var apexY = h0 + vy0*apexT - 0.5*G*apexT*apexT;
+    return { vx:vx, vy0:vy0, h0:h0, tLand:tLand, xLand:xLand, speedImpact:speedImpact, ke:ke, apexY:Math.max(apexY,h0) };
+  }
+  function posAt(f, t){
+    t = clamp(t, 0, f.tLand);
+    var y = f.h0 + f.vy0*t - 0.5*G*t*t;
+    return { x: f.vx*t, y: Math.max(y,0) };
+  }
+  function flight(){ return flightFor(state.h0, state.angle, state.v0); }
+
+  // ---- hero geometry: viewBox width == measured CSS px width, both axes share one scale ----
+  function geom(w, f){
+    var narrow = w < 620;
+    var leftPad = narrow?30:44, rightPad=16, topPad=narrow?30:38, bottomPad=narrow?34:40;
+    var XMAX = Math.max(HOLE_D+1.5, f.xLand*1.15, 5);
+    var YMAX = Math.max(state.h0, f.apexY, 1.2)*1.25;
+    var plotW = Math.max(60, w-leftPad-rightPad);
+    var scale = plotW/XMAX;
+    var plotH = YMAX*scale;
+    var groundY = topPad+plotH;
+    var vbH = groundY+bottomPad;
+    function px(xm){ return leftPad+xm*scale; }
+    function py(ym){ return groundY-ym*scale; }
+    return { w:w, vbH:vbH, groundY:groundY, scale:scale, XMAX:XMAX, YMAX:YMAX, px:px, py:py, leftPad:leftPad, plotW: plotW };
+  }
+
+  function pathFor(f, g){
+    var N = 44, pts = [];
+    for(var i=0;i<=N;i++){
+      var t = f.tLand*i/N;
+      var y = state.h0 + f.vy0*t - 0.5*G*t*t;
+      if(y<0){ y=0; }
+      pts.push(g.px(f.vx*t).toFixed(1)+','+g.py(y).toFixed(1));
+    }
+    return 'M'+pts.join(' L');
+  }
+
+  var groundLine, trajPath, holeOuter, holeInner, h0Line, h0Dot, landTick, potato;
+  function buildSvg(){
+    heroSvg.innerHTML = '';
+    groundLine = el('line',{stroke:'var(--line2)','stroke-width':1.25});
+    trajPath = el('path',{fill:'none',stroke:'var(--line2)','stroke-width':1.5,'stroke-dasharray':'2 5'});
+    holeOuter = el('ellipse',{fill:'var(--bg)',stroke:'var(--line2)','stroke-width':1.25});
+    holeInner = el('ellipse',{fill:'color-mix(in srgb, var(--fg) 18%, var(--bg))'});
+    h0Line = el('line',{stroke:'var(--line2)','stroke-width':1.25,'stroke-dasharray':'3 3'});
+    h0Dot = el('circle',{r:3.5,fill:'var(--muted2)'});
+    landTick = el('line',{stroke:'var(--bad)','stroke-width':2});
+    potato = el('ellipse',{rx:7,ry:5.4,fill:'#B9834B',stroke:'var(--bg)','stroke-width':1.5});
+    [groundLine,trajPath,holeOuter,holeInner,h0Line,h0Dot,landTick,potato].forEach(function(e){ heroSvg.appendChild(e); });
+  }
+  buildSvg();
+
+  function drawHero(){
+    var w = heroW || heroWrap.clientWidth || 1100;
+    var f = flight();
+    var g = geom(w, f);
+
+    heroSvg.setAttribute('viewBox','0 0 '+w+' '+g.vbH);
+
+    groundLine.setAttribute('x1', g.px(0)); groundLine.setAttribute('x2', g.px(g.XMAX));
+    groundLine.setAttribute('y1', g.groundY); groundLine.setAttribute('y2', g.groundY);
+
+    trajPath.setAttribute('d', pathFor(f, g));
+    trajPath.setAttribute('stroke', state.active==='angle'||state.active==='v0' ? 'var(--accent)' : 'var(--line2)');
+
+    var holeRpx = Math.max(4, HOLE_R*g.scale);
+    var holeX = g.px(HOLE_D);
+    holeOuter.setAttribute('cx', holeX); holeOuter.setAttribute('cy', g.groundY);
+    holeOuter.setAttribute('rx', holeRpx); holeOuter.setAttribute('ry', Math.min(7, holeRpx*0.55));
+    holeInner.setAttribute('cx', holeX); holeInner.setAttribute('cy', g.groundY+1.5);
+    holeInner.setAttribute('rx', holeRpx*0.72); holeInner.setAttribute('ry', Math.min(5, holeRpx*0.4));
+
+    h0Line.setAttribute('x1', g.px(0)); h0Line.setAttribute('x2', g.px(0));
+    h0Line.setAttribute('y1', g.groundY); h0Line.setAttribute('y2', g.py(state.h0));
+    h0Dot.setAttribute('cx', g.px(0)); h0Dot.setAttribute('cy', g.py(state.h0));
+    h0Dot.setAttribute('fill', state.active==='h0' ? 'var(--accent)' : 'var(--muted2)');
+    h0Line.setAttribute('stroke', state.active==='h0' ? 'var(--accent)' : 'var(--line2)');
+
+    var landColor = Math.abs(f.xLand-HOLE_D) <= HOLE_R ? 'var(--fg)' : 'var(--bad)';
+    var landX = g.px(clamp(f.xLand,0,g.XMAX));
+    landTick.setAttribute('x1', landX); landTick.setAttribute('x2', landX);
+    landTick.setAttribute('y1', g.groundY-9); landTick.setAttribute('y2', g.groundY+3);
+    landTick.setAttribute('stroke', landColor);
+
+    var p = anim.playing ? posAt(f, anim.t) : (anim.thrown ? {x:f.xLand,y:0} : {x:0,y:state.h0});
+    potato.setAttribute('cx', g.px(p.x)); potato.setAttribute('cy', g.py(p.y));
+    potato.style.opacity = 1;
+
+    var px = function(x){ return (x/w*100)+'%'; };
+    var py = function(y){ return (y/g.vbH*100)+'%'; };
+    lblH0.style.left = px(g.px(0)); lblH0.style.top = py(g.py(state.h0)-18);
+    lblH0.textContent = state.h0.toFixed(2)+' m';
+    lblH0.style.transform = 'translate(6px,-50%)'; lblH0.style.textAlign='left';
+    lblHole.style.left = px(holeX); lblHole.style.top = py(g.groundY+16);
+    lblHole.textContent = 'hole, 3.00 m';
+  }
+
+  // ---- equation + legend colouring ----
+  var accent = 'var(--accent)';
+  function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
+  var eqnTerms = document.querySelectorAll('.eqn em[data-k]');
+  var legendEl = $('legend');
+
+  function drawEquationAndLegend(){
+    Array.prototype.forEach.call(eqnTerms, function(e){ e.style.color = activeColor(e.dataset.k); });
+    var f = flight();
+    var rows = [
+      {sym:'v₀', name:'launch speed', val: state.v0.toFixed(1)+' m/s', key:'v0'},
+      {sym:'θ', name:'launch angle', val: state.angle.toFixed(0)+'°', key:'theta'},
+      {sym:'h₀', name:'release height', val: state.h0.toFixed(2)+' m', key:'h0'},
+      {sym:'g', name:'gravity (fixed)', val:'9.81 m/s²', key:null},
+      {sym:'d', name:'hole distance (fixed)', val:'3.00 m', key:null},
+      {sym:'m', name:'potato mass (fixed)', val:'200 g', key:null}
+    ];
+    legendEl.innerHTML = '';
+    rows.forEach(function(row){
+      var div = document.createElement('div'); div.className='row';
+      var sym = document.createElement('em'); sym.className='sym'; sym.textContent = row.sym;
+      sym.style.color = row.key ? activeColor(row.key) : 'var(--fg)';
+      var name = document.createElement('span'); name.className='name'; name.textContent = row.name;
+      var val = document.createElement('span'); val.className='val mono'; val.textContent = row.val;
+      div.appendChild(sym); div.appendChild(name); div.appendChild(val);
+      legendEl.appendChild(div);
+    });
+  }
+
+  // ---- sliders ----
+  function makeSlider(key, track, fill, thumb, lo, hi, step){
+    var dragging = false;
+    function setFromClientX(x){
+      var r = track.getBoundingClientRect();
+      var fr = clamp((x-r.left)/r.width, 0, 1);
+      var v = lo + fr*(hi-lo);
+      v = clamp(Math.round(v/step)*step, lo, hi);
+      state[key] = v;
+      resetThrow();
+      render();
+    }
+    track.addEventListener('pointerdown', function(e){
+      dragging = true;
+      if(track.setPointerCapture) track.setPointerCapture(e.pointerId);
+      state.drag = key; state.active = key;
+      setFromClientX(e.clientX);
+    });
+    track.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
+    function endDrag(){ if(dragging){ dragging=false; state.drag=null; render(); } }
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+    track.addEventListener('pointerenter', function(){ state.active = key; render(); });
+    track.addEventListener('keydown', function(e){
+      var s = e.shiftKey ? step*10 : step;
+      var cur = state[key];
+      var v = null;
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown') v = cur-s;
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = cur+s;
+      else if(e.key==='Home') v = lo;
+      else if(e.key==='End') v = hi;
+      if(v!==null){ e.preventDefault(); v = clamp(Math.round(v/step)*step, lo, hi); state[key]=v; resetThrow(); render(); }
+    });
+    return {
+      draw: function(){
+        var cur = state[key];
+        var pct = ((cur-lo)/(hi-lo)*100).toFixed(2)+'%';
+        fill.style.width = pct; thumb.style.left = pct;
+        track.setAttribute('aria-valuemin', lo);
+        track.setAttribute('aria-valuemax', hi);
+        track.setAttribute('aria-valuenow', cur);
+        track.setAttribute('aria-valuetext', key==='h0' ? cur.toFixed(2)+' metres' : key==='angle' ? cur.toFixed(0)+' degrees' : cur.toFixed(1)+' metres per second');
+      }
+    };
+  }
+  var h0Slider = makeSlider('h0', $('h0Track'), $('h0Fill'), $('h0Thumb'), H0MIN, H0MAX, 0.05);
+  var angleSlider = makeSlider('angle', $('angleTrack'), $('angleFill'), $('angleThumb'), AMIN, AMAX, 1);
+  var v0Slider = makeSlider('v0', $('v0Track'), $('v0Fill'), $('v0Thumb'), VMIN, VMAX, 0.1);
+
+  [$('h0Ctrl'), $('angleCtrl'), $('v0Ctrl')].forEach(function(box){
+    box.addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+  });
+
+  // ---- result box ----
+  var distValueEl=$('distValue'), verdictEl=$('verdict'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+  var gZone=$('gZone'), gMark=$('gMark'), gMarkLabel=$('gMarkLabel'), gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
+
+  function drawResult(){
+    var f = flight();
+    var diff = f.xLand - HOLE_D;
+    var hit = Math.abs(diff) <= HOLE_R;
+    var color = hit ? 'var(--fg)' : 'var(--bad)';
+
+    distValueEl.textContent = f.xLand.toFixed(2);
+    distValueEl.style.color = color;
+    verdictEl.style.color = color;
+
+    if(hit){
+      verdictEl.textContent = 'In the hole!';
+      verdictSubEl.textContent = 'Lands within 15 cm of centre — a clean shot.';
+    } else if(diff < 0){
+      verdictEl.textContent = 'Short';
+      verdictSubEl.textContent = 'Falls '+Math.abs(diff-HOLE_R).toFixed(2)+' m short of the hole.';
+    } else {
+      verdictEl.textContent = 'Long';
+      verdictSubEl.textContent = 'Overshoots the hole by '+(diff-HOLE_R).toFixed(2)+' m.';
+    }
+
+    effortLineEl.textContent = f.tLand.toFixed(2)+' s flight · hits at '+f.speedImpact.toFixed(1)+' m/s ('+f.ke.toFixed(1)+' J)';
+
+    var XMAX = Math.max(HOLE_D+1.5, f.xLand*1.15, 5);
+    function pos(x){ return clamp(x/XMAX,0,1)*100; }
+    gZone.style.left = pos(HOLE_D-HOLE_R).toFixed(2)+'%';
+    gZone.style.width = (pos(HOLE_D+HOLE_R)-pos(HOLE_D-HOLE_R)).toFixed(2)+'%';
+    var markPct = pos(f.xLand);
+    gMark.style.left = markPct.toFixed(2)+'%';
+    gMark.style.background = color;
+    var labelPct = clamp(markPct,4,88);
+    gMarkLabel.style.left = labelPct.toFixed(2)+'%';
+    gMarkLabel.style.transform = markPct>72 ? 'translateX(-100%)' : markPct<20 ? 'translateX(0)' : 'translateX(-50%)';
+    gMarkLabel.style.color = color;
+    gMarkLabel.textContent = f.xLand.toFixed(2)+' m';
+
+    var ticksHtml='', labelsHtml='';
+    var step = XMAX<=6?1:XMAX<=12?2:4;
+    for(var d=0; d<=XMAX+0.01; d+=step){
+      var left = pos(d).toFixed(2)+'%';
+      ticksHtml += '<div class="tick" style="left:'+left+'"></div>';
+      var tx = d===0 ? 'translateX(0)' : d>=XMAX-step*0.5 ? 'translateX(-100%)' : 'translateX(-50%)';
+      labelsHtml += '<div class="ticklabel" style="left:'+left+';transform:'+tx+'">'+d+' m</div>';
+    }
+    gTicksEl.innerHTML = ticksHtml;
+    gLabelsEl.innerHTML = labelsHtml;
+  }
+
+  // ---- throw playback ----
+  var throwBtn = $('throwBtn'), flightTxt = $('flightTxt');
+  function resetThrow(){
+    if(anim.raf) cancelAnimationFrame(anim.raf);
+    anim.playing = false; anim.t = 0; anim.thrown = false;
+    throwBtn.textContent = '▶ Throw';
+    flightTxt.textContent = '';
+  }
+  function stepAnim(ts){
+    if(!anim.start) anim.start = ts;
+    var f = flight();
+    var elapsed = (ts-anim.start)/1000*PLAYBACK_RATE;
+    anim.t = elapsed;
+    if(elapsed >= f.tLand){
+      anim.t = f.tLand; anim.playing = false; anim.thrown = true;
+      render();
+      throwBtn.textContent = '▶ Throw again';
+      return;
+    }
+    render();
+    anim.raf = requestAnimationFrame(stepAnim);
+  }
+  throwBtn.addEventListener('click', function(){
+    if(anim.raf) cancelAnimationFrame(anim.raf);
+    anim.playing = true; anim.t = 0; anim.start = 0; anim.thrown = false;
+    throwBtn.textContent = 'Throwing…';
+    anim.raf = requestAnimationFrame(stepAnim);
+  });
+
+  // ---- presets ----
+  document.querySelectorAll('.preset').forEach(function(b){
+    var presets = {
+      straight:{h0:0, angle:45, v0:Math.sqrt(HOLE_D*G)},
+      lob:{h0:0, angle:70, v0:Math.sqrt(HOLE_D*G/Math.sin(70*2*Math.PI/180))},
+      flat:{h0:1, angle:10, v0:7},
+      gentle:{h0:1.5, angle:75, v0:4}
+    };
+    b.addEventListener('click', function(){
+      var p = presets[b.dataset.p];
+      state.h0=p.h0; state.angle=p.angle; state.v0=p.v0;
+      resetThrow();
+      render();
+    });
+  });
+
+  // ---- theme toggle ----
+  var STORAGE_KEY = 'potato-trajectory-theme';
+  var themeToggle = $('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    var applied = document.documentElement.getAttribute('data-theme');
+    if(applied) return applied;
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+
+  (function(){
+    var backLink = document.getElementById('backLink');
+    if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
+      backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
+      backLink.target = '_blank';
+      backLink.rel = 'noopener';
+      backLink.textContent = 'Simple Viz on GitHub ↗';
+    }
+  })();
+
+  function measure(){
+    var w = heroWrap.clientWidth;
+    if(w && w !== heroW){ heroW = w; render(); }
+  }
+
+  function render(){
+    drawHero();
+    drawEquationAndLegend();
+    h0Slider.draw(); angleSlider.draw(); v0Slider.draw();
+    $('h0Readout').textContent = state.h0.toFixed(2)+' m';
+    $('angleReadout').textContent = state.angle.toFixed(0)+'°';
+    $('v0Readout').textContent = state.v0.toFixed(1)+' m/s';
+    drawResult();
+    if(anim.playing){
+      var f = flight();
+      flightTxt.textContent = 't = '+Math.min(anim.t,f.tLand).toFixed(2)+' / '+f.tLand.toFixed(2)+' s';
+    } else if(anim.thrown){
+      var f2 = flight();
+      flightTxt.textContent = 'landed at t = '+f2.tLand.toFixed(2)+' s';
+    }
+  }
+
+  new ResizeObserver(measure).observe(heroWrap);
+  window.addEventListener('resize', measure);
+  [60,250,900].forEach(function(t){ setTimeout(measure, t); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  resetThrow();
+  render();
+})();
+</script>
+<script>
+(function(){
+  var root = document.querySelector('[data-feedback]');
+  if(!root) return;
+  var form = root.querySelector('.feedback-form');
+  var choices = Array.prototype.slice.call(root.querySelectorAll('.feedback-choice'));
+  var textarea = root.querySelector('textarea');
+  var status = root.querySelector('.feedback-status');
+  var send = root.querySelector('.feedback-send');
+  var rating = '';
+
+  choices.forEach(function(choice){
+    choice.addEventListener('click', function(){
+      rating = choice.dataset.rating;
+      choices.forEach(function(item){ item.setAttribute('aria-pressed', item===choice ? 'true' : 'false'); });
+      form.hidden = false;
+      status.textContent = '';
+    });
+  });
+
+  function pageSlug(){
+    var file = location.pathname.split('/').pop() || '';
+    return file.replace(/\.html?$/i,'').toLowerCase() || 'visualization';
+  }
+
+  function currentContext(){
+    var values = [];
+    Array.prototype.forEach.call(document.querySelectorAll('[role="slider"]'), function(slider){
+      var label = slider.getAttribute('aria-label') || 'Control';
+      var value = slider.getAttribute('aria-valuetext') || slider.getAttribute('aria-valuenow');
+      if(value) values.push(label+': '+value);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('select'), function(select){
+      var label = select.getAttribute('aria-label') || select.name || 'Selection';
+      var option = select.options[select.selectedIndex];
+      if(option) values.push(label+': '+option.textContent.trim());
+    });
+    return values.slice(0,20);
+  }
+
+  form.addEventListener('submit', function(event){
+    event.preventDefault();
+    if(!rating) return;
+    if(location.protocol==='file:'){
+      status.textContent = 'Feedback can be sent from madeclear.ca.';
+      return;
+    }
+    send.disabled = true;
+    status.textContent = 'Sending…';
+    fetch('/api/feedback', {
+      method:'POST',
+      credentials:'same-origin',
+      headers:{'content-type':'application/json'},
+      body:JSON.stringify({
+        page:pageSlug(),
+        rating:rating,
+        comment:textarea.value,
+        website:form.elements.website.value,
+        context:currentContext()
+      })
+    }).then(function(response){
+      if(!response.ok) throw new Error('request failed');
+      status.textContent = 'Thank you — your feedback is private.';
+      textarea.value = '';
+    }).catch(function(){
+      status.innerHTML = 'Could not send. Try <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.';
+    }).then(function(){ send.disabled = false; });
+  });
+})();
+</script>
+</html>

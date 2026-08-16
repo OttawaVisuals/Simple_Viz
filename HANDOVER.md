@@ -10,12 +10,63 @@ tool can pick up mid-stream without re-reading the whole chat history.
   `CLOUDFLARE_SETUP.md` (create/run the D1 migration, bind `FEEDBACK_DB`, add the
   `FEEDBACK_HASH_KEY` secret, route `hello@madeclear.ca`, and redeploy) before testing the
   new feedback form in production.
-- The site currently contains **44 visualization pages** in `visualizations/`.
-- `index.html` lists all 44 pages and now includes client-side search plus category
+- The site currently contains **45 visualization pages** in `visualizations/`, plus a new
+  `about.html` at the repo root (not a visualization — no equation/sliders — so it's not in
+  `index.html`'s grid or `tracker.html`'s `PAGES` array; it's linked from the homepage
+  footer instead).
+- `index.html` lists all 45 pages and now includes client-side search plus category
   filtering (`Everyday maths`, `Discoveries`, `Fun physics`). The result count is live and
   the filter is intentionally dependency-free.
-- `tracker.html` now tracks all 44 pages. Keep its `PAGES` array synchronized with the
+- `tracker.html` now tracks all 45 pages. Keep its `PAGES` array synchronized with the
   homepage when adding or removing a visualization.
+- **`about.html`** ("Why this site exists") — new root-level page telling the site's own
+  origin story: the *Taskmaster* Tim Vine straws-vs-hose bit that became
+  `straw-hose-flow.html`, generalized into why every page since follows the same
+  play-first format. Reuses `index.html`'s shell (tokens, topbar, theme toggle, footer) at
+  a narrower 760px prose width instead of the topgrid/hero/resultrow skeleton, since it has
+  no equation or interactive figure. Linked from `index.html`'s footer ("Why this site
+  exists").
+- **`visualizations/potato-trajectory.html`** ("Throwing a potato into a hole") — new page,
+  card 45 under **Fun physics**. Standard no-drag projectile motion (`x=v₀cosθ·t`,
+  `y=h₀+v₀sinθ·t−½gt²`), three sliders (release height 0–2 m, launch angle 0–85°, speed
+  1–10 m/s) against a **fixed target**: a hole 3.00 m away, 30 cm wide (an assumed
+  tolerance, stated as such), landed on by a 200 g potato (mass used only for the
+  impact-energy stat — without drag it never affects the trajectory itself, which the note
+  says explicitly so the fixed third slider-looking constant doesn't read as load-bearing
+  physics it isn't). Direct sibling of `straw-hose-flow.html`: both trace back to the same
+  *Taskmaster* "get an object to a target" format, cross-linked from each page's closing
+  note and from the new `about.html`.
+  - **Dynamic hero axis, both dimensions share one scale.** The horizontal domain
+    recomputes each render as `max(hole+1.5, landing×1.15, 5)` m so the view zooms to fit
+    whatever the current slider combination actually produces — tight around the hole for
+    a well-aimed throw, wide enough to show a wild overshoot without clipping it. Height
+    domain follows the same idea off the release height/apex. Critically, both axes use the
+    *same* px-per-metre scale (not independently stretched), so the parabola on screen is
+    the true shape of the throw, not a squashed schematic — this matters more here than on
+    most pages since the arc's shape (not just its endpoint) is the thing being shown.
+  - **Throw is a user-triggered playback, not an auto-looping or slider-linked animation.**
+    Matches `lightning-distance.html`'s "play it out" button pattern rather than
+    `pendulum-period.html`'s auto-playing loop: the static trajectory, landing marker, and
+    hit/miss verdict all update live while dragging sliders, but the animated potato only
+    moves when "Throw" is pressed, at a fixed 0.6× real-time rate (stated in the note) since
+    some slider combinations land in well under half a second at full speed. Any slider
+    change resets the throw back to "▶ Throw" at the release point. No `prefers-reduced-
+    motion` branch was needed under the site's own rule for this shape of animation — it's
+    the explicitly user-initiated/bounded case the style guide says to leave alone.
+  - **Two presets ("Straight in" 45°/5.43 m/s and "The lob, same hole" 70°/6.76 m/s) land at
+    exactly the same 3.00 m**, computed from the real range identity
+    `R=v₀²sin(2θ)/g` rather than tuned by eye — this demonstrates a genuine, non-obvious
+    property of the equation (complementary angles on level ground share a range) rather
+    than just being two more example throws. Both presets deliberately use `h₀=0`, since the
+    complementary-angle identity is only exact on level ground; adding release height would
+    have made the "same hole" claim slightly false. Two more presets ("Too flat", "Too
+    gentle") show a real overshoot and undershoot for contrast.
+  - **The result gauge is a target zone, not a single limit line** — a departure from every
+    other page's gauge (straw-hose's mouth-limit line, eratosthenes' single reference tick):
+    a highlighted band spans `hole ± 15 cm` and the landing-distance marker either falls
+    inside it (verdict "In the hole!", `--fg`) or outside it (verdict "Short"/"Long",
+    `--bad`), since this page's whole point is a target window, not a pass/fail threshold or
+    a "how close" percentage.
 - `index.html` and `tracker.html` have visible `:focus-visible` keyboard outlines.
 - All 44 visualization pages now end with the same private clarity-feedback component:
   `Yes` / `Almost` / `Not yet`, plus an optional comment. The canonical implementation is

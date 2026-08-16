@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About — Physics You Can See</title>
+<style>
+  /* Tokens, type and topbar kept byte-identical to index.html/straw-hose-flow.html so this
+     reads as the same site, per STYLE_GUIDE.md. */
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:760px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+  :where(a,button,input,select,textarea,[tabindex]):focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+  .brand{display:flex;align-items:center;gap:10px;color:var(--fg);text-transform:none;letter-spacing:0}
+  .brand:hover{color:var(--fg)}
+  .brand-icon{display:block;width:58px;height:28px;overflow:visible}
+  .brand-icon text{fill:currentColor;font:italic 22px Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  .brand-icon path{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .brand-word{display:flex;align-items:baseline;font:italic 25px/1 Georgia,"Iowan Old Style","Palatino Linotype",serif;white-space:nowrap}
+  .brand-word .sub{font-size:.54em;line-height:1;transform:translateY(.38em);margin-right:.18em;color:inherit}
+  .back{color:var(--muted)}
+  .back:hover{color:var(--accent)}
+
+  .head{margin:clamp(48px,9vw,96px) 0 clamp(36px,5vw,56px)}
+  h1{font-weight:300;font-size:clamp(2rem,4.6vw,3rem);line-height:1.06;letter-spacing:-.025em;margin:0}
+  .sub{font-size:clamp(.98rem,1.15vw,1.1rem);line-height:1.65;color:var(--muted2);margin:18px 0 0;text-wrap:pretty}
+
+  .prose{font-size:1.02rem;line-height:1.75;color:var(--fg)}
+  .prose p{margin:0 0 22px}
+  .prose p:last-child{margin-bottom:0}
+  .prose em{font-style:italic}
+  .prose a{border-bottom:1px solid var(--line2)}
+
+  .note{margin:clamp(40px,5vw,64px) 0 0;max-width:88ch;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .site-footer{margin-top:clamp(48px,6vw,72px);padding-top:16px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,40px);font:11.5px/1.7 ui-monospace,monospace;color:var(--muted)}
+  .site-footer a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .site-footer a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+
+  @media (max-width:480px){
+    .topbar .count{display:none}
+    .brand-word{display:none}
+  }
+  @media (max-width:700px){
+    .site-footer{grid-template-columns:1fr;gap:10px}
+  }
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a class="brand" href="index.html" aria-label="Made clear — home">
+      <svg class="brand-icon" viewBox="0 0 58 28" aria-hidden="true">
+        <text x="22" y="16">mc</text>
+        <path d="M1 22 C3 22 3 16 5 16 S7 26 9 26 S11 13 13 13 S15 23 17 23 S19 18 21 18 L57 18"/>
+      </svg>
+      <span class="brand-word" aria-hidden="true"><span>m</span><span class="sub">ade</span><span>c</span><span class="sub">lear</span></span>
+    </a>
+    <div class="topbar-right">
+      <a class="back" href="index.html">&larr; All visualizations</a>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="head">
+    <h1>Why this site exists.</h1>
+    <p class="sub">It started with a comedian, a chain of drinking straws, and a garden hose that made the same trick look easy.</p>
+  </div>
+
+  <div class="prose">
+    <p>On <em>Taskmaster</em>, Tim Vine taped a long chain of drinking straws together and tried to blow out a candle through them. He couldn't do it &mdash; no matter how hard he blew, the candle stayed lit. Moments later, a garden hose of roughly the same length did the job with no effort at all. Same length, same idea, wildly different result, and the reason isn't obvious until you actually work through the physics: resistance to flow scales with the <em>fourth power</em> of the tube's radius, so a straw's narrowness matters far more than its length ever could.</p>
+    <p>That gag is the reason this site exists. The equation behind it (Hagen&ndash;Poiseuille flow) is genuinely not intuitive from the numbers alone &mdash; but it's obvious the moment you can drag a slider and watch a straw and a hose fight the same rule in real time. That first page, <a href="visualizations/straw-hose-flow.html">Why the straw gives up</a>, set the format for everything since: one real question, real numbers, and a figure you move yourself instead of a wall of text explaining what would happen if you did.</p>
+    <p>Every page since has followed the same shape &mdash; pick a concept that's usually hidden inside a formula or a big number, find the smallest interactive figure that makes it click, and be honest on the page about any approximation being made. There's no dashboard chrome, no login, no tracking. Just physics and maths you can see.</p>
+    <p>The site is designed and maintained by Simon, built with AI-assisted development. If something's unclear, wrong, or you have an idea for a concept worth adding, write to <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a> &mdash; or leave private feedback directly on any page.</p>
+  </div>
+
+  <div class="site-footer">
+    <span>Designed and maintained by Simon using AI-assisted development. Sources and approximations are stated on each page.</span>
+    <span>Spot a mistake or have an idea? Write to <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.</span>
+  </div>
+
+</div>
+</main>
+<script>
+(function(){
+  var STORAGE_KEY = 'index-theme';
+  var themeToggle = document.getElementById('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    var applied = document.documentElement.getAttribute('data-theme');
+    if(applied) return applied;
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+})();
+</script>
+</html>

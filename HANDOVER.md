@@ -681,6 +681,61 @@ Five of the eighteen build agents (`slinky-drop.html`, `time-dilation.html`, `an
 
 All eighteen were added to `index.html`'s Discoveries and Fun physics grids in the same edit that removed the (now-empty) roadmap section entirely. Verified in-browser (local static-file preview) that `index.html` renders all 42 cards with no console errors, and individually re-verified every one of the eighteen pages' key numbers by loading each and checking console/page text against the building agents' claimed figures.
 
+### `cosmic-scale.html` — "Closer to the smallest thing, or the biggest?" (2026-08-16)
+
+Built to the [STYLE_GUIDE.md](STYLE_GUIDE.md) skeleton, no earlier draft, from a one-line user
+idea ("are we closer in size to the smallest or biggest things in the universe, slider could
+go from grain of rice to Earth"). Card 43, under **Fun physics** (14 pages now), same "scale"
+sub-genre as `ocean-salt.html`/`animal-biomass.html`.
+
+- **The equation is the log-position formula itself**, not a physics law: `f = log(s/ℓₚ) /
+  log(U/ℓₚ)`, where `ℓₚ` is the Planck length (1.616255×10⁻³⁵ m, fixed) and `U` is the
+  observable universe's diameter (8.8×10²⁶ m, fixed). `f` is literally what fraction of the
+  way along a base-10-log ruler a given size sits — 0 at the Planck length, 1 at the edge of
+  the observable universe. This is the same log10-exponent-as-slider-state pattern used by
+  `gravity-lab.html`/`rocket-equation.html`, just carried all the way into the page's own
+  headline number instead of being an intermediate step.
+- **The payoff number: a human (1.7 m) sits at f≈56.7%** — past the midpoint, i.e. closer to
+  the biggest end of the log scale than the smallest, which most people's intuition gets
+  backwards. This fixed human benchmark is drawn on the hero (bold "You" tick) and the result
+  gauge (a permanent tick labeled "you") regardless of what the slider is currently pointing
+  at, so every other object the user drags to is implicitly compared against it.
+- **Single log-scale slider spans the entire range** (`state.logS` runs from `log10(ℓₚ)` to
+  `log10(U)`, ~61.7 decades) rather than a bounded, physically-plausible range like other
+  pages' log sliders — the whole point here is that the range itself is the content. Presets
+  (proton/virus/rice/whale/Earth/observable universe) jump to real reference sizes.
+- **Hero is a static log-scale ruler, not an animated diagram** — eleven reference objects
+  (Planck length, proton, atom, virus, rice grain, human, blue whale, Earth, Sun, Milky Way,
+  observable universe) as fixed ticks, plus one moving accent-colored marker tracking the
+  slider. **4-lane vertical label stacking, cycled by array index (`i%4`), not 2-lane
+  alternation** — a 2-lane top/bottom layout (straw-hose-flow's usual pattern) was tried first
+  and produced real overlapping labels and one label overflowing past the hero's right edge,
+  caught by measuring `getBoundingClientRect()` in-browser rather than by eye. The 4-lane
+  version was verified the same way (positions logged and checked pairwise for overlap at
+  desktop 1280px and mobile 375px) before shipping. The first/last labels (Planck length,
+  Universe) are anchored `translateX(0)`/`translateX(-100%)` instead of the usual centered
+  `-50%`, same edge-anchoring reasoning as the gauge ticklabels elsewhere on the site.
+- **A same-shaped formatting bug caught before shipping, matching this project's documented
+  history of huge/tiny-number formatting bugs**: the initial `fmtLen()` ran every sub-metre
+  bucket (cm/mm/µm/nm/pm/fm) through the same scientific-notation helper as the multi-order-
+  of-magnitude buckets, so a proton printed as "1.70 × 10⁰ fm" instead of "1.70 fm". Fixed by
+  splitting a `niceNum()` helper that only drops to scientific notation outside a
+  comfortably-readable 0.01–1000 range, reserved for the axis extremes and light-year figures.
+- **Honest caveat placed directly in the note**: the Planck length is a theoretical
+  quantum-gravity scale, not the size of a real particle, and is named as such rather than
+  implied to be "the smallest thing." Also flags that the Planck-length-to-proton gap alone is
+  ~20 orders of magnitude (about a third of the whole ruler), almost entirely empty of any
+  built structure — so the 56.7% "midpoint" answer is shaped as much by that empty subatomic
+  stretch as by anything at the cosmic end, which is worth knowing before treating 56.7% as a
+  deep fact about human significance rather than an artifact of how the two endpoints were
+  chosen.
+- Reference sizes used (recheck if reused elsewhere): Planck length 1.616255×10⁻³⁵ m; proton
+  1.7×10⁻¹⁵ m; hydrogen atom 1.06×10⁻¹⁰ m; a virus ~1×10⁻⁷ m; DNA width and red blood cell were
+  considered but dropped from the permanent tick set as redundant with nearby ticks (still
+  fine as future preset additions); grain of rice 7 mm; human height 1.7 m; blue whale 25 m;
+  Earth diameter 1.2742×10⁷ m; Sun diameter 1.3914×10⁹ m; Milky Way diameter ~9.4607×10²⁰ m
+  (100,000 ly); observable universe diameter 8.8×10²⁶ m (~93 billion ly).
+
 ## Roadmap
 
 There is currently no roadmap list — the 2026-08-16 batch above cleared the last of it, and
@@ -692,7 +747,7 @@ used (see git history prior to 2026-08-16 for the exact markup).
 
 ## Open questions / next steps
 
-- A site index (`index.html`) now links forty-two concepts, grouped into the three categories
+- A site index (`index.html`) now links forty-three concepts, grouped into the three categories
   described above (Everyday maths / Discoveries / Fun physics). Each is intentionally a
   simplified explainer, with its approximation stated in-page.
 - **Decided (2026-08-14):** every visualization should share the visual language in

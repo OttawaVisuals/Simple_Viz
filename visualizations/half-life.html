@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reading a bone's age off its isotopes</title>
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  .topgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
+
+  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqn{display:flex;align-items:center;gap:clamp(6px,1vw,10px);font-size:clamp(26px,3.2vw,38px);line-height:1;font-weight:300}
+  .eqn .eq{color:var(--muted)}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .eqn sup{font-size:.52em;position:relative;top:-.65em}
+  .eqn sub{font-size:.52em;position:relative;top:.5em}
+
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:1.6em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:8px 2px}
+  .legend .sym{font-size:17px;font-weight:300;transition:color .2s}
+  .legend .name{font-size:12.5px;color:var(--muted2)}
+  .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0;display:flex;gap:clamp(20px,3vw,40px);align-items:flex-start}
+  .curvewrap{flex:2 1 420px;min-width:0}
+  .curvewrap svg{width:100%;height:auto;display:block}
+  .atomwrap{flex:1 1 190px;max-width:230px;display:flex;flex-direction:column;align-items:center}
+  .atomwrap svg{width:100%;height:auto;display:block}
+  .atomcaption{margin-top:8px;font-size:12px;color:var(--muted);text-align:center;line-height:1.5}
+  @media (max-width:700px){.hero{flex-direction:column}.atomwrap{max-width:220px}}
+
+  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
+
+  .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;text-transform:none;transition:color .2s}
+  .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
+  .iso-buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .iso-buttons button{cursor:pointer;font-family:Georgia,serif;font-style:italic;font-size:14px;padding:6px 13px 7px;border-radius:999px;transition:all .18s ease;border:1px solid var(--border);background:transparent;color:var(--muted)}
+  .iso-buttons button:hover{color:var(--fg)}
+  .iso-note{margin-top:11px;font-size:13.5px;line-height:1.45;color:var(--muted)}
+  .readout{font-family:ui-monospace,monospace;font-size:clamp(24px,2.6vw,32px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
+  .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
+  .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
+  .track .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
+  .track .thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
+  .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
+
+  .result{text-align:left}
+  .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
+  .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
+  .result-value .v{font-size:clamp(14px,1.5vw,16px);font-weight:600;margin-left:2px}
+  .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
+  .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
+  .gauge{position:relative;height:50px;margin-top:16px;max-width:420px}
+  .gauge .track{position:absolute;left:0;right:0;top:10px;height:10px;background:var(--track);border-radius:2px}
+  .gauge .reach{position:absolute;top:10px;height:10px;border-radius:2px 0 0 2px;background:color-mix(in srgb, var(--accent) 16%, transparent);left:0}
+  .gauge .tick{position:absolute;top:22px;width:1px;height:5px;background:var(--line2)}
+  .gauge .ticklabel{position:absolute;top:29px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
+  .gauge .limit{position:absolute;top:5px;height:20px;width:1px;background:var(--bad)}
+  .gauge .limitlabel{position:absolute;top:-9px;white-space:nowrap;font:400 9px ui-monospace,monospace;letter-spacing:.05em;color:var(--bad)}
+  .gauge .mark{position:absolute;top:8px;height:14px;width:3px;border-radius:2px;background:var(--accent);transition:left .12s linear}
+  .gauge .marklabel{position:absolute;top:-15px;white-space:nowrap;font:500 11px ui-monospace,monospace;color:var(--accent);transition:left .12s linear}
+
+  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+  .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
+  .preset:hover{border-color:var(--accent);color:var(--accent)}
+
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../index.html" id="backLink">&larr; Physics you can see</a>
+    <div class="topbar-right">
+      <span>Radioactive decay</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>Reading a bone's age <em>off its atoms</em>.</h1>
+      <p class="sub">Every radioactive isotope decays at a fixed, measurable rate. Carbon dating just runs that clock backward: measure how much carbon-14 is left in a bone, and the ratio tells you how long it's been decaying.</p>
+    </div>
+
+    <div class="eqnbox">
+      <div class="eqn">
+        <em id="Nterm">N</em>
+        <span class="eq">=</span>
+        <em>N</em><sub>0</sub>
+        <span class="eq">e</span><sup>&minus;<em id="lambdaTerm">&lambda;</em><em id="tTerm">t</em></sup>
+      </div>
+    </div>
+
+    <div class="legendbox">
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="hero" id="heroWrap">
+    <div class="curvewrap">
+      <svg id="curveSvg" viewBox="0 0 640 250" role="img" aria-label="Exponential decay curve: fraction of atoms remaining versus elapsed half-lives, with the current value marked.">
+        <g id="gridLines"></g>
+        <g id="yLabels"></g>
+        <path id="curvePath" fill="none" stroke="var(--line2)" stroke-width="2"></path>
+        <line id="limitLine" stroke="var(--bad)" stroke-width="1.25" stroke-dasharray="3 3"></line>
+        <text id="limitLabel" font-family="ui-monospace,monospace" font-size="9" fill="var(--bad)"></text>
+        <line id="guideX" stroke="var(--line2)" stroke-width="1" stroke-dasharray="2 3"></line>
+        <line id="guideY" stroke="var(--line2)" stroke-width="1" stroke-dasharray="2 3"></line>
+        <circle id="curveMark" r="5" fill="var(--accent)"></circle>
+        <g id="xTicks"></g>
+        <g id="xLabels"></g>
+      </svg>
+    </div>
+    <div class="atomwrap">
+      <svg id="atomSvg" viewBox="0 0 200 200" role="img" aria-label="Grid of 100 dots representing a sample of atoms; solid dots are undecayed, hollow dots have decayed.">
+        <g id="atomDots"></g>
+      </svg>
+      <div class="atomcaption mono" id="atomCaption"></div>
+    </div>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrls">
+      <div class="ctrl" id="isoCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Isotope <em id="lambdaLabel">&lambda;</em></span>
+          <span class="ctrl-rel">&lambda; = ln2 / T&frac12;</span>
+        </div>
+        <div class="iso-buttons" id="isoButtons"></div>
+        <div class="iso-note" id="isoNote"></div>
+      </div>
+
+      <div class="ctrl" id="timeCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Elapsed <em id="tLabel">t</em></span>
+          <span class="ctrl-rel">in half-lives</span>
+        </div>
+        <div class="readout mono" id="tReadout"></div>
+        <div class="track" id="tTrack" tabindex="0" role="slider" aria-label="Elapsed time, in half-lives">
+          <div class="rail"></div>
+          <div class="fill" id="tFill"></div>
+          <div class="thumb" id="tThumb"></div>
+        </div>
+        <div class="track-range"><span>0</span><span class="mid">n = t / T&frac12;</span><span>10 half-lives</span></div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Remaining, N/N&#8320;</div>
+      <div class="result-value"><span class="num mono" id="fracValue"></span><span class="unit mono">%</span><span class="v" id="verdict"></span></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+      <div class="effort-line" id="effortLine"></div>
+      <div class="gauge" id="gauge">
+        <div class="track"></div>
+        <div class="reach" id="gReach"></div>
+        <div class="limit" id="gLimit"></div>
+        <div class="limitlabel" id="gLimitLabel">~50,000 yr limit</div>
+        <div class="mark" id="gMark"></div>
+        <div class="marklabel mono" id="gMarkLabel"></div>
+        <div id="gTicks"></div>
+        <div id="gLabels"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-p="fresh">fresh bone</button>
+    <button class="preset" data-p="half">half gone</button>
+    <button class="preset" data-p="carbon">carbon-dated to ~11,460 yr</button>
+    <button class="preset" data-p="med">nuclear medicine, 1 week later</button>
+    <button class="preset" data-p="geo">geological timescale</button>
+  </div>
+
+  <p class="note">Radioactive <a href="https://en.wikipedia.org/wiki/Radioactive_decay" target="_blank" rel="noopener">decay</a> follows N = N&#8320;e<sup>&minus;&lambda;t</sup>, where the <a href="https://en.wikipedia.org/wiki/Half-life" target="_blank" rel="noopener">half-life</a> T&frac12; sets the decay constant &lambda; = ln2 / T&frac12;. Because &lambda;t = (ln2)&middot;(t/T&frac12;), the same fraction remaining can be written N/N&#8320; = 2&minus;&#8319; where n is just the elapsed time measured in half-lives &mdash; the two forms always agree, and 2&minus;&#8319; is what this page computes to avoid rounding &lambda; unnecessarily. The atom grid is a static illustration, not a simulation: real decay is a random process per atom, only statistically predictable in large numbers, and it doesn't halve the sample in one clean step the way this drawing implies. Carbon dating itself is only reliable out to about 8&ndash;9 C-14 half-lives (roughly 50,000 years) &mdash; beyond that, so little carbon-14 remains that measurement error swamps the signal, and other methods (like uranium&ndash;lead dating, used above for the geological preset) take over.</p>
+
+</div>
+</main>
+<script>
+(function(){
+  var LN2 = Math.LN2;
+  var ISO = [
+    {key:'c14', name:'Carbon-14', symbol:'¹⁴C', half:5730, unit:'years', color:'#4E7FC4',
+     note:'Absorbed while alive from atmospheric CO₂; decay starts the moment an organism dies. The basis of radiocarbon dating.'},
+    {key:'i131', name:'Iodine-131', symbol:'¹³¹I', half:8.02, unit:'days', color:'#C48AA8',
+     note:'A short-lived medical isotope used in thyroid imaging and treatment — its whole decay plays out in weeks.'},
+    {key:'co60', name:'Cobalt-60', symbol:'⁶⁰Co', half:5.27, unit:'years', color:'#C89A3F',
+     note:'Used in industrial radiography and radiotherapy sources; replaced every few years as it decays.'},
+    {key:'u238', name:'Uranium-238', symbol:'²³⁸U', half:4.468e9, unit:'years', color:'#8FA3B8',
+     note:'Decays into lead-206 on a timescale comparable to Earth’s own age — the basis of uranium–lead dating.'}
+  ];
+  var TMIN=0, TMAX=10;
+  var C14_LIMIT_N = 50000/5730; // ~8.73 half-lives, the practical carbon-dating ceiling
+  var SUP='⁰¹²³⁴⁵⁶⁷⁸⁹';
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+  function sup(n){ return String(n).split('').map(function(c){ return c==='-'?'⁻':SUP[+c]; }).join(''); }
+
+  function iso(){ return ISO[state.iso]; }
+  function lambdaOf(is){ return LN2/is.half; }
+  // Remaining fraction: 2^-n, algebraically identical to e^-(lambda t) since lambda*t = ln2 * (t/T1/2) = ln2 * n.
+  function fracFor(n){ return Math.pow(2,-n); }
+
+  function fmtLambda(is){
+    var lam = lambdaOf(is);
+    var unitTxt = is.unit==='days' ? '/day' : '/yr';
+    var e = Math.floor(Math.log10(lam));
+    var mant = lam/Math.pow(10,e);
+    return mant.toFixed(2)+' × 10'+sup(e)+' '+unitTxt;
+  }
+  function fmtHalf(is){
+    if(is.unit==='days') return is.half.toFixed(2)+' days';
+    if(is.half>=1e6) return (is.half/1e9).toFixed(3)+' billion years';
+    return is.half.toFixed(2)+' years';
+  }
+  function fmtReal(is,n){
+    var val = n*is.half;
+    if(is.unit==='days') return (val<10?val.toFixed(2):val.toFixed(1))+' days';
+    if(is.half>=1e6) return (val/1e9).toFixed(3)+' billion years';
+    if(val>=1000) return Math.round(val).toLocaleString()+' years';
+    return val.toFixed(1)+' years';
+  }
+
+  var $ = function(id){ return document.getElementById(id); };
+  var state = { iso:0, t:0, active:null, drag:null };
+
+  // ---- atom grid: fixed shuffled decay order so the same 100 dots drop out progressively ----
+  var ATOM_N = 100;
+  var atomOrder = (function(){
+    var arr = []; for(var i=0;i<ATOM_N;i++) arr.push(i);
+    // deterministic shuffle (not crypto-random, just needs to look scattered and stay fixed)
+    var seed = 42;
+    function rnd(){ seed = (seed*1103515245+12345)&0x7fffffff; return seed/0x7fffffff; }
+    for(var j=arr.length-1;j>0;j--){ var k=Math.floor(rnd()*(j+1)); var tmp=arr[j]; arr[j]=arr[k]; arr[k]=tmp; }
+    return arr;
+  })();
+  var NS='http://www.w3.org/2000/svg';
+  function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+
+  var atomDotsG = $('atomDots');
+  var atomCircles = [];
+  (function buildAtomGrid(){
+    var cols=10, cell=20, r=7;
+    for(var i=0;i<ATOM_N;i++){
+      var col=i%cols, row=Math.floor(i/cols);
+      var cx = cell*col+cell/2, cy = cell*row+cell/2;
+      var c = el('circle',{cx:cx,cy:cy,r:r,'stroke-width':1.25});
+      atomDotsG.appendChild(c);
+      atomCircles.push(c);
+    }
+  })();
+  function drawAtoms(){
+    var is = iso();
+    var n = state.t;
+    var frac = fracFor(n);
+    var remaining = Math.round(ATOM_N*frac);
+    atomCircles.forEach(function(c,i){
+      var order = atomOrder[i];
+      var alive = order < remaining;
+      c.setAttribute('fill', alive ? is.color : 'none');
+      c.setAttribute('stroke', alive ? is.color : 'var(--line2)');
+      c.setAttribute('opacity', alive ? 1 : 0.55);
+    });
+    $('atomCaption').textContent = remaining+' of '+ATOM_N+' atoms undecayed';
+  }
+
+  // ---- decay curve ----
+  var curveSvg=$('curveSvg'), curvePath=$('curvePath'), curveMark=$('curveMark');
+  var guideX=$('guideX'), guideY=$('guideY'), limitLine=$('limitLine'), limitLabel=$('limitLabel');
+  var gridLinesG=$('gridLines'), yLabelsG=$('yLabels'), xTicksG=$('xTicks'), xLabelsG=$('xLabels');
+  var X0=52, X1=616, Y0=16, Y1=200; // plot box in viewBox units
+
+  function px(n){ return X0 + (n/TMAX)*(X1-X0); }
+  function py(f){ return Y1 - f*(Y1-Y0); }
+
+  function buildStaticCurve(){
+    // Gridlines + y labels at 100/75/50/25/0%, built once (curve shape is fixed: 2^-n vs n)
+    var fracs=[1,0.75,0.5,0.25,0];
+    var gh='', yl='';
+    fracs.forEach(function(f){
+      var y=py(f);
+      gh += '<line x1="'+X0+'" x2="'+X1+'" y1="'+y+'" y2="'+y+'" stroke="var(--line)" stroke-width="1"></line>';
+      yl += '<text x="'+(X0-8)+'" y="'+(y+3)+'" text-anchor="end" font-family="ui-monospace,monospace" font-size="10" fill="var(--muted)">'+(f*100)+'%</text>';
+    });
+    gridLinesG.innerHTML = gh; yLabelsG.innerHTML = yl;
+
+    var xt='', xlab='';
+    for(var i=0;i<=10;i++){
+      var x = px(i);
+      xt += '<line x1="'+x+'" x2="'+x+'" y1="'+Y1+'" y2="'+(Y1+5)+'" stroke="var(--line2)" stroke-width="1"></line>';
+      xlab += '<text x="'+x+'" y="'+(Y1+17)+'" text-anchor="middle" font-family="ui-monospace,monospace" font-size="10" fill="var(--muted)">'+i+'</text>';
+    }
+    xTicksG.innerHTML = xt; xLabelsG.innerHTML = xlab;
+
+    var d='';
+    for(var i=0;i<=200;i++){
+      var n = i/200*TMAX;
+      var f = fracFor(n);
+      d += (i===0?'M':'L')+px(n).toFixed(2)+' '+py(f).toFixed(2)+' ';
+    }
+    curvePath.setAttribute('d', d);
+  }
+
+  function drawCurve(){
+    var is = iso();
+    var n = state.t;
+    var f = fracFor(n);
+    var x = px(n), y = py(f);
+    curveMark.setAttribute('cx', x); curveMark.setAttribute('cy', y);
+    guideX.setAttribute('x1', x); guideX.setAttribute('x2', x); guideX.setAttribute('y1', y); guideX.setAttribute('y2', Y1);
+    guideY.setAttribute('x1', X0); guideY.setAttribute('x2', x); guideY.setAttribute('y1', y); guideY.setAttribute('y2', y);
+
+    if(is.key==='c14' && C14_LIMIT_N<=TMAX){
+      var lx = px(C14_LIMIT_N);
+      limitLine.setAttribute('x1', lx); limitLine.setAttribute('x2', lx);
+      limitLine.setAttribute('y1', Y0); limitLine.setAttribute('y2', Y1);
+      limitLine.setAttribute('opacity', 1);
+      limitLabel.setAttribute('x', lx+4); limitLabel.setAttribute('y', Y0+9);
+      limitLabel.textContent = '≈ 8.7 half-lives: dating limit';
+    } else {
+      limitLine.setAttribute('opacity', 0);
+      limitLabel.textContent = '';
+    }
+  }
+
+  // ---- equation + legend colouring ----
+  var accent = 'var(--accent)';
+  var lambdaTerm=$('lambdaTerm'), tTerm=$('tTerm');
+  var lambdaLabel=$('lambdaLabel'), tLabel=$('tLabel');
+  var legendEl = $('legend');
+  function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
+
+  function drawEquationAndLegend(){
+    lambdaTerm.style.color = activeColor('lambda');
+    tTerm.style.color = activeColor('t');
+    lambdaLabel.style.color = activeColor('lambda');
+    tLabel.style.color = activeColor('t');
+
+    var is = iso();
+    var n = state.t;
+    var rows = [
+      {sym:'N₀', name:'initial amount', val:'100%', key:null},
+      {sym:'λ', name:'decay constant, '+is.name.toLowerCase(), val:fmtLambda(is), key:'lambda'},
+      {sym:'t', name:'elapsed time', val:fmtReal(is,n), key:'t'},
+      {sym:'T½', name:'half-life', val:fmtHalf(is), key:'lambda'}
+    ];
+    legendEl.innerHTML = '';
+    rows.forEach(function(row){
+      var div = document.createElement('div'); div.className='row';
+      var sym = document.createElement('em'); sym.className='sym'; sym.textContent = row.sym;
+      sym.style.color = row.key ? activeColor(row.key) : 'var(--fg)';
+      var name = document.createElement('span'); name.className='name'; name.textContent = row.name;
+      var val = document.createElement('span'); val.className='val mono'; val.textContent = row.val;
+      div.appendChild(sym); div.appendChild(name); div.appendChild(val);
+      legendEl.appendChild(div);
+    });
+  }
+
+  // ---- isotope buttons ----
+  var isoButtons = $('isoButtons'), isoNote=$('isoNote');
+  ISO.forEach(function(f,i){
+    var b = document.createElement('button');
+    b.textContent = f.name;
+    b.addEventListener('click', function(){ state.iso=i; state.active='lambda'; render(); });
+    b.addEventListener('pointerenter', function(){ state.active='lambda'; render(); });
+    isoButtons.appendChild(b);
+  });
+  function drawIsoButtons(){
+    Array.prototype.forEach.call(isoButtons.children, function(b,i){
+      var f = ISO[i], active = i===state.iso;
+      b.style.background = active ? 'color-mix(in srgb, '+f.color+' 22%, var(--bg))' : 'transparent';
+      b.style.borderColor = active ? f.color : 'var(--border)';
+      b.style.color = active ? 'var(--fg)' : 'var(--muted)';
+    });
+    isoNote.textContent = iso().note;
+  }
+
+  // ---- slider ----
+  function makeSlider(track, fill, thumb, lo, hi){
+    var dragging = false;
+    function setFromClientX(x){
+      var r = track.getBoundingClientRect();
+      var f = clamp((x-r.left)/r.width, 0, 1);
+      var v = lo + f*(hi-lo);
+      v = clamp(Math.round(v*100)/100, lo, hi);
+      state.t = v;
+      render();
+    }
+    track.addEventListener('pointerdown', function(e){
+      dragging = true;
+      if(track.setPointerCapture) track.setPointerCapture(e.pointerId);
+      state.drag='t'; state.active='t';
+      setFromClientX(e.clientX);
+    });
+    track.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
+    function endDrag(){ if(dragging){ dragging=false; state.drag=null; render(); } }
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+    track.addEventListener('pointerenter', function(){ state.active='t'; render(); });
+    track.addEventListener('keydown', function(e){
+      var step = e.shiftKey ? 1 : 0.1;
+      var v = null;
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown') v = state.t-step;
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = state.t+step;
+      else if(e.key==='Home') v = lo;
+      else if(e.key==='End') v = hi;
+      if(v!==null){ e.preventDefault(); state.t = clamp(Math.round(v*100)/100, lo, hi); render(); }
+    });
+    return {
+      draw: function(){
+        var pct = ((state.t-lo)/(hi-lo)*100).toFixed(2)+'%';
+        fill.style.width = pct; thumb.style.left = pct;
+        track.setAttribute('aria-valuemin', lo);
+        track.setAttribute('aria-valuemax', hi);
+        track.setAttribute('aria-valuenow', state.t);
+        track.setAttribute('aria-valuetext', state.t.toFixed(2)+' half-lives ('+fmtReal(iso(),state.t)+')');
+      }
+    };
+  }
+  var tSlider = makeSlider($('tTrack'), $('tFill'), $('tThumb'), TMIN, TMAX);
+
+  [$('isoCtrl'), $('timeCtrl')].forEach(function(box){
+    box.addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+  });
+
+  // ---- result box ----
+  var fracValueEl=$('fracValue'), verdictEl=$('verdict'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+  var gReach=$('gReach'), gLimit=$('gLimit'), gLimitLabel=$('gLimitLabel'), gMark=$('gMark'), gMarkLabel=$('gMarkLabel');
+  var gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
+
+  function pos(n){ return clamp(n/TMAX,0,1)*100; }
+
+  function drawResult(){
+    var is = iso();
+    var n = state.t;
+    var frac = fracFor(n);
+    var pct = frac*100;
+    var pastLimit = is.key==='c14' && n>C14_LIMIT_N;
+    var resultColor = pastLimit ? 'var(--bad)' : 'var(--fg)';
+
+    fracValueEl.textContent = pct>=10 ? pct.toFixed(1) : pct.toFixed(2);
+    fracValueEl.style.color = resultColor;
+    verdictEl.textContent = pastLimit ? 'Too faint to date' : '';
+    verdictEl.style.color = 'var(--bad)';
+
+    verdictSubEl.textContent = '= 2⁻ⁿ, n = '+n.toFixed(2)+' half-lives';
+    effortLineEl.textContent = 'elapsed time: ≈ '+fmtReal(is,n)+(is.key==='c14' && n<=C14_LIMIT_N+0.01 ? ' (within carbon dating’s reliable range)' : '');
+
+    // gauge
+    var markPct = pos(n);
+    gReach.style.width = markPct.toFixed(2)+'%';
+    gMark.style.left = markPct.toFixed(2)+'%';
+    var labelPct = clamp(markPct,4,88);
+    gMarkLabel.style.left = labelPct.toFixed(2)+'%';
+    gMarkLabel.style.transform = markPct>72 ? 'translateX(-100%)' : markPct<20 ? 'translateX(0)' : 'translateX(-50%)';
+    gMarkLabel.textContent = pct.toFixed(1)+'%';
+
+    if(is.key==='c14' && C14_LIMIT_N<=TMAX){
+      var lp = pos(C14_LIMIT_N);
+      gLimit.style.opacity = 1; gLimit.style.left = lp.toFixed(2)+'%';
+      gLimitLabel.style.opacity = 1; gLimitLabel.style.left = clamp(lp,8,80).toFixed(2)+'%';
+    } else {
+      gLimit.style.opacity = 0; gLimitLabel.style.opacity = 0;
+    }
+
+    if(!gTicksEl.dataset.built){
+      var ticksHtml='', labelsHtml='';
+      for(var i=0;i<=10;i++){
+        var left = (i/TMAX*100).toFixed(2)+'%';
+        ticksHtml += '<div class="tick" style="left:'+left+'"></div>';
+        if(i%2===0){
+          var tx = i===0 ? 'translateX(0)' : i===10 ? 'translateX(-100%)' : 'translateX(-50%)';
+          labelsHtml += '<div class="ticklabel" style="left:'+left+';transform:'+tx+'">'+i+'</div>';
+        }
+      }
+      gTicksEl.innerHTML = ticksHtml; gTicksEl.dataset.built='1';
+      gLabelsEl.innerHTML = labelsHtml;
+    }
+  }
+
+  // ---- presets ----
+  document.querySelectorAll('.preset').forEach(function(b){
+    var presets = {
+      fresh:{iso:0,t:0},
+      half:{iso:0,t:1},
+      carbon:{iso:0,t:2},
+      med:{iso:1,t:7/8.02},
+      geo:{iso:3,t:1}
+    };
+    b.addEventListener('click', function(){
+      var p = presets[b.dataset.p];
+      state.iso=p.iso; state.t=p.t; state.active=null;
+      render();
+    });
+  });
+
+  // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
+  var STORAGE_KEY = 'half-life-theme';
+  var themeToggle = $('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    var applied = document.documentElement.getAttribute('data-theme');
+    if(applied) return applied;
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+
+  (function(){
+    var backLink = document.getElementById('backLink');
+    if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
+      backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
+      backLink.target = '_blank';
+      backLink.rel = 'noopener';
+      backLink.textContent = 'Simple Viz on GitHub ↗';
+    }
+  })();
+
+  function render(){
+    drawEquationAndLegend();
+    drawIsoButtons();
+    tSlider.draw();
+    $('tReadout').textContent = state.t.toFixed(2)+' half-lives';
+    drawCurve();
+    drawAtoms();
+    drawResult();
+  }
+
+  buildStaticCurve();
+  render();
+  // No continuous animation on this page (redraw-on-interaction only), so there is nothing
+  // to gate on prefers-reduced-motion beyond what render() already does synchronously.
+})();
+</script>
+</html>

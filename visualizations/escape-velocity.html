@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why the Moon lost its atmosphere</title>
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  .topgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
+
+  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqn{display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);font-size:clamp(28px,3.6vw,42px);line-height:1;font-weight:300}
+  .eqn .eq{color:var(--muted)}
+  .eqn .radical{display:inline-flex;align-items:flex-start}
+  .eqn .radical .sign{font-size:1.15em;line-height:1;padding-top:.02em;font-weight:300}
+  .eqn .radical .inner{border-top:1.5px solid var(--fg);padding:0 .08em 0 .12em;display:flex;align-items:center;gap:.14em}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .eqn sup{font-size:.5em;position:relative;top:-.5em}
+
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:1.6em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:8px 2px}
+  .legend .sym{font-size:17px;font-weight:300;transition:color .2s}
+  .legend .name{font-size:12.5px;color:var(--muted2)}
+  .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero svg{width:100%;height:auto;display:block}
+  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s,color .2s}
+
+  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
+
+  .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;text-transform:none;transition:color .2s}
+  .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
+  .body-buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .body-buttons button{cursor:pointer;font-family:Georgia,serif;font-style:italic;font-size:15px;padding:6px 13px 7px;border-radius:999px;transition:all .18s ease;border:1px solid var(--border);background:transparent;color:var(--muted)}
+  .body-buttons button:hover{color:var(--fg)}
+  .body-note{margin-top:11px;font-size:13.5px;line-height:1.45;color:var(--muted)}
+  .readout{font-family:ui-monospace,monospace;font-size:clamp(26px,2.8vw,34px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
+  .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
+  .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
+  .track .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
+  .track .thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
+  .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
+
+  .launch-buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
+  .launch-buttons button{cursor:pointer;font-family:Georgia,serif;font-style:italic;font-size:15px;padding:6px 13px 7px;border-radius:999px;transition:all .18s ease;border:1px solid var(--border);background:transparent;color:var(--muted)}
+  .launch-buttons button:hover{color:var(--fg);border-color:var(--accent)}
+  .launch-buttons button:disabled{opacity:.5;cursor:default}
+  .launch-note{margin-top:11px;font-size:13.5px;line-height:1.45;color:var(--muted)}
+
+  .result{text-align:left}
+  .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
+  .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
+  .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px}
+  .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
+  .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
+  .gauge{position:relative;height:56px;margin-top:16px;max-width:420px}
+  .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
+  .gauge .reach{position:absolute;top:14px;height:10px;border-radius:2px 0 0 2px;background:color-mix(in srgb, var(--accent) 16%, transparent);left:0}
+  .gauge .tick{position:absolute;top:26px;width:1px;height:5px;background:var(--line2)}
+  .gauge .ticklabel{position:absolute;top:33px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
+  .gauge .limit{position:absolute;top:9px;height:20px;width:1px;background:var(--bad)}
+  .gauge .limitlabel{position:absolute;top:0;white-space:nowrap;font:400 9px ui-monospace,monospace;letter-spacing:.05em;color:var(--bad)}
+  .gauge .mark{position:absolute;top:12px;height:14px;width:3px;border-radius:2px;transition:left .12s linear}
+  .gauge .marklabel{position:absolute;top:-3px;white-space:nowrap;font:500 11px ui-monospace,monospace;transition:left .12s linear}
+
+  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+  .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
+  .preset:hover{border-color:var(--accent);color:var(--accent)}
+
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../index.html" id="backLink">&larr; Physics you can see</a>
+    <div class="topbar-right">
+      <span>v<sub>esc</sub> = &radic;(2GM/r)</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>Why the Moon <em>lost its atmosphere</em>.</h1>
+      <p class="sub">Every world has a minimum speed a thrown object needs to never come back &mdash; escape velocity. The Moon's is only 2.38&nbsp;km/s; Earth's is nearly five times that. That gap is a big part of why one world kept its air and the other didn't.</p>
+    </div>
+
+    <div class="eqnbox">
+      <div class="eqn">
+        <em>v</em><sub style="font-size:.5em">esc</sub>
+        <span class="eq">=</span>
+        <span class="radical">
+          <span class="sign">&radic;</span>
+          <span class="inner"><span>2</span><em id="GTerm">G</em><em id="MTerm">M</em><span class="eq">/</span><em id="rTerm">r</em></span>
+        </span>
+      </div>
+    </div>
+
+    <div class="legendbox">
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="hero" id="heroWrap">
+    <div class="lbl" id="lblBody" style="transform:translateX(-50%);font-weight:500;color:var(--muted2)"></div>
+    <div class="lbl" id="lblOutcome" style="transform:translateX(-50%)"></div>
+    <svg id="heroSvg" role="img" aria-label="A projectile launched straight up from the selected body's surface, either arcing back down or flying off the top of the frame depending on the chosen launch speed.">
+      <line id="groundLine" stroke="var(--line2)" stroke-width="1.25"></line>
+      <circle id="bodyDot" stroke-width="1.25"></circle>
+      <line id="trajLine" stroke-linecap="round"></line>
+      <polygon id="trajArrow"></polygon>
+      <circle id="projectile" r="5"></circle>
+    </svg>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrls">
+      <div class="ctrl" id="bodyCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Body <em id="MLabel">M</em>, <em id="rLabel">r</em></span>
+          <span class="ctrl-rel">M<sup>&frac12;</sup>&middot;r<sup>&minus;&frac12;</sup> &prop; v<sub>esc</sub></span>
+        </div>
+        <div class="body-buttons" id="bodyButtons"></div>
+        <div class="body-note" id="bodyNote"></div>
+      </div>
+
+      <div class="ctrl" id="velCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Launch speed</span>
+          <span class="ctrl-rel">vs v<sub>esc</sub></span>
+        </div>
+        <div class="readout mono" id="velReadout"></div>
+        <div class="track" id="velTrack" tabindex="0" role="slider" aria-label="Launch speed">
+          <div class="rail"></div>
+          <div class="fill" id="velFill"></div>
+          <div class="thumb" id="velThumb"></div>
+        </div>
+        <div class="track-range"><span>0.3 km/s</span><span class="mid">how fast does it leave the surface?</span><span>800 km/s</span></div>
+
+        <div class="launch-buttons">
+          <button id="launchBtn" type="button">&#9650; launch</button>
+        </div>
+        <div class="launch-note" id="launchNote">A simplified straight-up throw, not a real orbital trajectory &mdash; watch it either arc back or fly off the top.</div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Escape velocity</div>
+      <div class="result-value"><span class="num mono" id="vescValue"></span><span class="unit mono" id="vescUnit"></span><span class="v" id="verdict"></span></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+      <div class="effort-line" id="effortLine"></div>
+      <div class="gauge" id="gauge">
+        <div class="track"></div>
+        <div class="reach" id="gReach"></div>
+        <div class="limit" id="gLimit"></div>
+        <div class="limitlabel" id="gLimitLabel">escape velocity</div>
+        <div class="mark" id="gMark"></div>
+        <div class="marklabel mono" id="gMarkLabel"></div>
+        <div id="gTicks"></div>
+        <div id="gLabels"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-p="moonascent">Moon, Apollo ascent</button>
+    <button class="preset" data-p="earthorbit">Earth, orbital speed</button>
+    <button class="preset" data-p="earthescape">Earth, escape speed</button>
+    <button class="preset" data-p="jupiter">Jupiter, a fast probe</button>
+    <button class="preset" data-p="sun">the Sun's surface</button>
+  </div>
+
+  <p class="note">Newton's <a href="https://en.wikipedia.org/wiki/Escape_velocity" target="_blank" rel="noopener">escape velocity</a> is the speed a single instantaneous kick needs to give an object so it never falls back, ignoring air resistance: v<sub>esc</sub> = &radic;(2GM/r), with G = 6.674 &times; 10&#8315;&sup1;&sup1; N&middot;m&sup2;/kg&sup2;. Real spacecraft don't work this way &mdash; they climb under continuous engine thrust over minutes, not one instant shove &mdash; and this page ignores atmospheric drag entirely. This is also <em style="font-style:italic">not</em> a full model of atmospheric retention: what actually keeps a gas around is comparing escape velocity to the *statistical spread* of a gas's molecular speeds (heat means molecules constantly colliding and exchanging speed, so some are always moving much faster than the average), not a single number every molecule must clear at once. The Moon's low v<sub>esc</sub> (2.38&nbsp;km/s), combined with billions of years of solar heating, let enough of the fast tail of light gas molecules escape one by one that its atmosphere thinned to almost nothing; Earth's v<sub>esc</sub> (11.19&nbsp;km/s) is high enough that even light gases like hydrogen escape far more slowly, and heavier ones like nitrogen and oxygen barely escape at all. This page shows v<sub>esc</sub> itself, honestly &mdash; not that fuller kinetic-theory picture.</p>
+
+</div>
+</main>
+<script>
+(function(){
+  var G = 6.674e-11;
+  var BODIES = [
+    {key:'moon', name:'Moon', M:7.342e22, r:1.7370e6, Mtxt:'7.342 × 10²² kg', rtxt:'1,737 km', color:'#9AA5B1',
+     note:'A little more than a quarter of Earth’s radius, and 1.2% of its mass.'},
+    {key:'mars', name:'Mars', M:6.417e23, r:3.3890e6, Mtxt:'6.417 × 10²³ kg', rtxt:'3,389 km', color:'#C1633B',
+     note:'About half Earth’s radius — its thin, largely-lost atmosphere is a smaller version of the same story.'},
+    {key:'earth', name:'Earth', M:5.972e24, r:6.3710e6, Mtxt:'5.972 × 10²⁴ kg', rtxt:'6,371 km', color:'#3F7FBF',
+     note:'The reference case: massive and compact enough to hold onto nitrogen and oxygen for billions of years.'},
+    {key:'jupiter', name:'Jupiter', M:1.898e27, r:7.1492e7, Mtxt:'1.898 × 10²⁷ kg', rtxt:'71,492 km', color:'#C9A26A',
+     note:'318 Earth masses — massive enough to have kept even hydrogen and helium since it formed.'},
+    {key:'sun', name:'the Sun’s surface', M:1.989e30, r:6.9634e8, Mtxt:'1.989 × 10³⁰ kg', rtxt:'696,340 km', color:'#E0A93E',
+     note:'The photosphere — the visible "surface" of a ball of gas with no solid edge at all.'}
+  ];
+  var VMIN=0.3, VMAX=800;
+  var LOGMIN=Math.log10(VMIN), LOGMAX=Math.log10(VMAX);
+
+  var SUP='⁰¹²³⁴⁵⁶⁷⁸⁹';
+  function sup(n){ return String(n).split('').map(function(c){ return c==='-'?'⁻':SUP[+c]; }).join(''); }
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+  function fmtVel(v){
+    if(v<10) return v.toFixed(2)+' km/s';
+    if(v<100) return v.toFixed(1)+' km/s';
+    return Math.round(v).toLocaleString()+' km/s';
+  }
+
+  var NS='http://www.w3.org/2000/svg';
+  function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+
+  // v: current launch speed slider state stored as its own log10 exponent, same pattern as
+  // gravity-lab.html's mass/distance sliders, so precision stays even across an 800:1 range.
+  var state = { body:2, vExp: Math.log10(9.0), active:null, drag:null, playing:false };
+  var heroW = 0;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
+  var groundLine=$('groundLine'), bodyDot=$('bodyDot'), trajLine=$('trajLine'), trajArrow=$('trajArrow'), projectile=$('projectile');
+  var lblBody=$('lblBody'), lblOutcome=$('lblOutcome');
+
+  function body(){ return BODIES[state.body]; }
+  function launchV(){ return Math.pow(10, state.vExp); } // km/s
+  function vesc(b){ b = b || body(); return Math.sqrt(2*G*b.M/b.r) / 1000; } // km/s
+
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var lastGeom = null;
+
+  // ---- hero geometry: viewBox width == measured CSS px width, 1 unit = 1px ----
+  function geom(w){
+    var narrow = w < 620;
+    var vbH = narrow ? 260 : 300;
+    var groundY = vbH - (narrow?36:44);
+    var topY = narrow ? 22 : 26;
+    var cx = w/2;
+    var bodyR = narrow ? 7 : 9;
+    return { w:w, vbH:vbH, groundY:groundY, topY:topY, cx:cx, bodyR:bodyR };
+  }
+
+  // Illustrative height mapping only (per CLAUDE.md's honest-device guidance, stated in-page):
+  // real energy-conserving apogee blows up asymptotically as v -> vesc, which doesn't fit a
+  // fixed frame. Below vesc, apex height is a monotonic, capped function of v/vesc; at/above
+  // vesc the projectile simply keeps going past the top edge. The numbers shown elsewhere on
+  // the page (vesc, the gauge, the verdict) are exact — only this animation's shape is stylized.
+  function apexFrac(v, ve){
+    var ratio = v/ve;
+    if(ratio >= 1) return 1;
+    return clamp(Math.pow(ratio, 0.55), 0.015, 0.95);
+  }
+
+  function drawHero(progress){
+    var w = heroW || heroWrap.clientWidth || 1100;
+    var g = geom(w);
+    lastGeom = g;
+    var b = body();
+    var v = launchV(), ve = vesc(b);
+    var escapes = v >= ve;
+    var frac = apexFrac(v, ve);
+
+    heroSvg.setAttribute('viewBox','0 0 '+w+' '+g.vbH);
+    heroSvg.setAttribute('preserveAspectRatio','none');
+
+    groundLine.setAttribute('x1', 12); groundLine.setAttribute('x2', w-12);
+    groundLine.setAttribute('y1', g.groundY); groundLine.setAttribute('y2', g.groundY);
+
+    bodyDot.setAttribute('cx', g.cx); bodyDot.setAttribute('cy', g.groundY+g.bodyR*0.6); bodyDot.setAttribute('r', g.bodyR);
+    bodyDot.setAttribute('fill', b.color); bodyDot.setAttribute('stroke', 'var(--line2)');
+
+    var apexY = g.groundY - frac*(g.groundY-g.topY);
+
+    // static dashed preview of the outcome, hidden while the launch animation is running
+    if(progress === undefined){
+      trajLine.setAttribute('x1', g.cx); trajLine.setAttribute('x2', g.cx);
+      trajLine.setAttribute('y1', g.groundY - g.bodyR - 4);
+      trajLine.setAttribute('y2', apexY);
+      trajLine.setAttribute('stroke', escapes ? 'var(--accent)' : 'var(--line2)');
+      trajLine.setAttribute('stroke-width', 1.5);
+      trajLine.setAttribute('stroke-dasharray', '3 5');
+      trajLine.setAttribute('opacity', 0.8);
+      if(escapes){
+        trajArrow.setAttribute('points', (g.cx-5)+','+(g.topY+8)+' '+(g.cx+5)+','+(g.topY+8)+' '+g.cx+','+(g.topY-3));
+        trajArrow.setAttribute('fill', 'var(--accent)');
+        trajArrow.setAttribute('opacity', 0.8);
+      } else {
+        trajArrow.setAttribute('points', (g.cx-5)+','+(apexY-8)+' '+(g.cx+5)+','+(apexY-8)+' '+g.cx+','+(apexY+3));
+        trajArrow.setAttribute('fill', 'var(--line2)');
+        trajArrow.setAttribute('opacity', 0.8);
+      }
+      projectile.setAttribute('cx', g.cx); projectile.setAttribute('cy', g.groundY - g.bodyR - 4);
+      projectile.setAttribute('fill', 'var(--fg)'); projectile.setAttribute('opacity', 0.55);
+    } else {
+      trajLine.setAttribute('opacity', 0); trajArrow.setAttribute('opacity', 0);
+      var py, pOpacity = 1;
+      if(escapes){
+        // keeps rising past the top edge for the whole animation, fading out near the end
+        py = (g.groundY - g.bodyR - 4) - progress*((g.groundY-g.bodyR-4) - (g.topY - 30));
+        if(progress > 0.7) pOpacity = clamp(1 - (progress-0.7)/0.3, 0, 1);
+      } else if(progress <= 0.5){
+        var up = progress/0.5;
+        py = (g.groundY - g.bodyR - 4) - up*((g.groundY-g.bodyR-4) - apexY);
+      } else {
+        var down = (progress-0.5)/0.5;
+        py = apexY + down*((g.groundY-g.bodyR-4) - apexY);
+      }
+      projectile.setAttribute('cx', g.cx); projectile.setAttribute('cy', py);
+      projectile.setAttribute('fill', escapes ? 'var(--accent)' : 'var(--fg)');
+      projectile.setAttribute('opacity', pOpacity);
+    }
+
+    var px = function(x){ return (x/w*100)+'%'; };
+    var py2 = function(y){ return (y/g.vbH*100)+'%'; };
+    lblBody.style.left = px(g.cx); lblBody.style.top = py2(g.groundY+16);
+    lblBody.textContent = b.name.charAt(0).toUpperCase()+b.name.slice(1);
+    lblOutcome.style.left = px(g.cx); lblOutcome.style.top = py2(g.topY-2);
+    lblOutcome.style.color = escapes ? 'var(--accent)' : 'var(--muted)';
+    lblOutcome.textContent = progress===undefined ? (escapes ? 'escapes →' : 'falls back') : (progress>=1 ? (escapes?'escaped.':'fell back.') : '');
+  }
+
+  // ---- equation + legend colouring ----
+  var accent = 'var(--accent)';
+  var GTerm=$('GTerm'), MTerm=$('MTerm'), rTerm=$('rTerm');
+  var MLabel=$('MLabel'), rLabel=$('rLabel');
+  var legendEl = $('legend');
+
+  function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
+
+  function drawEquationAndLegend(){
+    MTerm.style.color = activeColor('body');
+    rTerm.style.color = activeColor('body');
+    MLabel.style.color = activeColor('body');
+    rLabel.style.color = activeColor('body');
+    GTerm.style.color = 'var(--fg)';
+
+    var b = body();
+    var rows = [
+      {sym:'G', name:'gravitational constant', val:'6.674 × 10⁻¹¹', key:null},
+      {sym:'M', name:'mass of '+b.name, val:b.Mtxt, key:'body'},
+      {sym:'r', name:'radius of '+b.name, val:b.rtxt, key:'body'},
+      {sym:'v', name:'escape velocity (computed)', val:fmtVel(vesc(b)), key:null}
+    ];
+    legendEl.innerHTML = '';
+    rows.forEach(function(row){
+      var div = document.createElement('div'); div.className='row';
+      var sym = document.createElement('em'); sym.className='sym'; sym.textContent = row.sym;
+      sym.style.color = row.key ? activeColor(row.key) : 'var(--fg)';
+      var name = document.createElement('span'); name.className='name'; name.textContent = row.name;
+      var val = document.createElement('span'); val.className='val mono'; val.textContent = row.val;
+      div.appendChild(sym); div.appendChild(name); div.appendChild(val);
+      legendEl.appendChild(div);
+    });
+  }
+
+  // ---- body buttons ----
+  var bodyButtons = $('bodyButtons'), bodyNote=$('bodyNote');
+  BODIES.forEach(function(b,i){
+    var btn = document.createElement('button');
+    btn.textContent = b.name.replace(/^the /,'').replace(/’s.*/,'').length ? b.name.replace('the ','').replace('’s surface','') : b.name;
+    btn.addEventListener('click', function(){ state.body=i; state.active='body'; render(); });
+    btn.addEventListener('pointerenter', function(){ state.active='body'; render(); });
+    bodyButtons.appendChild(btn);
+  });
+  function drawBodyButtons(){
+    Array.prototype.forEach.call(bodyButtons.children, function(btn,i){
+      var b = BODIES[i], active = i===state.body;
+      btn.style.background = active ? 'color-mix(in srgb, '+b.color+' 22%, var(--bg))' : 'transparent';
+      btn.style.borderColor = active ? b.color : 'var(--border)';
+      btn.style.color = active ? 'var(--fg)' : 'var(--muted)';
+    });
+    bodyNote.textContent = body().note;
+  }
+
+  // ---- velocity slider (log scale, stored as log10 exponent) ----
+  function makeSlider(track, fill, thumb, lo, hi){
+    var dragging = false;
+    function setFromClientX(x){
+      var r = track.getBoundingClientRect();
+      var f = clamp((x-r.left)/r.width, 0, 1);
+      var v = lo + f*(hi-lo);
+      v = clamp(Math.round(v*1000)/1000, lo, hi);
+      state.vExp = v;
+      render();
+    }
+    track.addEventListener('pointerdown', function(e){
+      dragging = true;
+      if(track.setPointerCapture) track.setPointerCapture(e.pointerId);
+      state.active = 'v';
+      setFromClientX(e.clientX);
+    });
+    track.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
+    function endDrag(){ if(dragging){ dragging=false; render(); } }
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+    track.addEventListener('pointerenter', function(){ state.active='v'; render(); });
+    track.addEventListener('pointerleave', function(){ if(!dragging){ state.active=null; render(); } });
+    track.addEventListener('keydown', function(e){
+      var step = e.shiftKey ? 0.1 : 0.02;
+      var cur = state.vExp;
+      var v = null;
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown') v = cur-step;
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = cur+step;
+      else if(e.key==='Home') v = lo;
+      else if(e.key==='End') v = hi;
+      if(v!==null){ e.preventDefault(); state.vExp = clamp(Math.round(v*1000)/1000, lo, hi); render(); }
+    });
+    return {
+      draw: function(){
+        var cur = state.vExp;
+        var pct = clamp((cur-lo)/(hi-lo)*100, 0, 100).toFixed(2)+'%';
+        fill.style.width = pct; thumb.style.left = pct;
+        track.setAttribute('aria-valuemin', lo);
+        track.setAttribute('aria-valuemax', hi);
+        track.setAttribute('aria-valuenow', cur);
+        track.setAttribute('aria-valuetext', fmtVel(launchV()));
+      }
+    };
+  }
+  var velSlider = makeSlider($('velTrack'), $('velFill'), $('velThumb'), LOGMIN, LOGMAX);
+
+  [$('bodyCtrl'), $('velCtrl')].forEach(function(box){
+    box.addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+  });
+
+  // ---- result box ----
+  var vescValueEl=$('vescValue'), vescUnitEl=$('vescUnit'), verdictEl=$('verdict'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+  var gReach=$('gReach'), gLimit=$('gLimit'), gLimitLabel=$('gLimitLabel'), gMark=$('gMark'), gMarkLabel=$('gMarkLabel');
+  var gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
+
+  function pos(v){ return clamp((Math.log10(Math.max(v,VMIN)) - LOGMIN)/(LOGMAX-LOGMIN), 0, 1)*100; }
+
+  function drawResult(){
+    var b = body();
+    var ve = vesc(b), v = launchV();
+    var escapes = v >= ve;
+    var color = escapes ? 'var(--accent)' : 'var(--bad)';
+
+    vescValueEl.textContent = ve<10 ? ve.toFixed(2) : ve<100 ? ve.toFixed(1) : Math.round(ve).toLocaleString();
+    vescUnitEl.textContent = 'km/s';
+
+    verdictEl.textContent = escapes ? 'Escapes.' : 'Falls back.';
+    verdictEl.style.color = color;
+
+    if(escapes){
+      verdictSubEl.textContent = 'At '+fmtVel(v)+', that’s enough to leave '+b.name+' for good.';
+    } else {
+      var short = ve - v;
+      verdictSubEl.textContent = 'At '+fmtVel(v)+', that’s '+fmtVel(short)+' short of escaping '+b.name+'.';
+    }
+    effortLineEl.textContent = Math.round(v/ve*100)+'% of escape velocity';
+
+    var markPct = pos(v), limitPct = pos(ve);
+    gReach.style.width = Math.min(markPct,limitPct).toFixed(2)+'%';
+    gLimit.style.left = limitPct.toFixed(2)+'%';
+    gLimitLabel.style.left = clamp(limitPct,8,80).toFixed(2)+'%';
+    gMark.style.left = markPct.toFixed(2)+'%';
+    gMark.style.background = color;
+    var labelPct = clamp(markPct,4,88);
+    gMarkLabel.style.left = labelPct.toFixed(2)+'%';
+    gMarkLabel.style.transform = markPct>72 ? 'translateX(-100%)' : markPct<20 ? 'translateX(0)' : 'translateX(-50%)';
+    gMarkLabel.style.color = color;
+    gMarkLabel.textContent = fmtVel(v);
+
+    if(!gTicksEl.dataset.built){
+      var ticksHtml='', labelsHtml='';
+      var decades = [0.3,1,3,10,30,100,300,800];
+      decades.forEach(function(d,i){
+        var left = pos(d).toFixed(2)+'%';
+        ticksHtml += '<div class="tick" style="left:'+left+'"></div>';
+        var tx = i===0 ? 'translateX(0)' : i===decades.length-1 ? 'translateX(-100%)' : 'translateX(-50%)';
+        labelsHtml += '<div class="ticklabel" style="left:'+left+';transform:'+tx+'">'+(d<1?d:Math.round(d))+'</div>';
+      });
+      gTicksEl.innerHTML = ticksHtml; gTicksEl.dataset.built='1';
+      gLabelsEl.innerHTML = labelsHtml;
+    }
+  }
+
+  // ---- launch button: bounded, user-triggered animation (the content itself, like
+  // lightning-distance.html's "play it out" — not gated behind prefers-reduced-motion, since
+  // there is no self-starting/looping part here for that rule to apply to) ----
+  var launchBtn = $('launchBtn');
+  var launchRafId = null;
+  function stopLaunch(){
+    state.playing = false;
+    if(launchRafId){ cancelAnimationFrame(launchRafId); launchRafId=null; }
+    launchBtn.disabled = false; launchBtn.textContent = '▲ launch';
+    drawHero(undefined);
+  }
+  launchBtn.addEventListener('click', function(){
+    if(state.playing) return;
+    state.playing = true;
+    launchBtn.disabled = true; launchBtn.textContent = 'launching…';
+    var durationMs = 1600;
+    var start = null;
+    function frame(ts){
+      if(start===null) start = ts;
+      var progress = clamp((ts-start)/durationMs, 0, 1);
+      drawHero(progress);
+      if(progress < 1){
+        launchRafId = requestAnimationFrame(frame);
+      } else {
+        drawHero(1);
+        setTimeout(stopLaunch, 700);
+      }
+    }
+    launchRafId = requestAnimationFrame(frame);
+  });
+
+  // ---- presets ----
+  document.querySelectorAll('.preset').forEach(function(b){
+    var presets = {
+      moonascent:{body:0, v:2.5},
+      earthorbit:{body:2, v:7.8},
+      earthescape:{body:2, v:11.19},
+      jupiter:{body:3, v:60},
+      sun:{body:4, v:620}
+    };
+    b.addEventListener('click', function(){
+      var p = presets[b.dataset.p];
+      state.body = p.body; state.vExp = Math.log10(p.v);
+      render();
+    });
+  });
+
+  // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
+  var STORAGE_KEY = 'escape-velocity-theme';
+  var themeToggle = $('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    var applied = document.documentElement.getAttribute('data-theme');
+    if(applied) return applied;
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+
+  // The relative "../index.html" link only resolves when this file is sitting in
+  // Simple_Viz/visualizations/ next to the site index. Published standalone (e.g. as an
+  // Artifact) there's no sibling index to reach, so fall back to the GitHub repo instead of
+  // leaving a link that 404s.
+  (function(){
+    var backLink = document.getElementById('backLink');
+    if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
+      backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
+      backLink.target = '_blank';
+      backLink.rel = 'noopener';
+      backLink.textContent = 'Simple Viz on GitHub ↗';
+    }
+  })();
+
+  function measure(){
+    var w = heroWrap.clientWidth;
+    if(w && w !== heroW){ heroW = w; if(!state.playing) render(); }
+  }
+
+  function render(){
+    if(!state.playing) drawHero(undefined);
+    drawEquationAndLegend();
+    drawBodyButtons();
+    velSlider.draw();
+    $('velReadout').textContent = fmtVel(launchV());
+    drawResult();
+  }
+
+  new ResizeObserver(measure).observe(heroWrap);
+  window.addEventListener('resize', measure);
+  [60,250,900].forEach(function(t){ setTimeout(measure, t); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  render();
+})();
+</script>
+</html>

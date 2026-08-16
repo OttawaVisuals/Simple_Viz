@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The ten-metre ceiling</title>
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  .topgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
+
+  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqn{display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);font-size:clamp(30px,4vw,46px);line-height:1;font-weight:300}
+  .eqn .eq{color:var(--muted)}
+  .eqn .frac{display:inline-flex;flex-direction:column;align-items:center}
+  .eqn .frac .row{display:flex;gap:.16em;align-items:flex-start}
+  .eqn .frac .num{padding:0 .3em .06em}
+  .eqn .frac .den{padding:.06em .3em 0}
+  .eqn .frac .bar{height:1.5px;background:var(--fg);width:100%}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .eqn sup{font-size:.5em;position:relative;top:-.5em}
+  .eqn sub{font-size:.5em;position:relative;top:.5em}
+
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:1.6em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:8px 2px}
+  .legend .sym{font-size:17px;font-weight:300;transition:color .2s}
+  .legend .name{font-size:12.5px;color:var(--muted2)}
+  .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero svg{width:100%;height:auto;display:block}
+  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
+  .hero .lbl.ceil{color:var(--bad);font-weight:600}
+
+  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
+
+  .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;text-transform:none;transition:color .2s}
+  .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
+  .fluid-buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .fluid-buttons button{cursor:pointer;font-family:Georgia,serif;font-style:italic;font-size:15px;padding:6px 13px 7px;border-radius:999px;transition:all .18s ease;border:1px solid var(--border);background:transparent;color:var(--muted)}
+  .fluid-buttons button:hover{color:var(--fg)}
+  .fluid-note{margin-top:11px;font-size:13.5px;line-height:1.45;color:var(--muted)}
+  .readout{font-family:ui-monospace,monospace;font-size:clamp(26px,2.8vw,34px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
+  .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
+  .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
+  .track .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
+  .track .thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
+  .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
+
+  .result{text-align:left}
+  .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
+  .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
+  .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px}
+  .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
+  .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
+  .gauge{position:relative;height:56px;margin-top:16px;max-width:420px}
+  .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
+  .gauge .reach{position:absolute;top:14px;height:10px;border-radius:2px 0 0 2px;background:color-mix(in srgb, var(--accent) 16%, transparent);left:0}
+  .gauge .tick{position:absolute;top:26px;width:1px;height:5px;background:var(--line2)}
+  .gauge .ticklabel{position:absolute;top:33px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
+  .gauge .limit{position:absolute;top:9px;height:20px;width:1px;background:var(--bad)}
+  .gauge .limitlabel{position:absolute;top:0;white-space:nowrap;font:400 9px ui-monospace,monospace;letter-spacing:.05em;color:var(--bad)}
+  .gauge .ghost{position:absolute;top:11px;height:16px;width:1px;background:var(--line2)}
+  .gauge .ghostlabel{position:absolute;top:33px;white-space:nowrap;font:400 9px ui-monospace,monospace;color:var(--muted)}
+  .gauge .mark{position:absolute;top:12px;height:14px;width:3px;border-radius:2px;transition:left .12s linear}
+  .gauge .marklabel{position:absolute;top:-3px;white-space:nowrap;font:500 11px ui-monospace,monospace;transition:left .12s linear}
+
+  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+  .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
+  .preset:hover{border-color:var(--accent);color:var(--accent)}
+
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../index.html" id="backLink">&larr; Physics you can see</a>
+    <div class="topbar-right">
+      <span>Atmospheric pressure limit</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>The ten-metre <em>ceiling</em>.</h1>
+      <p class="sub">No pump on Earth can suck water higher than about 10.33&nbsp;m &mdash; however hard it pulls. A pump doesn't lift the water; the weight of the atmosphere below does, and there's only so much of it to push with.</p>
+    </div>
+
+    <div class="eqnbox">
+      <div class="eqn">
+        <span><em>h</em></span>
+        <span class="eq">=</span>
+        <span class="frac">
+          <span class="row num"><em id="p0Term">P</em><sub>0</sub></span>
+          <span class="bar"></span>
+          <span class="row den"><em id="rhoTerm">&rho;</em><em>g</em></span>
+        </span>
+      </div>
+    </div>
+
+    <div class="legendbox">
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="hero" id="heroWrap">
+    <div class="lbl ceil" id="lblCeil"></div>
+    <div class="lbl" id="lblZero">0 m</div>
+    <div class="lbl" id="lblVac">vacuum &mdash; zero pressure</div>
+    <div class="lbl" id="lblAtm">atmosphere pushes down, P&#8320;</div>
+    <div class="lbl" id="lblLiq"></div>
+    <svg id="heroSvg" role="img" aria-label="A vertical tube standing in an open reservoir, with liquid rising from the reservoir into the tube's evacuated top, stopping at the computed ceiling height.">
+      <defs>
+        <pattern id="vacHatch" width="9" height="9" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+          <line x1="0" y1="0" x2="0" y2="9" stroke="var(--line2)" stroke-width="1.25"></line>
+        </pattern>
+      </defs>
+      <polygon id="basinPoly" fill="none" stroke="var(--line2)" stroke-width="1.25"></polygon>
+      <polygon id="basinLiq"></polygon>
+      <g id="atmArrows"></g>
+      <rect id="tubeVac" fill="url(#vacHatch)"></rect>
+      <rect id="tubeLiq"></rect>
+      <rect id="tubeOutline" fill="none" stroke="var(--line2)" stroke-width="1.25"></rect>
+      <g id="gridlines"></g>
+      <line id="ceilLine" stroke="var(--bad)" stroke-width="1.75" stroke-dasharray="6 5"></line>
+    </svg>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrls">
+      <div class="ctrl" id="densityCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Liquid <em id="rhoLabel">&rho;</em></span>
+          <span class="ctrl-rel">&rho;&#8315;&#185; &prop; h</span>
+        </div>
+        <div class="fluid-buttons" id="densityButtons"></div>
+        <div class="fluid-note" id="densityNote"></div>
+      </div>
+
+      <div class="ctrl" id="altCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Altitude <em id="p0Label">P</em></span>
+          <span class="ctrl-rel">P&#8320; &prop; h</span>
+        </div>
+        <div class="readout mono" id="altReadout"></div>
+        <div class="track" id="altTrack" tabindex="0" role="slider" aria-label="Site altitude">
+          <div class="rail"></div>
+          <div class="fill" id="altFill"></div>
+          <div class="thumb" id="altThumb"></div>
+        </div>
+        <div class="track-range"><span>0 m</span><span class="mid">higher up &middot; thinner air &middot; lower ceiling</span><span>5,000 m</span></div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Maximum lift height</div>
+      <div class="result-value"><span class="num mono" id="hValue"></span><span class="unit mono" id="hUnit">m</span><span class="v" id="verdict">the ceiling.</span></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+      <div class="effort-line" id="effortLine"></div>
+      <div class="gauge" id="gauge">
+        <div class="track"></div>
+        <div class="reach" id="gReach"></div>
+        <div class="ghost" id="gGhost"></div>
+        <div class="ghostlabel" id="gGhostLabel">water, sea level</div>
+        <div class="mark" id="gMark"></div>
+        <div class="marklabel mono" id="gMarkLabel"></div>
+        <div class="limitlabel" id="gLimitLabel">impossible beyond this line</div>
+        <div id="gTicks"></div>
+        <div id="gLabels"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-p="waterSL">water, sea level</button>
+    <button class="preset" data-p="mercurySL">mercury &mdash; the barometer</button>
+    <button class="preset" data-p="waterDenver">water, Denver altitude</button>
+    <button class="preset" data-p="gasolineSL">gasoline, sea level</button>
+  </div>
+
+  <p class="note">This is the <a href="https://en.wikipedia.org/wiki/Atmospheric_pressure" target="_blank" rel="noopener">barometric limit</a>: h = P&#8320;/(&rho;g), the column height at which the weight of the liquid exactly balances atmospheric pressure. A pump &mdash; or a mouth, or a "suction" of any kind &mdash; doesn't pull liquid upward; it only removes air from above the column, and it's the full weight of the atmosphere pressing on the open reservoir below that pushes the liquid up to fill the emptied space. Once the pump has produced a perfect vacuum, there is nothing left to improve: no stronger pump, no better seal, gets the column an inch higher, because the ceiling is set by the atmosphere outside the tube, not by anything happening inside it. Evangelista <a href="https://en.wikipedia.org/wiki/Barometer" target="_blank" rel="noopener">Torricelli discovered this in 1643</a> using mercury rather than water precisely because mercury's much higher density shrinks the same physics down to a benchtop-sized 760&nbsp;mm tube &mdash; the mercury barometer. This is the hydrostatic sibling to <a href="straw-hose-flow.html">straw-hose-flow.html</a>'s viscous-drag straw problem: that page is about the effort of pushing a liquid sideways through a narrow tube; this one is about a hard ceiling on pushing any liquid straight up, no matter how wide the tube or how strong the vacuum. Altitude pressures use the standard-atmosphere approximation and are illustrative, not survey-grade.</p>
+
+</div>
+</main>
+<script>
+(function(){
+  var G = 9.80665;
+  var P0_SEA = 101325;
+
+  var DENS = [
+    {key:'water', name:'Water', rho:1000, rhoTxt:'1,000 kg/m&sup3;', color:'#4E7FC4',
+     note:'The familiar number: the one hand pumps, drinking straws, and irrigation siphons all bump into.'},
+    {key:'mercury', name:'Mercury', rho:13595.1, rhoTxt:'13,595 kg/m&sup3;', color:'#9AA3AD',
+     note:'13.6&times; denser than water, so its ceiling is 13.6&times; shorter &mdash; about 760 mm. That’s exactly why a mercury barometer fits on a benchtop instead of needing a 10-metre tower.'},
+    {key:'gasoline', name:'Gasoline', rho:750, rhoTxt:'750 kg/m&sup3;', color:'#D9A441',
+     note:'Lighter than water, so its ceiling sits higher &mdash; relevant to how deep a suction fuel pump can really reach into a tank.'},
+    {key:'light', name:'Feather-fluid', rho:100, rhoTxt:'100 kg/m&sup3; (hypothetical)', color:'#8FD9B4',
+     note:'No real liquid is this light &mdash; a hypothetical stand-in so the far end of the ceiling is visible at all. Real liquids don’t get close to this density.'}
+  ];
+  var ALT_MIN = 0, ALT_MAX = 5000;
+  var LOGMIN = -1, LOGMAX = 2.5; // gauge: 0.1 m .. ~316 m
+  var H_WATER_SL = P0_SEA/(1000*G);
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+  function niceRound(v,d){ return +v.toFixed(d); }
+
+  function pressureAtAltitude(alt){
+    var f = 1 - 2.25577e-5*alt;
+    if(f < 0) f = 0;
+    return P0_SEA * Math.pow(f, 5.25588);
+  }
+  function heightFor(rho, p0){ return p0/(rho*G); }
+
+  function fmtH(h){
+    if(h < 10) return h.toFixed(2);
+    if(h < 100) return h.toFixed(1);
+    return h.toFixed(0);
+  }
+  function fmtKPa(pa){ return (pa/1000).toFixed(1); }
+
+  var NS='http://www.w3.org/2000/svg';
+  function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+
+  var state = { density:0, altitude:0, active:null, drag:null };
+  var heroW = 0;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
+  var basinPoly=$('basinPoly'), basinLiq=$('basinLiq'), atmArrows=$('atmArrows');
+  var tubeVac=$('tubeVac'), tubeLiq=$('tubeLiq'), tubeOutline=$('tubeOutline'), gridlinesG=$('gridlines'), ceilLine=$('ceilLine');
+  var lblCeil=$('lblCeil'), lblZero=$('lblZero'), lblVac=$('lblVac'), lblAtm=$('lblAtm'), lblLiq=$('lblLiq');
+
+  function d(){ return DENS[state.density]; }
+  function p0(){ return pressureAtAltitude(state.altitude); }
+  function height(){ return heightFor(d().rho, p0()); }
+
+  // ---- hero geometry: viewBox width == measured CSS px width, so 1 unit = 1px ----
+  function geom(w,h,dens){
+    var narrow = w < 620;
+    var vbH = narrow ? 320 : 380;
+    var cx = w/2;
+    var tubeW = narrow ? 34 : 46;
+    var basinW = narrow ? 120 : 170, basinH = narrow ? 30 : 38;
+    var tubeTopY = 26;
+    var basinTopY = vbH - (narrow ? 58 : 72);
+    var resSurfaceY = basinTopY;
+    var tubePxLen = resSurfaceY - tubeTopY;
+    var liquidFraction = 0.74;
+    var liquidTopY = resSurfaceY - tubePxLen*liquidFraction;
+
+    var basinX = cx - basinW/2, basinBotY = basinTopY + basinH;
+    var inset = basinW*0.12;
+    var basinPts = [basinX+','+basinTopY, (basinX+basinW)+','+basinTopY, (basinX+basinW-inset)+','+basinBotY, (basinX+inset)+','+basinBotY].join(' ');
+    var liqInset = inset*0.5;
+    var basinLiqPts = [(basinX+liqInset)+','+(basinTopY+2), (basinX+basinW-liqInset)+','+(basinTopY+2), (basinX+basinW-inset)+','+basinBotY, (basinX+inset)+','+basinBotY].join(' ');
+
+    var gridFracs = [0.25,0.5,0.75];
+    var gridlines = gridFracs.map(function(f){ return resSurfaceY - tubePxLen*f; });
+
+    return {
+      w:w, vbH:vbH, cx:cx,
+      tubeX: cx-tubeW/2, tubeW: tubeW,
+      tubeTopY: tubeTopY, resSurfaceY: resSurfaceY, liquidTopY: liquidTopY,
+      basinPts: basinPts, basinLiqPts: basinLiqPts,
+      basinX: basinX, basinW: basinW, basinTopY: basinTopY,
+      gridlines: gridlines,
+      arrowY0: basinTopY-20, arrowY1: basinTopY-4,
+      arrowXs: [cx-basinW*0.28, cx, cx+basinW*0.28]
+    };
+  }
+
+  function measure(){
+    var w = heroWrap.clientWidth;
+    if(w && w !== heroW){ heroW = w; render(); }
+  }
+
+  var arrowEls = [];
+  function ensureArrows(n){
+    while(arrowEls.length < n){
+      var line = el('line',{stroke:'var(--muted)','stroke-width':1.25});
+      var head = el('path',{fill:'var(--muted)'});
+      atmArrows.appendChild(line); atmArrows.appendChild(head);
+      arrowEls.push({line:line, head:head});
+    }
+  }
+
+  function drawHero(){
+    var w = heroW || heroWrap.clientWidth || 1100;
+    var h = height();
+    var dn = d();
+    var g = geom(w, h, dn);
+
+    heroSvg.setAttribute('viewBox','0 0 '+w+' '+g.vbH);
+    heroSvg.setAttribute('preserveAspectRatio','none');
+
+    basinPoly.setAttribute('points', g.basinPts);
+    basinLiq.setAttribute('points', g.basinLiqPts);
+    basinLiq.setAttribute('fill', dn.color);
+    basinLiq.setAttribute('opacity', 0.32);
+
+    ensureArrows(g.arrowXs.length);
+    g.arrowXs.forEach(function(ax,i){
+      var a = arrowEls[i];
+      a.line.setAttribute('x1', ax); a.line.setAttribute('x2', ax);
+      a.line.setAttribute('y1', g.arrowY0); a.line.setAttribute('y2', g.arrowY1);
+      a.head.setAttribute('d', 'M'+(ax-3.5)+','+(g.arrowY1-5)+' L'+(ax+3.5)+','+(g.arrowY1-5)+' L'+ax+','+g.arrowY1+' Z');
+    });
+
+    tubeVac.setAttribute('x', g.tubeX); tubeVac.setAttribute('y', g.tubeTopY);
+    tubeVac.setAttribute('width', g.tubeW); tubeVac.setAttribute('height', Math.max(0, g.liquidTopY-g.tubeTopY));
+
+    tubeLiq.setAttribute('x', g.tubeX); tubeLiq.setAttribute('y', g.liquidTopY);
+    tubeLiq.setAttribute('width', g.tubeW); tubeLiq.setAttribute('height', Math.max(0, g.resSurfaceY-g.liquidTopY));
+    tubeLiq.setAttribute('fill', dn.color); tubeLiq.setAttribute('opacity', 0.6);
+
+    tubeOutline.setAttribute('x', g.tubeX); tubeOutline.setAttribute('y', g.tubeTopY);
+    tubeOutline.setAttribute('width', g.tubeW); tubeOutline.setAttribute('height', g.resSurfaceY-g.tubeTopY);
+
+    gridlinesG.innerHTML = '';
+    g.gridlines.forEach(function(y){
+      var line = el('line',{x1:g.tubeX+2, x2:g.tubeX+g.tubeW-2, y1:y, y2:y, stroke:'var(--line)','stroke-width':1});
+      gridlinesG.appendChild(line);
+    });
+
+    ceilLine.setAttribute('x1', g.tubeX-14); ceilLine.setAttribute('x2', g.tubeX+g.tubeW+14);
+    ceilLine.setAttribute('y1', g.liquidTopY); ceilLine.setAttribute('y2', g.liquidTopY);
+
+    var px = function(x){ return (x/w*100)+'%'; };
+    var py = function(y){ return (y/g.vbH*100)+'%'; };
+
+    lblCeil.style.left = px(g.tubeX+g.tubeW+18); lblCeil.style.top = py(g.liquidTopY);
+    lblCeil.style.transform = 'translateY(-100%)';
+    lblCeil.textContent = 'h = '+fmtH(h)+' m — no pump can push higher';
+
+    lblZero.style.left = px(g.tubeX-10); lblZero.style.top = py(g.resSurfaceY);
+    lblZero.style.transform = 'translate(-100%,-50%)';
+
+    lblVac.style.left = px(g.cx); lblVac.style.top = py((g.tubeTopY+g.liquidTopY)/2);
+    lblVac.style.transform = 'translate(-50%,-50%)';
+    lblVac.style.opacity = (g.liquidTopY-g.tubeTopY) > 40 ? 1 : 0;
+
+    lblAtm.style.left = px(g.cx); lblAtm.style.top = py(g.arrowY0-4);
+    lblAtm.style.transform = 'translate(-50%,-100%)';
+
+    lblLiq.style.left = px(g.tubeX+g.tubeW+18); lblLiq.style.top = py((g.liquidTopY+g.resSurfaceY)/2);
+    lblLiq.style.transform = 'translateY(-50%)';
+    lblLiq.textContent = dn.name.toLowerCase();
+    lblLiq.style.opacity = (g.resSurfaceY-g.liquidTopY) > 30 ? 1 : 0;
+  }
+
+  // ---- equation + legend colouring ----
+  var accent = 'var(--accent)';
+  var p0Term=$('p0Term'), rhoTerm=$('rhoTerm');
+  var p0Label=$('p0Label'), rhoLabel=$('rhoLabel');
+  var legendEl = $('legend');
+
+  function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
+
+  function drawEquationAndLegend(){
+    p0Term.style.color = activeColor('p0'); p0Label.style.color = activeColor('p0');
+    rhoTerm.style.color = activeColor('rho'); rhoLabel.style.color = activeColor('rho');
+
+    var dn = d(), p = p0();
+    var rows = [
+      {sym:'P&#8320;', name:'atmospheric pressure', val: fmtKPa(p)+' kPa', key:'p0'},
+      {sym:'&rho;', name:'liquid density ('+dn.name.toLowerCase()+')', val: dn.rhoTxt, key:'rho'},
+      {sym:'g', name:'gravitational acceleration', val:'9.80665 m/s&sup2;', key:null}
+    ];
+    legendEl.innerHTML = '';
+    rows.forEach(function(row){
+      var div = document.createElement('div'); div.className='row';
+      var sym = document.createElement('em'); sym.className='sym'; sym.innerHTML = row.sym;
+      sym.style.color = row.key ? activeColor(row.key) : 'var(--fg)';
+      var name = document.createElement('span'); name.className='name'; name.textContent = row.name;
+      var val = document.createElement('span'); val.className='val mono'; val.innerHTML = row.val;
+      div.appendChild(sym); div.appendChild(name); div.appendChild(val);
+      legendEl.appendChild(div);
+    });
+  }
+
+  // ---- density buttons ----
+  var densityButtons = $('densityButtons'), densityNote=$('densityNote');
+  DENS.forEach(function(f,i){
+    var b = document.createElement('button');
+    b.textContent = f.name;
+    b.addEventListener('click', function(){ state.density=i; state.active='rho'; render(); });
+    b.addEventListener('pointerenter', function(){ state.active='rho'; render(); });
+    densityButtons.appendChild(b);
+  });
+  function drawDensityButtons(){
+    Array.prototype.forEach.call(densityButtons.children, function(b,i){
+      var f = DENS[i], active = i===state.density;
+      b.style.background = active ? 'color-mix(in srgb, '+f.color+' 22%, var(--bg))' : 'transparent';
+      b.style.borderColor = active ? f.color : 'var(--border)';
+      b.style.color = active ? 'var(--fg)' : 'var(--muted)';
+    });
+    densityNote.innerHTML = d().note;
+  }
+
+  // ---- altitude slider ----
+  var altTrack=$('altTrack'), altFill=$('altFill'), altThumb=$('altThumb');
+  (function(){
+    var dragging = false;
+    function setFromClientX(x){
+      var r = altTrack.getBoundingClientRect();
+      var f = clamp((x-r.left)/r.width, 0, 1);
+      var v = ALT_MIN + f*(ALT_MAX-ALT_MIN);
+      v = clamp(Math.round(v/10)*10, ALT_MIN, ALT_MAX);
+      state.altitude = v;
+      render();
+    }
+    altTrack.addEventListener('pointerdown', function(e){
+      dragging = true;
+      if(altTrack.setPointerCapture) altTrack.setPointerCapture(e.pointerId);
+      state.active = 'p0';
+      setFromClientX(e.clientX);
+    });
+    altTrack.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
+    function endDrag(){ if(dragging){ dragging=false; render(); } }
+    altTrack.addEventListener('pointerup', endDrag);
+    altTrack.addEventListener('pointercancel', endDrag);
+    altTrack.addEventListener('pointerenter', function(){ state.active='p0'; render(); });
+    altTrack.addEventListener('keydown', function(e){
+      var step = e.shiftKey ? 500 : 100;
+      var v = null;
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown') v = state.altitude-step;
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = state.altitude+step;
+      else if(e.key==='Home') v = ALT_MIN;
+      else if(e.key==='End') v = ALT_MAX;
+      if(v!==null){ e.preventDefault(); state.altitude = clamp(v, ALT_MIN, ALT_MAX); render(); }
+    });
+  })();
+  function drawAltSlider(){
+    var pct = ((state.altitude-ALT_MIN)/(ALT_MAX-ALT_MIN)*100).toFixed(2)+'%';
+    altFill.style.width = pct; altThumb.style.left = pct;
+    altTrack.setAttribute('aria-valuemin', ALT_MIN);
+    altTrack.setAttribute('aria-valuemax', ALT_MAX);
+    altTrack.setAttribute('aria-valuenow', state.altitude);
+    altTrack.setAttribute('aria-valuetext', state.altitude.toLocaleString()+' metres, P₀ ≈ '+fmtKPa(p0())+' kPa');
+    $('altReadout').textContent = state.altitude.toLocaleString()+' m  ·  P₀ ≈ '+fmtKPa(p0())+' kPa';
+  }
+
+  [$('densityCtrl'), $('altCtrl')].forEach(function(box){
+    box.addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+  });
+
+  // ---- result box ----
+  var hValueEl=$('hValue'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+  var gReach=$('gReach'), gGhost=$('gGhost'), gMark=$('gMark'), gMarkLabel=$('gMarkLabel');
+  var gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
+
+  function pos(m){ return clamp((Math.log10(Math.max(m,1e-3)) - LOGMIN)/(LOGMAX-LOGMIN), 0, 1)*100; }
+
+  function drawResult(){
+    var dn = d(), h = height();
+    var BAD = 'var(--bad)';
+
+    hValueEl.textContent = fmtH(h);
+    hValueEl.style.color = BAD;
+
+    verdictSubEl.textContent = 'A perfect vacuum gets '+dn.name.toLowerCase()+' exactly this far and not one metre more — a better pump cannot improve on it.';
+
+    var ratio = h / H_WATER_SL;
+    if(Math.abs(ratio-1) < 0.01){
+      effortLineEl.textContent = 'the classic textbook number, at sea level';
+    } else if(ratio < 1){
+      effortLineEl.textContent = (1/ratio).toFixed(1)+'× shorter than water’s sea-level ceiling ('+fmtH(H_WATER_SL)+' m)';
+    } else {
+      effortLineEl.textContent = ratio.toFixed(1)+'× taller than water’s sea-level ceiling ('+fmtH(H_WATER_SL)+' m)';
+    }
+
+    var markPct = pos(h);
+    gReach.style.width = markPct.toFixed(2)+'%';
+    gMark.style.left = markPct.toFixed(2)+'%';
+    gMark.style.background = BAD;
+    var labelPct = clamp(markPct,4,78);
+    gMarkLabel.style.left = labelPct.toFixed(2)+'%';
+    gMarkLabel.style.transform = markPct>72 ? 'translateX(-100%)' : markPct<20 ? 'translateX(0)' : 'translateX(-50%)';
+    gMarkLabel.style.color = BAD;
+    gMarkLabel.textContent = fmtH(h)+' m';
+
+    var ghostPct = pos(H_WATER_SL);
+    gGhost.style.left = ghostPct.toFixed(2)+'%';
+    $('gGhostLabel').style.left = clamp(ghostPct,4,78).toFixed(2)+'%';
+
+    if(!gTicksEl.dataset.built){
+      var ticksHtml='', labelsHtml='';
+      for(var e=LOGMIN; e<=LOGMAX; e++){
+        var left = ((e-LOGMIN)/(LOGMAX-LOGMIN)*100).toFixed(2)+'%';
+        ticksHtml += '<div class="tick" style="left:'+left+'"></div>';
+        var tv = Math.pow(10,e);
+        var txt = tv<1 ? tv.toFixed(1) : tv.toFixed(0);
+        var tx = e===LOGMIN ? 'translateX(0)' : e>=LOGMAX-0.5 ? 'translateX(-100%)' : 'translateX(-50%)';
+        labelsHtml += '<div class="ticklabel" style="left:'+left+';transform:'+tx+'">'+txt+' m</div>';
+      }
+      gTicksEl.innerHTML = ticksHtml; gTicksEl.dataset.built='1';
+      gLabelsEl.innerHTML = labelsHtml;
+    }
+  }
+
+  // ---- presets ----
+  document.querySelectorAll('.preset').forEach(function(b){
+    var presets = {
+      waterSL:{d:0, alt:0},
+      mercurySL:{d:1, alt:0},
+      waterDenver:{d:0, alt:1600},
+      gasolineSL:{d:2, alt:0}
+    };
+    b.addEventListener('click', function(){
+      var p = presets[b.dataset.p];
+      state.density=p.d; state.altitude=p.alt;
+      render();
+    });
+  });
+
+  // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
+  var STORAGE_KEY = 'ten-metre-ceiling-theme';
+  var themeToggle = $('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    var applied = document.documentElement.getAttribute('data-theme');
+    if(applied) return applied;
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+
+  // The relative "../index.html" link only resolves when this file is sitting in
+  // Simple_Viz/visualizations/ next to the site index. Published standalone (e.g. as an
+  // Artifact) there's no sibling index to reach, so fall back to the GitHub repo instead of
+  // leaving a link that 404s.
+  (function(){
+    var backLink = document.getElementById('backLink');
+    if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
+      backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
+      backLink.target = '_blank';
+      backLink.rel = 'noopener';
+      backLink.textContent = 'Simple Viz on GitHub ↗';
+    }
+  })();
+
+  function render(){
+    drawHero();
+    drawEquationAndLegend();
+    drawDensityButtons();
+    drawAltSlider();
+    drawResult();
+  }
+
+  new ResizeObserver(measure).observe(heroWrap);
+  window.addEventListener('resize', measure);
+  [60,250,900].forEach(function(t){ setTimeout(measure, t); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  render();
+  // No continuous or auto-triggered animation on this page (the diagram is fully redrawn
+  // from state on every interaction, like snells-law.html / eratosthenes-shadow.html), so
+  // there is nothing that needs gating behind prefers-reduced-motion.
+})();
+</script>
+</html>

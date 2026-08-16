@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A small push, badly timed</title>
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  .topgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
+
+  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqn{display:flex;align-items:center;gap:clamp(7px,1vw,12px);font-size:clamp(22px,2.6vw,32px);line-height:1;font-weight:300}
+  .eqn .eq{color:var(--muted)}
+  .eqn .rad{display:inline-flex;align-items:stretch}
+  .eqn .radsign{position:relative;width:.42em}
+  .eqn .radsign svg{position:absolute;inset:0;width:100%;height:100%;color:var(--fg);display:block}
+  .eqn .radbar{border-top:1.5px solid var(--fg);padding:.1em .12em 0 .06em}
+  .eqn .radinner{display:flex;align-items:center;gap:.14em;padding-top:.08em;white-space:nowrap;font-size:.72em}
+  .eqn .frac{display:inline-flex;flex-direction:column;align-items:center}
+  .eqn .frac .row{display:flex;gap:.14em;align-items:flex-start}
+  .eqn .frac .bar{height:1.5px;background:var(--fg);width:100%;margin:.05em 0}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .eqn sup{font-size:.62em;position:relative;top:-.5em}
+
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:1.6em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:8px 2px}
+  .legend .sym{font-size:17px;font-weight:300;transition:color .2s}
+  .legend .name{font-size:12.5px;color:var(--muted2)}
+  .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0;display:flex;gap:clamp(20px,3vw,40px);align-items:flex-start}
+  @media (max-width:760px){.hero{flex-direction:column}}
+  .plotWrap{position:relative;flex:1 1 68%;min-width:0}
+  .plotWrap svg{width:100%;height:auto;display:block}
+  .oscWrap{position:relative;flex:1 1 30%;min-width:200px;max-width:340px;align-self:center}
+  @media (max-width:760px){.oscWrap{max-width:none;width:100%}}
+  .oscWrap svg{width:100%;height:auto;display:block}
+  .oscCaption{text-align:center;font:400 11px ui-monospace,monospace;color:var(--muted);margin-top:6px;letter-spacing:.03em}
+  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
+
+  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
+
+  .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;text-transform:none;transition:color .2s}
+  .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
+  .readout{font-family:ui-monospace,monospace;font-size:clamp(26px,2.8vw,34px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
+  .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
+  .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
+  .track .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
+  .track .thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
+  .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
+
+  .result{text-align:left}
+  .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
+  .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
+  .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px}
+  .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
+  .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
+  .gauge{position:relative;height:56px;margin-top:16px;max-width:420px}
+  .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
+  .gauge .reach{position:absolute;top:14px;height:10px;border-radius:2px 0 0 2px;background:color-mix(in srgb, var(--accent) 16%, transparent);left:0}
+  .gauge .tick{position:absolute;top:26px;width:1px;height:5px;background:var(--line2)}
+  .gauge .ticklabel{position:absolute;top:33px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
+  .gauge .limit{position:absolute;top:9px;height:20px;width:1px;background:var(--bad)}
+  .gauge .limitlabel{position:absolute;top:0;white-space:nowrap;font:400 9px ui-monospace,monospace;letter-spacing:.05em;color:var(--bad)}
+  .gauge .mark{position:absolute;top:12px;height:14px;width:3px;border-radius:2px;transition:left .12s linear}
+  .gauge .marklabel{position:absolute;top:-3px;white-space:nowrap;font:500 11px ui-monospace,monospace;transition:left .12s linear}
+
+  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+  .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
+  .preset:hover{border-color:var(--accent);color:var(--accent)}
+
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+
+  .footer{margin-top:clamp(40px,4.6vw,64px);padding-top:18px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr 1fr;gap:clamp(20px,3vw,40px);font-family:ui-monospace,monospace;font-size:12px;line-height:1.7;color:var(--muted)}
+  @media (max-width:700px){.footer{grid-template-columns:1fr;gap:14px}}
+  .footer a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .footer a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  .footer .coffee{opacity:.72;font-size:11.5px}
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../index.html" id="backLink">&larr; Physics you can see</a>
+    <div class="topbar-right">
+      <span>Driven harmonic oscillator</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>A small push, <em>badly timed</em>.</h1>
+      <p class="sub">Push something in step with its own natural rhythm and every nudge adds to the last, so a gentle force builds into a large swing &mdash; sweep the driving frequency across a structure's natural frequency &omega;&#8320; below and watch the amplitude spike, then use the damping slider to see what keeps that spike from running away.</p>
+    </div>
+
+    <div class="eqnbox">
+      <div class="eqn">
+        <em id="QTerm">Q</em>
+        <span class="eq">=</span>
+        <span class="frac">
+          <span class="row"><span>1</span></span>
+          <span class="bar"></span>
+          <span class="row">
+            <span class="rad">
+              <span class="radsign"><svg viewBox="0 0 22 54" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,32 5,32 11,50 22,0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg></span>
+              <span class="radbar"><span class="radinner">(1&minus;<em id="xTerm1">x</em><sup>2</sup>)<sup>2</sup> + (<em id="bTerm1">b&#770;</em><em id="xTerm2">x</em>)<sup>2</sup></span></span>
+            </span>
+          </span>
+        </span>
+      </div>
+    </div>
+
+    <div class="legendbox">
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="hero" id="heroWrap">
+    <div class="plotWrap" id="plotWrap">
+      <div class="lbl" id="lblInf" style="transform:translateX(-50%)">&rarr; &infin; as b&#770;&rarr;0</div>
+      <svg id="plotSvg" role="img" aria-label="The resonance curve: amplitude ratio Q versus driving frequency ratio x, for the current damping, with a dashed undamped reference curve and a marker at the current driving frequency."></svg>
+    </div>
+    <div class="oscWrap" id="oscWrap">
+      <svg id="oscSvg" role="img" aria-label="A mass on a spring, driven back and forth at the chosen frequency, swinging with the amplitude the curve predicts."></svg>
+      <div class="oscCaption" id="oscCaption"></div>
+    </div>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrls">
+      <div class="ctrl" id="xCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Driving frequency <em id="xLabel">x = &omega;/&omega;&#8320;</em></span>
+          <span class="ctrl-rel">x = 1 at resonance</span>
+        </div>
+        <div class="readout mono" id="xReadout"></div>
+        <div class="track" id="xTrack" tabindex="0" role="slider" aria-label="Driving frequency, as a ratio of the natural frequency">
+          <div class="rail"></div>
+          <div class="fill" id="xFill"></div>
+          <div class="thumb" id="xThumb"></div>
+        </div>
+        <div class="track-range"><span>0</span><span class="mid">&omega;&#8320; sits in the middle</span><span>2&times;&omega;&#8320;</span></div>
+      </div>
+
+      <div class="ctrl" id="bCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Damping <em id="bLabel">b&#770;</em></span>
+          <span class="ctrl-rel">b&#770;&#8315;&sup1; &prop; peak height</span>
+        </div>
+        <div class="readout mono" id="bReadout"></div>
+        <div class="track" id="bTrack" tabindex="0" role="slider" aria-label="Damping coefficient, as a fraction of the natural frequency">
+          <div class="rail"></div>
+          <div class="fill" id="bFill"></div>
+          <div class="thumb" id="bThumb"></div>
+        </div>
+        <div class="track-range"><span>light</span><span class="mid">taller &amp; sharper as b&#770;&rarr;0</span><span>heavy</span></div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Amplitude, relative to a slow steady push</div>
+      <div class="result-value"><span class="num mono" id="qValue"></span><span class="unit mono">&times; static</span><span class="v" id="verdict"></span></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+      <div class="effort-line" id="effortLine"></div>
+      <div class="gauge" id="gauge">
+        <div class="track"></div>
+        <div class="reach" id="gReach"></div>
+        <div class="limit" id="gLimit"></div>
+        <div class="limitlabel" id="gLimitLabel">peak for this b&#770;</div>
+        <div class="mark" id="gMark"></div>
+        <div class="marklabel mono" id="gMarkLabel"></div>
+        <div id="gTicks"></div>
+        <div id="gLabels"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-p="far">far from resonance</button>
+    <button class="preset" data-p="nearlight">near resonance, light damping</button>
+    <button class="preset" data-p="resheavy">at resonance, heavy damping</button>
+    <button class="preset" data-p="reslight">at resonance, light damping</button>
+  </div>
+
+  <p class="note">This plots the standard damped&ndash;driven&ndash;oscillator <a href="https://en.wikipedia.org/wiki/Resonance" target="_blank" rel="noopener">resonance</a> response, Q(x) = 1/&radic;((1&minus;x&sup2;)&sup2; + (b&#770;x)&sup2;), where x = &omega;/&omega;&#8320; is the driving frequency as a fraction of the system's natural frequency and b&#770; = b/&omega;&#8320; is the damping coefficient in the same units &mdash; equivalent to A(&omega;) = F&#8320;/&radic;((&omega;&#8320;&sup2;&minus;&omega;&sup2;)&sup2; + (b&omega;)&sup2;) divided through by the static response F&#8320;/&omega;&#8320;&sup2;. A simpler formula sometimes quoted, A &prop; 1/(&omega;&#8320;&sup2;&minus;&omega;&sup2;), is this equation's b&rarr;0 limit &mdash; it is undamped, and genuinely blows up to infinity exactly at resonance, which no real bridge, glass, or spring does. That undamped curve is drawn above as a dashed reference and clipped where it would run off the top of the chart, rather than actually plotted to infinity. Damping is doing real work in engineering: shock absorbers and tuned mass dampers (like the one in Taipei 101) exist specifically to hold b&#770; high enough that a structure's resonance peak stays modest instead of catastrophic. The cleanest everyday example of the light-damping case is an opera singer shattering a wine glass by matching its natural frequency &mdash; a close-to-ideal single-resonance system. The 1940 Tacoma Narrows Bridge collapse is the anecdote most people reach for, but it's a shakier fit than the popular story suggests: the accepted modern explanation is aeroelastic flutter, a self-sustaining feedback between the bridge's motion and the wind flow around it, not simple forced resonance from a periodic gust matching the bridge's frequency. It's included here because it's the famous case, not because it's a textbook-clean example of this equation.</p>
+
+  <div class="footer">
+    <span>Spot a mistake or have an idea for a page? <a href="#">Send feedback</a> or write to <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.</span>
+    <span>Built with the help of AI, fact-checked by hand &mdash; if something looks off, that's on me, so tell me.</span>
+    <span class="coffee">If this was useful, you can <a href="#">buy me a coffee</a> &mdash; entirely optional.</span>
+  </div>
+
+</div>
+</main>
+<script>
+(function(){
+  var XMIN=0, XMAX=2, BMIN=0.08, BMAX=1.6, YMAX=14;
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+
+  // ---- the physics: standard damped-driven-oscillator amplitude, normalized by the
+  // static (omega->0) response. See the note in-page for the derivation from
+  // A(w) = F0/sqrt((w0^2-w^2)^2 + (b*w)^2). Verified by hand against the closed-form
+  // peak formula Q_peak = 1/(b*sqrt(1-b^2/4)) at x_peak = sqrt(1-b^2/2) before shipping;
+  // e.g. x=1,b=0.1 -> Q=10 exactly (1/b at resonance), x=0.3,b=0.4 -> Q~1.089. ----
+  function Q(x,b){
+    var t = 1 - x*x;
+    return 1/Math.sqrt(t*t + b*b*x*x);
+  }
+  function Qundamped(x){
+    var d = Math.abs(1 - x*x);
+    return d < 1e-6 ? Infinity : 1/d;
+  }
+  function peakOf(b){
+    if(b*b >= 2) return { x:0, q:1 };
+    var x = Math.sqrt(1 - b*b/2);
+    return { x:x, q: 1/(b*Math.sqrt(1 - b*b/4)) };
+  }
+
+  var NS='http://www.w3.org/2000/svg';
+  function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+  function clear(g){ while(g.firstChild) g.removeChild(g.firstChild); }
+
+  var state = { x:0.5, b:0.4, active:null, drag:null };
+
+  var $ = function(id){ return document.getElementById(id); };
+  var plotWrap=$('plotWrap'), plotSvg=$('plotSvg'), lblInf=$('lblInf');
+  var oscWrap=$('oscWrap'), oscSvg=$('oscSvg'), oscCaption=$('oscCaption');
+  var heroWrap=$('heroWrap');
+  var plotW=0, oscW=0;
+
+  // ---- resonance curve plot: viewBox width == measured CSS px width of plotWrap ----
+  var MARGIN = { l:34, r:14, t:16, b:26 };
+
+  function xToPx(x, w){ return MARGIN.l + (x/XMAX)*(w-MARGIN.l-MARGIN.r); }
+  function qToPx(q, h){ return MARGIN.t + (h-MARGIN.t-MARGIN.b) - (clamp(q,0,YMAX)/YMAX)*(h-MARGIN.t-MARGIN.b); }
+
+  function drawPlot(){
+    var w = plotW || plotWrap.clientWidth || 620;
+    var h = Math.max(200, Math.min(300, w*0.46));
+    clear(plotSvg);
+    plotSvg.setAttribute('viewBox','0 0 '+w+' '+h);
+
+    // axes
+    plotSvg.appendChild(el('line',{x1:MARGIN.l,y1:MARGIN.t,x2:MARGIN.l,y2:h-MARGIN.b, stroke:'var(--line2)','stroke-width':1}));
+    plotSvg.appendChild(el('line',{x1:MARGIN.l,y1:h-MARGIN.b,x2:w-MARGIN.r,y2:h-MARGIN.b, stroke:'var(--line2)','stroke-width':1}));
+
+    // x gridlines/ticks at 0, 0.5, 1, 1.5, 2 x omega0
+    [0,0.5,1,1.5,2].forEach(function(xv){
+      var px = xToPx(xv, w);
+      plotSvg.appendChild(el('line',{x1:px,y1:MARGIN.t,x2:px,y2:h-MARGIN.b, stroke:'var(--line)','stroke-width':1}));
+      var t = el('text',{x:px,y:h-MARGIN.b+15,'text-anchor': xv===0?'start':xv===2?'end':'middle','font-size':10,'font-family':'ui-monospace,monospace',fill:'var(--muted)'});
+      t.textContent = xv===1 ? 'ω₀' : (xv+'×ω₀');
+      plotSvg.appendChild(t);
+    });
+    // y ticks at 0, 5, 10, 14ish
+    [0,5,10].forEach(function(qv){
+      var py = qToPx(qv, h);
+      var t = el('text',{x:MARGIN.l-6,y:py+3,'text-anchor':'end','font-size':10,'font-family':'ui-monospace,monospace',fill:'var(--muted)'});
+      t.textContent = qv;
+      plotSvg.appendChild(t);
+    });
+
+    // undamped reference curve (b -> 0 limit), dashed, clipped at YMAX
+    var N = 160, pathU = '';
+    for(var i=0;i<=N;i++){
+      var x = XMAX*i/N;
+      var qv = Qundamped(x);
+      var py = isFinite(qv) ? qToPx(qv,h) : MARGIN.t;
+      var px = xToPx(x,w);
+      pathU += (i===0?'M':'L')+px.toFixed(1)+','+py.toFixed(1)+' ';
+    }
+    plotSvg.appendChild(el('path',{d:pathU, fill:'none', stroke:'var(--line2)','stroke-width':1.4,'stroke-dasharray':'4 4'}));
+
+    // damped curve (the physically complete one), solid accent
+    var pathD = '';
+    for(var j=0;j<=N;j++){
+      var x2 = XMAX*j/N;
+      var q2 = Q(x2, state.b);
+      var px2 = xToPx(x2,w), py2 = qToPx(q2,h);
+      pathD += (j===0?'M':'L')+px2.toFixed(1)+','+py2.toFixed(1)+' ';
+    }
+    plotSvg.appendChild(el('path',{d:pathD, fill:'none', stroke:'var(--accent)','stroke-width':2.2}));
+
+    // marker at current x
+    var qCur = Q(state.x, state.b);
+    var mx = xToPx(state.x,w), my = qToPx(qCur,h);
+    plotSvg.appendChild(el('line',{x1:mx,y1:MARGIN.t,x2:mx,y2:h-MARGIN.b, stroke:'var(--fg)','stroke-width':1,'stroke-dasharray':'2 4', opacity:.55}));
+    plotSvg.appendChild(el('circle',{cx:mx,cy:my,r:5,fill:'var(--accent)',stroke:'var(--bg)','stroke-width':1.5}));
+
+    var lbl = el('text',{x:clamp(mx+8,MARGIN.l,w-40), y:clamp(my-8,MARGIN.t+10,h-MARGIN.b-4),'font-size':11,'font-family':'ui-monospace,monospace','font-weight':600, fill:'var(--accent)'});
+    lbl.textContent = '×'+qCur.toFixed(1);
+    plotSvg.appendChild(lbl);
+
+    // axis captions
+    var xc = el('text',{x:(w+MARGIN.l-MARGIN.r)/2,y:h-2,'text-anchor':'middle','font-size':10,'font-family':'ui-monospace,monospace',fill:'var(--muted)'});
+    xc.textContent = 'driving frequency (× ω₀)';
+    plotSvg.appendChild(xc);
+
+    // position the "-> infinity" label near the top, above x=1
+    var infPx = xToPx(1,w);
+    lblInf.style.left = (infPx/w*100)+'%';
+    lblInf.style.top = '2px';
+  }
+
+  // ---- mini mass-on-spring animation: driven at the current x, amplitude scaled to Q ----
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var simT = 0, rafId = null, lastTs = null;
+
+  function drawOsc(){
+    var w = oscW || oscWrap.clientWidth || 220;
+    var h = w * 0.62;
+    clear(oscSvg);
+    oscSvg.setAttribute('viewBox','0 0 '+w+' '+h);
+
+    var cy = h*0.55;
+    var wallX = 14;
+    var restX = w*0.58;
+    var maxAmpPx = Math.min(w*0.22, 46);
+    var q = Q(state.x, state.b);
+    var ampPx = clamp(q,0,YMAX)/YMAX * maxAmpPx;
+    var phase = Math.atan2(state.b*state.x, 1 - state.x*state.x);
+    var massX = restX + ampPx*Math.sin(simT - phase);
+
+    // wall (hatched)
+    oscSvg.appendChild(el('line',{x1:wallX,y1:cy-34,x2:wallX,y2:cy+34, stroke:'var(--fg)','stroke-width':2.5,'stroke-linecap':'round'}));
+    for(var i=-3;i<=3;i++){
+      oscSvg.appendChild(el('line',{x1:wallX,y1:cy+i*10,x2:wallX-8,y2:cy+i*10+8, stroke:'var(--line2)','stroke-width':1.2}));
+    }
+    // envelope (max reach), faint
+    oscSvg.appendChild(el('line',{x1:restX-ampPx,y1:cy-24,x2:restX-ampPx,y2:cy+24, stroke:'var(--line2)','stroke-width':1,'stroke-dasharray':'2 4',opacity:.6}));
+    oscSvg.appendChild(el('line',{x1:restX+ampPx,y1:cy-24,x2:restX+ampPx,y2:cy+24, stroke:'var(--line2)','stroke-width':1,'stroke-dasharray':'2 4',opacity:.6}));
+    // rest reference
+    oscSvg.appendChild(el('line',{x1:restX,y1:cy-24,x2:restX,y2:cy+24, stroke:'var(--line)','stroke-width':1}));
+
+    // spring zigzag from wall to mass
+    var coils = 7, spring = 'M'+wallX+','+cy;
+    var segW = (massX - wallX)/coils;
+    for(var s=1;s<coils;s++){
+      var sx = wallX + segW*s;
+      var sy = cy + (s%2===0 ? 10 : -10);
+      spring += ' L'+sx.toFixed(1)+','+sy.toFixed(1);
+    }
+    spring += ' L'+massX.toFixed(1)+','+cy;
+    oscSvg.appendChild(el('path',{d:spring, fill:'none', stroke:'var(--muted2)','stroke-width':1.6}));
+
+    // mass block
+    oscSvg.appendChild(el('rect',{x:massX-16,y:cy-16,width:32,height:32,rx:4, fill:'var(--accent)'}));
+
+    oscCaption.textContent = 'x = '+state.x.toFixed(2)+' · amplitude ' + (q>=9.95?'×'+q.toFixed(1):'×'+q.toFixed(2)) + ' static';
+  }
+
+  function tick(ts){
+    rafId = requestAnimationFrame(tick);
+    var dt = lastTs ? Math.min((ts-lastTs)/1000, 0.05) : 0;
+    lastTs = ts;
+    // simulated angular rate scales with the driving ratio so faster driving visibly
+    // oscillates faster; 2.4 is an arbitrary display speed, not a physical unit.
+    simT += dt * (0.6 + state.x*2.4);
+    drawOsc();
+  }
+
+  // ---- equation + legend ----
+  var accent='var(--accent)';
+  var QTerm=$('QTerm'), xTerm1=$('xTerm1'), xTerm2=$('xTerm2'), bTerm1=$('bTerm1');
+  var xLabel=$('xLabel'), bLabel=$('bLabel');
+  var legendEl=$('legend');
+  function activeColor(k){ return state.active===k ? accent : 'var(--fg)'; }
+
+  function drawEquationAndLegend(){
+    QTerm.style.color = 'var(--fg)';
+    xTerm1.style.color = activeColor('x'); xTerm2.style.color = activeColor('x');
+    bTerm1.style.color = activeColor('b');
+    xLabel.style.color = activeColor('x'); bLabel.style.color = activeColor('b');
+
+    var qCur = Q(state.x, state.b);
+    var rows = [
+      {sym:'Q', name:'amplitude, relative to a slow steady push', val:'×'+qCur.toFixed(2), key:null},
+      {sym:'x', name:'driving frequency ω/ω₀', val:state.x.toFixed(2), key:'x'},
+      {sym:'b̂', name:'damping, as a fraction of ω₀', val:state.b.toFixed(2), key:'b'}
+    ];
+    legendEl.innerHTML = '';
+    rows.forEach(function(row){
+      var div = document.createElement('div'); div.className='row';
+      var sym = document.createElement('em'); sym.className='sym'; sym.textContent = row.sym;
+      sym.style.color = row.key ? activeColor(row.key) : 'var(--fg)';
+      var name = document.createElement('span'); name.className='name'; name.textContent = row.name;
+      var val = document.createElement('span'); val.className='val mono'; val.textContent = row.val;
+      div.appendChild(sym); div.appendChild(name); div.appendChild(val);
+      legendEl.appendChild(div);
+    });
+  }
+
+  // ---- sliders ----
+  function makeSlider(key, track, fill, thumb, lo, hi){
+    var dragging = false;
+    function setFromClientX(cx){
+      var r = track.getBoundingClientRect();
+      var f = clamp((cx-r.left)/r.width, 0, 1);
+      var v = lo + f*(hi-lo);
+      v = clamp(Math.round(v*100)/100, lo, hi);
+      if(key==='x') state.x = v; else state.b = v;
+      render();
+    }
+    track.addEventListener('pointerdown', function(e){
+      dragging = true;
+      if(track.setPointerCapture) track.setPointerCapture(e.pointerId);
+      state.drag = key; state.active = key;
+      setFromClientX(e.clientX);
+    });
+    track.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
+    function endDrag(){ if(dragging){ dragging=false; state.drag=null; render(); } }
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+    track.addEventListener('pointerenter', function(){ state.active = key; render(); });
+    track.addEventListener('keydown', function(e){
+      var step = e.shiftKey ? 0.1 : 0.01;
+      var cur = key==='x' ? state.x : state.b;
+      var v = null;
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown') v = cur-step;
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = cur+step;
+      else if(e.key==='Home') v = lo;
+      else if(e.key==='End') v = hi;
+      if(v!==null){ e.preventDefault(); v = clamp(Math.round(v*100)/100, lo, hi); if(key==='x') state.x=v; else state.b=v; render(); }
+    });
+    return {
+      draw: function(){
+        var cur = key==='x' ? state.x : state.b;
+        var pct = ((cur-lo)/(hi-lo)*100).toFixed(2)+'%';
+        fill.style.width = pct; thumb.style.left = pct;
+        track.setAttribute('aria-valuemin', lo);
+        track.setAttribute('aria-valuemax', hi);
+        track.setAttribute('aria-valuenow', cur);
+        track.setAttribute('aria-valuetext', key==='x' ? cur.toFixed(2)+' times the natural frequency' : cur.toFixed(2)+' damping coefficient');
+      }
+    };
+  }
+  var xSlider = makeSlider('x', $('xTrack'), $('xFill'), $('xThumb'), XMIN, XMAX);
+  var bSlider = makeSlider('b', $('bTrack'), $('bFill'), $('bThumb'), BMIN, BMAX);
+
+  [$('xCtrl'), $('bCtrl')].forEach(function(box){
+    box.addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+  });
+
+  // ---- result box ----
+  var qValueEl=$('qValue'), verdictEl=$('verdict'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+  var gReach=$('gReach'), gLimit=$('gLimit'), gLimitLabel=$('gLimitLabel'), gMark=$('gMark'), gMarkLabel=$('gMarkLabel');
+  var gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
+
+  function pos(q){ return clamp(q/YMAX,0,1)*100; }
+
+  function drawResult(){
+    var qCur = Q(state.x, state.b);
+    var peak = peakOf(state.b);
+    var near = Math.abs(qCur - peak.q) < peak.q*0.03;
+    var big = qCur >= 5;
+    var col = big ? 'var(--bad)' : 'var(--fg)';
+
+    qValueEl.textContent = qCur.toFixed(2);
+    qValueEl.style.color = col;
+
+    verdictEl.textContent = big ? 'Running away.' : 'Under control.';
+    verdictEl.style.color = col;
+    verdictSubEl.textContent = near
+      ? 'Essentially at this damping’s peak response.'
+      : (qCur < 1 ? 'Weaker than a slow, steady push would produce.' : (qCur/1).toFixed(1)+'× what a slow steady push would produce.');
+    effortLineEl.textContent = 'peak for this damping: ×'+peak.q.toFixed(1)+' at x = '+peak.x.toFixed(2);
+
+    var markPct = pos(qCur), limitPct = pos(peak.q);
+    gReach.style.width = limitPct.toFixed(2)+'%';
+    gLimit.style.left = limitPct.toFixed(2)+'%';
+    gLimitLabel.style.left = clamp(limitPct,8,80).toFixed(2)+'%';
+    gMark.style.left = markPct.toFixed(2)+'%';
+    gMark.style.background = col;
+    var labelPct = clamp(markPct,4,88);
+    gMarkLabel.style.left = labelPct.toFixed(2)+'%';
+    gMarkLabel.style.transform = markPct>72 ? 'translateX(-100%)' : markPct<20 ? 'translateX(0)' : 'translateX(-50%)';
+    gMarkLabel.style.color = col;
+    gMarkLabel.textContent = '×'+qCur.toFixed(1);
+
+    if(!gTicksEl.dataset.built){
+      var ticksHtml='', labelsHtml='';
+      for(var d=0; d<=YMAX; d+=2){
+        var left = (d/YMAX*100).toFixed(2)+'%';
+        ticksHtml += '<div class="tick" style="left:'+left+'"></div>';
+        if(d%4===0){
+          var tx = d===0 ? 'translateX(0)' : d>=YMAX-2 ? 'translateX(-100%)' : 'translateX(-50%)';
+          labelsHtml += '<div class="ticklabel" style="left:'+left+';transform:'+tx+'">×'+d+'</div>';
+        }
+      }
+      gTicksEl.innerHTML = ticksHtml; gTicksEl.dataset.built='1';
+      gLabelsEl.innerHTML = labelsHtml;
+    }
+  }
+
+  // ---- presets ----
+  var PRESETS = {
+    far:       { x:0.30, b:0.40 },
+    nearlight: { x:0.98, b:0.10 },
+    resheavy:  { x:1.00, b:0.80 },
+    reslight:  { x:1.00, b:0.10 }
+  };
+  document.querySelectorAll('.preset').forEach(function(b){
+    b.addEventListener('click', function(){
+      var p = PRESETS[b.dataset.p];
+      state.x = p.x; state.b = p.b;
+      render();
+    });
+  });
+
+  // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
+  var STORAGE_KEY = 'resonance-theme';
+  var themeToggle = $('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    var applied = document.documentElement.getAttribute('data-theme');
+    if(applied) return applied;
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+
+  // The relative "../index.html" link only resolves when this file is sitting in
+  // Simple_Viz/visualizations/ next to the site index. Published standalone (e.g. as an
+  // Artifact) there's no sibling index to reach, so fall back to the GitHub repo instead of
+  // leaving a link that 404s.
+  (function(){
+    var backLink = document.getElementById('backLink');
+    if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
+      backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
+      backLink.target = '_blank';
+      backLink.rel = 'noopener';
+      backLink.textContent = 'Simple Viz on GitHub ↗';
+    }
+  })();
+
+  function measure(){
+    var w1 = plotWrap.clientWidth, w2 = oscWrap.clientWidth;
+    var changed = false;
+    if(w1 && w1 !== plotW){ plotW = w1; changed = true; }
+    if(w2 && w2 !== oscW){ oscW = w2; changed = true; }
+    if(changed) render();
+  }
+
+  function render(){
+    drawPlot();
+    drawOsc();
+    drawEquationAndLegend();
+    xSlider.draw(); bSlider.draw();
+    $('xReadout').textContent = state.x.toFixed(2)+'×ω₀';
+    $('bReadout').textContent = state.b.toFixed(2);
+    drawResult();
+  }
+
+  new ResizeObserver(measure).observe(plotWrap);
+  new ResizeObserver(measure).observe(oscWrap);
+  window.addEventListener('resize', measure);
+  [60,250,900].forEach(function(t){ setTimeout(measure, t); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  render();
+  // The mass-on-spring animation is a continuous decorative loop illustrating the driving
+  // force in real time, with no pause control of its own (the plot above is the actual
+  // interactive/data-bearing figure) — so it simply doesn't start under reduced motion. The
+  // page still renders correctly at rest: the oscillator sits at its rest position and the
+  // caption still reports the current x and amplitude.
+  if(!reduceMotion) rafId = requestAnimationFrame(tick);
+})();
+</script>

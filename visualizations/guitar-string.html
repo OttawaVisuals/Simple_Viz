@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A string you can actually hear</title>
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  .topgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
+
+  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqn{display:flex;align-items:center;gap:clamp(7px,1vw,12px);font-size:clamp(24px,3vw,36px);line-height:1;font-weight:300}
+  .eqn .eq{color:var(--muted)}
+  .eqn .rad{display:inline-flex;align-items:stretch}
+  .eqn .radsign{position:relative;width:.42em}
+  .eqn .radsign svg{position:absolute;inset:0;width:100%;height:100%;color:var(--fg);display:block}
+  .eqn .radbar{border-top:1.5px solid var(--fg);padding:.1em .12em 0 .06em}
+  .eqn .radinner{display:flex;align-items:center;gap:.1em;padding-top:.08em}
+  .eqn .frac{display:inline-flex;flex-direction:column;align-items:center}
+  .eqn .frac .row{display:flex;gap:.14em;align-items:flex-start}
+  .eqn .frac .bar{height:1.5px;background:var(--fg);width:100%;margin:.05em 0}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:1.6em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:8px 2px}
+  .legend .sym{font-size:17px;font-weight:300;transition:color .2s}
+  .legend .name{font-size:12.5px;color:var(--muted2)}
+  .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero svg{width:100%;height:auto;display:block}
+  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
+  .hero .lblFreq{font-size:clamp(15px,1.8vw,20px);font-weight:500;color:var(--fg)}
+  .playback{display:flex;flex-wrap:wrap;align-items:baseline;gap:14px;margin-top:14px}
+  .playback button{cursor:pointer;background:none;border:0;padding:0 0 2px;color:var(--fg);font:15px/1 Georgia,serif;font-style:italic;border-bottom:1px solid var(--line2)}
+  .playback button:hover{color:var(--accent);border-color:var(--accent)}
+  .playback button:disabled{cursor:default;color:var(--muted);border-color:var(--line);opacity:.55}
+  .playback button:disabled:hover{color:var(--muted);border-color:var(--line)}
+  .playback .sep{color:var(--line2)}
+  .playback .hint{font-size:12px;color:var(--muted)}
+
+  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
+
+  .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;text-transform:none;transition:color .2s}
+  .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
+  .readout{font-family:ui-monospace,monospace;font-size:clamp(26px,2.8vw,34px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
+  .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
+  .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
+  .track .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
+  .track .thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
+  .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
+
+  .result{text-align:left}
+  .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
+  .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
+  .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px;color:var(--accent)}
+  .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
+  .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
+  .gauge{position:relative;height:56px;margin-top:16px;max-width:420px}
+  .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
+  .gauge .tick{position:absolute;top:26px;width:1px;height:5px;background:var(--line2)}
+  .gauge .ticklabel{position:absolute;top:33px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
+  .gauge .mark{position:absolute;top:12px;height:14px;width:3px;border-radius:2px;background:var(--accent);transition:left .12s linear}
+  .gauge .marklabel{position:absolute;top:-3px;white-space:nowrap;font:500 11px ui-monospace,monospace;color:var(--accent);transition:left .12s linear}
+
+  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+  .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
+  .preset:hover{border-color:var(--accent);color:var(--accent)}
+
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../index.html" id="backLink">&larr; Physics you can see</a>
+    <div class="topbar-right">
+      <span>Mersenne&rsquo;s laws</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>A string you can actually <em>hear</em>.</h1>
+      <p class="sub">Change its length and tension, and the note moves with them &mdash; press play to hear the exact pitch this equation predicts.</p>
+    </div>
+
+    <div class="eqnbox">
+      <div class="eqn">
+        <em>f</em>
+        <span class="eq">=</span>
+        <span class="frac">
+          <span class="row num">1</span>
+          <span class="bar"></span>
+          <span class="row den">2<em id="LTerm">L</em></span>
+        </span>
+        <span class="rad">
+          <span class="radsign"><svg viewBox="0 0 22 54" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,32 5,32 11,50 22,0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg></span>
+          <span class="radbar"><span class="radinner">
+            <span class="frac">
+              <span class="row"><em id="TTerm">T</em></span>
+              <span class="bar"></span>
+              <span class="row"><em id="muTerm">&mu;</em></span>
+            </span>
+          </span></span>
+        </span>
+      </div>
+    </div>
+
+    <div class="legendbox">
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="hero" id="heroWrap">
+    <div class="lbl lblFreq" id="lblFreq" style="transform:translateX(-50%)"></div>
+    <div class="lbl" id="lblLen" style="transform:translateX(-50%)"></div>
+    <svg id="heroSvg" role="img" aria-label="A string stretched between two fixed pegs, oscillating in a single arc that stands for its fundamental vibration mode. The animation speed is a stylized visual, not the real acoustic frequency."></svg>
+    <div class="playback">
+      <button id="playBtn" type="button" aria-label="Play the computed note">&#9658; Play note</button>
+      <button id="stopBtn" type="button" aria-label="Stop the note" disabled>&#9632; Stop</button>
+      <span class="sep">&middot;</span>
+      <span class="hint mono">never plays on its own &mdash; press Play to hear it</span>
+    </div>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrls">
+      <div class="ctrl" id="lenCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Length <em id="lLabel">L</em></span>
+          <span class="ctrl-rel">L&#8315;&#185; &prop; f</span>
+        </div>
+        <div class="readout mono" id="lenReadout"></div>
+        <div class="track" id="lenTrack" tabindex="0" role="slider" aria-label="String length">
+          <div class="rail"></div>
+          <div class="fill" id="lenFill"></div>
+          <div class="thumb" id="lenThumb"></div>
+        </div>
+        <div class="track-range"><span>0.30 m</span><span class="mid">shorter &middot; higher pitch</span><span>1.00 m</span></div>
+      </div>
+
+      <div class="ctrl" id="tensCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Tension <em id="tLabel">T</em></span>
+          <span class="ctrl-rel">T&#189; &prop; f</span>
+        </div>
+        <div class="readout mono" id="tensReadout"></div>
+        <div class="track" id="tensTrack" tabindex="0" role="slider" aria-label="String tension">
+          <div class="rail"></div>
+          <div class="fill" id="tensFill"></div>
+          <div class="thumb" id="tensThumb"></div>
+        </div>
+        <div class="track-range"><span>20 N</span><span class="mid">tighter &middot; higher pitch</span><span>150 N</span></div>
+      </div>
+
+      <div class="ctrl" id="muCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Gauge <em id="muLabel">&mu;</em></span>
+          <span class="ctrl-rel">&mu;&#8315;&#189; &prop; f</span>
+        </div>
+        <div class="readout mono" id="muReadout"></div>
+        <div class="track" id="muTrack" tabindex="0" role="slider" aria-label="Linear mass density (string thickness), logarithmic scale">
+          <div class="rail"></div>
+          <div class="fill" id="muFill"></div>
+          <div class="thumb" id="muThumb"></div>
+        </div>
+        <div class="track-range"><span>0.0003 kg/m</span><span class="mid">thinner &middot; higher pitch</span><span>0.01 kg/m</span></div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Fundamental frequency</div>
+      <div class="result-value"><span class="num mono" id="fValue"></span><span class="unit mono">Hz</span><span class="v mono" id="noteBadge"></span></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+      <div class="effort-line" id="effortLine"></div>
+      <div class="gauge" id="gauge">
+        <div class="track"></div>
+        <div class="mark" id="gMark"></div>
+        <div class="marklabel mono" id="gMarkLabel"></div>
+        <div id="gTicks"></div>
+        <div id="gLabels"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-p="lowE">guitar low E</button>
+    <button class="preset" data-p="highE">guitar high E</button>
+    <button class="preset" data-p="bass">a bass string</button>
+    <button class="preset" data-p="tighten">tighten it</button>
+  </div>
+
+  <p class="note">Three relationships govern every stretched string &mdash; <a href="https://en.wikipedia.org/wiki/Mersenne%27s_laws" target="_blank" rel="noopener">Mersenne&rsquo;s laws</a>, first published in 1636: pitch rises as the string gets shorter, as it's pulled tighter, and as it gets thinner (lighter per unit length). Every tuning peg, every string gauge, and every playable scale length on every stringed instrument &mdash; guitar, violin, piano, harp &mdash; is a knob on this one equation. The <a href="https://en.wikipedia.org/wiki/String_vibration" target="_blank" rel="noopener">vibrating string</a> model behind it assumes both ends are rigidly fixed and shows only the fundamental (lowest) mode pictured above; a real plucked or bowed string also rings with overtones layered on top, which is what actually gives an instrument its timbre &mdash; not modeled here. The illustrative T/&mu; pairs on the presets are tuned to land on the real note, not arbitrary round numbers.</p>
+
+</div>
+</main>
+<script>
+(function(){
+  var LMIN=0.30, LMAX=1.00, TMIN=20, TMAX=150;
+  var MULOGMIN=Math.log10(0.0003), MULOGMAX=Math.log10(0.01);
+  var GLOGMIN=Math.log10(27.5), GLOGMAX=Math.log10(4186); // A0..C8, full piano range
+  var SUP='⁰¹²³⁴⁵⁶⁷⁸⁹';
+  var NOTE_NAMES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+  function sup(n){ return String(n).split('').map(function(c){ return c==='-'?'⁻':SUP[+c]; }).join(''); }
+
+  function fmtMu(mu){
+    var e = Math.floor(Math.log10(mu));
+    var m = mu/Math.pow(10,e);
+    return m.toFixed(2)+' &times; 10'+sup(e)+' kg/m';
+  }
+  function fmtHz(f){
+    if(f<100) return f.toFixed(1);
+    if(f<1000) return f.toFixed(f<200?1:0);
+    return f.toFixed(0);
+  }
+  // Equal-temperament nearest-note lookup: n = 49 + 12*log2(f/440) is the standard
+  // piano-key numbering (A4 = key 49); shifting by +20 gives the equivalent MIDI note
+  // number (A4 = 69), which maps cleanly onto a 12-note name cycle plus octave.
+  function noteInfo(f){
+    var nRaw = 49 + 12*Math.log2(f/440);
+    var n = Math.round(nRaw);
+    var exactF = 440*Math.pow(2,(n-49)/12);
+    var m = n+20;
+    var idx = ((m%12)+12)%12;
+    var octave = Math.floor(m/12)-1;
+    var cents = 1200*Math.log2(f/exactF);
+    return { name: NOTE_NAMES[idx]+octave, exactF: exactF, cents: cents };
+  }
+
+  var NS='http://www.w3.org/2000/svg';
+  function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+  function clear(g){ while(g.firstChild) g.removeChild(g.firstChild); }
+
+  // ---- initial state: guitar high E (E4, 329.6 Hz — see presets for the verified numbers) ----
+  var state = { L:0.648, T:60.2, muLog: Math.log10(0.000330), active:null, drag:null };
+  var heroW = 0;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
+  var lblFreq=$('lblFreq'), lblLen=$('lblLen');
+
+  function mu(){ return Math.pow(10, state.muLog); }
+  function freq(){ return (1/(2*state.L)) * Math.sqrt(state.T/mu()); }
+
+  // ---- hero geometry: viewBox width == measured CSS px width, so 1 unit = 1px ----
+  function geom(w){
+    var narrow = w < 620;
+    var padX = narrow ? 24 : 40;
+    var span = Math.max(120, w - padX*2);
+    var frac = (state.L-LMIN)/(LMAX-LMIN);
+    var stringW = span*(0.32+0.68*frac);
+    var cy = narrow ? 78 : 96;
+    var startX = padX + (span-stringW)/2;
+    // tighter tension -> stiffer string -> smaller visible amplitude; looser -> larger
+    var tFrac = (state.T-TMIN)/(TMAX-TMIN);
+    var ampPx = (narrow ? 20 : 32) - (narrow?7:12)*tFrac;
+    // thicker gauge (higher mu) -> visibly thicker drawn string
+    var muFrac = (state.muLog-MULOGMIN)/(MULOGMAX-MULOGMIN);
+    var strokeW = 1.6 + 4.4*muFrac;
+    var vbH = cy + (narrow?46:60);
+    return { w:w, vbH:vbH, startX:startX, stringW:stringW, cy:cy, ampPx:ampPx, strokeW:strokeW, pegR: narrow?4:5 };
+  }
+
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var phase = 0, H = null;
+
+  function stringPath(h, envelope){
+    var N = 48, pts=[];
+    for(var i=0;i<=N;i++){
+      var x = h.stringW*i/N;
+      var y = h.ampPx*envelope*Math.sin(Math.PI*x/h.stringW);
+      pts.push((h.startX+x).toFixed(2)+','+(h.cy-y).toFixed(2));
+    }
+    return 'M'+pts.join(' L');
+  }
+
+  function drawStatic(){
+    var w = heroW || heroWrap.clientWidth || 1100;
+    var h = geom(w); H = h;
+    clear(heroSvg);
+    heroSvg.setAttribute('viewBox','0 0 '+w+' '+h.vbH);
+
+    // rest baseline (dashed)
+    heroSvg.appendChild(el('line',{x1:h.startX,y1:h.cy,x2:h.startX+h.stringW,y2:h.cy,
+      stroke:'var(--line2)','stroke-width':1,'stroke-dasharray':'2 5'}));
+
+    // pegs
+    heroSvg.appendChild(el('circle',{cx:h.startX,cy:h.cy,r:h.pegR,fill:'var(--fg)'}));
+    heroSvg.appendChild(el('circle',{cx:h.startX+h.stringW,cy:h.cy,r:h.pegR,fill:'var(--fg)'}));
+
+    // vibrating string, positioned by drawString()
+    heroSvg.appendChild(el('path',{id:'stringPath', fill:'none', stroke:'var(--accent)', 'stroke-width':h.strokeW, 'stroke-linecap':'round'}));
+
+    // length dimension ticks
+    heroSvg.appendChild(el('line',{x1:h.startX,y1:h.cy+16,x2:h.startX,y2:h.cy+24, stroke:'var(--line2)','stroke-width':1}));
+    heroSvg.appendChild(el('line',{x1:h.startX+h.stringW,y1:h.cy+16,x2:h.startX+h.stringW,y2:h.cy+24, stroke:'var(--line2)','stroke-width':1}));
+    heroSvg.appendChild(el('line',{x1:h.startX,y1:h.cy+20,x2:h.startX+h.stringW,y2:h.cy+20, stroke:'var(--line2)','stroke-width':1}));
+
+    var px=function(x){return (x/w*100)+'%';}, py=function(y){return (y/h.vbH*100)+'%';};
+    lblFreq.style.left = px(h.startX+h.stringW/2); lblFreq.style.top = py(h.cy-h.ampPx-24);
+    lblLen.style.left = px(h.startX+h.stringW/2); lblLen.style.top = py(h.cy+26);
+    lblLen.textContent = state.L.toFixed(3)+' m';
+
+    drawString();
+  }
+
+  function drawString(){
+    if(!H) return;
+    var envelope = reduceMotion ? 0.8 : Math.sin(phase);
+    var p = $('stringPath');
+    if(p) p.setAttribute('d', stringPath(H, envelope));
+    var ni = noteInfo(freq());
+    lblFreq.textContent = fmtHz(freq())+' Hz — close to '+ni.name;
+  }
+
+  function tick(ts){
+    requestAnimationFrame(tick);
+    // Purely decorative pulsation of the fundamental-mode shape — a slow, legible stand-in
+    // for the real acoustic frequency (hundreds of Hz, far too fast to animate visibly).
+    // Displayed numbers everywhere else on the page are exact; this rate is not.
+    var f = freq();
+    var visHz = clamp(0.35 + 0.55*Math.log10(f/20), 0.3, 2.6);
+    phase += visHz * 0.10;
+    drawString();
+    updateLiveFreq();
+  }
+
+  // ---- equation + legend ----
+  var accent='var(--accent)';
+  var LTerm=$('LTerm'), TTerm=$('TTerm'), muTerm=$('muTerm');
+  var lLabel=$('lLabel'), tLabel=$('tLabel'), muLabel=$('muLabel');
+  var legendEl=$('legend');
+  function activeColor(k){ return state.active===k ? accent : 'var(--fg)'; }
+
+  function drawEquationAndLegend(){
+    LTerm.style.color=activeColor('L'); TTerm.style.color=activeColor('T'); muTerm.style.color=activeColor('mu');
+    lLabel.style.color=activeColor('L'); tLabel.style.color=activeColor('T'); muLabel.style.color=activeColor('mu');
+
+    var rows = [
+      {sym:'f', name:'fundamental frequency', val:fmtHz(freq())+' Hz', key:null},
+      {sym:'L', name:'string length', val:state.L.toFixed(3)+' m', key:'L'},
+      {sym:'T', name:'tension', val:state.T.toFixed(1)+' N', key:'T'},
+      {sym:'μ', name:'linear mass density', val:'', key:'mu', html:fmtMu(mu())}
+    ];
+    legendEl.innerHTML='';
+    rows.forEach(function(row){
+      var div=document.createElement('div'); div.className='row';
+      var sym=document.createElement('em'); sym.className='sym'; sym.textContent=row.sym;
+      sym.style.color = row.key ? activeColor(row.key) : 'var(--fg)';
+      var name=document.createElement('span'); name.className='name'; name.textContent=row.name;
+      var val=document.createElement('span'); val.className='val mono';
+      if(row.html) val.innerHTML=row.html; else val.textContent=row.val;
+      div.appendChild(sym); div.appendChild(name); div.appendChild(val);
+      legendEl.appendChild(div);
+    });
+  }
+
+  // ---- sliders ----
+  function makeSlider(key, track, fill, thumb, lo, hi, step){
+    var dragging=false;
+    function getRaw(){ return key==='mu' ? state.muLog : (key==='L' ? state.L : state.T); }
+    function setRaw(v){ if(key==='mu') state.muLog=v; else if(key==='L') state.L=v; else state.T=v; }
+    function setFromClientX(x){
+      var r=track.getBoundingClientRect();
+      var f=clamp((x-r.left)/r.width,0,1);
+      var v = lo+f*(hi-lo);
+      v = clamp(Math.round(v/step)*step, lo, hi);
+      setRaw(v);
+      render();
+    }
+    track.addEventListener('pointerdown', function(e){
+      dragging=true; if(track.setPointerCapture) track.setPointerCapture(e.pointerId);
+      state.active=key; state.drag=key; setFromClientX(e.clientX);
+    });
+    track.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
+    function endDrag(){ if(dragging){ dragging=false; state.drag=null; render(); } }
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+    track.addEventListener('pointerenter', function(){ state.active=key; render(); });
+    track.addEventListener('keydown', function(e){
+      var bigStep = step*10;
+      var s = e.shiftKey ? bigStep : step;
+      var cur = getRaw(), v=null;
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown') v=cur-s;
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp') v=cur+s;
+      else if(e.key==='Home') v=lo;
+      else if(e.key==='End') v=hi;
+      if(v!==null){ e.preventDefault(); v=clamp(Math.round(v/step)*step, lo, hi); setRaw(v); render(); }
+    });
+    return { draw:function(){
+      var cur = getRaw();
+      var pct = ((cur-lo)/(hi-lo)*100).toFixed(2)+'%';
+      fill.style.width=pct; thumb.style.left=pct;
+      track.setAttribute('aria-valuemin',lo); track.setAttribute('aria-valuemax',hi);
+      track.setAttribute('aria-valuenow',cur);
+      var text = key==='L' ? state.L.toFixed(3)+' metres'
+        : key==='T' ? state.T.toFixed(1)+' newtons'
+        : fmtMu(mu()).replace('&times;','times');
+      track.setAttribute('aria-valuetext', text);
+    }};
+  }
+  var lenSlider = makeSlider('L', $('lenTrack'), $('lenFill'), $('lenThumb'), LMIN, LMAX, 0.001);
+  var tensSlider = makeSlider('T', $('tensTrack'), $('tensFill'), $('tensThumb'), TMIN, TMAX, 0.1);
+  var muSlider = makeSlider('mu', $('muTrack'), $('muFill'), $('muThumb'), MULOGMIN, MULOGMAX, 0.001);
+
+  [$('lenCtrl'), $('tensCtrl'), $('muCtrl')].forEach(function(box){
+    box.addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+  });
+
+  // ---- result ----
+  var fValue=$('fValue'), noteBadge=$('noteBadge'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+  var gMark=$('gMark'), gMarkLabel=$('gMarkLabel'), gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
+
+  function pos(f){ return clamp((Math.log10(f)-GLOGMIN)/(GLOGMAX-GLOGMIN),0,1)*100; }
+
+  function drawResult(){
+    var f = freq();
+    var ni = noteInfo(f);
+    fValue.textContent = fmtHz(f);
+    noteBadge.textContent = '≈ '+ni.name;
+    var centsTxt = Math.abs(ni.cents)<1 ? 'almost exactly on pitch' : (Math.abs(ni.cents).toFixed(0)+' cents '+(ni.cents>0?'sharp of':'flat of')+' standard '+ni.name+' ('+ni.exactF.toFixed(2)+' Hz)');
+    verdictSubEl.textContent = centsTxt+'.';
+    effortLineEl.textContent = 'wavelength λ = 2L = '+(2*state.L).toFixed(3)+' m';
+
+    var markPct = pos(f);
+    gMark.style.left = markPct.toFixed(2)+'%';
+    var labelPct = clamp(markPct,4,88);
+    gMarkLabel.style.left = labelPct.toFixed(2)+'%';
+    gMarkLabel.style.transform = markPct>72 ? 'translateX(-100%)' : markPct<20 ? 'translateX(0)' : 'translateX(-50%)';
+    gMarkLabel.textContent = fmtHz(f)+' Hz';
+
+    if(!gTicksEl.dataset.built){
+      var landmarks = [{f:27.5,l:'A0'},{f:110,l:'A2'},{f:440,l:'A4'},{f:1760,l:'A6'},{f:4186,l:'C8'}];
+      var t_='', lb='';
+      landmarks.forEach(function(m){
+        var left = pos(m.f).toFixed(2)+'%';
+        t_ += '<div class="tick" style="left:'+left+'"></div>';
+        var tx = m.f<=27.5 ? 'translateX(0)' : m.f>=4186 ? 'translateX(-100%)' : 'translateX(-50%)';
+        lb += '<div class="ticklabel" style="left:'+left+';transform:'+tx+'">'+m.l+'</div>';
+      });
+      gTicksEl.innerHTML=t_; gTicksEl.dataset.built='1'; gLabelsEl.innerHTML=lb;
+    }
+  }
+
+  // ---- presets: T/μ pairs verified against f = (1/2L)·√(T/μ) to land on the real note ----
+  var PRESETS = {
+    lowE:    { L:0.648, T:67.3, mu:0.00590 },   // → 82.4 Hz ≈ E2
+    highE:   { L:0.648, T:60.2, mu:0.000330 },  // → 329.6 Hz ≈ E4
+    bass:    { L:0.864, T:85,   mu:0.0075 },    // → 61.6 Hz ≈ B1 (longer, thicker, lower)
+    tighten: { L:0.648, T:150,  mu:0.00590 }    // same L/μ as low E, tension near max → 123 Hz
+  };
+  document.querySelectorAll('.preset').forEach(function(b){
+    b.addEventListener('click', function(){
+      var p = PRESETS[b.dataset.p];
+      state.L=p.L; state.T=p.T; state.muLog=Math.log10(p.mu);
+      render();
+    });
+  });
+
+  // ---- Web Audio: a genuinely user-triggered tone, never autoplayed ----
+  var audioCtx=null, osc=null, gainNode=null, playing=false;
+  var ATTACK=0.015, RELEASE=0.02, PEAK_GAIN=0.18;
+  var playBtn=$('playBtn'), stopBtn=$('stopBtn');
+
+  function ensureCtx(){
+    if(!audioCtx){
+      var AC = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new AC();
+    }
+    if(audioCtx.state==='suspended') audioCtx.resume();
+    return audioCtx;
+  }
+  function startNote(){
+    if(playing) return;
+    var ctx = ensureCtx();
+    osc = ctx.createOscillator();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq(), ctx.currentTime);
+    gainNode = ctx.createGain();
+    gainNode.gain.setValueAtTime(0, ctx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(PEAK_GAIN, ctx.currentTime+ATTACK);
+    osc.connect(gainNode); gainNode.connect(ctx.destination);
+    osc.start();
+    playing = true;
+    updatePlayButtons();
+  }
+  function stopNote(){
+    if(!playing || !audioCtx || !gainNode) return;
+    var now = audioCtx.currentTime;
+    gainNode.gain.cancelScheduledValues(now);
+    gainNode.gain.setValueAtTime(gainNode.gain.value, now);
+    gainNode.gain.linearRampToValueAtTime(0, now+RELEASE);
+    var o = osc;
+    setTimeout(function(){ try{ o.stop(); }catch(e){} }, RELEASE*1000+40);
+    osc=null; gainNode=null;
+    playing = false;
+    updatePlayButtons();
+  }
+  function updateLiveFreq(){
+    if(playing && osc && audioCtx) osc.frequency.setValueAtTime(freq(), audioCtx.currentTime);
+  }
+  function updatePlayButtons(){
+    playBtn.disabled = playing;
+    stopBtn.disabled = !playing;
+  }
+  playBtn.addEventListener('click', startNote);
+  stopBtn.addEventListener('click', stopNote);
+  document.addEventListener('visibilitychange', function(){ if(document.hidden) stopNote(); });
+
+  // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
+  var STORAGE_KEY = 'guitar-string-theme';
+  var themeToggle = $('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    var applied = document.documentElement.getAttribute('data-theme');
+    if(applied) return applied;
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+
+  // The relative "../index.html" link only resolves when this file is sitting in
+  // Simple_Viz/visualizations/ next to the site index. Published standalone (e.g. as an
+  // Artifact) there's no sibling index to reach, so fall back to the GitHub repo instead of
+  // leaving a link that 404s.
+  (function(){
+    var backLink = document.getElementById('backLink');
+    if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
+      backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
+      backLink.target = '_blank';
+      backLink.rel = 'noopener';
+      backLink.textContent = 'Simple Viz on GitHub ↗';
+    }
+  })();
+
+  function measure(){
+    var w = heroWrap.clientWidth;
+    if(w && w !== heroW){ heroW = w; render(); }
+  }
+
+  function render(){
+    drawStatic();
+    drawEquationAndLegend();
+    lenSlider.draw(); tensSlider.draw(); muSlider.draw();
+    $('lenReadout').textContent = state.L.toFixed(3)+' m';
+    $('tensReadout').textContent = state.T.toFixed(1)+' N';
+    $('muReadout').innerHTML = fmtMu(mu());
+    drawResult();
+    updateLiveFreq();
+  }
+
+  new ResizeObserver(measure).observe(heroWrap);
+  window.addEventListener('resize', measure);
+  [60,250,900].forEach(function(t){ setTimeout(measure, t); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  render();
+  // The string's pulsation is a continuous decorative loop with no pause control (like the
+  // orbiting planet in keplers-third-law.html), so it's gated on prefers-reduced-motion: under
+  // reduced motion the shape freezes at a fixed non-zero envelope (still showing the arc,
+  // per drawString()) and the rAF loop below is simply never started. Sound is independent of
+  // this — it only ever plays after an explicit Play-button press, regardless of motion
+  // preference, so reduced motion never blocks the intended interaction.
+  if(!reduceMotion) requestAnimationFrame(tick);
+})();
+</script>
+</html>

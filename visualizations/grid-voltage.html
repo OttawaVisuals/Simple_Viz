@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why the grid runs at 400,000 volts</title>
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  .topgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
+
+  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqn{display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);font-size:clamp(30px,4vw,46px);line-height:1;font-weight:300}
+  .eqn .eq{color:var(--muted)}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .eqn sup{font-size:.5em;position:relative;top:-.5em}
+  .eqn sub{font-size:.5em;position:relative;top:.45em}
+
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:1.6em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:8px 2px}
+  .legend .sym{font-size:17px;font-weight:300;transition:color .2s}
+  .legend .name{font-size:12.5px;color:var(--muted2)}
+  .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero svg{width:100%;height:auto;display:block}
+  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
+
+  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
+
+  .ctrls{display:grid;grid-template-columns:1fr;gap:clamp(14px,2vw,20px)}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;text-transform:none;transition:color .2s}
+  .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
+  .readout{font-family:ui-monospace,monospace;font-size:clamp(26px,2.8vw,34px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
+  .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
+  .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
+  .track .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
+  .track .thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
+  .track .vtick{position:absolute;top:16px;width:1px;height:6px;background:var(--line2)}
+  .track .vticklabel{position:absolute;top:22px;font:400 10px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+  .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
+
+  .result{text-align:left}
+  .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
+  .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
+  .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px}
+  .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
+  .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
+  .gauge{position:relative;height:56px;margin-top:16px;max-width:420px}
+  .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
+  .gauge .reach{position:absolute;top:14px;height:10px;border-radius:2px 0 0 2px;background:color-mix(in srgb, var(--accent) 16%, transparent);left:0}
+  .gauge .tick{position:absolute;top:26px;width:1px;height:5px;background:var(--line2)}
+  .gauge .ticklabel{position:absolute;top:33px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
+  .gauge .limit{position:absolute;top:9px;height:20px;width:1px;background:var(--bad)}
+  .gauge .limitlabel{position:absolute;top:0;white-space:nowrap;font:400 9px ui-monospace,monospace;letter-spacing:.05em;color:var(--bad)}
+  .gauge .mark{position:absolute;top:12px;height:14px;width:3px;border-radius:2px;transition:left .12s linear}
+  .gauge .marklabel{position:absolute;top:-3px;white-space:nowrap;font:500 11px ui-monospace,monospace;transition:left .12s linear}
+
+  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+  .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
+  .preset:hover{border-color:var(--accent);color:var(--accent)}
+  .preset .pv{font-family:ui-monospace,monospace;font-size:11px;font-style:normal;color:var(--muted);margin-left:4px}
+
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+
+  .footer{margin-top:clamp(40px,4.6vw,64px);padding-top:18px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr 1fr;gap:clamp(20px,3vw,40px);font-family:ui-monospace,monospace;font-size:12px;line-height:1.7;color:var(--muted)}
+  @media (max-width:700px){.footer{grid-template-columns:1fr;gap:14px}}
+  .footer a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .footer a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  .footer .coffee{opacity:.72;font-size:11.5px}
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../index.html" id="backLink">&larr; Physics you can see</a>
+    <div class="topbar-right">
+      <span>Joule heating &middot; I&sup2;R loss</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>Why the grid runs at <em>400,000 volts</em>.</h1>
+      <p class="sub">Push the same 500&nbsp;MW down the same wire &mdash; only the voltage changes. Since current falls as voltage rises (P&nbsp;=&nbsp;VI), and resistive loss goes as the <em style="font-style:italic">square</em> of current, a 10&times; step up in voltage leaves just 1/100th the loss.</p>
+    </div>
+
+    <div class="eqnbox">
+      <div class="eqn">
+        <span>P<sub>loss</sub></span>
+        <span class="eq">=</span>
+        <em id="ITerm">I</em><sup>2</sup>
+        <em id="RTerm">R</em>
+      </div>
+    </div>
+
+    <div class="legendbox">
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="hero" id="heroWrap">
+    <div class="lbl" id="lblLeft">power station</div>
+    <div class="lbl" id="lblRight">to city / distribution</div>
+    <div class="lbl" id="lblCurrent"></div>
+    <div class="lbl" id="lblVoltage"></div>
+    <svg id="heroSvg" role="img" aria-label="A transmission line between two pylons, whose wire thickness, glow, and current-flow dash density increase as transmission voltage is lowered.">
+      <line id="groundLine" stroke="var(--line)" stroke-width="1"></line>
+      <path id="wireGlow" fill="none" stroke-linecap="round"></path>
+      <path id="wireLine" fill="none" stroke-linecap="round"></path>
+      <path id="wireDash" fill="none" stroke-linecap="round"></path>
+      <polyline id="pylonL1" fill="none" stroke="var(--line2)" stroke-width="1.5"></polyline>
+      <polyline id="pylonL2" fill="none" stroke="var(--line2)" stroke-width="1.5"></polyline>
+      <line id="armL" stroke="var(--line2)" stroke-width="1.5"></line>
+      <polyline id="pylonR1" fill="none" stroke="var(--line2)" stroke-width="1.5"></polyline>
+      <polyline id="pylonR2" fill="none" stroke="var(--line2)" stroke-width="1.5"></polyline>
+      <line id="armR" stroke="var(--line2)" stroke-width="1.5"></line>
+      <circle id="xfL1" fill="none" stroke="var(--line2)" stroke-width="1.25"></circle>
+      <circle id="xfL2" fill="none" stroke="var(--line2)" stroke-width="1.25"></circle>
+      <circle id="xfR1" fill="none" stroke="var(--line2)" stroke-width="1.25"></circle>
+      <circle id="xfR2" fill="none" stroke="var(--line2)" stroke-width="1.25"></circle>
+    </svg>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrls">
+      <div class="ctrl" id="vCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Transmission voltage <em id="VLabel">V</em></span>
+          <span class="ctrl-rel">V &uarr; 10&times; &rArr; loss &darr; 100&times;</span>
+        </div>
+        <div class="readout mono" id="vReadout"></div>
+        <div class="track" id="vTrack" tabindex="0" role="slider" aria-label="Transmission voltage">
+          <div class="rail"></div>
+          <div class="fill" id="vFill"></div>
+          <div id="vTicks"></div>
+          <div class="thumb" id="vThumb"></div>
+        </div>
+        <div class="track-range"><span>11 kV</span><span class="mid">distribution &nbsp;&harr;&nbsp; ultra-high-voltage transmission</span><span>765 kV</span></div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Resistive (I&sup2;R) loss</div>
+      <div class="result-value"><span class="num mono" id="pctValue"></span><span class="unit mono" id="pctUnit">%</span><span class="v" id="verdict"></span></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+      <div class="effort-line" id="effortLine"></div>
+      <div class="gauge" id="gauge">
+        <div class="track"></div>
+        <div class="reach" id="gReach"></div>
+        <div class="limit" id="gLimit"></div>
+        <div class="limitlabel" id="gLimitLabel">~5% economical</div>
+        <div class="mark" id="gMark"></div>
+        <div class="marklabel mono" id="gMarkLabel"></div>
+        <div id="gTicks"></div>
+        <div id="gLabels"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-v="11000">11 kV<span class="pv" id="pv0"></span></button>
+    <button class="preset" data-v="33000">33 kV<span class="pv" id="pv1"></span></button>
+    <button class="preset" data-v="132000">132 kV<span class="pv" id="pv2"></span></button>
+    <button class="preset" data-v="400000">400 kV<span class="pv" id="pv3"></span></button>
+    <button class="preset" data-v="765000">765 kV<span class="pv" id="pv4"></span></button>
+  </div>
+
+  <p class="note">This models pure <a href="https://en.wikipedia.org/wiki/Joule_heating" target="_blank" rel="noopener">Joule heating (I&sup2;R loss)</a> in the conductor itself &mdash; it leaves out corona discharge and transformer core losses, which are real but comparatively small. P&nbsp;=&nbsp;500&nbsp;MW is representative of one large power-station unit; R&nbsp;=&nbsp;15&nbsp;&Omega; represents one specific, fixed wire &mdash; a ~300&nbsp;km line at roughly 0.05&nbsp;&Omega;/km, a plausible resistance for a large overhead conductor &mdash; held constant on purpose, so the only thing changing across the slider is voltage, matching the "same wire" framing above. Since I&nbsp;=&nbsp;P/V, loss&nbsp;=&nbsp;I&sup2;R&nbsp;=&nbsp;R(P/V)&sup2;, which is why doubling voltage always quarters the loss, independent of P or R. The ~5% line on the gauge is a common informal ceiling engineers use for "economical" line loss, not a hard regulatory limit; at low, distribution-class voltages, 500&nbsp;MW over 300&nbsp;km would draw more current than any real conductor of this resistance could carry without failing &mdash; which is exactly why bulk power is never actually sent that way. This is also why the grid uses step-up transformers to reach transmission voltage for the long haul, then step-down transformers to bring it back down near the load, where I&sup2;R no longer matters because the distances are short.</p>
+
+  <div class="footer">
+    <span>Spot a mistake or have an idea for a page? <a href="#">Send feedback</a> or write to <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.</span>
+    <span>Built with the help of AI, fact-checked by hand &mdash; if something looks off, that's on me, so tell me.</span>
+    <span class="coffee">If this was useful, you can <a href="#">buy me a coffee</a> &mdash; entirely optional.</span>
+  </div>
+
+</div>
+</main>
+<script>
+(function(){
+  var P = 5e8;      // 500 MW delivered power, held fixed
+  var R = 15;        // ohms, one fixed wire (~300 km at ~0.05 ohm/km)
+  var VMIN = 11000, VMAX = 765000;
+  var LOGMIN = Math.log10(VMIN), LOGMAX = Math.log10(VMAX);
+  var STD = [
+    {v:11000,  label:'11 kV'},
+    {v:33000,  label:'33 kV'},
+    {v:132000, label:'132 kV'},
+    {v:400000, label:'400 kV'},
+    {v:765000, label:'765 kV'}
+  ];
+  var GLOGMIN = -1, GLOGMAX = 4; // gauge: 0.1% .. 10,000% of delivered power
+  var ECON_PCT = 5; // informal "economical" I2R loss ceiling, stated in the note
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+
+  function V(){ return Math.pow(10, state.logV); }
+  function I(v){ return P/(v===undefined?V():v); }
+  function lossW(v){ var i=I(v); return i*i*R; }
+  function lossPct(v){ return lossW(v)/P*100; }
+
+  function fmtkV(v){
+    var kv = v/1000;
+    var d = kv>=100 ? 0 : (kv>=10 ? 1 : 2);
+    return kv.toFixed(d)+' kV';
+  }
+  function fmtA(i){
+    if(i>=1000) return (i/1000).toFixed(i>=10000?1:2)+' kA';
+    return Math.round(i)+' A';
+  }
+  function fmtW(w){
+    if(w>=1e9) return [(w/1e9).toPrecision(3),'GW'];
+    if(w>=1e6) return [(w/1e6).toPrecision(3),'MW'];
+    if(w>=1e3) return [(w/1e3).toPrecision(3),'kW'];
+    return [w.toFixed(0),'W'];
+  }
+  function fmtPct(p){
+    if(p>=1000) return Math.round(p).toLocaleString();
+    if(p>=100) return p.toFixed(0);
+    if(p>=10) return p.toFixed(1);
+    return p.toFixed(2);
+  }
+
+  var NS='http://www.w3.org/2000/svg';
+
+  var state = { logV: Math.log10(400000), active:null, drag:false };
+  var heroW = 0;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
+  var groundLine=$('groundLine'), wireGlow=$('wireGlow'), wireLine=$('wireLine'), wireDash=$('wireDash');
+  var pylonL1=$('pylonL1'), pylonL2=$('pylonL2'), armL=$('armL'), pylonR1=$('pylonR1'), pylonR2=$('pylonR2'), armR=$('armR');
+  var xfL1=$('xfL1'), xfL2=$('xfL2'), xfR1=$('xfR1'), xfR2=$('xfR2');
+  var lblLeft=$('lblLeft'), lblRight=$('lblRight'), lblCurrent=$('lblCurrent'), lblVoltage=$('lblVoltage');
+
+  // t: 0 at the coolest/thinnest (765 kV, lowest current) to 1 at the hottest/thickest
+  // (11 kV, highest current), on a log scale of current since I spans ~70x across the range.
+  var LOGIMIN = Math.log10(I(VMAX)), LOGIMAX = Math.log10(I(VMIN));
+  function heatT(){
+    return clamp((Math.log10(I())-LOGIMIN)/(LOGIMAX-LOGIMIN), 0, 1);
+  }
+
+  function geom(w){
+    var narrow = w < 620;
+    var baseY = narrow ? 118 : 138;
+    var towerH = narrow ? 62 : 82;
+    var topY = baseY - towerH;
+    var lx = narrow ? 42 : 66;
+    var rx = w - (narrow ? 42 : 66);
+    var legSpread = narrow ? 16 : 24;
+    var armY = topY + (narrow?10:14);
+    var armHalf = narrow ? 13 : 19;
+    var sag = 14 + (rx-lx)*0.02;
+    var midX = (lx+rx)/2;
+    var wireY = armY - (narrow?6:8);
+    var wireMidY = wireY + sag;
+    return {
+      w:w, vbH: baseY+18, baseY:baseY, lx:lx, rx:rx,
+      pylonL: [ (lx-legSpread)+','+baseY, lx+','+topY, (lx+legSpread)+','+baseY ].join(' '),
+      pylonL2: [ lx+','+topY, lx+','+baseY ].join(' '),
+      pylonR: [ (rx-legSpread)+','+baseY, rx+','+topY, (rx+legSpread)+','+baseY ].join(' '),
+      pylonR2: [ rx+','+topY, rx+','+baseY ].join(' '),
+      armLx1: lx-armHalf, armLx2: lx+armHalf, armY: armY,
+      armRx1: rx-armHalf, armRx2: rx+armHalf,
+      wireD: 'M '+lx+' '+wireY+' Q '+midX+' '+wireMidY+' '+rx+' '+wireY,
+      wireY: wireY, midX: midX, wireMidY: wireMidY,
+      xfR: narrow?5:6,
+      xfLy: baseY-(narrow?5:6), xfRy: baseY-(narrow?5:6)
+    };
+  }
+
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var dashOff = 0, rafId = null;
+  function tick(){
+    rafId = requestAnimationFrame(tick);
+    dashOff -= 1.1;
+    wireDash.style.strokeDashoffset = dashOff.toFixed(2)+'px';
+  }
+
+  function measure(){
+    var w = heroWrap.clientWidth;
+    if(w && w !== heroW){ heroW = w; render(); }
+  }
+
+  function drawHero(){
+    var w = heroW || heroWrap.clientWidth || 1100;
+    var h = geom(w);
+    var t = heatT();
+
+    heroSvg.setAttribute('viewBox','0 0 '+w+' '+h.vbH);
+    heroSvg.setAttribute('preserveAspectRatio','none');
+
+    groundLine.setAttribute('x1',0); groundLine.setAttribute('x2',w);
+    groundLine.setAttribute('y1',h.baseY); groundLine.setAttribute('y2',h.baseY);
+
+    pylonL1.setAttribute('points', h.pylonL);
+    pylonL2.setAttribute('points', h.pylonL2);
+    pylonR1.setAttribute('points', h.pylonR);
+    pylonR2.setAttribute('points', h.pylonR2);
+    armL.setAttribute('x1',h.armLx1); armL.setAttribute('x2',h.armLx2); armL.setAttribute('y1',h.armY); armL.setAttribute('y2',h.armY);
+    armR.setAttribute('x1',h.armRx1); armR.setAttribute('x2',h.armRx2); armR.setAttribute('y1',h.armY); armR.setAttribute('y2',h.armY);
+
+    [[xfL1,h.lx-h.xfR*0.9],[xfL2,h.lx+h.xfR*0.9]].forEach(function(p){
+      p[0].setAttribute('cx',p[1]); p[0].setAttribute('cy',h.xfLy); p[0].setAttribute('r',h.xfR);
+    });
+    [[xfR1,h.rx-h.xfR*0.9],[xfR2,h.rx+h.xfR*0.9]].forEach(function(p){
+      p[0].setAttribute('cx',p[1]); p[0].setAttribute('cy',h.xfRy); p[0].setAttribute('r',h.xfR);
+    });
+
+    var strokeW = 2.6 + t*10.5;
+    var wireColor = 'color-mix(in srgb, var(--bad) '+(t*100).toFixed(0)+'%, var(--fg) '+(100-t*100).toFixed(0)+'%)';
+
+    wireLine.setAttribute('d', h.wireD);
+    wireLine.setAttribute('stroke', wireColor);
+    wireLine.setAttribute('stroke-width', strokeW.toFixed(2));
+
+    wireGlow.setAttribute('d', h.wireD);
+    wireGlow.setAttribute('stroke', 'var(--bad)');
+    wireGlow.setAttribute('stroke-width', (strokeW*2.6).toFixed(2));
+    wireGlow.setAttribute('opacity', (t*0.28).toFixed(2));
+
+    var dashLen = 9, gapLen = 32 - t*24;
+    wireDash.setAttribute('d', h.wireD);
+    wireDash.setAttribute('stroke', 'var(--bg)');
+    wireDash.setAttribute('stroke-width', Math.max(1.5, strokeW*0.34).toFixed(2));
+    wireDash.setAttribute('stroke-dasharray', dashLen+' '+gapLen.toFixed(1));
+    wireDash.setAttribute('opacity', 0.75);
+
+    var px = function(x){ return (x/w*100)+'%'; };
+    var py = function(y){ return (y/h.vbH*100)+'%'; };
+    lblLeft.style.left = px(h.lx); lblLeft.style.top = py(h.baseY+10); lblLeft.style.transform='translateX(-50%)';
+    lblRight.style.left = px(h.rx); lblRight.style.top = py(h.baseY+10); lblRight.style.transform='translateX(-50%)';
+    lblCurrent.style.left = px(h.midX); lblCurrent.style.top = py(h.wireMidY+10); lblCurrent.style.transform='translateX(-50%)';
+    lblCurrent.textContent = 'I = '+fmtA(I());
+    lblCurrent.style.color = t>0.5 ? 'var(--bad)' : 'var(--muted)';
+    lblVoltage.style.left = px(h.midX); lblVoltage.style.top = py(h.wireY-16); lblVoltage.style.transform='translateX(-50%)';
+    lblVoltage.textContent = 'V = '+fmtkV(V());
+  }
+
+  // ---- equation colouring (V's control also lights up I, since I = P/V) ----
+  var ITerm=$('ITerm'), RTerm=$('RTerm'), VLabel=$('VLabel');
+  var legendEl = $('legend');
+  var accent = 'var(--accent)';
+  function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
+
+  function drawEquationAndLegend(){
+    ITerm.style.color = activeColor('V');
+    VLabel.style.color = activeColor('V');
+    RTerm.style.color = 'var(--fg)';
+
+    var rows = [
+      {sym:'V', name:'transmission voltage (the slider)', val: fmtkV(V()), key:'V'},
+      {sym:'I', name:'current, I = P / V', val: fmtA(I()), key:'V'},
+      {sym:'R', name:'line resistance (fixed)', val: R.toFixed(0)+' Ω', key:null},
+      {sym:'P', name:'power delivered (fixed)', val: '500 MW', key:null}
+    ];
+    legendEl.innerHTML = '';
+    rows.forEach(function(row){
+      var div = document.createElement('div'); div.className='row';
+      var sym = document.createElement('em'); sym.className='sym'; sym.textContent = row.sym;
+      sym.style.color = row.key ? activeColor(row.key) : 'var(--fg)';
+      var name = document.createElement('span'); name.className='name'; name.textContent = row.name;
+      var val = document.createElement('span'); val.className='val mono'; val.textContent = row.val;
+      div.appendChild(sym); div.appendChild(name); div.appendChild(val);
+      legendEl.appendChild(div);
+    });
+  }
+
+  // ---- slider ----
+  var vTrack=$('vTrack'), vFill=$('vFill'), vThumb=$('vThumb'), vTicks=$('vTicks');
+  var ticksBuilt = false;
+  function buildTicks(){
+    if(ticksBuilt) return;
+    var html = '';
+    STD.forEach(function(s){
+      var pct = ((Math.log10(s.v)-LOGMIN)/(LOGMAX-LOGMIN)*100);
+      html += '<div class="vtick" style="left:'+pct.toFixed(2)+'%"></div>';
+      var tx = pct<6 ? 'translateX(0)' : pct>94 ? 'translateX(-100%)' : 'translateX(-50%)';
+      html += '<div class="vticklabel" style="left:'+pct.toFixed(2)+'%;transform:'+tx+'">'+s.label+'</div>';
+    });
+    vTicks.innerHTML = html;
+    ticksBuilt = true;
+  }
+
+  function setFromClientX(x){
+    var r = vTrack.getBoundingClientRect();
+    var f = clamp((x-r.left)/r.width, 0, 1);
+    var logv = LOGMIN + f*(LOGMAX-LOGMIN);
+    state.logV = clamp(logv, LOGMIN, LOGMAX);
+    render();
+  }
+  vTrack.addEventListener('pointerdown', function(e){
+    state.drag = true; state.active='V';
+    if(vTrack.setPointerCapture) vTrack.setPointerCapture(e.pointerId);
+    setFromClientX(e.clientX);
+  });
+  vTrack.addEventListener('pointermove', function(e){ if(state.drag) setFromClientX(e.clientX); });
+  function endDrag(){ if(state.drag){ state.drag=false; render(); } }
+  vTrack.addEventListener('pointerup', endDrag);
+  vTrack.addEventListener('pointercancel', endDrag);
+  vTrack.addEventListener('pointerenter', function(){ state.active='V'; render(); });
+  vTrack.addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+  vTrack.addEventListener('keydown', function(e){
+    var step = e.shiftKey ? 0.1 : 0.02;
+    var v = null;
+    if(e.key==='ArrowLeft'||e.key==='ArrowDown') v = state.logV-step;
+    else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = state.logV+step;
+    else if(e.key==='Home') v = LOGMIN;
+    else if(e.key==='End') v = LOGMAX;
+    if(v!==null){ e.preventDefault(); state.logV = clamp(v, LOGMIN, LOGMAX); render(); }
+  });
+
+  function drawSlider(){
+    buildTicks();
+    var pct = ((state.logV-LOGMIN)/(LOGMAX-LOGMIN)*100).toFixed(2)+'%';
+    vFill.style.width = pct; vThumb.style.left = pct;
+    vTrack.setAttribute('aria-valuemin', LOGMIN.toFixed(3));
+    vTrack.setAttribute('aria-valuemax', LOGMAX.toFixed(3));
+    vTrack.setAttribute('aria-valuenow', state.logV.toFixed(3));
+    vTrack.setAttribute('aria-valuetext', fmtkV(V()));
+    $('vReadout').textContent = fmtkV(V());
+  }
+
+  // ---- result + gauge ----
+  var pctValueEl=$('pctValue'), verdictEl=$('verdict'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+  var gReach=$('gReach'), gLimit=$('gLimit'), gLimitLabel=$('gLimitLabel'), gMark=$('gMark'), gMarkLabel=$('gMarkLabel');
+  var gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
+
+  function gpos(p){ return clamp((Math.log10(Math.max(p,1e-3))-GLOGMIN)/(GLOGMAX-GLOGMIN), 0, 1)*100; }
+
+  function drawResult(){
+    var pct = lossPct();
+    var over = pct > ECON_PCT;
+    var resultColor = over ? 'var(--bad)' : 'var(--fg)';
+
+    pctValueEl.textContent = fmtPct(pct);
+    pctValueEl.style.color = resultColor;
+
+    verdictEl.textContent = over ? 'Wasteful.' : 'Efficient.';
+    verdictEl.style.color = resultColor;
+
+    var fw = fmtW(lossW());
+    verdictSubEl.textContent = fw[0]+' '+fw[1]+' lost of 500 MW delivered, carried at '+fmtA(I())+' at '+fmtkV(V())+'.';
+
+    effortLineEl.textContent = over
+      ? ((pct/ECON_PCT).toFixed(pct/ECON_PCT>=100?0:1)+'× the ~5% economical threshold')
+      : (Math.round(pct/ECON_PCT*100)+'% of the ~5% economical threshold');
+
+    var markPct = gpos(pct);
+    var limitPct = gpos(ECON_PCT);
+    gReach.style.width = limitPct.toFixed(2)+'%';
+    gLimit.style.left = limitPct.toFixed(2)+'%';
+    gLimitLabel.style.left = clamp(limitPct,10,80).toFixed(2)+'%';
+    gMark.style.left = markPct.toFixed(2)+'%';
+    gMark.style.background = resultColor;
+    var labelPct = clamp(markPct,4,88);
+    gMarkLabel.style.left = labelPct.toFixed(2)+'%';
+    gMarkLabel.style.transform = markPct>72 ? 'translateX(-100%)' : markPct<20 ? 'translateX(0)' : 'translateX(-50%)';
+    gMarkLabel.style.color = resultColor;
+    gMarkLabel.textContent = fmtPct(pct)+'%';
+
+    if(!gTicksEl.dataset.built){
+      var ticksHtml='', labelsHtml='';
+      var decades = [-1,0,1,2,3,4];
+      decades.forEach(function(d){
+        var left = ((d-GLOGMIN)/(GLOGMAX-GLOGMIN)*100).toFixed(2)+'%';
+        ticksHtml += '<div class="tick" style="left:'+left+'"></div>';
+        var tv = Math.pow(10,d);
+        var txt = tv<1 ? tv.toFixed(1) : (tv>=1000 ? tv.toLocaleString() : tv.toString());
+        var tx = d===GLOGMIN ? 'translateX(0)' : d>=GLOGMAX-1 ? 'translateX(-100%)' : 'translateX(-50%)';
+        labelsHtml += '<div class="ticklabel" style="left:'+left+';transform:'+tx+'">'+txt+'%</div>';
+      });
+      gTicksEl.innerHTML = ticksHtml; gTicksEl.dataset.built='1';
+      gLabelsEl.innerHTML = labelsHtml;
+    }
+  }
+
+  // ---- presets ----
+  document.querySelectorAll('.preset').forEach(function(b,idx){
+    var v = +b.dataset.v;
+    var pctEl = $('pv'+idx);
+    pctEl.textContent = fmtPct(lossPct(v))+'%';
+    b.addEventListener('click', function(){
+      state.logV = Math.log10(v); state.active='V';
+      render();
+    });
+  });
+
+  // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
+  var STORAGE_KEY = 'grid-voltage-theme';
+  var themeToggle = $('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    var applied = document.documentElement.getAttribute('data-theme');
+    if(applied) return applied;
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+
+  (function(){
+    var backLink = document.getElementById('backLink');
+    if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
+      backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
+      backLink.target = '_blank';
+      backLink.rel = 'noopener';
+      backLink.textContent = 'Simple Viz on GitHub ↗';
+    }
+  })();
+
+  function render(){
+    drawHero();
+    drawEquationAndLegend();
+    drawSlider();
+    drawResult();
+  }
+
+  new ResizeObserver(measure).observe(heroWrap);
+  window.addEventListener('resize', measure);
+  [60,250,900].forEach(function(t){ setTimeout(measure, t); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  render();
+  // The current-flow dashes are a continuous decorative loop with no pause control; under
+  // reduced motion the wire still renders at the correct thickness/colour/density for the
+  // current voltage, it just doesn't scroll on its own.
+  if(!reduceMotion) rafId = requestAnimationFrame(tick);
+})();
+</script>

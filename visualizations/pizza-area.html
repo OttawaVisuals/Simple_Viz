@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The pizza that fools everyone</title>
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  .topgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
+
+  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqn{display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);font-size:clamp(30px,4vw,46px);line-height:1;font-weight:300}
+  .eqn .eq{color:var(--muted)}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .eqn sup{font-size:.55em;position:relative;top:-.5em}
+
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:1.6em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:8px 2px}
+  .legend .sym{font-size:17px;font-weight:300;transition:color .2s}
+  .legend .name{font-size:12.5px;color:var(--muted2)}
+  .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero svg{width:100%;height:auto;display:block}
+  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;text-align:center;transition:opacity .2s}
+
+  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
+
+  .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;text-transform:none;transition:color .2s}
+  .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
+  .readout{font-family:ui-monospace,monospace;font-size:clamp(26px,2.8vw,34px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
+  .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
+  .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
+  .track .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
+  .track .thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
+  .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
+
+  .size-buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .size-buttons button{cursor:pointer;font-family:ui-monospace,monospace;font-size:13px;padding:6px 12px 7px;border-radius:999px;transition:all .18s ease;border:1px solid var(--border);background:transparent;color:var(--muted)}
+  .size-buttons button:hover{color:var(--fg)}
+
+  .result{text-align:left}
+  .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(28px,3.2vw,38px);line-height:1;letter-spacing:-.03em}
+  .result-value .unit{font-family:ui-monospace,monospace;font-size:13px;color:var(--muted)}
+  .result-row2{margin-top:10px}
+  .verdict-sub{font-size:14px;line-height:1.45;margin-top:10px;color:var(--muted2)}
+  .verdict-big{font-size:clamp(17px,1.8vw,20px);font-weight:600;margin-top:2px}
+
+  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+  .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
+  .preset:hover{border-color:var(--accent);color:var(--accent)}
+
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+
+  .footer{margin-top:clamp(40px,4.6vw,64px);padding-top:18px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr 1fr;gap:clamp(20px,3vw,40px);font-family:ui-monospace,monospace;font-size:12px;line-height:1.7;color:var(--muted)}
+  @media (max-width:700px){.footer{grid-template-columns:1fr;gap:14px}}
+  .footer a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .footer a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  .footer .coffee{opacity:.72;font-size:11.5px}
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../index.html" id="backLink">&larr; Physics you can see</a>
+    <div class="topbar-right">
+      <span>Area of a circle</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>One <em>big</em> pizza, or two smaller ones?</h1>
+      <p class="sub">Pizza area grows with the <em style="font-style:italic">square</em> of the diameter, not the diameter itself &mdash; so a single bigger pie is very often more food than two smaller ones whose sizes sound like more when you just add them up. An 18-inch pizza alone beats two 12-inch pizzas combined, even though 12 + 12 = 24 sounds huge next to 18.</p>
+    </div>
+
+    <div class="eqnbox">
+      <div class="eqn">
+        <em>A</em>
+        <span class="eq">=</span>
+        <em>&pi;</em><em id="rTerm">r</em><sup>2</sup>
+      </div>
+    </div>
+
+    <div class="legendbox">
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="hero" id="heroWrap">
+    <div class="lbl" id="lblBig"></div>
+    <div class="lbl" id="lblSmall"></div>
+    <svg id="heroSvg" role="img" aria-label="One large pizza circle compared against two smaller pizza circles, all drawn to true relative area.">
+      <circle id="circBig" fill="none" stroke-width="1.5"></circle>
+      <circle id="circSmall1" fill="none" stroke-width="1.5"></circle>
+      <circle id="circSmall2" fill="none" stroke-width="1.5"></circle>
+      <line id="vDivider" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 5"></line>
+    </svg>
+    <div class="lbl" id="lblVs" style="font-style:italic;font-family:Georgia,serif"></div>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrls">
+      <div class="ctrl" id="bigCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">One big pizza <em id="bigLabel">d&#8321;</em></span>
+          <span class="ctrl-rel">A &prop; d&#8321;&sup2;</span>
+        </div>
+        <div class="readout mono" id="bigReadout"></div>
+        <div class="track" id="bigTrack" tabindex="0" role="slider" aria-label="Diameter of the one big pizza">
+          <div class="rail"></div>
+          <div class="fill" id="bigFill"></div>
+          <div class="thumb" id="bigThumb"></div>
+        </div>
+        <div class="track-range"><span>8 in</span><span class="mid">diameter</span><span>24 in</span></div>
+      </div>
+
+      <div class="ctrl" id="smallCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Two smaller pizzas <em id="smallLabel">d&#8322;</em></span>
+          <span class="ctrl-rel">A &prop; 2&times;d&#8322;&sup2;</span>
+        </div>
+        <div class="readout mono" id="smallReadout"></div>
+        <div class="size-buttons" id="sizeButtons"></div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Total area</div>
+      <div class="result-value"><span class="num mono" id="bigAreaValue"></span><span class="unit mono">sq in &mdash; one big</span></div>
+      <div class="result-value result-row2"><span class="num mono" id="smallAreaValue"></span><span class="unit mono">sq in &mdash; two smaller, combined</span></div>
+      <div class="verdict-big" id="verdict"></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-p="classic">two 12s vs one 18</button>
+    <button class="preset" data-p="p2">two 10s vs one 16</button>
+    <button class="preset" data-p="p3">two 14s vs one 20</button>
+  </div>
+
+  <p class="note">Circle area is A = &pi;r&sup2; (<a href="https://en.wikipedia.org/wiki/Area_of_a_circle" target="_blank" rel="noopener">area of a circle</a>), where r is half the diameter you set above. Because area scales with the <em style="font-style:italic">square</em> of diameter, doubling a pizza's diameter roughly quadruples how much you get to eat &mdash; which is also why comparing pizza deals by price-per-inch-of-diameter is misleading, and price per square inch is the fair way to do it. This page is pure geometry: it doesn't model a real pizzeria's crust-to-topping ratio, how thin the dough is stretched at larger sizes, or that a chain's "18-inch" isn't always exactly 18 inches edge to edge.</p>
+
+  <div class="footer">
+    <span>Spot a mistake or have an idea for a page? <a href="#">Send feedback</a> or write to <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.</span>
+    <span>Built with the help of AI, fact-checked by hand &mdash; if something looks off, that's on me, so tell me.</span>
+    <span class="coffee">If this was useful, you can <a href="#">buy me a coffee</a> &mdash; entirely optional.</span>
+  </div>
+
+</div>
+</main>
+<script>
+(function(){
+  var BIGMIN=8, BIGMAX=24;
+  var SIZES=[8,10,12,14,16,18,20,22,24];
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+  function area(d){ var r=d/2; return Math.PI*r*r; }
+  function fmtArea(a){ return a.toFixed(1); }
+
+  var $ = function(id){ return document.getElementById(id); };
+
+  var state = { big:18, small:12, active:null, drag:null };
+
+  var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
+  var circBig=$('circBig'), circSmall1=$('circSmall1'), circSmall2=$('circSmall2'), vDivider=$('vDivider');
+  var lblBig=$('lblBig'), lblSmall=$('lblSmall'), lblVs=$('lblVs');
+  var heroW = 0;
+
+  // ---- hero geometry: viewBox width == measured CSS px width, so 1 unit = 1px ----
+  function geom(w, big, small){
+    var narrow = w < 620;
+    var vbH = narrow ? Math.round(w*0.72) : Math.round(w*0.5);
+    var padTop = narrow ? 30 : 26;
+    var padBot = narrow ? 34 : 30;
+    var usableH = vbH - padTop - padBot;
+    var maxD = 24; // reference diameter for scale, matches slider max
+    // Scale so the largest possible circle (24in big pizza, radius 12) fits usableH/2
+    var pxPerInch = (usableH/2) / (maxD/2);
+
+    var leftCx = w*0.27;
+    var rightCx = w*0.73;
+    var cy = padTop + usableH/2;
+
+    var rBig = (big/2)*pxPerInch;
+    var rSmall = (small/2)*pxPerInch;
+    var gap = Math.max(rSmall*0.25, 6);
+    var sm1Cx = rightCx - rSmall - gap/2;
+    var sm2Cx = rightCx + rSmall + gap/2;
+
+    return {
+      w:w, vbH:vbH, cy:cy,
+      leftCx:leftCx, rBig:rBig,
+      sm1Cx:sm1Cx, sm2Cx:sm2Cx, rSmall:rSmall,
+      dividerX: w*0.5,
+      vsX: w*0.5, vsY: cy
+    };
+  }
+
+  function drawHero(){
+    var w = heroW || heroWrap.clientWidth || 1100;
+    var h = geom(w, state.big, state.small);
+
+    heroSvg.setAttribute('viewBox','0 0 '+w+' '+h.vbH);
+    heroSvg.setAttribute('preserveAspectRatio','none');
+
+    circBig.setAttribute('cx', h.leftCx); circBig.setAttribute('cy', h.cy); circBig.setAttribute('r', h.rBig);
+    circBig.setAttribute('stroke', 'var(--accent)');
+    circBig.setAttribute('fill', 'color-mix(in srgb, var(--accent) 12%, transparent)');
+
+    circSmall1.setAttribute('cx', h.sm1Cx); circSmall1.setAttribute('cy', h.cy); circSmall1.setAttribute('r', h.rSmall);
+    circSmall2.setAttribute('cx', h.sm2Cx); circSmall2.setAttribute('cy', h.cy); circSmall2.setAttribute('r', h.rSmall);
+    [circSmall1, circSmall2].forEach(function(c){
+      c.setAttribute('stroke', 'var(--fg)');
+      c.setAttribute('fill', 'color-mix(in srgb, var(--fg) 8%, transparent)');
+    });
+
+    vDivider.setAttribute('x1', h.dividerX); vDivider.setAttribute('x2', h.dividerX);
+    vDivider.setAttribute('y1', 6); vDivider.setAttribute('y2', h.vbH-6);
+
+    var px = function(x){ return (x/w*100)+'%'; };
+    var py = function(y){ return (y/h.vbH*100)+'%'; };
+    lblBig.style.left = px(h.leftCx); lblBig.style.top = py(h.cy + h.rBig + 10);
+    lblBig.style.transform = 'translateX(-50%)';
+    lblBig.textContent = 'one ' + state.big + '" pizza — ' + fmtArea(area(state.big)) + ' sq in';
+
+    lblSmall.style.left = px((h.sm1Cx+h.sm2Cx)/2); lblSmall.style.top = py(h.cy + h.rSmall + 10);
+    lblSmall.style.transform = 'translateX(-50%)';
+    lblSmall.textContent = 'two ' + state.small + '" pizzas — ' + fmtArea(2*area(state.small)) + ' sq in';
+
+    lblVs.style.left = px(h.vsX); lblVs.style.top = py(h.vsY);
+    lblVs.style.transform = 'translate(-50%,-50%)';
+    lblVs.textContent = 'vs';
+  }
+
+  // ---- equation colouring ----
+  var rTerm = $('rTerm');
+  var bigLabel = $('bigLabel'), smallLabel = $('smallLabel');
+  var legendEl = $('legend');
+  var accent = 'var(--accent)';
+  function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
+
+  function drawEquationAndLegend(){
+    rTerm.style.color = activeColor('big');
+    bigLabel.style.color = activeColor('big');
+    smallLabel.style.color = activeColor('small');
+
+    var rows = [
+      {sym:'d₁', name:'one big pizza, diameter', val: state.big+' in', key:'big'},
+      {sym:'d₂', name:'each of two smaller pizzas, diameter', val: state.small+' in', key:'small'},
+      {sym:'π', name:'pi', val:'3.14159…', key:null}
+    ];
+    legendEl.innerHTML = '';
+    rows.forEach(function(row){
+      var div = document.createElement('div'); div.className='row';
+      var sym = document.createElement('em'); sym.className='sym'; sym.textContent = row.sym;
+      sym.style.color = row.key ? activeColor(row.key) : 'var(--fg)';
+      var name = document.createElement('span'); name.className='name'; name.textContent = row.name;
+      var val = document.createElement('span'); val.className='val mono'; val.textContent = row.val;
+      div.appendChild(sym); div.appendChild(name); div.appendChild(val);
+      legendEl.appendChild(div);
+    });
+  }
+
+  // ---- big-pizza slider ----
+  var bigTrack=$('bigTrack'), bigFill=$('bigFill'), bigThumb=$('bigThumb'), bigReadout=$('bigReadout');
+  function makeBigSlider(){
+    var dragging = false;
+    function setFromClientX(x){
+      var r = bigTrack.getBoundingClientRect();
+      var f = clamp((x-r.left)/r.width, 0, 1);
+      var v = BIGMIN + f*(BIGMAX-BIGMIN);
+      v = clamp(Math.round(v), BIGMIN, BIGMAX);
+      state.big = v;
+      render();
+    }
+    bigTrack.addEventListener('pointerdown', function(e){
+      dragging = true;
+      if(bigTrack.setPointerCapture) bigTrack.setPointerCapture(e.pointerId);
+      state.drag = 'big'; state.active = 'big';
+      setFromClientX(e.clientX);
+    });
+    bigTrack.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
+    function endDrag(){ if(dragging){ dragging=false; state.drag=null; render(); } }
+    bigTrack.addEventListener('pointerup', endDrag);
+    bigTrack.addEventListener('pointercancel', endDrag);
+    bigTrack.addEventListener('pointerenter', function(){ state.active='big'; render(); });
+    bigTrack.addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+    bigTrack.addEventListener('keydown', function(e){
+      var step = e.shiftKey ? 2 : 1;
+      var v = null;
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown') v = state.big-step;
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = state.big+step;
+      else if(e.key==='Home') v = BIGMIN;
+      else if(e.key==='End') v = BIGMAX;
+      if(v!==null){ e.preventDefault(); state.big = clamp(Math.round(v), BIGMIN, BIGMAX); render(); }
+    });
+    return {
+      draw: function(){
+        var pct = ((state.big-BIGMIN)/(BIGMAX-BIGMIN)*100).toFixed(2)+'%';
+        bigFill.style.width = pct; bigThumb.style.left = pct;
+        bigTrack.setAttribute('aria-valuemin', BIGMIN);
+        bigTrack.setAttribute('aria-valuemax', BIGMAX);
+        bigTrack.setAttribute('aria-valuenow', state.big);
+        bigTrack.setAttribute('aria-valuetext', state.big+' inches');
+      }
+    };
+  }
+  var bigSlider = makeBigSlider();
+
+  // ---- small-pizza size pills ----
+  var sizeButtons = $('sizeButtons');
+  SIZES.forEach(function(sz){
+    var b = document.createElement('button');
+    b.textContent = sz+'"';
+    b.addEventListener('click', function(){ state.small=sz; state.active='small'; render(); });
+    b.addEventListener('pointerenter', function(){ state.active='small'; render(); });
+    b.addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+    sizeButtons.appendChild(b);
+  });
+  function drawSizeButtons(){
+    Array.prototype.forEach.call(sizeButtons.children, function(b,i){
+      var active = SIZES[i]===state.small;
+      b.style.background = active ? 'color-mix(in srgb, var(--accent) 22%, var(--bg))' : 'transparent';
+      b.style.borderColor = active ? 'var(--accent)' : 'var(--border)';
+      b.style.color = active ? 'var(--fg)' : 'var(--muted)';
+    });
+  }
+
+  // ---- result ----
+  var bigAreaValueEl=$('bigAreaValue'), smallAreaValueEl=$('smallAreaValue');
+  var verdictEl=$('verdict'), verdictSubEl=$('verdictSub');
+
+  function drawResult(){
+    var aBig = area(state.big);
+    var aSmall = 2*area(state.small);
+    bigAreaValueEl.textContent = fmtArea(aBig);
+    smallAreaValueEl.textContent = fmtArea(aSmall);
+
+    var bigColor = 'var(--fg)', smallColor = 'var(--fg)';
+    var diffPct, verdictText, subText;
+    if(Math.abs(aBig-aSmall) < 0.05){
+      verdictText = 'A dead tie.';
+      subText = 'One ' + state.big + '" pizza and two ' + state.small + '" pizzas give almost exactly the same total area.';
+    } else if(aBig > aSmall){
+      diffPct = (aBig/aSmall - 1)*100;
+      verdictText = 'The one big pizza wins — ' + diffPct.toFixed(1) + '% more pizza.';
+      subText = 'One ' + state.big + '" pizza (' + fmtArea(aBig) + ' sq in) beats two ' + state.small + '" pizzas combined (' + fmtArea(aSmall) + ' sq in)' +
+        (state.small*2 > state.big ? ', even though ' + state.small + ' + ' + state.small + ' = ' + (state.small*2) + ' sounds bigger than ' + state.big + '.' : '.');
+      bigColor = 'var(--accent)';
+    } else {
+      diffPct = (aSmall/aBig - 1)*100;
+      verdictText = 'The two smaller pizzas win — ' + diffPct.toFixed(1) + '% more pizza.';
+      subText = 'Two ' + state.small + '" pizzas combined (' + fmtArea(aSmall) + ' sq in) beat one ' + state.big + '" pizza (' + fmtArea(aBig) + ' sq in).';
+      smallColor = 'var(--accent)';
+    }
+    verdictEl.textContent = verdictText;
+    bigAreaValueEl.style.color = bigColor;
+    smallAreaValueEl.style.color = smallColor;
+    verdictSubEl.textContent = subText;
+  }
+
+  // ---- presets ----
+  document.querySelectorAll('.preset').forEach(function(b){
+    var presets = {
+      classic:{big:18, small:12},
+      p2:{big:16, small:10},
+      p3:{big:20, small:14}
+    };
+    b.addEventListener('click', function(){
+      var p = presets[b.dataset.p];
+      state.big=p.big; state.small=p.small;
+      render();
+    });
+  });
+
+  // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
+  var STORAGE_KEY = 'pizza-area-theme';
+  var themeToggle = $('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    var applied = document.documentElement.getAttribute('data-theme');
+    if(applied) return applied;
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+
+  // The relative "../index.html" link only resolves when this file is sitting in
+  // Simple_Viz/visualizations/ next to the site index. Published standalone (e.g. as an
+  // Artifact) there's no sibling index to reach, so fall back to the GitHub repo instead of
+  // leaving a link that 404s.
+  (function(){
+    var backLink = document.getElementById('backLink');
+    if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
+      backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
+      backLink.target = '_blank';
+      backLink.rel = 'noopener';
+      backLink.textContent = 'Simple Viz on GitHub ↗';
+    }
+  })();
+
+  function measure(){
+    var w = heroWrap.clientWidth;
+    if(w && w !== heroW){ heroW = w; render(); }
+  }
+
+  function render(){
+    drawHero();
+    drawEquationAndLegend();
+    bigSlider.draw();
+    drawSizeButtons();
+    bigReadout.textContent = state.big + ' in';
+    $('smallReadout').textContent = state.small + ' in each';
+    drawResult();
+  }
+
+  new ResizeObserver(measure).observe(heroWrap);
+  window.addEventListener('resize', measure);
+  [60,250,900].forEach(function(t){ setTimeout(measure, t); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  render();
+  // No continuous animation on this page (a static geometric comparison, like snells-law.html
+  // and gravity-lab.html) — nothing to gate behind prefers-reduced-motion.
+})();
+</script>

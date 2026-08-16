@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The overshoot that refuses to leave</title>
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  .topgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
+
+  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqn{display:flex;align-items:center;gap:clamp(6px,1vw,11px);font-size:clamp(22px,2.9vw,32px);line-height:1;font-weight:300}
+  .eqn .eq{color:var(--muted)}
+  .eqn .frac{display:inline-flex;flex-direction:column;align-items:center}
+  .eqn .frac .row{display:flex;gap:.16em;align-items:flex-start;white-space:nowrap}
+  .eqn .frac .num{padding:0 .3em .06em}
+  .eqn .frac .den{padding:.06em .3em 0}
+  .eqn .frac .bar{height:1.5px;background:var(--fg);width:100%}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .eqn .bigsum{display:inline-flex;flex-direction:column;align-items:center;line-height:1;transition:color .2s}
+  .eqn .bigsum .sumtop{font-size:.42em;font-family:ui-monospace,monospace;margin-bottom:1px}
+  .eqn .bigsum .sumsym{font-size:1.5em;font-weight:300}
+  .eqn .bigsum .sumbot{font-size:.36em;font-family:ui-monospace,monospace;margin-top:1px;white-space:nowrap}
+
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:1.6em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:8px 2px}
+  .legend .sym{font-size:17px;font-weight:300;transition:color .2s}
+  .legend .name{font-size:12.5px;color:var(--muted2)}
+  .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero svg{width:100%;height:auto;display:block}
+  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
+
+  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
+
+  .ctrls{display:grid;grid-template-columns:1fr;gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;text-transform:none;transition:color .2s}
+  .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
+  .readout{font-family:ui-monospace,monospace;font-size:clamp(26px,2.8vw,34px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
+  .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
+  .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
+  .track .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
+  .track .thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
+  .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
+
+  .result{text-align:left}
+  .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
+  .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
+  .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px}
+  .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
+  .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
+  .gauge{position:relative;height:56px;margin-top:16px;max-width:420px}
+  .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
+  .gauge .reach{position:absolute;top:14px;height:10px;border-radius:2px 0 0 2px;background:color-mix(in srgb, var(--accent) 16%, transparent);left:0}
+  .gauge .tick{position:absolute;top:26px;width:1px;height:5px;background:var(--line2)}
+  .gauge .ticklabel{position:absolute;top:33px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
+  .gauge .limit{position:absolute;top:9px;height:20px;width:1px;background:var(--bad)}
+  .gauge .limitlabel{position:absolute;top:0;white-space:nowrap;font:400 9px ui-monospace,monospace;letter-spacing:.05em;color:var(--bad)}
+  .gauge .ghost{position:absolute;top:11px;height:16px;width:1px;background:var(--line2)}
+  .gauge .mark{position:absolute;top:12px;height:14px;width:3px;border-radius:2px;transition:left .12s linear}
+  .gauge .marklabel{position:absolute;top:-3px;white-space:nowrap;font:500 11px ui-monospace,monospace;transition:left .12s linear}
+
+  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+  .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
+  .preset:hover{border-color:var(--accent);color:var(--accent)}
+
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+
+  .footer{margin-top:clamp(40px,4.6vw,64px);padding-top:18px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr 1fr;gap:clamp(20px,3vw,40px);font-family:ui-monospace,monospace;font-size:12px;line-height:1.7;color:var(--muted)}
+  @media (max-width:700px){.footer{grid-template-columns:1fr;gap:14px}}
+  .footer a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .footer a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  .footer .coffee{opacity:.72;font-size:11.5px}
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../index.html" id="backLink">&larr; Physics you can see</a>
+    <div class="topbar-right">
+      <span>Fourier series</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>The overshoot that <em>refuses to leave</em>.</h1>
+      <p class="sub">Stack enough odd-numbered sine waves and their sum turns into a square wave &mdash; almost. Right at each edge a little "ear" pokes past the flat top, and no matter how many terms you add, it never shrinks below about 9% of the jump.</p>
+    </div>
+
+    <div class="eqnbox">
+      <div class="eqn">
+        <em>f</em><span class="eq">(</span><em>t</em><span class="eq">)</span>
+        <span class="eq">=</span>
+        <span class="frac"><span class="row num">4</span><span class="bar"></span><span class="row den">&pi;</span></span>
+        <span class="bigsum" id="sumTerm">
+          <span class="sumtop mono" id="sumTop">N</span>
+          <span class="sumsym">&Sigma;</span>
+          <span class="sumbot mono">k=1,3,5&hellip;</span>
+        </span>
+        <span class="frac"><span class="row num">sin(<em id="kTerm">k</em>&omega;<em>t</em>)</span><span class="bar"></span><span class="row den"><em id="kTerm2">k</em></span></span>
+      </div>
+    </div>
+
+    <div class="legendbox">
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="hero" id="heroWrap">
+    <div class="lbl" id="lblOvershoot"></div>
+    <div class="lbl" id="lblUndershoot"></div>
+    <svg id="heroSvg" role="img" aria-label="Plot of the partial Fourier sum over two periods, approaching a square wave, with a small overshoot ear at each edge.">
+      <line id="axisZero" stroke="var(--line)" stroke-width="1"></line>
+      <line id="axisPlus" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 4"></line>
+      <line id="axisMinus" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 4"></line>
+      <polyline id="squarePoly" fill="none" stroke="var(--line2)" stroke-width="1.25" stroke-dasharray="1 5" stroke-linecap="round"></polyline>
+      <polyline id="wavePoly" fill="none" stroke="var(--accent)" stroke-width="2"></polyline>
+      <circle id="overDot" r="3.5" fill="var(--bad)"></circle>
+      <circle id="underDot" r="3.5" fill="var(--bad)"></circle>
+    </svg>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrls">
+      <div class="ctrl" id="termsCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Terms <em id="NLabel">N</em></span>
+          <span class="ctrl-rel">harmonics 1&hellip;<span id="kMaxRel">1</span></span>
+        </div>
+        <div class="readout mono" id="termsReadout"></div>
+        <div class="track" id="termsTrack" tabindex="0" role="slider" aria-label="Number of odd harmonics included">
+          <div class="rail"></div>
+          <div class="fill" id="termsFill"></div>
+          <div class="thumb" id="termsThumb"></div>
+        </div>
+        <div class="track-range"><span>1 term</span><span class="mid">each step adds the next odd harmonic</span><span>99 terms</span></div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Overshoot at the edge</div>
+      <div class="result-value"><span class="num mono" id="overValue"></span><span class="unit mono" id="overUnit">% of jump</span></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+      <div class="effort-line" id="effortLine"></div>
+      <div class="gauge" id="gauge">
+        <div class="track"></div>
+        <div class="reach" id="gReach"></div>
+        <div class="limit" id="gLimit"></div>
+        <div class="limitlabel" id="gLimitLabel">Gibbs limit &asymp; 8.95%</div>
+        <div class="mark" id="gMark"></div>
+        <div class="marklabel mono" id="gMarkLabel"></div>
+        <div id="gTicks"></div>
+        <div id="gLabels"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-p="1">1 term</button>
+    <button class="preset" data-p="5">5 terms</button>
+    <button class="preset" data-p="25">25 terms</button>
+    <button class="preset" data-p="99">99 terms</button>
+  </div>
+
+  <p class="note">This is a <a href="https://en.wikipedia.org/wiki/Fourier_series" target="_blank" rel="noopener">Fourier series</a> &mdash; the idea, from Joseph Fourier, that almost any repeating wave can be built by adding up sine waves of the right frequencies and sizes. Here only the odd harmonics of a square wave are used, each weighted 1/k, which is the classic textbook case. The stubborn overshoot at every jump is the <a href="https://en.wikipedia.org/wiki/Gibbs_phenomenon" target="_blank" rel="noopener">Gibbs phenomenon</a>: as more terms are added the overshoot squeezes closer to the edge and gets narrower, but its height converges to a fixed &asymp;8.95% of the jump size (numerically confirmed here up to 500 terms, matching the textbook constant (2/&pi;)&#8747;&#8320;<sup>&pi;</sup> sin(x)/x&thinsp;dx &minus; 1 &asymp; 0.0895) and never disappears. It's the same reason digital audio and video systems apply anti-aliasing and smoothing around sharp edges: any hard discontinuity reconstructed from a finite set of frequencies rings, and that ringing traces straight back to this fact.</p>
+
+  <div class="footer">
+    <span>Spot a mistake or have an idea for a page? <a href="#">Send feedback</a> or write to <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.</span>
+    <span>Built with the help of AI, fact-checked by hand &mdash; if something looks off, that's on me, so tell me.</span>
+    <span class="coffee">If this was useful, you can <a href="#">buy me a coffee</a> &mdash; entirely optional.</span>
+  </div>
+
+</div>
+</main>
+<script>
+(function(){
+  var TMIN=1, TMAX=99;
+  var TWO_PI = 2*Math.PI;
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+
+  // f(t) for period T=1, angular frequency w = 2*pi/T = 2*pi.
+  // Odd harmonics only: k = 1,3,5,...,(2*terms-1).
+  function partialSum(t, terms){
+    var w = TWO_PI;
+    var s = 0;
+    for(var i=0;i<terms;i++){
+      var k = 2*i+1;
+      s += Math.sin(k*w*t)/k;
+    }
+    return (4/Math.PI)*s;
+  }
+
+  // Locate the first local peak of f just to the right of the rising jump at t=0,
+  // searching the open interval (0, 0.5) — the flat-top segment before the next jump.
+  // Fine linear scan is enough: for N terms the highest harmonic is k=2N-1, and its
+  // first peak sits near t = 1/(2*(2N-1)); 8000 samples over (0,0.5) resolves that
+  // easily even at N=99 (k=197, peak near t≈0.0025).
+  function findOvershoot(terms){
+    var n = 8000;
+    var best = -Infinity, bestT = 0;
+    for(var i=1;i<n;i++){
+      var t = 0.5*i/n;
+      var v = partialSum(t, terms);
+      if(v>best){ best=v; bestT=t; }
+    }
+    return { t:bestT, v:best };
+  }
+  function findUndershoot(terms){
+    // mirror case: local minimum just after the falling jump at t=0.5
+    var n = 8000;
+    var best = Infinity, bestT = 0.5;
+    for(var i=1;i<n;i++){
+      var t = 0.5 + 0.5*i/n;
+      var v = partialSum(t, terms);
+      if(v<best){ best=v; bestT=t; }
+    }
+    return { t:bestT, v:best };
+  }
+
+  // ---- self-check the Gibbs constant at a high term count, once, at load time ----
+  // Known result: overshoot height -> (2/pi)*Si(pi) - 1 ~= 0.08949... of the jump (=2).
+  var GIBBS_CHECK = (function(){
+    var o = findOvershoot(500);
+    return (o.v - 1)/2; // fraction of jump height above the target amplitude of 1
+  })();
+
+  var NS='http://www.w3.org/2000/svg';
+  function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+
+  var state = { terms:5, active:null, drag:null };
+  var heroW = 0;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
+  var axisZero=$('axisZero'), axisPlus=$('axisPlus'), axisMinus=$('axisMinus');
+  var squarePoly=$('squarePoly'), wavePoly=$('wavePoly'), overDot=$('overDot'), underDot=$('underDot');
+  var lblOvershoot=$('lblOvershoot'), lblUndershoot=$('lblUndershoot');
+
+  // ---- hero geometry: viewBox width == measured CSS px width, so 1 unit = 1px ----
+  var YMAX = 1.35; // fixed y-domain across all term counts, so the ear's height is honestly comparable
+  var PERIODS = 2;
+  function geom(w){
+    var narrow = w < 620;
+    var padL = narrow?10:14, padR = narrow?10:14;
+    var padT = 14, padB = 14;
+    var plotW = Math.max(60, w - padL - padR);
+    var plotH = narrow?180:230;
+    var vbH = plotH + padT + padB;
+    function px(t){ return padL + (t/PERIODS)*plotW; }
+    function py(v){ return padT + (1 - (v+YMAX)/(2*YMAX))*plotH; }
+    return { w:w, vbH:vbH, padL:padL, padT:padT, plotW:plotW, plotH:plotH, px:px, py:py };
+  }
+
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function measure(){
+    var w = heroWrap.clientWidth;
+    if(w && w !== heroW){ heroW = w; render(); }
+  }
+
+  function drawHero(){
+    var w = heroW || heroWrap.clientWidth || 1100;
+    var g = geom(w);
+    heroSvg.setAttribute('viewBox','0 0 '+w+' '+g.vbH);
+    heroSvg.setAttribute('preserveAspectRatio','none');
+
+    axisZero.setAttribute('x1', g.padL); axisZero.setAttribute('x2', g.padL+g.plotW);
+    axisZero.setAttribute('y1', g.py(0)); axisZero.setAttribute('y2', g.py(0));
+    axisPlus.setAttribute('x1', g.padL); axisPlus.setAttribute('x2', g.padL+g.plotW);
+    axisPlus.setAttribute('y1', g.py(1)); axisPlus.setAttribute('y2', g.py(1));
+    axisMinus.setAttribute('x1', g.padL); axisMinus.setAttribute('x2', g.padL+g.plotW);
+    axisMinus.setAttribute('y1', g.py(-1)); axisMinus.setAttribute('y2', g.py(-1));
+
+    // ideal square wave reference, period 1: +1 on (0,0.5), -1 on (0.5,1), repeated
+    var sqPts = [];
+    for(var p=0;p<PERIODS;p++){
+      sqPts.push(g.px(p)+','+g.py(1));
+      sqPts.push(g.px(p+0.5)+','+g.py(1));
+      sqPts.push(g.px(p+0.5)+','+g.py(-1));
+      sqPts.push(g.px(p+1)+','+g.py(-1));
+    }
+    squarePoly.setAttribute('points', sqPts.join(' '));
+
+    // partial sum waveform, densely sampled so the narrowing ear stays visible at high N
+    var N = state.terms;
+    var samples = 1400;
+    var wavePts = [];
+    for(var i=0;i<=samples;i++){
+      var t = PERIODS*i/samples;
+      var v = partialSum(t, N);
+      wavePts.push(g.px(t)+','+g.py(clamp(v,-YMAX,YMAX)));
+    }
+    wavePoly.setAttribute('points', wavePts.join(' '));
+
+    // mark the overshoot/undershoot ear nearest the first jump
+    var over = findOvershoot(N);
+    var under = findUndershoot(N);
+    overDot.setAttribute('cx', g.px(over.t)); overDot.setAttribute('cy', g.py(over.v));
+    underDot.setAttribute('cx', g.px(under.t)); underDot.setAttribute('cy', g.py(under.v));
+
+    var px2pct = function(x){ return (x/w*100)+'%'; };
+    var py2pct = function(y){ return (y/g.vbH*100)+'%'; };
+    lblOvershoot.style.left = px2pct(g.px(over.t)+8);
+    lblOvershoot.style.top = py2pct(g.py(over.v)-16);
+    lblOvershoot.textContent = over.v.toFixed(3);
+    lblUndershoot.style.left = px2pct(g.px(under.t)+8);
+    lblUndershoot.style.top = py2pct(g.py(under.v)+4);
+    lblUndershoot.textContent = under.v.toFixed(3);
+
+    return { over:over, under:under };
+  }
+
+  // ---- equation + legend colouring ----
+  var accent = 'var(--accent)';
+  var sumTerm=$('sumTerm'), sumTop=$('sumTop'), kTerm=$('kTerm'), kTerm2=$('kTerm2'), NLabel=$('NLabel');
+  var legendEl = $('legend');
+
+  function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
+
+  function drawEquationAndLegend(){
+    var kmax = 2*state.terms-1;
+    sumTerm.style.color = activeColor('N');
+    NLabel.style.color = activeColor('N');
+    sumTop.textContent = state.terms===1 ? 'N=1' : 'N='+state.terms;
+    kTerm.style.color = activeColor('N');
+    kTerm2.style.color = activeColor('N');
+
+    var rows = [
+      {sym:'N', name:'terms included', val: state.terms+' ('+(state.terms===1?'1 term':state.terms+' terms')+')', key:'N'},
+      {sym:'k', name:'highest harmonic', val: 'k = '+kmax, key:'N'},
+      {sym:'&omega;', name:'angular frequency', val: '2&pi;/T', key:null},
+      {sym:'t', name:'time (in periods)', val: '0 &ndash; 2', key:null}
+    ];
+    legendEl.innerHTML = '';
+    rows.forEach(function(row){
+      var div = document.createElement('div'); div.className='row';
+      var sym = document.createElement('em'); sym.className='sym'; sym.innerHTML = row.sym;
+      sym.style.color = row.key ? activeColor(row.key) : 'var(--fg)';
+      var name = document.createElement('span'); name.className='name'; name.textContent = row.name;
+      var val = document.createElement('span'); val.className='val mono'; val.innerHTML = row.val;
+      div.appendChild(sym); div.appendChild(name); div.appendChild(val);
+      legendEl.appendChild(div);
+    });
+  }
+
+  // ---- slider ----
+  function makeSlider(track, fill, thumb, lo, hi){
+    var dragging = false;
+    function setFromClientX(x){
+      var r = track.getBoundingClientRect();
+      var f = clamp((x-r.left)/r.width, 0, 1);
+      var v = Math.round(lo + f*(hi-lo));
+      v = clamp(v, lo, hi);
+      state.terms = v;
+      render();
+    }
+    track.addEventListener('pointerdown', function(e){
+      dragging = true;
+      if(track.setPointerCapture) track.setPointerCapture(e.pointerId);
+      state.drag = 'N'; state.active = 'N';
+      setFromClientX(e.clientX);
+    });
+    track.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
+    function endDrag(){ if(dragging){ dragging=false; state.drag=null; render(); } }
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+    track.addEventListener('pointerenter', function(){ state.active='N'; render(); });
+    track.addEventListener('keydown', function(e){
+      var step = e.shiftKey ? 10 : 1;
+      var cur = state.terms;
+      var v = null;
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown') v = cur-step;
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = cur+step;
+      else if(e.key==='Home') v = lo;
+      else if(e.key==='End') v = hi;
+      if(v!==null){ e.preventDefault(); v = clamp(Math.round(v), lo, hi); state.terms=v; render(); }
+    });
+    return {
+      draw: function(){
+        var cur = state.terms;
+        var pct = ((cur-lo)/(hi-lo)*100).toFixed(2)+'%';
+        fill.style.width = pct; thumb.style.left = pct;
+        track.setAttribute('aria-valuemin', lo);
+        track.setAttribute('aria-valuemax', hi);
+        track.setAttribute('aria-valuenow', cur);
+        track.setAttribute('aria-valuetext', cur+(cur===1?' term':' terms')+', harmonics up to '+(2*cur-1));
+      }
+    };
+  }
+  var termsSlider = makeSlider($('termsTrack'), $('termsFill'), $('termsThumb'), TMIN, TMAX);
+
+  $('termsCtrl').addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+
+  // ---- result box ----
+  var overValueEl=$('overValue');
+  var verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+  var gReach=$('gReach'), gLimit=$('gLimit'), gMark=$('gMark'), gMarkLabel=$('gMarkLabel');
+  var gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
+  var GAUGE_MAX = 15; // %, comfortably above the N=1 peak (~13.7%) and the ~8.95% limit
+  var GIBBS_PCT = GIBBS_CHECK*100; // numerically verified above, ~8.949
+
+  function pos(pct){ return clamp(pct/GAUGE_MAX, 0, 1)*100; }
+
+  function drawResult(overUnder){
+    var over = overUnder.over;
+    var overPct = (over.v - 1)/2*100; // overshoot as % of the jump size (2)
+
+    overValueEl.textContent = overPct.toFixed(2);
+
+    if(state.terms===1){
+      verdictSubEl.textContent = 'Just the fundamental — no square shape yet, so no real "ear" to speak of.';
+    } else if(overPct > GIBBS_PCT + 0.5){
+      verdictSubEl.textContent = 'Still settling down toward the Gibbs limit.';
+    } else {
+      verdictSubEl.textContent = 'Essentially at the Gibbs limit — adding more terms won’t lower this.';
+    }
+    effortLineEl.textContent = 'peak value ' + over.v.toFixed(4) + ' vs. target 1.0000  ·  jump size 2.0000';
+
+    var markPct = pos(overPct);
+    var limitPct = pos(GIBBS_PCT);
+    gReach.style.width = Math.min(markPct,limitPct).toFixed(2)+'%';
+    gLimit.style.left = limitPct.toFixed(2)+'%';
+    gMark.style.left = markPct.toFixed(2)+'%';
+    gMark.style.background = 'var(--accent)';
+    var labelPct = clamp(markPct,4,88);
+    gMarkLabel.style.left = labelPct.toFixed(2)+'%';
+    gMarkLabel.style.transform = markPct>72 ? 'translateX(-100%)' : markPct<20 ? 'translateX(0)' : 'translateX(-50%)';
+    gMarkLabel.style.color = 'var(--accent)';
+    gMarkLabel.textContent = overPct.toFixed(2)+'%';
+
+    if(!gTicksEl.dataset.built){
+      var ticksHtml='', labelsHtml='';
+      [0,5,10,15].forEach(function(d){
+        var left = pos(d).toFixed(2)+'%';
+        ticksHtml += '<div class="tick" style="left:'+left+'"></div>';
+        var tx = d===0 ? 'translateX(0)' : d===15 ? 'translateX(-100%)' : 'translateX(-50%)';
+        labelsHtml += '<div class="ticklabel" style="left:'+left+';transform:'+tx+'">'+d+'%</div>';
+      });
+      gTicksEl.innerHTML = ticksHtml; gTicksEl.dataset.built='1';
+      gLabelsEl.innerHTML = labelsHtml;
+    }
+  }
+
+  // ---- presets ----
+  document.querySelectorAll('.preset').forEach(function(b){
+    b.addEventListener('click', function(){
+      state.terms = +b.dataset.p;
+      render();
+    });
+  });
+
+  // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
+  var STORAGE_KEY = 'square-wave-theme';
+  var themeToggle = $('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    var applied = document.documentElement.getAttribute('data-theme');
+    if(applied) return applied;
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+
+  // The relative "../index.html" link only resolves when this file is sitting in
+  // Simple_Viz/visualizations/ next to the site index. Published standalone (e.g. as an
+  // Artifact) there's no sibling index to reach, so fall back to the GitHub repo instead of
+  // leaving a link that 404s.
+  (function(){
+    var backLink = document.getElementById('backLink');
+    if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
+      backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
+      backLink.target = '_blank';
+      backLink.rel = 'noopener';
+      backLink.textContent = 'Simple Viz on GitHub ↗';
+    }
+  })();
+
+  function render(){
+    var overUnder = drawHero();
+    drawEquationAndLegend();
+    termsSlider.draw();
+    $('termsReadout').textContent = state.terms+(state.terms===1?' term':' terms');
+    $('kMaxRel').textContent = (2*state.terms-1);
+    drawResult(overUnder);
+  }
+
+  new ResizeObserver(measure).observe(heroWrap);
+  window.addEventListener('resize', measure);
+  [60,250,900].forEach(function(t){ setTimeout(measure, t); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  // This page has no self-running animation — the waveform redraws only in response to the
+  // slider/presets, so there's nothing to gate behind prefers-reduced-motion beyond that
+  // (reduceMotion is computed above for completeness/consistency with the other pages).
+  render();
+})();
+</script>

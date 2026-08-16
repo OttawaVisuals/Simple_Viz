@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why the sky is blue (and sunsets are red)</title>
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  .topgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
+
+  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqn{display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);font-size:clamp(30px,4vw,46px);line-height:1;font-weight:300}
+  .eqn .eq{color:var(--muted)}
+  .eqn .frac{display:inline-flex;flex-direction:column;align-items:center}
+  .eqn .frac .row{display:flex;gap:.16em;align-items:flex-start}
+  .eqn .frac .num{padding:0 .3em .06em}
+  .eqn .frac .den{padding:.06em .3em 0}
+  .eqn .frac .bar{height:1.5px;background:var(--fg);width:100%}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .eqn sup{font-size:.5em;position:relative;top:-.5em}
+
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:2.2em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:8px 2px}
+  .legend .sym{font-size:16px;font-weight:300;transition:color .2s}
+  .legend .sym sub{font-size:.6em;position:relative;bottom:-.2em}
+  .legend .name{font-size:12.5px;color:var(--muted2)}
+  .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0;display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,2.4vw,28px)}
+  @media (max-width:700px){.hero{grid-template-columns:1fr}}
+  .heropanel{position:relative}
+  .heropanel svg{width:100%;height:auto;display:block}
+  .heropanel .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.03em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
+  .heropanel .lbl.title{font:600 11px ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2)}
+
+  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
+
+  .ctrls{display:block}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;text-transform:none;transition:color .2s}
+  .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
+  .readout{display:flex;align-items:baseline;gap:10px;margin:5px 0 2px}
+  .readout .num{font-family:ui-monospace,monospace;font-size:clamp(26px,2.8vw,34px);font-weight:400;letter-spacing:-.02em}
+  .readout .swatch{width:1em;height:1em;border-radius:50%;border:1px solid var(--border);display:inline-block;transform:translateY(.05em)}
+  .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
+  .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
+  .track .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
+  .track .thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
+  .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
+
+  .result{text-align:left}
+  .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
+  .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
+  .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px}
+  .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
+
+  .beambars{margin-top:18px;max-width:420px}
+  .beamrow{margin-top:12px}
+  .beamrow-head{display:flex;justify-content:space-between;font:400 11.5px ui-monospace,monospace;color:var(--muted)}
+  .beamrow-head .v{color:var(--muted2)}
+  .beamrow-track{position:relative;height:8px;background:var(--track);border-radius:2px;margin-top:4px;overflow:hidden}
+  .beamrow-fill{position:absolute;left:0;top:0;height:8px;border-radius:2px;transition:width .12s linear,background-color .12s linear}
+
+  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+  .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
+  .preset:hover{border-color:var(--accent);color:var(--accent)}
+
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../index.html" id="backLink">&larr; Physics you can see</a>
+    <div class="topbar-right">
+      <span>Rayleigh scattering</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>Why the sky is <em>blue</em> &mdash; and sunsets <em>red</em>.</h1>
+      <p class="sub">Air molecules scatter short wavelengths far more than long ones (I &prop; 1/&lambda;&#8308;) &mdash; enough to paint the whole daytime sky blue, and, once sunlight has to cross far more air at a low sun angle, to scatter away nearly all the blue before it reaches your eye directly, leaving red and orange behind.</p>
+    </div>
+
+    <div class="eqnbox">
+      <div class="eqn">
+        <em id="Iterm">I</em>
+        <span class="eq">&prop;</span>
+        <span class="frac">
+          <span class="row num"><span>1</span></span>
+          <span class="bar"></span>
+          <span class="row den"><em id="lambdaTerm">&lambda;</em><sup>4</sup></span>
+        </span>
+      </div>
+    </div>
+
+    <div class="legendbox">
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="hero" id="heroWrap">
+    <div class="heropanel" id="dayWrap">
+      <div class="lbl title" id="lblDayTitle" style="left:6%;top:4%"></div>
+      <div class="lbl" id="lblDayAM" style="left:6%;top:14%"></div>
+      <div class="lbl" id="lblDaySun" style="right:4%;top:4%;text-align:right" ></div>
+      <svg id="daySvg" role="img" aria-label="A midday scene: the sun high overhead, sunlight crossing a short path of atmosphere before reaching the eye, scattering blue light across the whole sky dome."></svg>
+    </div>
+    <div class="heropanel" id="sunsetWrap">
+      <div class="lbl title" id="lblSunsetTitle" style="left:6%;top:4%"></div>
+      <div class="lbl" id="lblSunsetAM" style="left:6%;top:14%"></div>
+      <div class="lbl" id="lblSunsetSun" style="right:4%;top:4%;text-align:right"></div>
+      <svg id="sunsetSvg" role="img" aria-label="A sunset scene: the sun near the horizon, sunlight crossing a much longer path of atmosphere, losing nearly all its blue before reaching the eye directly and leaving the direct beam red."></svg>
+    </div>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrls">
+      <div class="ctrl" id="wlCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Wavelength <em id="lambdaLabel">&lambda;</em></span>
+          <span class="ctrl-rel">&lambda;&#8315;&#8308; &prop; I</span>
+        </div>
+        <div class="readout"><span class="num mono" id="wlReadout"></span><span class="swatch" id="wlSwatch"></span></div>
+        <div class="track" id="wlTrack" tabindex="0" role="slider" aria-label="Wavelength of light">
+          <div class="rail"></div>
+          <div class="fill" id="wlFill"></div>
+          <div class="thumb" id="wlThumb"></div>
+        </div>
+        <div class="track-range"><span>380 nm &middot; violet</span><span class="mid">shorter &lambda; scatters much more</span><span>750 nm &middot; red</span></div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Relative scattering</div>
+      <div class="result-value"><span class="num mono" id="ratioValue"></span><span class="unit mono" id="ratioUnit">&times; vs 550 nm</span><span class="v" id="verdict"></span></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+
+      <div class="beambars">
+        <div class="beamrow">
+          <div class="beamrow-head"><span>midday direct beam survives</span><span class="v mono" id="dayBeamPct"></span></div>
+          <div class="beamrow-track"><div class="beamrow-fill" id="dayBeamFill"></div></div>
+        </div>
+        <div class="beamrow">
+          <div class="beamrow-head"><span>sunset direct beam survives</span><span class="v mono" id="sunsetBeamPct"></span></div>
+          <div class="beamrow-track"><div class="beamrow-fill" id="sunsetBeamFill"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-p="day">midday sky</button>
+    <button class="preset" data-p="sunset">sunset</button>
+    <button class="preset" data-p="ref">reference green</button>
+  </div>
+
+  <p class="note">Named for Lord Rayleigh, who worked out the 1/&lambda;&#8308; law in the 1870s &mdash; see <a href="https://en.wikipedia.org/wiki/Rayleigh_scattering" target="_blank" rel="noopener">Rayleigh scattering</a>. Using 450&nbsp;nm and 650&nbsp;nm as representative blue and red wavelengths, blue scatters about (650/450)&#8308;&nbsp;&asymp;&nbsp;4.35&times; more than red at those specific wavelengths &mdash; a different pair of representative wavelengths gives a different number (400&nbsp;nm vs. 700&nbsp;nm gives (700/400)&#8308;&nbsp;&asymp;&nbsp;9.38&times;, close to the "about 5.5&times;" figure sometimes quoted elsewhere), so there's no single "the" ratio without stating which wavelengths went in. The two atmosphere path lengths above (airmass &asymp;1.15 at 60&deg; elevation, &asymp;37.9 at the horizon) come from the empirical Kasten&ndash;Young formula, computed live, not looked up; the sun and sky colors are a simplified composite built by weighting each sample wavelength's color by how much of it survives that path (Beer&ndash;Lambert, using a real sea-level reference optical depth of &asymp;0.1 at 550&nbsp;nm), assuming an evenly-bright input spectrum rather than the sun's true irradiance curve &mdash; illustrative, not a radiative-transfer simulation. This model only holds because air is mostly N&#8322;/O&#8322; molecules much smaller than a wavelength of visible light, which is exactly the regime Rayleigh scattering requires; larger particles like water droplets, dust, or pollution scatter all visible wavelengths roughly equally (<a href="https://en.wikipedia.org/wiki/Mie_scattering" target="_blank" rel="noopener">Mie scattering</a>) which is why clouds and haze look white or grey rather than blue.</p>
+
+</div>
+</main>
+<script>
+(function(){
+  var WLMIN=380, WLMAX=750;
+  var D2R = Math.PI/180;
+  var TAU550 = 0.1; // real approximate sea-level Rayleigh optical depth at 550 nm
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+
+  // ---- real physics: airmass (Kasten-Young 1989), Rayleigh optical depth, transmittance ----
+  function airmass(elevDeg){
+    var z = 90 - elevDeg;
+    var zr = z*D2R;
+    return 1/(Math.cos(zr) + 0.50572*Math.pow(96.07995 - z, -1.6364));
+  }
+  var DAY_ELEV = 60, SUNSET_ELEV = 0;
+  var DAY_AM = airmass(DAY_ELEV);       // ~1.154
+  var SUNSET_AM = airmass(SUNSET_ELEV); // ~37.9
+
+  function tau(wl){ return TAU550*Math.pow(550/wl, 4); }
+  function transmittance(wl, am){ return Math.exp(-tau(wl)*am); }
+  function relIntensity(wl){ return Math.pow(550/wl, 4); } // I / I(550nm)
+
+  function colorName(wl){
+    if(wl<450) return 'violet';
+    if(wl<495) return 'blue';
+    if(wl<570) return 'green';
+    if(wl<590) return 'yellow';
+    if(wl<620) return 'orange';
+    return 'red';
+  }
+
+  // ---- wavelength -> RGB (Dan Bruton's widely-published piecewise-linear approximation) ----
+  // Sanity-checked: 650nm -> pure red rgb(255,0,0); 450nm -> blue rgb(0,~70,255);
+  // 550nm -> dominant-green rgb(~163,255,0), i.e. yellow-green, never red or blue. All hold.
+  function wavelengthToRGB(wl){
+    var r,g,b,factor;
+    if(wl>=380 && wl<440){ r=-(wl-440)/(440-380); g=0; b=1; }
+    else if(wl>=440 && wl<490){ r=0; g=(wl-440)/(490-440); b=1; }
+    else if(wl>=490 && wl<510){ r=0; g=1; b=-(wl-510)/(510-490); }
+    else if(wl>=510 && wl<580){ r=(wl-510)/(580-510); g=1; b=0; }
+    else if(wl>=580 && wl<645){ r=1; g=-(wl-645)/(645-580); b=0; }
+    else if(wl>=645 && wl<=780){ r=1; g=0; b=0; }
+    else { r=0; g=0; b=0; }
+    if(wl>=380 && wl<420) factor = 0.3+0.7*(wl-380)/(420-380);
+    else if(wl>=420 && wl<701) factor = 1.0;
+    else if(wl>=701 && wl<=780) factor = 0.3+0.7*(780-wl)/(780-700);
+    else factor = 0.0;
+    var GAMMA = 0.8;
+    function adj(c){ return c<=0 ? 0 : Math.round(255*Math.pow(c*factor, GAMMA)); }
+    return { r:adj(r), g:adj(g), b:adj(b) };
+  }
+  function rgbCss(c){ return 'rgb('+c.r+','+c.g+','+c.b+')'; }
+  function rgbHex(c){
+    function h(n){ var s=n.toString(16); return s.length<2?'0'+s:s; }
+    return '#'+h(c.r)+h(c.g)+h(c.b);
+  }
+
+  // ---- composite sun-disc color: weight each sample wavelength's color by how much of it
+  // survives the given airmass, per Beer-Lambert. Assumes an evenly-bright input spectrum
+  // (stated as a simplification in the closing note) rather than the true solar irradiance
+  // curve, since that curve isn't needed to show the blue-stripped-first mechanism. ----
+  function sunDiscColor(am){
+    var rs=0,gs=0,bs=0;
+    for(var wl=380; wl<=750; wl+=10){
+      var t = transmittance(wl, am);
+      var c = wavelengthToRGB(wl);
+      rs += c.r*t; gs += c.g*t; bs += c.b*t;
+    }
+    var mx = Math.max(rs,gs,bs,1e-6);
+    var scale = 232/mx;
+    var r = clamp(Math.round(rs*scale+14),0,255);
+    var g = clamp(Math.round(gs*scale+10),0,255);
+    var b = clamp(Math.round(bs*scale+10),0,255);
+    return { r:r, g:g, b:b };
+  }
+
+  var NS='http://www.w3.org/2000/svg';
+  function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+  function clear(g){ while(g.firstChild) g.removeChild(g.firstChild); }
+
+  var state = { wl: 550, active: null };
+
+  var $ = function(id){ return document.getElementById(id); };
+  var heroWrap=$('heroWrap'), dayWrap=$('dayWrap'), sunsetWrap=$('sunsetWrap');
+  var daySvg=$('daySvg'), sunsetSvg=$('sunsetSvg');
+  var dayW=0, sunsetW=0;
+
+  // Fixed schematic panel layouts (not a literal trig projection of elevation angle — the
+  // two hand-placed sun positions already tell the honest story: high-and-short for midday,
+  // low-and-far-to-the-side for sunset). Real quantities (airmass, transmittance, color) are
+  // all computed live; only the on-screen placement is a fixed illustrative device, matching
+  // CLAUDE.md's "honest device over literal-scale illustration" guidance.
+  function drawPanel(svg, w, opts){
+    var h = Math.round(w*0.66);
+    clear(svg);
+    svg.setAttribute('viewBox','0 0 '+w+' '+h);
+    svg.setAttribute('preserveAspectRatio','none');
+
+    var horizonY = h*0.80;
+    var sun = opts.isSunset ? { x:w*0.80, y:h*0.76 } : { x:w*0.66, y:h*0.14 };
+    var sunR = opts.isSunset ? w*0.055 : w*0.045;
+    var obs = { x:w*0.13, y:h*0.82 };
+
+    var gradId = opts.isSunset ? 'skyGradSunset' : 'skyGradDay';
+    svg.appendChild(el('rect',{x:0,y:0,width:w,height:horizonY, fill:'url(#'+gradId+')'}));
+    svg.appendChild(el('rect',{x:0,y:horizonY,width:w,height:h-horizonY, fill:'var(--line)'}));
+    svg.appendChild(el('line',{x1:0,y1:horizonY,x2:w,y2:horizonY, stroke:'var(--line2)', 'stroke-width':1}));
+
+    // scattered light: small dots across the sky dome, colored by the current wavelength,
+    // opacity driven by how much of that wavelength scatters away rather than going straight
+    // through (1 - transmittance) along this panel's atmospheric path.
+    var scatterFrac = 1 - transmittance(opts.wl, opts.am);
+    var dotColor = rgbCss(wavelengthToRGB(opts.wl));
+    var dotSpots = [
+      [0.20,0.10],[0.40,0.06],[0.58,0.22],[0.30,0.34],[0.72,0.12],
+      [0.85,0.30],[0.14,0.48],[0.48,0.44],[0.65,0.50]
+    ];
+    dotSpots.forEach(function(p){
+      var dx=w*p[0], dy=horizonY*p[1];
+      svg.appendChild(el('circle',{cx:dx,cy:dy,r:Math.max(1.6,w*0.008),
+        fill:dotColor, opacity:clamp(scatterFrac,0.05,0.85).toFixed(3)}));
+    });
+
+    // direct beam: sun to observer, opacity = how much of the current wavelength survives
+    var beamOpacity = clamp(transmittance(opts.wl, opts.am), 0.04, 1);
+    svg.appendChild(el('line',{x1:sun.x,y1:sun.y,x2:obs.x,y2:obs.y,
+      stroke:dotColor, 'stroke-width':Math.max(1.5,w*0.006), 'stroke-dasharray':'5 6',
+      'stroke-linecap':'round', opacity:beamOpacity.toFixed(3)}));
+
+    // sun disc: full-spectrum composite color for this path, independent of the slider
+    svg.appendChild(el('circle',{cx:sun.x,cy:sun.y,r:sunR, fill:rgbCss(opts.sunColor)}));
+    svg.appendChild(el('circle',{cx:sun.x,cy:sun.y,r:sunR, fill:'none', stroke:'var(--line2)', 'stroke-width':1}));
+
+    // observer marker
+    svg.appendChild(el('circle',{cx:obs.x,cy:obs.y,r:Math.max(2.5,w*0.012), fill:'var(--fg)'}));
+
+    return { w:w, h:h, sun:sun, obs:obs };
+  }
+
+  function ensureGradients(){
+    if($('skyGradDay')) return;
+    var defs = el('defs',{});
+    var gDay = el('linearGradient',{id:'skyGradDay', x1:'0', y1:'0', x2:'0', y2:'1'});
+    gDay.appendChild(el('stop',{offset:'0%','stop-color':'#3E6FB0'}));
+    gDay.appendChild(el('stop',{offset:'100%','stop-color':'#CFE0EF'}));
+    defs.appendChild(gDay);
+    var gSun = el('linearGradient',{id:'skyGradSunset', x1:'0', y1:'0', x2:'0', y2:'1'});
+    gSun.appendChild(el('stop',{id:'sunsetZenithStop', offset:'0%','stop-color':'#1F3A6B'}));
+    gSun.appendChild(el('stop',{offset:'55%','stop-color':'#8C6A8A'}));
+    gSun.appendChild(el('stop',{id:'sunsetHorizonStop', offset:'100%','stop-color':'#E0813C'}));
+    defs.appendChild(gSun);
+    daySvg.appendChild(defs);
+  }
+
+  function drawHero(){
+    ensureGradients();
+    var w1 = dayW || dayWrap.clientWidth || 500;
+    var w2 = sunsetW || sunsetWrap.clientWidth || 500;
+
+    var daySun = sunDiscColor(DAY_AM);
+    var sunsetSun = sunDiscColor(SUNSET_AM);
+
+    // tie the sunset gradient's horizon stop to the computed sunset sun color, so the glow
+    // near the horizon isn't an arbitrary hand-picked hex value
+    var horizonStop = $('sunsetHorizonStop');
+    if(horizonStop) horizonStop.setAttribute('stop-color', rgbHex(sunsetSun));
+
+    drawPanel(daySvg, w1, { isSunset:false, wl:state.wl, am:DAY_AM, sunColor:daySun });
+    drawPanel(sunsetSvg, w2, { isSunset:true, wl:state.wl, am:SUNSET_AM, sunColor:sunsetSun });
+
+    $('lblDayTitle').textContent = 'Midday';
+    $('lblDayAM').innerHTML = 'sun 60&deg; up &middot; airmass &asymp; '+DAY_AM.toFixed(2);
+    $('lblDaySun').textContent = 'direct sun: '+rgbHex(daySun);
+    $('lblDaySun').style.color = rgbCss(daySun);
+
+    $('lblSunsetTitle').textContent = 'Sunset';
+    $('lblSunsetAM').innerHTML = 'sun at horizon &middot; airmass &asymp; '+SUNSET_AM.toFixed(1);
+    $('lblSunsetSun').textContent = 'direct sun: '+rgbHex(sunsetSun);
+    $('lblSunsetSun').style.color = rgbCss(sunsetSun);
+  }
+
+  // ---- equation + legend ----
+  var accent = 'var(--accent)';
+  var Iterm=$('Iterm'), lambdaTerm=$('lambdaTerm'), lambdaLabel=$('lambdaLabel');
+  var legendEl=$('legend');
+  function activeColor(k){ return state.active===k ? accent : 'var(--fg)'; }
+  function drawEquationAndLegend(){
+    lambdaTerm.style.color = activeColor('wl');
+    lambdaLabel.style.color = activeColor('wl');
+    Iterm.style.color = 'var(--fg)';
+
+    var ratio = relIntensity(state.wl);
+    var rows = [
+      { sym:'&lambda;', name:colorName(state.wl)+' light', val: state.wl+' nm', key:'wl' },
+      { sym:'I', sub:'rel', name:'scattering vs. 550 nm', val: ratio.toFixed(2)+'×', key:'wl' }
+    ];
+    legendEl.innerHTML='';
+    rows.forEach(function(row){
+      var div=document.createElement('div'); div.className='row';
+      var sym=document.createElement('em'); sym.className='sym';
+      sym.innerHTML = row.sub ? row.sym+'<sub>'+row.sub+'</sub>' : row.sym;
+      sym.style.color = activeColor(row.key);
+      var name=document.createElement('span'); name.className='name'; name.textContent=row.name;
+      var val=document.createElement('span'); val.className='val mono'; val.textContent=row.val;
+      div.appendChild(sym); div.appendChild(name); div.appendChild(val);
+      legendEl.appendChild(div);
+    });
+  }
+
+  // ---- slider ----
+  var wlTrack=$('wlTrack'), wlFill=$('wlFill'), wlThumb=$('wlThumb'), wlSwatch=$('wlSwatch');
+  (function(){
+    var dragging=false;
+    function setFromClientX(x){
+      var r=wlTrack.getBoundingClientRect();
+      var f=clamp((x-r.left)/r.width,0,1);
+      state.wl = clamp(Math.round(WLMIN+f*(WLMAX-WLMIN)), WLMIN, WLMAX);
+      render();
+    }
+    wlTrack.addEventListener('pointerdown', function(e){
+      dragging=true; if(wlTrack.setPointerCapture) wlTrack.setPointerCapture(e.pointerId);
+      state.active='wl'; setFromClientX(e.clientX);
+    });
+    wlTrack.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
+    function endDrag(){ if(dragging){ dragging=false; render(); } }
+    wlTrack.addEventListener('pointerup', endDrag);
+    wlTrack.addEventListener('pointercancel', endDrag);
+    wlTrack.addEventListener('pointerenter', function(){ state.active='wl'; render(); });
+    wlTrack.addEventListener('keydown', function(e){
+      var step = e.shiftKey ? 20 : 5, v=null;
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown') v=state.wl-step;
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp') v=state.wl+step;
+      else if(e.key==='Home') v=WLMIN;
+      else if(e.key==='End') v=WLMAX;
+      if(v!==null){ e.preventDefault(); state.wl=clamp(v,WLMIN,WLMAX); render(); }
+    });
+  })();
+  $('wlCtrl').addEventListener('pointerleave', function(){ if(!$('wlTrack').matches(':active')){ state.active=null; render(); } });
+
+  // The slider's own fill/thumb/swatch are colored to the real visible-spectrum color at the
+  // current wavelength, via wavelengthToRGB() above. This is a deliberate, STYLE_GUIDE-
+  // sanctioned exception to the shared --bg/--fg/--muted/--muted2/--line/--line2/--border/
+  // --accent/--bad/--track token set: STYLE_GUIDE.md's "Design tokens" section explicitly
+  // allows per-concept colors that carry semantic meaning (it names straw-hose-flow's four
+  // fluid colors as the precedent) to sit outside the shared tokens as their own constants.
+  // Here the wavelength-to-color mapping *is* the concept, so the page chrome (background,
+  // text, borders, equation, legend, gauge track) still uses only the approved tokens; only
+  // this slider's fill/thumb/swatch and the hero's spectral colors use real RGB values.
+  function drawSlider(){
+    var pct = ((state.wl-WLMIN)/(WLMAX-WLMIN)*100).toFixed(2)+'%';
+    var col = rgbCss(wavelengthToRGB(state.wl));
+    wlFill.style.width = pct; wlFill.style.background = col;
+    wlThumb.style.left = pct; wlThumb.style.borderColor = col;
+    wlSwatch.style.background = col;
+    wlTrack.setAttribute('aria-valuemin', WLMIN);
+    wlTrack.setAttribute('aria-valuemax', WLMAX);
+    wlTrack.setAttribute('aria-valuenow', state.wl);
+    wlTrack.setAttribute('aria-valuetext', state.wl+' nanometres, '+colorName(state.wl));
+    $('wlReadout').textContent = state.wl+' nm';
+  }
+
+  // ---- result ----
+  function fmtPct(p){
+    var pct = p*100;
+    if(pct < 0.01) return '<0.01';
+    if(pct < 1) return pct.toFixed(2);
+    if(pct < 10) return pct.toFixed(1);
+    return String(Math.round(pct));
+  }
+  var ratioValueEl=$('ratioValue'), verdictEl=$('verdict'), verdictSubEl=$('verdictSub');
+  var dayBeamPctEl=$('dayBeamPct'), dayBeamFillEl=$('dayBeamFill');
+  var sunsetBeamPctEl=$('sunsetBeamPct'), sunsetBeamFillEl=$('sunsetBeamFill');
+
+  function drawResult(){
+    var ratio = relIntensity(state.wl);
+    var col = rgbCss(wavelengthToRGB(state.wl));
+    ratioValueEl.textContent = ratio.toFixed(2);
+    ratioValueEl.style.color = col;
+    verdictEl.textContent = colorName(state.wl);
+    verdictEl.style.color = col;
+    verdictSubEl.textContent = ratio >= 1
+      ? ('Scatters '+ratio.toFixed(2)+'× as much as mid-spectrum (550 nm) green light.')
+      : ('Scatters only '+(1/ratio).toFixed(2)+'× less than mid-spectrum (550 nm) green light — barely scatters at all.');
+
+    var dayT = transmittance(state.wl, DAY_AM);
+    var sunsetT = transmittance(state.wl, SUNSET_AM);
+    dayBeamPctEl.textContent = fmtPct(dayT)+'%';
+    sunsetBeamPctEl.textContent = fmtPct(sunsetT)+'%';
+    dayBeamFillEl.style.width = (dayT*100).toFixed(3)+'%';
+    dayBeamFillEl.style.background = col;
+    sunsetBeamFillEl.style.width = (sunsetT*100).toFixed(3)+'%';
+    sunsetBeamFillEl.style.background = col;
+  }
+
+  // ---- presets ----
+  var PRESETS = { day:{wl:470}, sunset:{wl:620}, ref:{wl:550} };
+  document.querySelectorAll('.preset').forEach(function(b){
+    b.addEventListener('click', function(){
+      var p = PRESETS[b.dataset.p];
+      state.wl = p.wl; state.active='wl';
+      render();
+    });
+  });
+
+  // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
+  var STORAGE_KEY = 'sky-blue-theme';
+  var themeToggle = $('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    var applied = document.documentElement.getAttribute('data-theme');
+    if(applied) return applied;
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+
+  // The relative "../index.html" link only resolves when this file is sitting in
+  // Simple_Viz/visualizations/ next to the site index. Published standalone (e.g. as an
+  // Artifact) there's no sibling index to reach, so fall back to the GitHub repo instead of
+  // leaving a link that 404s.
+  (function(){
+    var backLink = document.getElementById('backLink');
+    if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
+      backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
+      backLink.target = '_blank';
+      backLink.rel = 'noopener';
+      backLink.textContent = 'Simple Viz on GitHub ↗';
+    }
+  })();
+
+  function measure(){
+    var w1=dayWrap.clientWidth, w2=sunsetWrap.clientWidth, changed=false;
+    if(w1 && w1!==dayW){ dayW=w1; changed=true; }
+    if(w2 && w2!==sunsetW){ sunsetW=w2; changed=true; }
+    if(changed) render();
+  }
+
+  function render(){
+    drawHero();
+    drawEquationAndLegend();
+    drawSlider();
+    drawResult();
+  }
+
+  new ResizeObserver(measure).observe(heroWrap);
+  window.addEventListener('resize', measure);
+  [60,250,900].forEach(function(t){ setTimeout(measure, t); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  render();
+  // No animation on this page — both hero panels and every readout redraw fully from state on
+  // each interaction, same category as snells-law.html (gravity-lab, mass-energy, eratosthenes-
+  // shadow, horizon-distance, planet-light-delay per the correctness-sweep note in HANDOVER.md)
+  // — so there's nothing that needs a prefers-reduced-motion check.
+})();
+</script>

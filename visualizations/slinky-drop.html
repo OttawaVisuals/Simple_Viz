@@ -1,0 +1,657 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The bottom hasn't heard yet</title>
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  .topgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
+
+  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqn{display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);font-size:clamp(28px,3.6vw,42px);line-height:1;font-weight:300}
+  .eqn .eq{color:var(--muted)}
+  .eqn .rad{display:inline-flex;align-items:stretch}
+  .eqn .radsign{position:relative;width:.42em}
+  .eqn .radsign svg{position:absolute;inset:0;width:100%;height:100%;color:var(--fg);display:block}
+  .eqn .radbar{border-top:1.5px solid var(--fg);padding:.1em .12em 0 .06em}
+  .eqn .radinner{display:flex;align-items:center;gap:.1em;padding-top:.08em}
+  .eqn .frac{display:inline-flex;flex-direction:column;align-items:center}
+  .eqn .frac .row{display:flex;gap:.1em;align-items:flex-start}
+  .eqn .frac .bar{height:1.5px;background:var(--fg);width:100%;margin:.05em 0}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .eqn sup{font-size:.55em;position:relative;top:-.5em}
+
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:1.6em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:8px 2px}
+  .legend .sym{font-size:17px;font-weight:300;transition:color .2s}
+  .legend .name{font-size:12.5px;color:var(--muted2)}
+  .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero svg{width:100%;height:auto;display:block}
+  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
+  .playback{display:flex;align-items:center;gap:14px;margin-top:12px}
+  .playback button{cursor:pointer;background:none;border:0;padding:0 0 2px;color:var(--fg);font:15px/1 Georgia,serif;font-style:italic;border-bottom:1px solid var(--line2)}
+  .playback button:hover{color:var(--accent);border-color:var(--accent)}
+  .playback .sep{color:var(--line2)}
+
+  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
+
+  .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;text-transform:none;transition:color .2s}
+  .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
+  .readout{font-family:ui-monospace,monospace;font-size:clamp(26px,2.8vw,34px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
+  .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
+  .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
+  .track .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
+  .track .thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
+  .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
+
+  .result{text-align:left}
+  .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
+  .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
+  .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px}
+  .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
+  .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
+  .gauge{position:relative;height:56px;margin-top:16px;max-width:420px}
+  .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
+  .gauge .reach{position:absolute;top:14px;height:10px;border-radius:2px 0 0 2px;background:color-mix(in srgb, var(--accent) 16%, transparent);left:0}
+  .gauge .tick{position:absolute;top:26px;width:1px;height:5px;background:var(--line2)}
+  .gauge .ticklabel{position:absolute;top:33px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
+  .gauge .limit{position:absolute;top:9px;height:20px;width:1px;background:var(--bad)}
+  .gauge .limitlabel{position:absolute;top:0;white-space:nowrap;font:400 9px ui-monospace,monospace;letter-spacing:.05em;color:var(--bad)}
+  .gauge .mark{position:absolute;top:12px;height:14px;width:3px;border-radius:2px;transition:left .12s linear}
+  .gauge .marklabel{position:absolute;top:-3px;white-space:nowrap;font:500 11px ui-monospace,monospace;transition:left .12s linear}
+
+  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+  .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
+  .preset:hover{border-color:var(--accent);color:var(--accent)}
+
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../index.html" id="backLink">&larr; Physics you can see</a>
+    <div class="topbar-right">
+      <span>Slinky drop</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>The bottom <em>doesn't know</em> it's falling.</h1>
+      <p class="sub">Hold a stretched slinky and let go of only the top. The bottom coil stays exactly where it is &mdash; motionless &mdash; until a compression wave racing down from the top delivers the news that the tension holding it up has changed.</p>
+    </div>
+
+    <div class="eqnbox">
+      <div class="eqn">
+        <em id="vTerm">v</em>
+        <span class="eq">=</span>
+        <span class="rad">
+          <span class="radsign"><svg viewBox="0 0 22 54" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,32 5,32 11,50 22,0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg></span>
+          <span class="radbar"><span class="radinner">
+            <span class="frac">
+              <span class="row num"><em id="kTerm">k</em><em id="LTerm2">L</em><sup>2</sup></span>
+              <span class="bar"></span>
+              <span class="row den"><em id="mTerm2">m</em></span>
+            </span>
+          </span></span>
+        </span>
+      </div>
+    </div>
+
+    <div class="legendbox">
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="hero" id="heroWrap">
+    <div class="lbl" id="lblTime" style="transform:translateX(-100%)"></div>
+    <div class="lbl" id="lblStatus"></div>
+    <div class="lbl" id="lblWave" style="transform:translateY(-50%)"></div>
+    <svg id="heroSvg" role="img" aria-label="A stretched slinky hanging vertically. Its top falls the instant it's released while the bottom stays fixed until a compression wave, travelling down from the top, reaches it."></svg>
+    <div class="playback">
+      <button id="playBtn" type="button">Pause</button>
+      <span class="sep">&middot;</span>
+      <button id="resetBtn" type="button">Drop again</button>
+    </div>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrls">
+      <div class="ctrl" id="kCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Spring constant <em id="kLabel">k</em></span>
+          <span class="ctrl-rel">wait &prop; 1/&radic;k</span>
+        </div>
+        <div class="readout mono" id="kReadout"></div>
+        <div class="track" id="kTrack" tabindex="0" role="slider" aria-label="Spring constant">
+          <div class="rail"></div>
+          <div class="fill" id="kFill"></div>
+          <div class="thumb" id="kThumb"></div>
+        </div>
+        <div class="track-range"><span>1.0 N/m</span><span class="mid">stiffer &middot; faster wave</span><span>3.0 N/m</span></div>
+      </div>
+
+      <div class="ctrl" id="LCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Stretched length <em id="LLabel">L</em></span>
+          <span class="ctrl-rel">no effect on the wait</span>
+        </div>
+        <div class="readout mono" id="LReadout"></div>
+        <div class="track" id="LTrack" tabindex="0" role="slider" aria-label="Stretched length">
+          <div class="rail"></div>
+          <div class="fill" id="LFill"></div>
+          <div class="thumb" id="LThumb"></div>
+        </div>
+        <div class="track-range"><span>0.5 m</span><span class="mid">farther to go, but faster too</span><span>3.0 m</span></div>
+      </div>
+
+      <div class="ctrl" id="mCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Total mass <em id="mLabel">m</em></span>
+          <span class="ctrl-rel">wait &prop; &radic;m</span>
+        </div>
+        <div class="readout mono" id="mReadout"></div>
+        <div class="track" id="mTrack" tabindex="0" role="slider" aria-label="Total mass">
+          <div class="rail"></div>
+          <div class="fill" id="mFill"></div>
+          <div class="thumb" id="mThumb"></div>
+        </div>
+        <div class="track-range"><span>100 g</span><span class="mid">heavier &middot; slower wave</span><span>300 g</span></div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Bottom stays still for</div>
+      <div class="result-value"><span class="num mono" id="tValue"></span><span class="unit mono">s</span><span class="v" id="verdict">until the wave arrives.</span></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+      <div class="effort-line" id="effortLine"></div>
+      <div class="gauge" id="gauge">
+        <div class="track"></div>
+        <div class="reach" id="gReach"></div>
+        <div class="limit" id="gLimit"></div>
+        <div class="limitlabel" id="gLimitLabel">real slow-mo videos, upper end</div>
+        <div class="mark" id="gMark"></div>
+        <div class="marklabel mono" id="gMarkLabel"></div>
+        <div id="gTicks"></div>
+        <div id="gLabels"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-p="loose">loosely stretched</button>
+    <button class="preset" data-p="tight">tightly stretched</button>
+  </div>
+
+  <p class="note">This is the real <a href="https://en.wikipedia.org/wiki/Slinky" target="_blank" rel="noopener">slinky-drop demo</a>, familiar from countless slow-motion videos and analyzed in detail by physicist Rhett Allain: release only the top of a stretched slinky and the bottom hangs in the air, unmoving, until a compression wave &mdash; carrying the "news" that the tension holding it up has changed &mdash; travels down and reaches it. Before that news arrives, the bottom's own weight is still being held up by exactly the tension it always had, so nothing about its situation has changed yet. The slinky's overall centre of mass falls at g the whole time regardless, exactly as Newton's second law demands for the system as a whole &mdash; it's only individual coils, not the average, that wait their turn. Wave speed here is v&nbsp;=&nbsp;L&radic;(k/m) (equivalently &radic;(kL&sup2;/m)): k in N/m, L in m and m in kg gives (N/m&middot;m&sup2;)/kg&nbsp;=&nbsp;(kg/s&sup2;&middot;m&sup2;)/kg&nbsp;=&nbsp;m&sup2;/s&sup2;, so the square root is honestly in m/s. The travel time is then L/v, which simplifies to &radic;(m/k) &mdash; note that L cancels out entirely, so stretching the slinky further doesn't change how long the bottom waits, only how dramatic the pause looks (the wave has farther to travel, but it also moves proportionally faster). k, L and m above are representative values for a typical metal slinky, not one specific product's spec sheet. Each coil in the animation is modelled as staying perfectly still until the wave reaches it, then beginning free fall from rest at that instant &mdash; a simplification of the true elastic dynamics, but one that reproduces the timing and the stillness this page is about.</p>
+
+</div>
+</main>
+<script>
+(function(){
+  // ---- physical ranges (representative slinky values, not a specific product spec) ----
+  var KMIN=1.0, KMAX=3.0;      // N/m, real slinkies are quite soft springs
+  var LMIN=0.5, LMAX=3.0;      // m, how far you've stretched it before dropping
+  var MMIN=0.10, MMAX=0.30;    // kg, a real metal slinky is roughly 100-300 g
+  var G = 9.81;
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+
+  // ---- wave speed & travel time ----
+  // Standard derivation: model the slinky as a chain of point masses linked by short
+  // springs, each carrying spring constant N*k (N segments in series give total constant
+  // k), mass m/N apiece, spread over the CURRENT stretched length L. Taking the continuum
+  // limit gives a longitudinal wave speed v = L*sqrt(k/m) for waves measured against the
+  // *stretched* configuration - this is the standard "wave speed on a stretched spring"
+  // result (equivalently written v = sqrt(k*L^2/m)).
+  //
+  // Dimensional check: k [N/m] = [kg/s^2]; L^2 [m^2]; m [kg].
+  //   k*L^2/m -> (kg/s^2 * m^2) / kg = m^2/s^2   -- correct units for a SPEED SQUARED.
+  // (The roadmap's shorthand v=sqrt(kL/m) is NOT dimensionally consistent: kL/m has units
+  // of (N/m*m)/kg = N/kg = m/s^2, an acceleration, not a speed-squared - that version is
+  // wrong and was not used here.)
+  function waveSpeed(k,L,m){ return L*Math.sqrt(k/m); }
+  // Travel time = L / v = L / (L*sqrt(k/m)) = sqrt(m/k) -- L cancels exactly.
+  function travelTime(k,L,m){ return Math.sqrt(m/k); }
+
+  // Sample check at representative mid-range values (k=2 N/m, L=1.5 m, m=0.2 kg):
+  //   v = 1.5*sqrt(2/0.2) = 1.5*sqrt(10) = 4.74 m/s
+  //   t = L/v = 1.5/4.74 = 0.316 s   (also equals sqrt(0.2/2) = sqrt(0.1) = 0.316 s - matches)
+  // That's squarely in the "few tenths of a second" range real slow-motion slinky-drop
+  // footage shows. Across the full slider range travel time spans sqrt(0.1/3)=0.183 s
+  // (stiffest, lightest) to sqrt(0.3/1)=0.548 s (softest, heaviest) - also a plausible
+  // fraction of a second, so the model checks out at both ends, not just the middle.
+
+  var CAP_MULT = 1.4; // how much extra time (relative to the wave's travel time) the
+                       // animation keeps running after the wave arrives, to show the
+                       // slinky finish falling together before it pauses on its own.
+
+  var NS='http://www.w3.org/2000/svg';
+  function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+
+  var state = { k:2.0, L:1.5, m:0.20, active:null, drag:null };
+  var sim = { t:0, playing:false, finished:false };
+  var heroW = 0, H = null;
+  var N_COILS = 16;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
+  var lblTime=$('lblTime'), lblStatus=$('lblStatus'), lblWave=$('lblWave');
+
+  function v(){ return waveSpeed(state.k, state.L, state.m); }
+  function tWave(){ return travelTime(state.k, state.L, state.m); }
+  function tCap(){ return tWave()*CAP_MULT; }
+
+  function resetDrop(){ sim.t = 0; sim.finished = false; }
+
+  // ---- hero geometry: viewBox width == measured CSS px width, so 1 unit = 1px ----
+  // Vertical budget is sized off the WORST CASE across the whole slider range (longest
+  // stretch + slowest/heaviest combo's fall distance during the capped animation window),
+  // so the diagram never resizes as sliders move - only the coils' positions inside it do.
+  var PXPERM = 50, TOP_Y = 55, BOTTOM_MARGIN = 46;
+  var MAX_TCAP = CAP_MULT*travelTime(KMIN, LMAX, MMAX);
+  var MAX_FALL_M = 0.5*G*MAX_TCAP*MAX_TCAP;
+  var BUDGET_M = LMAX + MAX_FALL_M + 0.6;
+
+  function geom(w){
+    var narrow = w < 620;
+    var vbH = TOP_Y + BUDGET_M*PXPERM + BOTTOM_MARGIN;
+    return { w:w, vbH:vbH, Ox:w/2, rx: narrow?24:32 };
+  }
+
+  // ---- per-coil kinematics ----
+  // Coil i sits at material coordinate x_i (metres from the top, along the slinky's own
+  // stretched length) and stays at rest (y = x_i) until the wave reaches it at time
+  // x_i / v(state); after that it free-falls from rest starting at that instant:
+  //   y(t) = x_i + 0.5*g*(t - x_i/v)^2      for t >= x_i/v
+  //   y(t) = x_i                            for t <  x_i/v
+  // This is a simplification of the true elastic dynamics (see note in the page text) but
+  // it reproduces exactly the effect being demonstrated: motionless until the news
+  // arrives, then falling.
+  function coilYm(xi, t, vv){
+    var tArrive = xi/vv;
+    if(t < tArrive) return xi;
+    var dt = t - tArrive;
+    return xi + 0.5*G*dt*dt;
+  }
+
+  var coilEls = [], springEls = [];
+  function buildHeroSkeleton(){
+    while(heroSvg.firstChild) heroSvg.removeChild(heroSvg.firstChild);
+    coilEls = []; springEls = [];
+    heroSvg.appendChild(el('rect',{id:'handBar', rx:2, fill:'var(--fg)'}));
+    for(var i=0;i<3;i++) heroSvg.appendChild(el('line',{'class':'hatch', stroke:'var(--line2)', 'stroke-width':1.2}));
+    var wave = el('line',{id:'waveLine', stroke:'var(--accent)', 'stroke-width':1.4, 'stroke-dasharray':'5 4'});
+    heroSvg.appendChild(wave);
+    for(var i=0;i<N_COILS-1;i++){
+      var s = el('line',{stroke:'var(--line2)','stroke-width':1});
+      heroSvg.appendChild(s); springEls.push(s);
+    }
+    for(var i=0;i<N_COILS;i++){
+      var c = el('ellipse',{ry:5,'stroke-width':1.4});
+      heroSvg.appendChild(c); coilEls.push(c);
+    }
+  }
+
+  function drawStatic(){
+    var w = heroW || heroWrap.clientWidth || 1100;
+    var h = geom(w); H = h;
+    heroSvg.setAttribute('viewBox','0 0 '+w+' '+h.vbH);
+    drawDynamic();
+  }
+
+  function drawDynamic(){
+    if(!H) return;
+    var w = H.w, vv = v(), tw = tWave(), t = sim.t;
+
+    var handBar = $('handBar');
+    var handOpacity = t>0.0005 ? 0 : 1;
+    handBar.setAttribute('x', H.Ox-18); handBar.setAttribute('y', TOP_Y-6);
+    handBar.setAttribute('width', 36); handBar.setAttribute('height', 4);
+    handBar.style.transition = 'opacity .35s'; handBar.style.opacity = handOpacity;
+    var hatches = heroSvg.querySelectorAll('.hatch');
+    for(var i=0;i<hatches.length;i++){
+      var hx = H.Ox-12+i*12;
+      hatches[i].setAttribute('x1',hx); hatches[i].setAttribute('y1',TOP_Y-6);
+      hatches[i].setAttribute('x2',hx-6); hatches[i].setAttribute('y2',TOP_Y-16);
+      hatches[i].style.transition = 'opacity .35s'; hatches[i].style.opacity = handOpacity;
+    }
+
+    var xs = [], ys = [];
+    for(var i=0;i<N_COILS;i++){
+      var xi = (i/(N_COILS-1))*state.L;
+      xs.push(xi);
+      ys.push(TOP_Y + coilYm(xi, t, vv)*PXPERM);
+    }
+    for(var i=0;i<N_COILS;i++){
+      var c = coilEls[i];
+      var fallen = t >= xs[i]/vv;
+      c.setAttribute('cx', H.Ox); c.setAttribute('cy', ys[i]); c.setAttribute('rx', H.rx);
+      c.setAttribute('fill', fallen ? 'color-mix(in srgb, var(--accent) 22%, var(--bg))' : 'var(--bg)');
+      c.setAttribute('stroke', fallen ? 'var(--accent)' : 'var(--fg)');
+      c.setAttribute('opacity', fallen ? 1 : 0.9);
+    }
+    for(var i=0;i<N_COILS-1;i++){
+      var s = springEls[i];
+      s.setAttribute('x1', H.Ox); s.setAttribute('y1', ys[i]);
+      s.setAttribute('x2', H.Ox); s.setAttribute('y2', ys[i+1]);
+    }
+
+    var waveLine = $('waveLine');
+    var frontM = Math.min(vv*t, state.L);
+    var waveDone = t >= tw;
+    waveLine.setAttribute('x1', H.Ox-H.rx-14); waveLine.setAttribute('x2', H.Ox+H.rx+14);
+    var waveY = TOP_Y + frontM*PXPERM;
+    waveLine.setAttribute('y1', waveY); waveLine.setAttribute('y2', waveY);
+    waveLine.setAttribute('opacity', waveDone ? 0 : 0.9);
+
+    var px = function(x){ return (x/w*100)+'%'; }, py = function(y){ return (y/H.vbH*100)+'%'; };
+    lblTime.style.left = px(w-10); lblTime.style.top = py(14);
+    lblTime.textContent = 't = '+t.toFixed(3)+' s';
+
+    lblWave.style.left = px(H.Ox+H.rx+22); lblWave.style.top = py(waveY);
+    lblWave.style.opacity = waveDone ? 0 : 1;
+    lblWave.textContent = 'the news, travelling down';
+
+    var bottomFallen = t >= xs[N_COILS-1]/vv;
+    lblStatus.style.left = px(H.Ox); lblStatus.style.top = py(ys[N_COILS-1]+16);
+    lblStatus.style.transform = 'translateX(-50%)';
+    lblStatus.textContent = bottomFallen ? 'bottom: falling now' : 'bottom: still motionless';
+    lblStatus.style.color = bottomFallen ? 'var(--accent)' : 'var(--muted)';
+  }
+
+  // ---- equation + legend ----
+  var accent = 'var(--accent)';
+  var kTerm=$('kTerm'), LTerm=$('LTerm2'), mTerm=$('mTerm2');
+  var kLabel=$('kLabel'), LLabel=$('LLabel'), mLabel=$('mLabel');
+  var legendEl = $('legend');
+  function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
+
+  function drawEquationAndLegend(){
+    kTerm.style.color = activeColor('k'); LTerm.style.color = activeColor('L');
+    mTerm.style.color = activeColor('m');
+    kLabel.style.color = activeColor('k'); LLabel.style.color = activeColor('L'); mLabel.style.color = activeColor('m');
+
+    var rows = [
+      {sym:'v', name:'compression-wave speed', val: v().toFixed(2)+' m/s', key:null},
+      {sym:'k', name:'spring constant', val: state.k.toFixed(1)+' N/m', key:'k'},
+      {sym:'L', name:'stretched length', val: state.L.toFixed(1)+' m', key:'L'},
+      {sym:'m', name:'total mass', val: (state.m*1000).toFixed(0)+' g', key:'m'}
+    ];
+    legendEl.innerHTML = '';
+    rows.forEach(function(row){
+      var div = document.createElement('div'); div.className='row';
+      var sym = document.createElement('em'); sym.className='sym'; sym.textContent = row.sym;
+      sym.style.color = row.key ? activeColor(row.key) : 'var(--fg)';
+      var name = document.createElement('span'); name.className='name'; name.textContent = row.name;
+      var val = document.createElement('span'); val.className='val mono'; val.textContent = row.val;
+      div.appendChild(sym); div.appendChild(name); div.appendChild(val);
+      legendEl.appendChild(div);
+    });
+  }
+
+  // ---- sliders ----
+  function makeSlider(key, track, fill, thumb, lo, hi, step, unitText){
+    var dragging = false;
+    function setFromClientX(x){
+      var r = track.getBoundingClientRect();
+      var f = clamp((x-r.left)/r.width, 0, 1);
+      var v = lo + f*(hi-lo);
+      v = clamp(Math.round(v/step)*step, lo, hi);
+      state[key] = v;
+      resetDrop(); render();
+    }
+    track.addEventListener('pointerdown', function(e){
+      dragging = true;
+      if(track.setPointerCapture) track.setPointerCapture(e.pointerId);
+      state.drag = key; state.active = key;
+      setFromClientX(e.clientX);
+    });
+    track.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
+    function endDrag(){ if(dragging){ dragging=false; state.drag=null; render(); } }
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+    track.addEventListener('pointerenter', function(){ state.active = key; render(); });
+    track.addEventListener('keydown', function(e){
+      var bigStep = step*10;
+      var s = e.shiftKey ? bigStep : step;
+      var cur = state[key];
+      var nv = null;
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown') nv = cur-s;
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp') nv = cur+s;
+      else if(e.key==='Home') nv = lo;
+      else if(e.key==='End') nv = hi;
+      if(nv!==null){ e.preventDefault(); nv = clamp(Math.round(nv/step)*step, lo, hi); state[key]=nv; resetDrop(); render(); }
+    });
+    return {
+      draw: function(){
+        var cur = state[key];
+        var pct = ((cur-lo)/(hi-lo)*100).toFixed(2)+'%';
+        fill.style.width = pct; thumb.style.left = pct;
+        track.setAttribute('aria-valuemin', lo);
+        track.setAttribute('aria-valuemax', hi);
+        track.setAttribute('aria-valuenow', cur);
+        track.setAttribute('aria-valuetext', unitText(cur));
+      }
+    };
+  }
+  var kSlider = makeSlider('k', $('kTrack'), $('kFill'), $('kThumb'), KMIN, KMAX, 0.1, function(v){ return v.toFixed(1)+' newtons per metre'; });
+  var LSlider = makeSlider('L', $('LTrack'), $('LFill'), $('LThumb'), LMIN, LMAX, 0.1, function(v){ return v.toFixed(1)+' metres'; });
+  var mSlider = makeSlider('m', $('mTrack'), $('mFill'), $('mThumb'), MMIN, MMAX, 0.01, function(v){ return Math.round(v*1000)+' grams'; });
+
+  [$('kCtrl'), $('LCtrl'), $('mCtrl')].forEach(function(box){
+    box.addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+  });
+
+  // ---- result box ----
+  var tValueEl=$('tValue'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+  var gReach=$('gReach'), gLimit=$('gLimit'), gLimitLabel=$('gLimitLabel'), gMark=$('gMark'), gMarkLabel=$('gMarkLabel');
+  var gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
+  var GMAX = 0.65, REAL_LIMIT = 0.5; // seconds; REAL_LIMIT is a rough upper bound seen in real slow-motion footage
+
+  function pos(t){ return clamp(t/GMAX,0,1)*100; }
+
+  function drawResult(){
+    var tw = tWave();
+    var fallCm = 0.5*G*tw*tw*100;
+
+    tValueEl.textContent = tw.toFixed(3);
+    verdictSubEl.textContent = 'By then the top has already fallen about '+fallCm.toFixed(0)+' cm, while the bottom hasn’t moved at all.';
+    effortLineEl.textContent = 'wave speed v = '+v().toFixed(2)+' m/s · wait = L/v = √(m/k), independent of L';
+
+    var markPct = pos(tw), limitPct = pos(REAL_LIMIT);
+    gReach.style.width = limitPct.toFixed(2)+'%';
+    gLimit.style.left = limitPct.toFixed(2)+'%';
+    gLimitLabel.style.left = clamp(limitPct,8,72).toFixed(2)+'%';
+    gMark.style.left = markPct.toFixed(2)+'%';
+    gMark.style.background = 'var(--fg)';
+    var labelPct = clamp(markPct,4,88);
+    gMarkLabel.style.left = labelPct.toFixed(2)+'%';
+    gMarkLabel.style.transform = markPct>72 ? 'translateX(-100%)' : markPct<20 ? 'translateX(0)' : 'translateX(-50%)';
+    gMarkLabel.textContent = tw.toFixed(3)+' s';
+
+    if(!gTicksEl.dataset.built){
+      var ticksHtml='', labelsHtml='';
+      for(var d=0; d<=GMAX*10; d++){
+        var dv = d/10;
+        var left = (dv/GMAX*100).toFixed(2)+'%';
+        ticksHtml += '<div class="tick" style="left:'+left+'"></div>';
+        if(d%2===0){
+          var tx = dv===0 ? 'translateX(0)' : dv>=GMAX-0.1 ? 'translateX(-100%)' : 'translateX(-50%)';
+          labelsHtml += '<div class="ticklabel" style="left:'+left+';transform:'+tx+'">'+dv.toFixed(1)+'s</div>';
+        }
+      }
+      gTicksEl.innerHTML = ticksHtml; gTicksEl.dataset.built='1';
+      gLabelsEl.innerHTML = labelsHtml;
+    }
+  }
+
+  // ---- presets ----
+  // "loosely stretched": soft k, long L, heavy m -> slowest wave -> longest, most dramatic pause.
+  // "tightly stretched": stiff k, short L, light m -> fastest wave -> shortest, least dramatic pause.
+  // (L itself doesn't move the wait time, since it cancels out of t = sqrt(m/k) - see note.)
+  var PRESETS = {
+    loose: { k:1.0, L:3.0, m:0.30 },
+    tight: { k:3.0, L:0.5, m:0.10 }
+  };
+  document.querySelectorAll('.preset').forEach(function(b){
+    b.addEventListener('click', function(){
+      var p = PRESETS[b.dataset.p];
+      state.k=p.k; state.L=p.L; state.m=p.m;
+      resetDrop(); render();
+    });
+  });
+
+  // ---- playback: real per-coil kinematics, integrated in real time, bounded (not looping) ----
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  sim.playing = !reduceMotion;
+  var playBtn=$('playBtn'), resetBtn=$('resetBtn');
+  var lastTs=null, rafId=null;
+
+  function tick(ts){
+    rafId = requestAnimationFrame(tick);
+    if(!sim.playing){ lastTs=null; return; }
+    var dt = lastTs ? Math.min((ts-lastTs)/1000, 0.05) : 0;
+    lastTs = ts;
+    sim.t += dt;
+    if(sim.t >= tCap()){
+      sim.t = tCap();
+      sim.finished = true;
+      setPlaying(false);
+    }
+    drawDynamic();
+  }
+  function setPlaying(p){
+    sim.playing = p;
+    playBtn.textContent = sim.finished ? 'Replay' : (sim.playing ? 'Pause' : 'Play');
+    if(sim.playing) lastTs = null;
+  }
+  playBtn.addEventListener('click', function(){
+    if(sim.finished){ resetDrop(); setPlaying(true); }
+    else { setPlaying(!sim.playing); }
+  });
+  resetBtn.addEventListener('click', function(){ resetDrop(); setPlaying(true); drawDynamic(); });
+  if(reduceMotion){ playBtn.textContent='Play'; playBtn.title='Autoplay disabled (reduced motion)'; }
+
+  // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
+  var STORAGE_KEY = 'slinky-drop-theme';
+  var themeToggle = $('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    // Read the applied DOM state first. If localStorage is unavailable (sandboxed iframe,
+    // private browsing, blocked cookies) falling straight through to the system preference
+    // would pin the toggle to one direction and it could never switch back.
+    var applied = document.documentElement.getAttribute('data-theme');
+    if(applied) return applied;
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+
+  // The relative "../index.html" link only resolves when this file is sitting in
+  // Simple_Viz/visualizations/ next to the site index. Published standalone (e.g. as an
+  // Artifact) there's no sibling index to reach, so fall back to the GitHub repo instead of
+  // leaving a link that 404s.
+  (function(){
+    var backLink = document.getElementById('backLink');
+    if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
+      backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
+      backLink.target = '_blank';
+      backLink.rel = 'noopener';
+      backLink.textContent = 'Simple Viz on GitHub ↗';
+    }
+  })();
+
+  function measure(){
+    var w = heroWrap.clientWidth;
+    if(w && w !== heroW){ heroW = w; render(); }
+  }
+
+  function render(){
+    drawStatic();
+    drawEquationAndLegend();
+    kSlider.draw(); LSlider.draw(); mSlider.draw();
+    $('kReadout').textContent = state.k.toFixed(1)+' N/m';
+    $('LReadout').textContent = state.L.toFixed(1)+' m';
+    $('mReadout').textContent = (state.m*1000).toFixed(0)+' g';
+    drawResult();
+  }
+
+  buildHeroSkeleton();
+  resetDrop();
+  new ResizeObserver(measure).observe(heroWrap);
+  window.addEventListener('resize', measure);
+  [60,250,900].forEach(function(t){ setTimeout(measure, t); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  render();
+  // A genuinely user-controllable, bounded animation (Play/Pause/Drop again) - it still
+  // starts paused under reduced motion (rafId keeps running so drawDynamic() can respond to
+  // the Reset button, but tick() no-ops whenever sim.playing is false, so nothing moves on
+  // its own). Unlike pendulum-period.html's swing, this one is a bounded one-shot event, not
+  // an endless loop, so it auto-pauses itself once the wave has arrived and the slinky has
+  // fallen together for a bit, offering "Replay" rather than looping forever.
+  rafId = requestAnimationFrame(tick);
+})();
+</script>

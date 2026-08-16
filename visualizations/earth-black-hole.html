@@ -112,11 +112,31 @@
   .note a{color:var(--muted2);text-decoration-color:var(--line2)}
   .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
 
-  .footer{margin-top:clamp(40px,4.6vw,64px);padding-top:18px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr 1fr;gap:clamp(20px,3vw,40px);font-family:ui-monospace,monospace;font-size:12px;line-height:1.7;color:var(--muted)}
-  @media (max-width:700px){.footer{grid-template-columns:1fr;gap:14px}}
+  .feedback{margin-top:clamp(40px,4.6vw,64px);padding-top:20px;border-top:1px solid var(--line)}
+  .feedback-head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:20px}
+  .feedback-kicker{margin:0 0 5px;font:10px/1.3 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .feedback h2{margin:0;font-size:clamp(21px,2.2vw,28px);font-weight:400;letter-spacing:-.02em}
+  .feedback-copy{margin:5px 0 0;font:12px/1.6 ui-monospace,monospace;color:var(--muted)}
+  .feedback-choices{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+  .feedback-choice{appearance:none;border:1px solid var(--line2);border-radius:999px;background:transparent;color:var(--muted2);padding:7px 12px;font:12px/1 ui-monospace,monospace;cursor:pointer}
+  .feedback-choice:hover,.feedback-choice:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
+  .feedback-choice[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--bg))}
+  .feedback-form{margin-top:18px;max-width:760px}
+  .feedback-form[hidden]{display:none}
+  .feedback-form label{display:block;margin-bottom:7px;font:12px/1.5 ui-monospace,monospace;color:var(--muted2)}
+  .feedback-form label span{color:var(--muted)}
+  .feedback-form textarea{box-sizing:border-box;width:100%;min-height:84px;resize:vertical;border:1px solid var(--line2);border-radius:3px;background:transparent;color:var(--fg);padding:10px 11px;font:14px/1.5 Georgia,serif}
+  .feedback-form textarea:focus{border-color:var(--accent);outline:1px solid var(--accent);outline-offset:2px}
+  .feedback-actions{display:flex;align-items:baseline;gap:14px;margin-top:9px}
+  .feedback-send{appearance:none;border:0;border-bottom:1px solid var(--line2);background:transparent;color:var(--muted2);padding:2px 0;font:12px/1.4 ui-monospace,monospace;cursor:pointer}
+  .feedback-send:hover,.feedback-send:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+  .feedback-send:disabled{cursor:wait;opacity:.55}
+  .feedback-status{font:11px/1.5 ui-monospace,monospace;color:var(--muted)}
+  .feedback-trap{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}
+  .footer{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,40px);font:11.5px/1.7 ui-monospace,monospace;color:var(--muted)}
   .footer a{color:var(--muted2);text-decoration-color:var(--line2)}
   .footer a:hover{color:var(--accent);text-decoration-color:var(--accent)}
-  .footer .coffee{opacity:.72;font-size:11.5px}
+  @media (max-width:700px){.feedback-head{grid-template-columns:1fr}.feedback-choices{justify-content:flex-start}.footer{grid-template-columns:1fr;gap:10px}}
 </style>
 <main>
 <div class="wrap">
@@ -216,10 +236,34 @@
 
   <p class="note">The <a href="https://en.wikipedia.org/wiki/Schwarzschild_radius" target="_blank" rel="noopener">Schwarzschild radius</a> is the size any mass would need to be compressed to for its escape velocity to reach the speed of light &mdash; cross that boundary (the event horizon) and nothing, not even light, gets back out. This page uses the simplest case, the non-rotating (Schwarzschild) solution, not the more realistic rotating (Kerr) black holes real stars collapse into. The "real radius" comparison for masses between the labelled presets is a smooth interpolation, not a measured object &mdash; treat it as illustrative rather than a precise density model. Compressing ordinary matter down to its Schwarzschild radius isn't something any machine or chemistry can do; as far as we know, the only process that has ever actually done it is the gravitational collapse of a massive star's core after it runs out of fuel.</p>
 
+
+  <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
+    <div class="feedback-head">
+      <div>
+        <p class="feedback-kicker">Private feedback</p>
+        <h2 id="feedbackHeading">Was this clear?</h2>
+        <p class="feedback-copy">Your response is private and helps improve this page.</p>
+      </div>
+      <div class="feedback-choices" role="group" aria-label="Clarity rating">
+        <button class="feedback-choice" type="button" data-rating="clear" aria-pressed="false">Yes</button>
+        <button class="feedback-choice" type="button" data-rating="almost" aria-pressed="false">Almost</button>
+        <button class="feedback-choice" type="button" data-rating="not-yet" aria-pressed="false">Not yet</button>
+      </div>
+    </div>
+    <form class="feedback-form" hidden>
+      <label for="feedbackComment">What could be clearer? <span>Optional, 1,200 characters maximum.</span></label>
+      <textarea id="feedbackComment" name="comment" maxlength="1200" placeholder="A confusing step, a possible mistake, or an idea..."></textarea>
+      <label class="feedback-trap" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
+      <div class="feedback-actions">
+        <button class="feedback-send" type="submit">Send private feedback</button>
+        <span class="feedback-status" role="status" aria-live="polite"></span>
+      </div>
+    </form>
+  </section>
+
   <div class="footer">
-    <span>Spot a mistake or have an idea for a page? <a href="#">Send feedback</a> or write to <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.</span>
-    <span>Built with the help of AI, fact-checked by hand &mdash; if something looks off, that's on me, so tell me.</span>
-    <span class="coffee">If this was useful, you can <a href="#">buy me a coffee</a> &mdash; entirely optional.</span>
+    <span>Designed and maintained by Simon using AI-assisted development. Sources and approximations are stated on each page.</span>
+    <span>Spot a mistake or have an idea? Write to <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.</span>
   </div>
 
 </div>
@@ -631,3 +675,73 @@
 })();
 </script>
 </html>
+<script>
+(function(){
+  var root = document.querySelector('[data-feedback]');
+  if(!root) return;
+  var form = root.querySelector('.feedback-form');
+  var choices = Array.prototype.slice.call(root.querySelectorAll('.feedback-choice'));
+  var textarea = root.querySelector('textarea');
+  var status = root.querySelector('.feedback-status');
+  var send = root.querySelector('.feedback-send');
+  var rating = '';
+
+  choices.forEach(function(choice){
+    choice.addEventListener('click', function(){
+      rating = choice.dataset.rating;
+      choices.forEach(function(item){ item.setAttribute('aria-pressed', item===choice ? 'true' : 'false'); });
+      form.hidden = false;
+      status.textContent = '';
+    });
+  });
+
+  function pageSlug(){
+    var file = location.pathname.split('/').pop() || '';
+    return file.replace(/\.html?$/i,'').toLowerCase() || 'visualization';
+  }
+
+  function currentContext(){
+    var values = [];
+    Array.prototype.forEach.call(document.querySelectorAll('[role="slider"]'), function(slider){
+      var label = slider.getAttribute('aria-label') || 'Control';
+      var value = slider.getAttribute('aria-valuetext') || slider.getAttribute('aria-valuenow');
+      if(value) values.push(label+': '+value);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('select'), function(select){
+      var label = select.getAttribute('aria-label') || select.name || 'Selection';
+      var option = select.options[select.selectedIndex];
+      if(option) values.push(label+': '+option.textContent.trim());
+    });
+    return values.slice(0,20);
+  }
+
+  form.addEventListener('submit', function(event){
+    event.preventDefault();
+    if(!rating) return;
+    if(location.protocol==='file:'){
+      status.textContent = 'Feedback can be sent from madeclear.ca.';
+      return;
+    }
+    send.disabled = true;
+    status.textContent = 'Sending…';
+    fetch('/api/feedback', {
+      method:'POST',
+      credentials:'same-origin',
+      headers:{'content-type':'application/json'},
+      body:JSON.stringify({
+        page:pageSlug(),
+        rating:rating,
+        comment:textarea.value,
+        website:form.elements.website.value,
+        context:currentContext()
+      })
+    }).then(function(response){
+      if(!response.ok) throw new Error('request failed');
+      status.textContent = 'Thank you — your feedback is private.';
+      textarea.value = '';
+    }).catch(function(){
+      status.innerHTML = 'Could not send. Try <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.';
+    }).then(function(){ send.disabled = false; });
+  });
+})();
+</script>

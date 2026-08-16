@@ -213,6 +213,21 @@ a resize observer).
 **Presets row** — text-styled buttons (no border/background, just an underline), each
 setting the full interactive state to a named real-world example in one click.
 
+**Private feedback** — every visualization ends with the same `data-feedback` section:
+`Yes` / `Almost` / `Not yet` clarity choices, followed by an optional private comment.
+Keep its CSS, HTML, and dependency-free JavaScript synchronized with
+`straw-hose-flow.html`, the canonical copy. The form posts to `/api/feedback`; when a page
+is opened directly from disk, it explains that submission is available on madeclear.ca
+instead of failing silently. Feedback has no public read endpoint and collects no email
+address. The generic context collector includes current accessible slider and select values
+so a confusing state can be reproduced without adding page-specific integration code.
+
+The form intentionally does not embed Turnstile. Turnstile's required remote browser script
+would break the self-contained/offline constraint. The endpoint instead uses same-origin
+validation, strict size and value limits, a hidden honeypot, and a daily HMAC duplicate key
+that never stores the underlying IP address or user-agent string. Add Turnstile only if
+observed spam justifies making this explicit exception.
+
 **Back link** — `<a href="../index.html" id="backLink">&larr; Physics you can see</a>` in the
 topbar only resolves when the file is actually sitting in `visualizations/` next to the site
 index — true when opened straight from the repo (the primary use case per CLAUDE.md) or from

@@ -4,6 +4,54 @@ Working log for switching between Claude and Codex on this project. Update this 
 whenever a design direction is decided, reversed, or left open — the goal is that either
 tool can pick up mid-stream without re-reading the whole chat history.
 
+## Current handoff — 2026-08-16
+
+- **Next-session reminder for Simon:** complete the Cloudflare dashboard steps in
+  `CLOUDFLARE_SETUP.md` (create/run the D1 migration, bind `FEEDBACK_DB`, add the
+  `FEEDBACK_HASH_KEY` secret, route `hello@madeclear.ca`, and redeploy) before testing the
+  new feedback form in production.
+- The site currently contains **44 visualization pages** in `visualizations/`.
+- `index.html` lists all 44 pages and now includes client-side search plus category
+  filtering (`Everyday maths`, `Discoveries`, `Fun physics`). The result count is live and
+  the filter is intentionally dependency-free.
+- `tracker.html` now tracks all 44 pages. Keep its `PAGES` array synchronized with the
+  homepage when adding or removing a visualization.
+- `index.html` and `tracker.html` have visible `:focus-visible` keyboard outlines.
+- All 44 visualization pages now end with the same private clarity-feedback component:
+  `Yes` / `Almost` / `Not yet`, plus an optional comment. The canonical implementation is
+  in `visualizations/straw-hose-flow.html` and is documented in `STYLE_GUIDE.md`.
+- Cloudflare Pages feedback infrastructure lives in `functions/api/feedback.js`, with the
+  D1 schema in `migrations/0001_feedback.sql`. One-time dashboard steps are documented in
+  `CLOUDFLARE_SETUP.md`; the required binding/secret names are `FEEDBACK_DB` and
+  `FEEDBACK_HASH_KEY`.
+- Feedback is private (there is no read endpoint), stores no email or raw IP address, and
+  uses a daily HMAC key to update rather than duplicate a visitor's response to one page.
+  Turnstile was deliberately deferred to preserve each page's no-external-dependency rule.
+- The homepage and all visualization pages now use `hello@madeclear.ca` and disclose that
+  the site is designed and maintained by Simon using AI-assisted development. The email
+  alias is not live until Simon creates the Cloudflare Email Routing rule.
+- No tipping link was added. Stripe Payment Links in CAD was recommended as the best neutral
+  option, with Ko-fi as the friendlier alternative; Simon has not selected/configured one.
+- Local checks completed after the latest changes: all 44 pages have exactly one feedback
+  section, three rating choices, one private form, balanced HTML structures, valid inline
+  JavaScript, and no dead feedback/coffee placeholders. Desktop and 390 px mobile layouts
+  were browser-checked. The Pages Function passed stubbed valid-POST/D1-write and non-POST
+  tests; the D1 migration executed successfully in SQLite. `git diff --check` passes.
+- The Cloudflare dashboard, D1 database, email route, production deployment, and production
+  form submission have **not** been changed or tested. Those are the next-session steps.
+- Working tree is intentionally uncommitted for handover. Changed files are `HANDOVER.md`,
+  `STYLE_GUIDE.md`, `index.html`, and all 44 `visualizations/*.html`; new files are
+  `CLOUDFLARE_SETUP.md`, `functions/api/feedback.js`, and
+  `migrations/0001_feedback.sql`. Claude Code should begin with `git status` and inspect the
+  diff before committing.
+- There is no build step or test runner. Validate changes by opening the affected HTML files
+  directly in a browser and running the local link/count checks when index or tracker data
+  changes.
+- Before handing work to the other coding agent, update this section with the current state,
+  decisions, open questions, and exact files changed. Then commit or at least leave a clean,
+  inspectable diff; the other agent should start from the same working directory and run
+  `git status`/`git diff` first.
+
 ## Folder structure
 
 ```
@@ -735,6 +783,51 @@ sub-genre as `ocean-salt.html`/`animal-biomass.html`.
   fine as future preset additions); grain of rice 7 mm; human height 1.7 m; blue whale 25 m;
   Earth diameter 1.2742×10⁷ m; Sun diameter 1.3914×10⁹ m; Milky Way diameter ~9.4607×10²⁰ m
   (100,000 ly); observable universe diameter 8.8×10²⁶ m (~93 billion ly).
+
+### `horizon-distance.html`: curve-direction fix and a body picker (2026-08-16)
+
+Found via the page tracker (`tracker.html`), which had a note on this page reading "Curve is
+wrong way. Could add other planets" — both items fixed in the same session.
+
+- **The hero's schematic arc was bowing the wrong way.** In `geom()`, `ctrlY = baseY +
+  arcRise` pulls the quadratic Bézier's midpoint *down* (larger SVG y), drawing a valley
+  (⌣) — the ground appeared to dip away from the observer and rise back up toward the
+  horizon point. The comment right above it ("how much the arc bows down at the edges")
+  describes the intended dome shape (⌢, high in the middle, dropping at the edges — the
+  correct way to show a surface curving away beneath you), so this was a sign error, not a
+  design choice. Fixed to `ctrlY = baseY - arcRise`. Verified at both a small height (1.7 m)
+  and the ISS preset (408 km) that the sight line now lands on the dome's downslope.
+- **Added a World picker** (Moon / Mars / Earth / Jupiter, real mean radii), following
+  `planet-light-delay.html`'s `.object-buttons` pill-picker pattern verbatim (added that CSS
+  class to this file, which hadn't needed it before). Selecting a world swaps the module-level
+  `R` and re-renders; the five presets (beach/lighthouse/Everest/airplane/ISS) are Earth-only
+  scenarios and now force the world back to Earth when clicked, rather than computing an Earth
+  height against whatever world happened to be selected.
+- **Each world's eye-height slider max is scaled to the same h÷R fraction as Earth's**
+  (500,000 / 6,371,000 ≈ 0.0785), giving Moon 130 km, Mars 260 km, Jupiter 5,000 km — so the
+  flat-horizon approximation's error at the top of the slider stays close to Earth's own
+  already-documented ~2%, rather than silently growing much larger on the smaller worlds
+  (the Moon's radius is small enough that reusing Earth's flat 1–500 km range would have put
+  the h² term at a dishonest ~14% by the top, not the ~2% the note claims). The note now
+  states this scaling explicitly and flags that Jupiter has no solid surface — h there is
+  measured from the standard cloud-top reference level used to define its "radius."
+- **The gauge needed to widen from ~1–2,500 km to ~1–30,000 km** to fit Jupiter's much larger
+  horizon (up to ~26,440 km at its slider's max), which surfaced two follow-on bugs, both
+  fixed before shipping:
+  - Five text tick labels no longer fit the result column's narrow width (verified by
+    measuring `getBoundingClientRect()` in-browser, the same technique used to catch
+    `cosmic-scale.html`'s label overlaps) — now only every other decade gets a text label
+    (every decade still gets a tick mark), standard minor/major log-axis convention.
+  - `fmtH()`'s `(h/1000).toPrecision(h>=100000?4:3)` flips to exponential notation once a
+    value needs 5+ significant digits — Jupiter's 69,911 km radius printed as `"6.991e+4
+    km"`. This is the same class of huge-number formatting bug documented earlier in this
+    file (gravity-lab, mass-energy, planet-light-delay); `fmtH()` now uses plain rounding
+    with `toLocaleString()` past 1,000 km instead of `toPrecision`. Re-verified all four
+    worlds' R and slider-max readouts, plus Jupiter's distance readout at both its default
+    and maximum height, print correctly.
+- The subtitle and note were reworded minimally to stop asserting "Earth" as the only body
+  while keeping the existing Earth-specific numbers (4.6 km beach, 2,000+ km ISS) intact as
+  the default-world example.
 
 ### `bounce-restitution.html` — "Count the bounces" (2026-08-16)
 

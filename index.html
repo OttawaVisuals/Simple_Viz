@@ -95,6 +95,9 @@
   .roadmap .status{font:11px ui-monospace,"Cascadia Code",monospace;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);white-space:nowrap;min-width:4.2em;text-align:right}
 
   .note{margin:clamp(40px,5vw,64px) 0 0;max-width:88ch;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .site-footer{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,40px);font:11.5px/1.7 ui-monospace,monospace;color:var(--muted)}
+  .site-footer a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .site-footer a:hover{color:var(--accent);text-decoration-color:var(--accent)}
 
   /* Below ~480px the three topbar items wrap onto two lines; the count is the expendable one. */
   @media (max-width:480px){
@@ -109,6 +112,7 @@
     .roadmap li{flex-wrap:wrap;gap:6px 16px}
     .roadmap .eq{margin-left:0}
     .roadmap .status{min-width:0;text-align:left}
+    .site-footer{grid-template-columns:1fr;gap:10px}
   }
 </style>
 <main>
@@ -236,6 +240,11 @@
   </section>
 
   <p class="note">Every visual is self-contained, approximate only where stated, and designed to be played with. Each page is a single HTML file with no build step and no external dependencies &mdash; open one directly in a browser and it works.</p>
+
+  <div class="site-footer">
+    <span>Designed and maintained by Simon using AI-assisted development. Sources and approximations are stated on each page.</span>
+    <span>Spot a mistake or have an idea? Write to <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.</span>
+  </div>
 
 </div>
 </main>

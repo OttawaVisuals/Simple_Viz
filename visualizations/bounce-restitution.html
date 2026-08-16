@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Count the bounces</title>
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  .topgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
+
+  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqn{display:flex;align-items:center;gap:clamp(6px,1vw,10px);font-size:clamp(28px,3.6vw,42px);line-height:1;font-weight:300}
+  .eqn .eq{color:var(--muted)}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .eqn sub{font-size:.5em;position:relative;bottom:-.35em}
+  .eqn sup{font-size:.5em;position:relative;top:-.6em}
+
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:1.6em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:8px 2px}
+  .legend .sym{font-size:17px;font-weight:300;transition:color .2s}
+  .legend .name{font-size:12.5px;color:var(--muted2)}
+  .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero svg{width:100%;height:auto;display:block}
+  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
+  .playback{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:12px}
+  .playback button{cursor:pointer;background:none;border:0;padding:0 0 2px;color:var(--fg);font:15px/1 Georgia,serif;font-style:italic;border-bottom:1px solid var(--line2)}
+  .playback button:hover{color:var(--accent);border-color:var(--accent)}
+  .playback button.on{color:var(--accent);border-color:var(--accent)}
+  .playback .sep{color:var(--line2)}
+
+  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
+
+  .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;text-transform:none;transition:color .2s}
+  .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
+  .pick-buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .pick-buttons button{cursor:pointer;font-family:Georgia,serif;font-style:italic;font-size:14px;padding:6px 13px 7px;border-radius:999px;transition:all .18s ease;border:1px solid var(--border);background:transparent;color:var(--muted)}
+  .pick-buttons button:hover{color:var(--fg)}
+  .pick-note{margin-top:11px;font-size:13.5px;line-height:1.45;color:var(--muted)}
+  .readout{font-family:ui-monospace,monospace;font-size:clamp(26px,2.8vw,34px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
+  .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
+  .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
+  .track .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
+  .track .thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
+  .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
+
+  .result{text-align:left}
+  .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
+  .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
+  .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
+  .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
+
+  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+  .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
+  .preset:hover{border-color:var(--accent);color:var(--accent)}
+
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="../index.html" id="backLink">&larr; Physics you can see</a>
+    <div class="topbar-right">
+      <span>Coefficient of restitution</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>Count the <em>bounces</em>.</h1>
+      <p class="sub">Every bounce keeps the same fraction of the last one's height &mdash; which is why a ball speeds up right before it seems to vanish, and why you can keep counting by ear long after your eyes give up.</p>
+    </div>
+
+    <div class="eqnbox">
+      <div class="eqn">
+        <em>h</em><sub>n</sub>
+        <span class="eq">=</span>
+        <em id="h0Term">h</em><sub>0</sub><em id="eTerm">e</em><sup>2n</sup>
+      </div>
+    </div>
+
+    <div class="legendbox">
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="hero" id="heroWrap">
+    <div class="lbl" id="lblCount" style="transform:translateX(-50%)"></div>
+    <div class="lbl" id="lblH0"></div>
+    <svg id="heroSvg" role="img" aria-label="A ball dropped above a floor, bouncing repeatedly with each rebound height shrinking by the same fraction."></svg>
+    <div class="playback">
+      <button id="playBtn" type="button">Pause</button>
+      <span class="sep">&middot;</span>
+      <button id="resetBtn" type="button">Drop again</button>
+      <span class="sep">&middot;</span>
+      <button id="drumBtn" type="button">Balloon drum: off</button>
+    </div>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrls">
+      <div class="ctrl" id="heightCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Drop height <em id="hLabel">h&#8320;</em></span>
+          <span class="ctrl-rel">taller drop &middot; more bounces</span>
+        </div>
+        <div class="readout mono" id="heightReadout"></div>
+        <div class="track" id="heightTrack" tabindex="0" role="slider" aria-label="Drop height">
+          <div class="rail"></div>
+          <div class="fill" id="heightFill"></div>
+          <div class="thumb" id="heightThumb"></div>
+        </div>
+        <div class="track-range"><span>0.3 m</span><span class="mid">off a table &middot; over your head</span><span>2 m</span></div>
+      </div>
+
+      <div class="ctrl" id="ballCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Ball &amp; surface <em id="eLabel">e</em></span>
+          <span class="ctrl-rel">e &prop; &radic;h&#8321;/h&#8320;</span>
+        </div>
+        <div class="pick-buttons" id="ballButtons"></div>
+        <div class="pick-note" id="ballNote"></div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Bounces before it's too small to see</div>
+      <div class="result-value"><span class="num mono" id="nValue"></span><span class="unit mono">bounces</span></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+      <div class="effort-line" id="effortLine"></div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-p="superball">superball off a table</button>
+    <button class="preset" data-p="basketball">basketball off a table</button>
+    <button class="preset" data-p="carpet">tennis ball onto carpet</button>
+    <button class="preset" data-p="golf">golf ball, overhead</button>
+  </div>
+
+  <p class="note">The <a href="https://en.wikipedia.org/wiki/Coefficient_of_restitution" target="_blank" rel="noopener">coefficient of restitution</a> e is the ratio of rebound speed to impact speed, which shows up as a height ratio, e = &radic;(h&#8321;/h&#8320;), because both scale as the square root of height. It's a property of the ball <em style="font-style:italic">and</em> the surface together, not the ball alone &mdash; the values above combine both into one approximate number, so treat them as representative rather than exact (basketball and tennis-on-concrete are close to real regulation figures: the NBA specifies a basketball dropped from 6 ft onto hardwood should rebound 49&ndash;54 in, and the ITF specifies a tennis ball dropped from 100 in onto concrete should rebound 53&ndash;58 in; the rest are rough estimates). The animation stops once a bounce's predicted peak falls below the ball's own radius &mdash; past that point there's no visible bounce left to see, only a sound if something amplifies it, which is what the balloon-drum toggle is for: turn it on and every impact rings the floor, so you can keep counting well past the point your eyes gave up. The total elapsed time shown is the idealized sum of a geometric series &mdash; infinitely many bounces in finite time &mdash; and a real ball stops a little sooner than that, since rolling, air drag, and sideways drift all bleed away a bit more energy than this model accounts for.</p>
+
+</div>
+</main>
+<script>
+(function(){
+  var G = 9.81;
+
+  // ---- real ball/surface pairs: coefficient of restitution + real ball radius (m) ----
+  var BALLS = [
+    {key:'superball', name:'Superball', surface:'concrete', e:0.88, r:0.020, color:'#C4574E',
+     note:'A high-bounce toy rubber ball on a hard floor — among the bounciest common combinations.'},
+    {key:'basketball', name:'Basketball', surface:'hardwood', e:0.85, r:0.121, color:'#C97A2B',
+     note:'The NBA spec: dropped from 6 ft onto hardwood, it must rebound 49–54 in — a real regulation number.'},
+    {key:'tennis_concrete', name:'Tennis ball', surface:'concrete', e:0.75, r:0.0335, color:'#8FA13E',
+     note:'The ITF spec: dropped from 100 in onto concrete, it must rebound 53–58 in — also a real regulation number.'},
+    {key:'golf_concrete', name:'Golf ball', surface:'concrete', e:0.67, r:0.0214, color:'#5C8A72',
+     note:'Hard and dense, but no official bounce spec like tennis or basketball — this is a rough estimate.'},
+    {key:'tennis_grass', name:'Tennis ball', surface:'grass', e:0.52, r:0.0335, color:'#8FA13E',
+     note:'Same ball, softer ground — grass absorbs much more of the impact than concrete does.'},
+    {key:'tennis_carpet', name:'Tennis ball', surface:'carpet', e:0.35, r:0.0335, color:'#8FA13E',
+     note:'Indoor carpet soaks up most of the energy — this one gives up fast.'}
+  ];
+
+  var HMIN=0.3, HMAX=2.0;
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+  function ball(){ return BALLS[state.ball]; }
+
+  function nStop(h0, e, r){
+    if(r>=h0) return 1;
+    return Math.max(1, Math.ceil(Math.log(r/h0) / (2*Math.log(e))));
+  }
+  function totalTime(h0, e){
+    var t0 = Math.sqrt(2*h0/G);
+    return t0*(1+e)/(1-e);
+  }
+
+  var NS='http://www.w3.org/2000/svg';
+  function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+  function clear(g){ while(g.firstChild) g.removeChild(g.firstChild); }
+
+  var state = { height:1.2, ball:0, drum:false, active:null, drag:null };
+  var heroW = 0, H = null;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
+  var lblCount=$('lblCount'), lblH0=$('lblH0');
+
+  // ---- real-time bounce simulation ----
+  // 'drop' phase: falling from rest at h0, y(t) = h0 - 0.5 g t^2, for t in [0, t0].
+  // 'bounce' phase: a full up-then-down parabola from the floor, y(t) = v0 t - 0.5 g t^2,
+  // for t in [0, 2*dur] where dur = sqrt(2*peak/g), v0 = g*dur — reaching `peak` at t=dur.
+  // Stops the first time a predicted new peak drops below the ball's own radius: past that,
+  // there's no bounce left that's visually distinguishable from the ball just sitting there.
+  var sim = { phase:'drop', peak:0, v0:0, segDur:0, segT:0, n:0, done:false };
+  var ghostTicks = [];
+  var pulses = [];
+
+  function resetSim(){
+    sim.phase='drop'; sim.peak=state.height; sim.v0=0;
+    sim.segDur=Math.sqrt(2*state.height/G); sim.segT=0; sim.n=0; sim.done=false;
+    ghostTicks = []; pulses = [];
+  }
+
+  function advance(dt){
+    var remaining = dt, guard=0;
+    while(remaining>0 && !sim.done && guard<200){
+      guard++;
+      var segRemaining = sim.segDur - sim.segT;
+      if(remaining < segRemaining){ sim.segT += remaining; remaining = 0; }
+      else {
+        remaining -= segRemaining;
+        sim.n++;
+        var e = ball().e, r = ball().r;
+        var newPeak = sim.peak * e * e;
+        if(newPeak < r){ sim.done = true; sim.peak = 0; sim.segT = 0; break; }
+        if(state.drum) triggerPulse();
+        ghostTicks.push(newPeak); if(ghostTicks.length>8) ghostTicks.shift();
+        sim.peak = newPeak;
+        sim.segDur = 2*Math.sqrt(2*newPeak/G);
+        sim.v0 = G*(sim.segDur/2);
+        sim.segT = 0;
+        sim.phase = 'bounce';
+      }
+    }
+  }
+
+  function simY(){
+    if(sim.done) return 0;
+    if(sim.phase==='drop') return Math.max(0, sim.peak - 0.5*G*sim.segT*sim.segT);
+    return Math.max(0, sim.v0*sim.segT - 0.5*G*sim.segT*sim.segT);
+  }
+
+  // ---- hero geometry: viewBox width == measured CSS px width, so 1 unit = 1px ----
+  function geom(w){
+    var narrow = w < 620;
+    var pxPerM = narrow ? 105 : 150;
+    var topPad = 22;
+    var floorY = topPad + HMAX*pxPerM;
+    var rulerX = narrow ? 30 : 42;
+    var laneX = narrow ? w*0.60 : w*0.56;
+    var floorX1 = rulerX - 6, floorX2 = Math.min(w-10, laneX + 60);
+    var vbH = floorY + 34;
+    return { w:w, vbH:vbH, pxPerM:pxPerM, topPad:topPad, floorY:floorY, rulerX:rulerX, laneX:laneX, floorX1:floorX1, floorX2:floorX2 };
+  }
+
+  function drawnRadius(r){
+    // real radii span ~2 cm (golf/superball) to ~12 cm (basketball) — mapped, not to scale,
+    // onto a legible on-screen range so the smallest ball is still visible as a circle.
+    var RMIN=0.02, RMAX=0.121;
+    var t = clamp((r-RMIN)/(RMAX-RMIN), 0, 1);
+    return 6 + t*15;
+  }
+
+  function drawStatic(){
+    var w = heroW || heroWrap.clientWidth || 1100;
+    var h = geom(w); H = h;
+    clear(heroSvg);
+    heroSvg.setAttribute('viewBox','0 0 '+w+' '+h.vbH);
+
+    // floor
+    heroSvg.appendChild(el('line',{x1:h.floorX1,y1:h.floorY,x2:h.floorX2,y2:h.floorY, stroke:'var(--fg)', 'stroke-width':1.6}));
+
+    // height ruler: ticks every 0.5 m from 0 to HMAX
+    for(var m=0; m<=HMAX+1e-6; m+=0.5){
+      var ty = h.floorY - m*h.pxPerM;
+      heroSvg.appendChild(el('line',{x1:h.rulerX-5,y1:ty,x2:h.rulerX,y2:ty, stroke:'var(--line2)', 'stroke-width':1}));
+      var lab = el('text',{x:h.rulerX-9,y:ty+3,'text-anchor':'end','font-size':10,'font-family':'ui-monospace,monospace',fill:'var(--muted)'});
+      lab.textContent = m.toFixed(1);
+      heroSvg.appendChild(lab);
+    }
+    heroSvg.appendChild(el('line',{x1:h.rulerX,y1:h.topPad-4,x2:h.rulerX,y2:h.floorY, stroke:'var(--line)', 'stroke-width':1}));
+
+    // dashed guide from ruler to drop height + start marker
+    var dropY = h.floorY - state.height*h.pxPerM;
+    heroSvg.appendChild(el('line',{x1:h.rulerX,y1:dropY,x2:h.laneX,y2:dropY, stroke:'var(--line2)', 'stroke-width':1, 'stroke-dasharray':'2 5'}));
+
+    // ghost-tick pool (peak heights of recent bounces, fading with age)
+    var ghosts = [];
+    ghostTicks.forEach(function(peak, i){
+      var gy = h.floorY - peak*h.pxPerM;
+      var op = 0.15 + 0.85*((i+1)/ghostTicks.length);
+      var line = el('line',{x1:h.laneX-16,y1:gy,x2:h.laneX+16,y2:gy, stroke:'var(--accent)', 'stroke-width':1, 'stroke-dasharray':'2 4', opacity:op.toFixed(2)});
+      heroSvg.appendChild(line);
+    });
+
+    // pulses group + ball, drawn last so they're on top
+    var pulseG = el('g',{id:'pulseG'}); heroSvg.appendChild(pulseG);
+    heroSvg.appendChild(el('circle',{id:'ballCircle', cx:h.laneX, cy:h.floorY, r:drawnRadius(ball().r), fill:ball().color}));
+
+    var px=function(x){return (x/w*100)+'%';}, py=function(y){return (y/h.vbH*100)+'%';};
+    lblCount.style.left = px(h.laneX); lblCount.style.top = py(h.topPad-16);
+    lblH0.style.left = px(h.rulerX); lblH0.style.top = py(h.topPad-16);
+    lblH0.textContent = 'drop height '+state.height.toFixed(2)+' m';
+
+    drawBall();
+  }
+
+  function drawBall(){
+    if(!H) return;
+    var y = simY();
+    var bc = $('ballCircle');
+    if(bc){ bc.setAttribute('cy', H.floorY - y*H.pxPerM); }
+    lblCount.textContent = sim.done ? 'resting' : 'bounce '+sim.n;
+
+    // pulses: expanding, fading rings at the floor, one per impact while the drum is on
+    var pulseG = $('pulseG');
+    if(pulseG){
+      clear(pulseG);
+      pulses.forEach(function(p){
+        var age = clamp(p.age/400, 0, 1);
+        pulseG.appendChild(el('circle',{cx:H.laneX, cy:H.floorY, r:(4+age*26).toFixed(1), fill:'none',
+          stroke:'var(--accent)', 'stroke-width':1.4, opacity:(1-age).toFixed(2)}));
+      });
+    }
+  }
+
+  function triggerPulse(){ pulses.push({age:0}); }
+
+  // ---- equation + legend ----
+  var accent='var(--accent)';
+  var h0Term=$('h0Term'), eTerm=$('eTerm'), hLabel=$('hLabel'), eLabel=$('eLabel');
+  var legendEl=$('legend');
+  function activeColor(k){ return state.active===k ? accent : 'var(--fg)'; }
+
+  function drawEquationAndLegend(){
+    h0Term.style.color = activeColor('h0'); hLabel.style.color = activeColor('h0');
+    eTerm.style.color = activeColor('e'); eLabel.style.color = activeColor('e');
+
+    var b = ball();
+    var rows = [
+      {sym:'h₀', name:'drop height', val:state.height.toFixed(2)+' m', key:'h0'},
+      {sym:'e', name:b.name.toLowerCase()+' on '+b.surface, val:b.e.toFixed(2), key:'e'},
+      {sym:'R', name:'ball radius — bounces below this are invisible', val:(b.r*100).toFixed(1)+' cm', key:'e'},
+      {sym:'n', name:'current bounce', val:sim.done?'settled':String(sim.n), key:null}
+    ];
+    legendEl.innerHTML='';
+    rows.forEach(function(row){
+      var div=document.createElement('div'); div.className='row';
+      var sym=document.createElement('em'); sym.className='sym'; sym.textContent=row.sym;
+      sym.style.color = row.key ? activeColor(row.key) : 'var(--fg)';
+      var name=document.createElement('span'); name.className='name'; name.textContent=row.name;
+      var val=document.createElement('span'); val.className='val mono'; val.id = row.sym==='n' ? 'nRow' : '';
+      val.textContent=row.val;
+      div.appendChild(sym); div.appendChild(name); div.appendChild(val);
+      legendEl.appendChild(div);
+    });
+  }
+  function updateNRow(){
+    var nRow = document.getElementById('nRow');
+    if(nRow) nRow.textContent = sim.done ? 'settled' : String(sim.n);
+  }
+
+  // ---- ball & surface picker ----
+  var ballButtons=$('ballButtons'), ballNote=$('ballNote');
+  BALLS.forEach(function(b,i){
+    var btn=document.createElement('button');
+    btn.textContent = b.name+' · '+b.surface;
+    btn.addEventListener('click', function(){ state.ball=i; state.active='e'; resetSim(); render(); });
+    btn.addEventListener('pointerenter', function(){ state.active='e'; render(); });
+    ballButtons.appendChild(btn);
+  });
+  function drawBallButtons(){
+    Array.prototype.forEach.call(ballButtons.children, function(btn,i){
+      var b=BALLS[i], on = i===state.ball;
+      btn.style.background = on ? 'color-mix(in srgb, '+b.color+' 22%, var(--bg))' : 'transparent';
+      btn.style.borderColor = on ? b.color : 'var(--border)';
+      btn.style.color = on ? 'var(--fg)' : 'var(--muted)';
+    });
+    ballNote.textContent = ball().note;
+  }
+
+  // ---- height slider ----
+  function makeSlider(track, fill, thumb, lo, hi){
+    var dragging=false;
+    function setFromClientX(x){
+      var r=track.getBoundingClientRect();
+      var f=clamp((x-r.left)/r.width,0,1);
+      var v = clamp(Math.round((lo+f*(hi-lo))*100)/100, lo, hi);
+      state.height=v; resetSim(); render();
+    }
+    track.addEventListener('pointerdown', function(e){
+      dragging=true; if(track.setPointerCapture) track.setPointerCapture(e.pointerId);
+      state.active='h0'; state.drag='h0'; setFromClientX(e.clientX);
+    });
+    track.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
+    function endDrag(){ if(dragging){ dragging=false; state.drag=null; render(); } }
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+    track.addEventListener('pointerenter', function(){ state.active='h0'; render(); });
+    track.addEventListener('keydown', function(e){
+      var step = e.shiftKey ? 0.5 : 0.1;
+      var v=null;
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown') v=state.height-step;
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp') v=state.height+step;
+      else if(e.key==='Home') v=lo;
+      else if(e.key==='End') v=hi;
+      if(v!==null){ e.preventDefault(); state.height=clamp(Math.round(v*100)/100,lo,hi); resetSim(); render(); }
+    });
+    return { draw:function(){
+      var pct = ((state.height-lo)/(hi-lo)*100).toFixed(2)+'%';
+      fill.style.width=pct; thumb.style.left=pct;
+      track.setAttribute('aria-valuemin',lo); track.setAttribute('aria-valuemax',hi);
+      track.setAttribute('aria-valuenow',state.height);
+      track.setAttribute('aria-valuetext', state.height.toFixed(2)+' metres');
+    }};
+  }
+  var heightSlider = makeSlider($('heightTrack'), $('heightFill'), $('heightThumb'), HMIN, HMAX);
+  [$('heightCtrl'), $('ballCtrl')].forEach(function(box){
+    box.addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+  });
+
+  // ---- result ----
+  var nValueEl=$('nValue'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+  function drawResult(){
+    var b = ball();
+    var n = nStop(state.height, b.e, b.r);
+    var T = totalTime(state.height, b.e);
+    nValueEl.textContent = n;
+    verdictSubEl.textContent = 'from '+state.height.toFixed(2)+' m, keeping '+(b.e*b.e*100).toFixed(0)+'% of its height every bounce.';
+    effortLineEl.textContent = '≈'+T.toFixed(1)+' s, start to (idealized) rest';
+  }
+
+  // ---- presets ----
+  var PRESETS = {
+    superball: {height:1.2, ball:0},
+    basketball:{height:0.9, ball:1},
+    carpet:    {height:1.0, ball:5},
+    golf:      {height:1.8, ball:3}
+  };
+  document.querySelectorAll('.preset').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var p = PRESETS[btn.dataset.p];
+      state.height=p.height; state.ball=p.ball;
+      resetSim(); render();
+    });
+  });
+
+  // ---- balloon drum toggle ----
+  var drumBtn=$('drumBtn');
+  drumBtn.addEventListener('click', function(){
+    state.drum = !state.drum;
+    drumBtn.textContent = 'Balloon drum: '+(state.drum?'on':'off');
+    drumBtn.classList.toggle('on', state.drum);
+  });
+
+  // ---- playback: real bounce physics, integrated in real time ----
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var playing = !reduceMotion;
+  var playBtn=$('playBtn'), resetBtn=$('resetBtn');
+  var lastTs=null, rafId=null;
+
+  function tick(ts){
+    rafId = requestAnimationFrame(tick);
+    pulses.forEach(function(p){ p.age += lastTs ? Math.min(ts-lastTs, 50) : 0; });
+    pulses = pulses.filter(function(p){ return p.age < 400; });
+    if(!playing){ lastTs=null; drawBall(); return; }
+    var dt = lastTs ? Math.min((ts-lastTs)/1000, 0.05) : 0;
+    lastTs = ts;
+    if(dt>0 && !sim.done) advance(dt);
+    drawBall();
+    updateNRow();
+  }
+  function setPlaying(p){
+    playing = p;
+    playBtn.textContent = playing ? 'Pause' : 'Play';
+    if(playing) lastTs = null;
+  }
+  playBtn.addEventListener('click', function(){ setPlaying(!playing); });
+  resetBtn.addEventListener('click', function(){ resetSim(); drawStatic(); updateNRow(); });
+  if(reduceMotion){ playBtn.textContent='Play'; playBtn.title='Autoplay disabled (reduced motion)'; }
+
+  // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
+  var STORAGE_KEY = 'bounce-restitution-theme';
+  var themeToggle = $('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    var applied = document.documentElement.getAttribute('data-theme');
+    if(applied) return applied;
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+
+  // The relative "../index.html" link only resolves when this file is sitting in
+  // Simple_Viz/visualizations/ next to the site index. Published standalone (e.g. as an
+  // Artifact) there's no sibling index to reach, so fall back to the GitHub repo instead of
+  // leaving a link that 404s.
+  (function(){
+    var backLink = document.getElementById('backLink');
+    if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
+      backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
+      backLink.target = '_blank';
+      backLink.rel = 'noopener';
+      backLink.textContent = 'Simple Viz on GitHub ↗';
+    }
+  })();
+
+  function measure(){
+    var w = heroWrap.clientWidth;
+    if(w && w !== heroW){ heroW = w; drawStatic(); }
+  }
+
+  function render(){
+    drawStatic();
+    drawEquationAndLegend();
+    drawBallButtons();
+    heightSlider.draw();
+    $('heightReadout').textContent = state.height.toFixed(2)+' m';
+    drawResult();
+  }
+
+  resetSim();
+  new ResizeObserver(measure).observe(heroWrap);
+  window.addEventListener('resize', measure);
+  [60,250,900].forEach(function(t){ setTimeout(measure, t); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  render();
+  // A genuinely user-controllable animation (Play/Pause/Drop again, like pendulum-period's
+  // playback), not a background decoration — it still starts paused under reduced motion
+  // (rafId keeps running so drawBall() can respond to Reset/Drum, but tick() no-ops the
+  // physics advance whenever `playing` is false, so nothing moves on its own).
+  rafId = requestAnimationFrame(tick);
+})();
+</script>
+</html>

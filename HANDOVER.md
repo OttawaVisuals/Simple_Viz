@@ -736,14 +736,79 @@ sub-genre as `ocean-salt.html`/`animal-biomass.html`.
   Earth diameter 1.2742×10⁷ m; Sun diameter 1.3914×10⁹ m; Milky Way diameter ~9.4607×10²⁰ m
   (100,000 ly); observable universe diameter 8.8×10²⁶ m (~93 billion ly).
 
+### `bounce-restitution.html` — "Count the bounces" (2026-08-16)
+
+Built directly from a filled-out design brief (`Drafts/Bounce_Design.md`), the first page
+built that way since `Drafts/Straw_Design.md`. Coefficient of restitution: `hₙ = h₀e^(2n)`,
+where e = √(h₁/h₀) is a property of a **ball-and-surface pair**, not the ball alone. Card 44,
+under **Fun physics**, right after `cosmic-scale.html`.
+
+- **A genuinely real-time simulation, not a per-render static diagram** — same category as
+  `pendulum-period.html`'s playback (Play/Pause/reset, `playing = !reduceMotion` at load). The
+  ball's height is computed from closed-form projectile segments (an initial half-parabola
+  drop, then alternating full up-down parabolas per bounce, each with `dur = √(2·peak/g)`) —
+  exact per-bounce kinematics, no numerical integrator needed since the physics itself is
+  piecewise-exact. Verified in-browser that the bounce counter and ghost-tick trail advance
+  correctly in real time; also verified (via `document.visibilityState`) that an apparent
+  animation stall during testing was the browser throttling `requestAnimationFrame` on a
+  backgrounded tab, not a bug in the tick loop — worth remembering for future testing sessions
+  using this same browser-automation tooling, since a backgrounded preview tab will look frozen
+  even when the code is correct.
+- **The stopping condition is the ball's own real radius, not an arbitrary threshold.** Once a
+  bounce's predicted peak height falls below the ball's physical radius, the animation settles
+  — there's no bounce left that's visually distinguishable from the ball just sitting on the
+  floor. This single physically-grounded threshold does double duty: it's both what "too small
+  to see" means or the animation, and what the closed-form `n = ⌈ln(R/h₀)/(2·ln e)⌉` predicts
+  for the result panel's headline number, so the two can't drift out of sync with each other.
+- **No possible/impossible gauge**, matching the `gravity-lab.html`/`mass-energy.html` no-gauge
+  precedent — there's no natural limit line for a bounce count. In its place, the hero itself
+  carries a fading trail of dashed "ghost ticks" at each bounce's peak height, visually showing
+  the geometric decay as a staircase even once the ball's own motion is hard to track by eye.
+- **The balloon-drum toggle** (the distinctive idea from the original brainstorm) shipped in
+  v1 rather than being deferred, since it turned out cheap to add once the bounce-event loop
+  already existed: toggling it on plays a small expanding-and-fading ring at the floor on every
+  impact (JS-driven per the site's SVG-animation rule, not a CSS transition), independent of
+  whether the ball itself is still visible — the point being you can keep counting by ear after
+  your eyes give up, which is also stated directly in the closing note.
+- **Ball radii are drawn to a compressed but honest relative scale** (mapped from real radii
+  0.02–0.121 m onto a 6–21 px range), so a basketball visibly reads larger than a golf ball
+  rather than all balls sharing one fixed icon size — a small honesty upgrade over just using a
+  uniform dot, in the spirit of CLAUDE.md's "real numbers, honestly presented."
+- **Two of the six ball/surface presets carry real regulation numbers, not estimates**: the
+  NBA's spec that a basketball dropped from 6 ft onto hardwood must rebound 49–54 in (→ e ≈
+  0.85) and the ITF's spec that a tennis ball dropped from 100 in onto concrete must rebound
+  53–58 in (→ e ≈ 0.75). The other four (superball/concrete, golf/concrete, tennis/grass,
+  tennis/carpet) are flagged in-page as rough estimates, since there's no equivalent official
+  spec for them — same honest-value treatment as straw-hose-flow's fluid viscosities.
+- Presets: superball off a table (1.2 m, most visible bounces), basketball off a table (0.9 m,
+  the NBA-spec pair), tennis ball onto carpet (1.0 m, dies fastest — makes the surface
+  contrast concrete), golf ball overhead (1.8 m, hard ball from height).
+- Added to `index.html`'s Fun physics grid as card 44 (category count 14→15 pages) and its
+  matching roadmap `<li>` removed, leaving three roadmap ideas still open (see below).
+
 ## Roadmap
 
-There is currently no roadmap list — the 2026-08-16 batch above cleared the last of it, and
-`index.html` no longer has a `<section class="roadmap">` at all, only the built grid. The
-next new-page idea should either be proposed fresh (ask the user, or float a candidate list)
-or, if the roadmap format is wanted back, a new "What's next" section can be re-added to
-`index.html` following the same `<h3 class="rm-cat">`/`<ul><li>` pattern the removed section
-used (see git history prior to 2026-08-16 for the exact markup).
+Three ideas are still open, added 2026-08-16 as a themed batch — kitchen-table experiments
+where you measure something real with household items. `bounce-restitution.html` above was the
+fourth and has been built; see `index.html`'s `<section class="roadmap">` for the current
+`<h3 class="rm-cat">`/`<ul><li>` markup if adding or removing entries.
+
+- **Why the spoon feels colder than the table** (Everyday maths) — same room temperature, but
+  touch metal and wood and your hand disagrees. The honest equation here is *thermal
+  effusivity* e = √(kρc), not conductivity alone — effusivity is what actually sets how fast
+  heat is pulled from your fingertip on contact, which is worth getting right rather than
+  reaching for the more familiar but less precise k.
+- **How deep is the well** (Everyday maths) — drop a stone, count the seconds to the splash,
+  back out the depth from d = ½gt². Same timing-trick family as `lightning-distance.html`, run
+  in reverse (there, known speed + measured delay gives distance; here it's closer to a
+  well-known "how deep is the well" puzzle, and a full solve should also account for the
+  stone's own splash sound needing to travel back up, the same correction lightning-distance
+  didn't need since light is instantaneous at that scale).
+- **Melting ice doesn't raise the glass** (Fun physics) — float an ice cube in a full glass,
+  mark the waterline, watch it not move. Archimedes' displacement: a floating object displaces
+  exactly its own weight in water, and ice melts into exactly that same volume of water — ties
+  into the real climate-science point that floating sea ice melting doesn't raise sea level
+  (only land ice does), worth stating directly in the note.
 
 ## Open questions / next steps
 

@@ -7,16 +7,19 @@
   :root{
     --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
     --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+    --diagram:#8A8270;
   }
   @media (prefers-color-scheme:dark){
     :root:not([data-theme="light"]){
       --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
       --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+      --diagram:#7C88A8;
     }
   }
   :root[data-theme="dark"]{
     --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
     --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    --diagram:#7C88A8;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
@@ -61,7 +64,7 @@
   .legend .name{font-size:12px;color:var(--muted2)}
   .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
 
-  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero{position:relative;width:100%;margin:clamp(8px,1.4vw,18px) 0 0}
   .hero svg{width:100%;height:auto;display:block}
   .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
   .playbar{display:flex;align-items:center;gap:14px;margin-top:10px}
@@ -100,6 +103,7 @@
   .gauge .ticklabel{position:absolute;top:33px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
   .gauge .mark{position:absolute;top:11px;height:16px;width:3px;border-radius:2px;transition:left .12s linear}
   .gauge .marklabel{position:absolute;top:-3px;white-space:nowrap;font:500 11px ui-monospace,monospace;transition:left .12s linear}
+  .effort2{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
 
   .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
   .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
@@ -187,7 +191,7 @@
           <div class="fill" id="h0Fill"></div>
           <div class="thumb" id="h0Thumb"></div>
         </div>
-        <div class="track-range"><span>0 m</span><span class="mid">ground level to overhead</span><span>2 m</span></div>
+        <div class="track-range"><span>0.5 m</span><span class="mid">waist height to overhead</span><span>1.5 m</span></div>
       </div>
 
       <div class="ctrl" id="angleCtrl">
@@ -200,7 +204,7 @@
           <div class="fill" id="angleFill"></div>
           <div class="thumb" id="angleThumb"></div>
         </div>
-        <div class="track-range"><span>0&deg;</span><span class="mid">flat to steep</span><span>85&deg;</span></div>
+        <div class="track-range"><span>0&deg;</span><span class="mid">flat to steep</span><span>75&deg;</span></div>
       </div>
 
       <div class="ctrl" id="v0Ctrl">
@@ -230,6 +234,13 @@
         <div id="gTicks"></div>
         <div id="gLabels"></div>
       </div>
+
+      <div class="effort2">
+        <div class="result-label">Energy to launch it</div>
+        <div class="result-value"><span class="num mono" id="throwJ"></span><span class="unit mono">J</span></div>
+        <div class="verdict-sub" id="throwForce"></div>
+        <div class="effort-line" id="throwCompare"></div>
+      </div>
     </div>
   </div>
 
@@ -241,7 +252,9 @@
     <button class="preset" data-p="gentle">Too gentle</button>
   </div>
 
-  <p class="note">Standard <a href="https://en.wikipedia.org/wiki/Projectile_motion" target="_blank" rel="noopener">projectile motion</a> with no air resistance &mdash; a real thrown potato is dense and slow enough that drag makes only a small difference over 3&nbsp;m, but it isn't modelled here. <em style="font-style:italic">g</em> is fixed at 9.81&nbsp;m/s&sup2;, the hole sits a fixed 3.00&nbsp;m away and is treated as 30&nbsp;cm wide, and the 200&nbsp;g potato mass only matters for the impact-energy figure &mdash; without drag, mass never affects the trajectory itself. The animated throw plays at 0.6&times; real speed, since some of the faster combinations land in well under a second. The &ldquo;lob&rdquo; preset shows a genuine property of this equation: on level ground, two different launch angles that add up to 90&deg; send something the same distance, just on a flatter or a higher arc &mdash; try it against &ldquo;Straight in&rdquo;. <em style="font-style:italic">Taskmaster</em> has run several tasks shaped exactly like this &mdash; throw an object a fixed distance into a target &mdash; which is what prompted this page, alongside <a href="straw-hose-flow.html">the straw-and-hose one</a>.</p>
+  <p class="note">Standard <a href="https://en.wikipedia.org/wiki/Projectile_motion" target="_blank" rel="noopener">projectile motion</a> with no air resistance &mdash; a real thrown potato is dense and slow enough that drag makes only a small difference over 3&nbsp;m, but it isn't modelled here &mdash; a numerical check treating the potato as a 6&nbsp;cm sphere (drag coefficient 0.47) at a 1&nbsp;m, 45&deg;, 5&nbsp;m/s throw lands about 3&nbsp;cm short of the no-drag distance, under 1%, so leaving it out is a reasonable simplification. <em style="font-style:italic">g</em> is fixed at 9.81&nbsp;m/s&sup2;, the hole sits a fixed 3.00&nbsp;m away and is treated as 20&nbsp;cm wide, and the 200&nbsp;g potato mass only matters for the impact-energy figure &mdash; without drag, mass never affects the trajectory itself. The animated throw plays at 0.6&times; real speed, since some of the faster combinations land in well under a second. The &ldquo;lob&rdquo; preset shows a genuine property of this equation: on level ground, two different launch angles that add up to 90&deg; send something the same distance, just on a flatter or a higher arc &mdash; try it against &ldquo;Straight in&rdquo;. <em style="font-style:italic">Taskmaster</em> has run several tasks shaped exactly like this &mdash; throw an object a fixed distance into a target &mdash; which is what prompted this page, alongside <a href="straw-hose-flow.html">the straw-and-hose one</a>.</p>
+
+  <p class="note">Launch energy is kinetic energy, <em style="font-style:italic">KE</em> = &frac12;<em style="font-style:italic">mv&#8320;</em><sup>2</sup> &mdash; mass and speed only, which is why it doesn't move when the angle or release-height sliders do. The force figure divides that energy by an assumed 0.6&nbsp;m arm swing (work = force &times; distance), a rough estimate since real throwing form varies and isn't modelled here. The cat and chair comparisons use gravitational potential energy, <em style="font-style:italic">PE</em> = <em style="font-style:italic">mgh</em>, with a 4&nbsp;kg house cat climbing a 3&nbsp;m tree and a 70&nbsp;kg adult stepping onto a 45&nbsp;cm chair &mdash; reasonable round numbers for a domestic cat's <a href="https://en.wikipedia.org/wiki/Cat" target="_blank" rel="noopener">weight</a> and a standard <a href="https://en.wikipedia.org/wiki/Chair" target="_blank" rel="noopener">chair seat height</a>, not a measurement of any specific animal or person. These are mechanical work numbers, not calories: muscle is roughly 20&ndash;25% efficient, so the actual food energy a cat or person burns climbing is several times higher than the <em style="font-style:italic">PE</em> quoted here.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -276,8 +289,9 @@
 </main>
 <script>
 (function(){
-  var G = 9.81, HOLE_D = 3.00, HOLE_R = 0.15, POTATO_M = 0.2;
-  var H0MIN=0, H0MAX=2, AMIN=0, AMAX=85, VMIN=1, VMAX=10;
+  var G = 9.81, HOLE_D = 3.00, HOLE_R = 0.10, POTATO_M = 0.2, ARM_SWING = 0.6;
+  var CAT_M = 4, CAT_TREE_H = 3, PERSON_M = 70, CHAIR_H = 0.45;
+  var H0MIN=0.5, H0MAX=1.5, AMIN=0, AMAX=75, VMIN=1, VMAX=10;
   var PLAYBACK_RATE = 0.6;
 
   function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
@@ -316,9 +330,9 @@
   // ---- hero geometry: viewBox width == measured CSS px width, both axes share one scale ----
   function geom(w, f){
     var narrow = w < 620;
-    var leftPad = narrow?30:44, rightPad=16, topPad=narrow?30:38, bottomPad=narrow?34:40;
+    var leftPad = narrow?30:44, rightPad=16, topPad=narrow?18:22, bottomPad=narrow?34:40;
     var XMAX = Math.max(HOLE_D+1.5, f.xLand*1.15, 5);
-    var YMAX = Math.max(state.h0, f.apexY, 1.2)*1.25;
+    var YMAX = Math.max(state.h0, f.apexY, 1.2)*1.1;
     var plotW = Math.max(60, w-leftPad-rightPad);
     var scale = plotW/XMAX;
     var plotH = YMAX*scale;
@@ -343,11 +357,11 @@
   var groundLine, trajPath, holeOuter, holeInner, h0Line, h0Dot, landTick, potato;
   function buildSvg(){
     heroSvg.innerHTML = '';
-    groundLine = el('line',{stroke:'var(--line2)','stroke-width':1.25});
-    trajPath = el('path',{fill:'none',stroke:'var(--line2)','stroke-width':1.5,'stroke-dasharray':'2 5'});
-    holeOuter = el('ellipse',{fill:'var(--bg)',stroke:'var(--line2)','stroke-width':1.25});
+    groundLine = el('line',{stroke:'var(--diagram)','stroke-width':1.5});
+    trajPath = el('path',{fill:'none',stroke:'var(--diagram)','stroke-width':2,'stroke-dasharray':'2 5'});
+    holeOuter = el('ellipse',{fill:'var(--bg)',stroke:'var(--diagram)','stroke-width':1.5});
     holeInner = el('ellipse',{fill:'color-mix(in srgb, var(--fg) 18%, var(--bg))'});
-    h0Line = el('line',{stroke:'var(--line2)','stroke-width':1.25,'stroke-dasharray':'3 3'});
+    h0Line = el('line',{stroke:'var(--diagram)','stroke-width':1.5,'stroke-dasharray':'3 3'});
     h0Dot = el('circle',{r:3.5,fill:'var(--muted2)'});
     landTick = el('line',{stroke:'var(--bad)','stroke-width':2});
     potato = el('ellipse',{rx:7,ry:5.4,fill:'#B9834B',stroke:'var(--bg)','stroke-width':1.5});
@@ -366,7 +380,7 @@
     groundLine.setAttribute('y1', g.groundY); groundLine.setAttribute('y2', g.groundY);
 
     trajPath.setAttribute('d', pathFor(f, g));
-    trajPath.setAttribute('stroke', state.active==='angle'||state.active==='v0' ? 'var(--accent)' : 'var(--line2)');
+    trajPath.setAttribute('stroke', state.active==='angle'||state.active==='v0' ? 'var(--accent)' : 'var(--diagram)');
 
     var holeRpx = Math.max(4, HOLE_R*g.scale);
     var holeX = g.px(HOLE_D);
@@ -379,7 +393,7 @@
     h0Line.setAttribute('y1', g.groundY); h0Line.setAttribute('y2', g.py(state.h0));
     h0Dot.setAttribute('cx', g.px(0)); h0Dot.setAttribute('cy', g.py(state.h0));
     h0Dot.setAttribute('fill', state.active==='h0' ? 'var(--accent)' : 'var(--muted2)');
-    h0Line.setAttribute('stroke', state.active==='h0' ? 'var(--accent)' : 'var(--line2)');
+    h0Line.setAttribute('stroke', state.active==='h0' ? 'var(--accent)' : 'var(--diagram)');
 
     var landColor = Math.abs(f.xLand-HOLE_D) <= HOLE_R ? 'var(--fg)' : 'var(--bad)';
     var landX = g.px(clamp(f.xLand,0,g.XMAX));
@@ -498,7 +512,7 @@
 
     if(hit){
       verdictEl.textContent = 'In the hole!';
-      verdictSubEl.textContent = 'Lands within 15 cm of centre — a clean shot.';
+      verdictSubEl.textContent = 'Lands within '+(HOLE_R*100).toFixed(0)+' cm of centre — a clean shot.';
     } else if(diff < 0){
       verdictEl.textContent = 'Short';
       verdictSubEl.textContent = 'Falls '+Math.abs(diff-HOLE_R).toFixed(2)+' m short of the hole.';
@@ -534,6 +548,17 @@
     gLabelsEl.innerHTML = labelsHtml;
   }
 
+  // ---- launch energy (mass and speed only — angle and height don't change it) ----
+  var throwJEl=$('throwJ'), throwForceEl=$('throwForce'), throwCompareEl=$('throwCompare');
+  function drawEffort(){
+    var joules = 0.5*POTATO_M*state.v0*state.v0;
+    var force = joules/ARM_SWING;
+    throwJEl.textContent = joules.toFixed(1);
+    throwForceEl.textContent = '≈ '+force.toFixed(1)+' N of push over the ~0.6 m your arm travels through the throw — a rough estimate, since real form varies.';
+    var catE = CAT_M*G*CAT_TREE_H, chairE = PERSON_M*G*CHAIR_H;
+    throwCompareEl.textContent = 'about 1/'+Math.round(catE/joules)+' the energy of a cat climbing a 3 m tree, or 1/'+Math.round(chairE/joules)+' of what it takes an adult to step up onto a chair.';
+  }
+
   // ---- throw playback ----
   var throwBtn = $('throwBtn'), flightTxt = $('flightTxt');
   function resetThrow(){
@@ -566,10 +591,10 @@
   // ---- presets ----
   document.querySelectorAll('.preset').forEach(function(b){
     var presets = {
-      straight:{h0:0, angle:45, v0:Math.sqrt(HOLE_D*G)},
-      lob:{h0:0, angle:70, v0:Math.sqrt(HOLE_D*G/Math.sin(70*2*Math.PI/180))},
+      straight:{h0:0.5, angle:45, v0:5.02},
+      lob:{h0:0.5, angle:70, v0:6.57},
       flat:{h0:1, angle:10, v0:7},
-      gentle:{h0:1.5, angle:75, v0:4}
+      gentle:{h0:1.5, angle:70, v0:4}
     };
     b.addEventListener('click', function(){
       var p = presets[b.dataset.p];
@@ -623,6 +648,7 @@
     $('angleReadout').textContent = state.angle.toFixed(0)+'°';
     $('v0Readout').textContent = state.v0.toFixed(1)+' m/s';
     drawResult();
+    drawEffort();
     if(anim.playing){
       var f = flight();
       flightTxt.textContent = 't = '+Math.min(anim.t,f.tLand).toFixed(2)+' / '+f.tLand.toFixed(2)+' s';

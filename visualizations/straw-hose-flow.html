@@ -96,13 +96,13 @@
   .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px}
   .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
   .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
-  .gauge{position:relative;height:56px;margin-top:16px;max-width:420px}
+  .gauge{position:relative;height:66px;margin-top:16px;max-width:420px}
   .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
   .gauge .reach{position:absolute;top:14px;height:10px;border-radius:2px 0 0 2px;background:color-mix(in srgb, var(--accent) 16%, transparent);left:0}
   .gauge .tick{position:absolute;top:26px;width:1px;height:5px;background:var(--line2)}
   .gauge .ticklabel{position:absolute;top:33px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
   .gauge .limit{position:absolute;top:9px;height:20px;width:1px;background:var(--bad)}
-  .gauge .limitlabel{position:absolute;top:0;white-space:nowrap;font:400 9px ui-monospace,monospace;letter-spacing:.05em;color:var(--bad)}
+  .gauge .limitlabel{position:absolute;top:47px;white-space:nowrap;font:400 9px ui-monospace,monospace;letter-spacing:.05em;color:var(--bad);transform:translateX(-50%)}
   .gauge .ghost{position:absolute;top:11px;height:16px;width:1px;background:var(--line2)}
   .gauge .mark{position:absolute;top:12px;height:14px;width:3px;border-radius:2px;transition:left .12s linear}
   .gauge .marklabel{position:absolute;top:-3px;white-space:nowrap;font:500 11px ui-monospace,monospace;transition:left .12s linear}
@@ -262,7 +262,7 @@
     <button class="preset" data-p="shake">milkshake straw</button>
   </div>
 
-  <p class="note">The <a href="https://en.wikipedia.org/wiki/Hagen%E2%80%93Poiseuille_equation" target="_blank" rel="noopener">Hagen&ndash;Poiseuille equation</a> describes slow, steady (laminar) flow through a round tube, where &eta; is viscosity, L is length, r is inner radius (half the diameter set above), and Q is a fixed, representative flow rate. The scale's limits are rough estimates of what a person can sustain by mouth, not hard numbers. This models horizontal flow only &mdash; a straw held upright also fights gravity, and no amount of suction can lift water more than about 10 m, since that alone needs a full atmosphere of pressure difference. It's also the reason a long drinking straw is so much harder to use than a garden hose of similar length: on <em style="font-style:italic">Taskmaster</em>, comedian Tim Vine taped a chain of drinking straws together and couldn't blow a candle out through them, while a garden hose of the same length worked fine &mdash; try both presets above. Real chained drinking straws also kink at their joints, choking flow by a mechanism this equation doesn't capture, likely a bigger factor in Tim Vine's attempt than viscosity alone.</p>
+  <p class="note">The <a href="https://en.wikipedia.org/wiki/Hagen%E2%80%93Poiseuille_equation" target="_blank" rel="noopener">Hagen&ndash;Poiseuille equation</a> describes slow, steady (laminar) flow through a round tube, where &eta; is viscosity, L is length, r is inner radius (half the diameter set above), and Q is a fixed, representative flow rate. The scale's limits are rough estimates of what a person can sustain by mouth, not hard numbers, drawn from <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4001942/" target="_blank" rel="noopener">clinical measurements of maximal mouth pressure</a> (the same PImax/PEmax test used to check respiratory-muscle strength, not a drinking-straw study specifically). Sucking and blowing are <em style="font-style:italic">not</em> the same limit: healthy adults typically manage on the order of 10&nbsp;kPa sucking (PImax) but close to double that blowing, around 20&nbsp;kPa (PEmax), since the muscles used to exhale are stronger than the ones used to inhale &mdash; which is why air's limit is set higher than water's, milkshake's, or honey's above. The gauge below uses a <strong>log scale</strong> (each major tick is 1,000&times; the last), since achievable pressures span nine orders of magnitude from a light sip to a seized industrial line; a result far past the red line shows its multiple of the mouth limit right next to the marker, instead of just crawling off the right edge. This models horizontal flow only &mdash; a straw held upright also fights gravity, and no amount of suction can lift water more than about 10 m, since that alone needs a full atmosphere of pressure difference. It's also the reason a long drinking straw is so much harder to use than a garden hose of similar length: on <em style="font-style:italic">Taskmaster</em>, comedian Tim Vine taped a chain of drinking straws together and couldn't blow a candle out through them, while a garden hose of the same length worked fine &mdash; try both presets above. Real chained drinking straws also kink at their joints, choking flow by a mechanism this equation doesn't capture, likely a bigger factor in Tim Vine's attempt than viscosity alone.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -602,7 +602,7 @@
     var limitPct = pos(l.limit);
     gReach.style.width = limitPct.toFixed(2)+'%';
     gLimit.style.left = limitPct.toFixed(2)+'%';
-    gLimitLabel.style.left = clamp(limitPct,8,80).toFixed(2)+'%';
+    gLimitLabel.style.left = clamp(limitPct,6,94).toFixed(2)+'%';
     gMark.style.left = markPct.toFixed(2)+'%';
     gMark.style.background = resultColor;
     var labelPct = clamp(markPct,4,88);
@@ -611,7 +611,7 @@
     gMarkLabel.style.color = resultColor;
 
     var ratio = state.drag && state.ghostPa ? pa/state.ghostPa : 1;
-    var deltaText = fp[0]+' '+fp[1];
+    var deltaText = over ? fp[0]+' '+fp[1]+' · '+sci(pa/l.limit)+' limit' : fp[0]+' '+fp[1];
     if(state.drag && Math.abs(Math.log(ratio))>0.02) deltaText = (ratio>1 ? sci(ratio)+' harder' : sci(1/ratio)+' easier');
     gMarkLabel.textContent = deltaText;
 

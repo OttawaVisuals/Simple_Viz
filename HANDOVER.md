@@ -168,6 +168,17 @@ Shows six things crossing the real Earth–Moon distance (384,400 km) at their r
 light, NASA's Parker Solar Probe, speed of sound in water, a rifle bullet, speed of sound
 in air, and a commercial jet.
 
+**Reviewed and complete as of 2026-08-17.** One of the original pages, revisited across
+several rounds of feedback (all in the entry below): the d/v legend table, sourcing every
+speed, and the zoom mechanics went through two further passes after the initial overhaul —
+(1) sound removed from the full-scale overview (only light + Parker move enough there to be
+worth showing; sound stayed in the zoom ruler) and Parker's overview line moved right under
+light's, and (2) the "Light's position" readout was dropped entirely (cumulative total
+distance is now the only result panel) and the zoom callout was redrawn as a full frame
+around the whole magnified ruler — title centered at its top, a magnifying-glass icon at the
+top-left, straight funnel lines from the small to-scale box into the frame's corners — since
+the user's original ask ("make the zoom box more clear") turned out to be about the visual
+composition, not the caption text. No open items remain.
 **2026-08-17 overhaul, one of the original pages, several rounds of user feedback:**
 - **Legend rebuilt as a d/v table.** Rows now show a `d`/`v` variable column (not just a
   colored letter + name + value) so each row visibly ties to the `t = d/v` equation above

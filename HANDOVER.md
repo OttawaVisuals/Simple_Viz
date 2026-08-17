@@ -47,6 +47,51 @@ tool can pick up mid-stream without re-reading the whole chat history.
 
 ## Previous handoff — 2026-08-16
 
+---
+
+**Same session, continued** — the other two of the three pitched ideas were built right
+after `starlight-spectrum.html` above, both added to **Discoveries** (now 20 pages, site
+total 48):
+
+- **`visualizations/newtons-cannonball.html`** ("Orbit isn't up. It's sideways.") — page 47.
+  Real two-body Kepler orbital mechanics (not a scripted arc): given a launch speed slider
+  (0–12 km/s, tangential, from a fixed 300 km altitude), the page derives the resulting
+  conic section analytically from specific energy and angular momentum (`ε = v²/2 − μ/r`,
+  `e = √(1 + 2εL²/μ²)`, `a = −μ/2ε`), classifies the launch point as periapsis or apoapsis
+  depending on whether `v ≥ v_circ`, and samples `r(ν) = p/(1+e·cos ν)` to draw the actual
+  crash arc, ellipse, or hyperbola. This is literally Newton's 1687 cannonball diagram,
+  computed for real rather than illustrated. One real bug caught during testing: right at
+  escape velocity, floating-point noise made `ε` read as a tiny *negative* number instead of
+  ≈0, so the escape case was misclassified as an almost-infinite bound ellipse (a 10.9-year
+  orbital period). Fixed with a `-50 m²/s²` threshold on ε (small vs. its ~1e7–1e8 scale, far
+  above float noise) — the "Escape Earth" preset was also switched from a hardcoded speed to
+  the runtime-computed `v_circ·√2`, since the hardcoded value happened to round to just under
+  the true escape speed for this altitude.
+- **`visualizations/coriolis-effect.html`** ("Straight lines that don't stay straight") —
+  page 48, directly answering the pitched idea's own question ("is it something you can test
+  easily at home?"). Two-panel hero (user-triggered "Roll the ball" animation, left panel
+  fixed/inertial view with visibly spinning disc, right panel co-rotating view where the same
+  straight-line motion traces a curve) demonstrates *why* the effect exists before any numbers
+  appear. Quantitative section uses the standard small-deflection formula
+  `y ≈ Ω sinφ · d²/v` against a four-item scenario picker (bathtub drain, thrown baseball,
+  naval gunfire, the WWI Paris Gun) spanning negligible→historically-documented. **A real
+  scoping catch during drafting**: an initially-planned fifth scenario (hurricane-scale wind
+  over 500 km) produced a computed deflection *larger than the distance travelled* — the
+  formula assumes the sideways drift is a small correction to an otherwise-straight path,
+  which breaks down completely at the hurricane/ocean-gyre scale where Coriolis doesn't
+  nudge the path, it *is* the reason the path spirals (needs full geostrophic-balance fluid
+  dynamics, out of scope for one equation). Rather than show a bogus number, that scenario
+  was dropped from the picker and the distinction is explained qualitatively in the note
+  instead. The note also directly cites Wikipedia's own documentation of the bathtub-drain
+  myth rather than just asserting it's false.
+  - Both pages verified in-browser (console, live computed values against hand-calculated
+    physics, preset behaviour, theme toggle both directions). The `requestAnimationFrame`
+    loops in both hero animations could not be visually screenshotted in this session's
+    preview tooling (confirmed via a plain rAF counter test that it never ticks in a
+    non-displayed pane) — this is a tooling limitation shared by every animated page on the
+    site already (`straw-hose-flow.html`, `earth-moon-race.html`), not specific to these two;
+    the underlying transform math was verified independently by direct computation instead.
+
 - **Next-session reminder for Simon:** complete the Cloudflare dashboard steps in
   `CLOUDFLARE_SETUP.md` (create/run the D1 migration, bind `FEEDBACK_DB`, add the
   `FEEDBACK_HASH_KEY` secret, route `hello@madeclear.ca`, and redeploy) before testing the

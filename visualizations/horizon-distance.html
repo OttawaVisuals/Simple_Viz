@@ -326,23 +326,31 @@
   // schematic height hs straight above G (so E, G and the circle's centre are colinear); the
   // horizon point H is the actual point of tangency from E onto the circle. That makes the
   // dashed sight line E→H a true tangent by construction — it can't drift out of true no matter
-  // how Rs/hs are chosen. Both Rs (curvature) and hs (rise) respond to the height slider: as h
-  // grows the schematic world visibly curls up (Rs shrinks) at the same time the eye lifts
-  // (hs grows), rather than the horizon point sliding along a fixed arc for an arbitrary reason.
-  // Still not to true scale — real R is thousands of km and this Rs is a few hundred px.
+  // how Rs/hs are chosen. The observer sits close to the left edge so almost the whole width is
+  // free for the curve; Rs is set as a multiple of the diagram's own width (huge — nearly flat —
+  // at the bottom of the slider, only a little over the width itself at the top) so the drawn
+  // arc always reaches both edges, "taking the whole width," rather than occupying an arbitrary
+  // fraction of it. Still not to true scale — real R is thousands of km and this Rs is ~1,000 px.
   function geom(w, hv){
-    var vbH = w < 620 ? 240 : 210;
-    var baseY = vbH - 34;
+    var narrow = w < 620;
     var arcSpan = w - 40;
     var x0 = 20, x1 = w - 20;
-    var eyeX = x0 + arcSpan*0.16;
+    var eyeX = x0 + 14; // observer kept near the left edge, leaving the rest of the width to the curve
     var t = (state.he - LOGMIN) / (logMax() - LOGMIN); // 0..1, log-scale height fraction
 
-    var narrow = w < 620;
-    var RsMax = narrow ? 900 : 1400, RsMin = narrow ? 340 : 500;
-    var hsMin = 8, hsMax = narrow ? 100 : 140;
-    var Rs = RsMax - t*(RsMax-RsMin);
+    // Eye rise is about half of what it was: height should read as a modest lift, not the
+    // dominant motion — curvature is what's supposed to carry the "farther up" feeling now.
+    var hsMin = 8, hsMax = narrow ? 54 : 74;
     var hs = hsMin + t*(hsMax-hsMin);
+
+    // baseY/vbH sized from hsMax so there's always enough room above the ground line for the
+    // eye + its label, and enough below it for the horizon point's vertical drop (which grows
+    // with curvature) — this is what was clipping the horizon out of the picture above ~9 m.
+    var baseY = hsMax + 35;
+    var vbH = baseY + hsMax + 20;
+
+    var RsMaxMult = 4.5, RsMinMult = 1.15;
+    var Rs = RsMaxMult*arcSpan - t*((RsMaxMult-RsMinMult)*arcSpan);
 
     var cx = eyeX, cy = baseY + Rs; // circle centre, directly below the ground point G
     var theta = Math.acos(clamp(Rs/(Rs+hs), -1, 1)); // tangent angle from the G direction
@@ -350,17 +358,18 @@
     var horizX = cx + Rs*Math.sin(theta);
     var horizY = cy - Rs*Math.cos(theta);
 
-    // Draw the visible arc from a bit left of G (reaching toward x0) to a bit past the
-    // tangent point H, so a sliver of "world" continues past the horizon.
+    // Draw the arc all the way from x0 to x1 — the full width — independent of where the
+    // tangent point happens to land; the world keeps curving away past the horizon, which is
+    // exactly the point being made, so the curve continuing past H is honest, not decorative.
     var phiLeft = Math.asin(clamp((cx-x0)/Rs, -1, 1));
-    var phiRight = 0.16;
-    var aStart = -phiLeft, aEnd = theta + phiRight;
+    var phiRightFull = Math.asin(clamp((x1-cx)/Rs, -1, 1));
+    var aStart = -phiLeft, aEnd = phiRightFull;
     var p0x = cx + Rs*Math.sin(aStart), p0y = cy - Rs*Math.cos(aStart);
     var p1x = cx + Rs*Math.sin(aEnd), p1y = cy - Rs*Math.cos(aEnd);
     var arcPath = 'M'+p0x+','+p0y+' A'+Rs+','+Rs+' 0 0 1 '+p1x+','+p1y;
     var fillPath = arcPath+' L'+p1x+','+vbH+' L'+p0x+','+vbH+' Z';
 
-    var refA = aStart*0.4;
+    var refA = aStart + (aEnd-aStart)*0.03;
     var refX = cx + Rs*Math.sin(refA), refY = cy - Rs*Math.cos(refA);
 
     var dTxt = fmtD(distanceFor(hv));

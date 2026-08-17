@@ -4,6 +4,15 @@ Working log for switching between Claude and Codex on this project. Update this 
 whenever a design direction is decided, reversed, or left open — the goal is that either
 tool can pick up mid-stream without re-reading the whole chat history.
 
+## Site info
+
+- **Published site:** [madeclear.ca](https://madeclear.ca), hosted on Cloudflare Pages.
+  `hello@madeclear.ca` is the contact address referenced in every page's footer (see the
+  Cloudflare Email Routing note below).
+- Simon has seen `madeclear.ca` blocked by work-laptop IT policy (category/content
+  filtering) with a "not a secure connection" warning — that's a corporate network/proxy
+  issue on his end, not a site or Cloudflare cert problem; nothing to action here.
+
 ## Current handoff — 2026-08-16
 
 - **Next-session reminder for Simon:** complete the Cloudflare dashboard steps in
@@ -930,6 +939,27 @@ under **Fun physics**, right after `cosmic-scale.html`.
 - Added to `index.html`'s Fun physics grid as card 44 (category count 14→15 pages) and its
   matching roadmap `<li>` removed, leaving three roadmap ideas still open (see below).
 
+### Homepage concept icons (2026-08-17)
+
+`index.html` now gives every one of its 45 visualization links a distinct preview icon.
+
+- The user chose the person + long looping straw + candle direction for
+  `straw-hose-flow.html`, then asked for the same visual treatment across the catalogue.
+- The production icons are **inline SVG symbols**, not generated PNGs. The initial raster
+  straw sketch was transparent with near-black outlines and therefore disappeared in dark
+  mode; the SVG set instead uses `currentColor`, `var(--accent)`, and `var(--bad)` so one asset
+  works automatically in both themes.
+- All symbols live in a hidden `<defs>` sprite near the top of `index.html`, use the shared
+  `0 0 120 64` viewBox and rounded 2.2 px line treatment, and are deliberately simple enough
+  to read at the homepage's 76 px icon height.
+- A short script derives each symbol ID from the visualization filename (for example,
+  `visualizations/straw-hose-flow.html` → `#icon-straw-hose-flow`) and inserts a decorative,
+  `aria-hidden` SVG before the card metadata. When adding a page, add a symbol whose ID uses
+  the same filename slug; no separate mapping table is required.
+- Browser verification: 45 links / 45 symbols / 45 rendered icons; light and dark themes;
+  search still returns the correct count and card; mobile at 390 px is a single column with
+  no horizontal overflow; no console warnings or errors. `git diff --check` also passes.
+
 ## Roadmap
 
 Three ideas are still open, added 2026-08-16 as a themed batch — kitchen-table experiments
@@ -956,7 +986,7 @@ fourth and has been built; see `index.html`'s `<section class="roadmap">` for th
 
 ## Open questions / next steps
 
-- A site index (`index.html`) now links forty-three concepts, grouped into the three categories
+- A site index (`index.html`) now links forty-five concepts, grouped into the three categories
   described above (Everyday maths / Discoveries / Fun physics). Each is intentionally a
   simplified explainer, with its approximation stated in-page.
 - **Decided (2026-08-14):** every visualization should share the visual language in

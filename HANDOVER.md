@@ -983,6 +983,31 @@ wrong way. Could add other planets" — both items fixed in the same session.
   while keeping the existing Earth-specific numbers (4.6 km beach, 2,000+ km ISS) intact as
   the default-world example.
 
+**Reviewed and complete as of 2026-08-17.** Three further rounds of feedback, all in this
+session:
+- **Gauge label collision fixed** — same `top:0` → below-axis move as `straw-hose-flow.html`/
+  `shelf-sag.html`/`bike-gears.html`, so the English Channel limit label can no longer overlap
+  the horizon-distance marker label.
+- **Switched to the exact formula.** `d = √(2Rh + h²)` is used for both the displayed equation
+  and the actual computation, replacing the flat-horizon approximation — simple enough not to
+  need the shortcut, and it let the note drop its "dropping the h² term" error-percentage
+  caveats entirely (the refraction, ground-arc, and schematic-scale caveats stayed, since
+  those are independent of which formula computes `d`).
+- **Hero diagram rebuilt around real circle-tangent geometry, then tuned twice more.** The
+  first pass (schematic radius shrinks + eye height grows together, horizon = the actual
+  tangent point) fixed the "arbitrary-looking" connection but introduced a real bug: the
+  tangent point's vertical drop grows with curvature while the margin below the baseline was
+  a fixed 34px, so the horizon marker rendered off the bottom of the viewBox above ~9 m —
+  caught by the user testing the live page, not by inline review. Second pass fixed it
+  properly: `baseY`/`vbH` are now sized from the eye-rise range so the drop always has room,
+  the circle radius is set as a multiple of the diagram's own width (so the arc always spans
+  edge-to-edge — "the world keeps curving away past the horizon" — rather than occupying an
+  arbitrary fraction of it), the observer moved from a 16%-inset position to hard against the
+  left edge to free the rest of the width, and the eye-rise pixel range was halved so height
+  reads as a modest lift rather than the dominant motion. Verified in-browser at the exact old
+  breakpoint (9.3 m) plus both slider extremes, Earth and Jupiter, mobile width, and both
+  themes.
+
 ### `bounce-restitution.html` — "Count the bounces" (2026-08-16)
 
 Built directly from a filled-out design brief (`Drafts/Bounce_Design.md`), the first page

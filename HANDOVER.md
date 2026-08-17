@@ -13,7 +13,39 @@ tool can pick up mid-stream without re-reading the whole chat history.
   filtering) with a "not a secure connection" warning — that's a corporate network/proxy
   issue on his end, not a site or Cloudflare cert problem; nothing to action here.
 
-## Current handoff — 2026-08-16
+## Current handoff — 2026-08-17
+
+- **`visualizations/starlight-spectrum.html`** ("Starlight has a barcode") — new page 46,
+  added to **Discoveries** on `index.html` and `tracker.html`. Built directly to the
+  [STYLE_GUIDE.md](STYLE_GUIDE.md) skeleton, no earlier draft; picked from three pitched
+  ideas (rocket science, Coriolis effect, spectroscopy) via user choice.
+  - **Equation**: the Rydberg formula for hydrogen's Balmer series,
+    `1/λ = R(1/2² − 1/n²)`, computed live (not hardcoded per-line) so the n=3..9 slider
+    sweeps smoothly from Hα (656 nm, red) toward the series limit (364.6 nm) as n grows —
+    the note states the 364.6 nm limit explicitly and explains why the slider stops at n=9
+    rather than claiming arbitrarily high n stays visible.
+  - **Hero, two panels**: a schematic (explicitly not energy-accurate, evenly-spaced rows —
+    same "not to scale" honesty pattern as `eratosthenes-shadow.html`'s zoom panel) hydrogen
+    energy-level diagram with a colour-coded arrow from the slider's n down to n=2, beside an
+    **emission**-style spectrum bar (bright single line on black, like a gas-discharge tube)
+    at the computed wavelength — both driven by one `wavelengthColor()` function so the arrow,
+    the line, and the result readout are always the same colour.
+  - **Second section, deliberately extending the skeleton**: a star picker (Rigel/Sirius
+    A/Sun/Betelgeuse, spanning B/A/G/M spectral types) shows an **absorption**-style spectrum
+    (dark lines on a full rainbow) for seven real elements/molecules at their real vacuum
+    wavelengths, with per-star relative line strengths. The note states directly that these
+    strengths are a qualitative illustration of the real Morgan–Keenan OBAFGKM classification
+    pattern (Balmer lines peak near A0, Ca II peaks in G/K, TiO bands only in M), not measured
+    equivalent widths — the underlying physical trend is real, the exact 0–1 numbers are not
+    sourced to a specific spectral atlas. Element legend rows dim/highlight the matching lines
+    on hover, reusing `earth-moon-race.html`'s lane-dimming pattern.
+  - Verified in-browser: both panels' colours match their computed wavelength, star switching
+    updates the metadata line and every element's strength label, the n slider works via both
+    drag and arrow-key input, and the theme toggle alternates correctly in both directions.
+  - `index.html`'s header count, results count, and the Discoveries section count were bumped
+    to 46/Eighteen; `tracker.html`'s `PAGES` array was updated to match.
+
+## Previous handoff — 2026-08-16
 
 - **Next-session reminder for Simon:** complete the Cloudflare dashboard steps in
   `CLOUDFLARE_SETUP.md` (create/run the D1 migration, bind `FEEDBACK_DB`, add the

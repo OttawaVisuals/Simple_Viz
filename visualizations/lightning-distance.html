@@ -88,13 +88,13 @@
   .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
   .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
   .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
-  .gauge{position:relative;height:56px;margin-top:16px;max-width:420px}
+  .gauge{position:relative;height:66px;margin-top:16px;max-width:420px}
   .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
   .gauge .reach{position:absolute;top:14px;height:10px;border-radius:2px 0 0 2px;background:color-mix(in srgb, var(--accent) 16%, transparent);left:0}
   .gauge .tick{position:absolute;top:26px;width:1px;height:5px;background:var(--line2)}
   .gauge .ticklabel{position:absolute;top:33px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
   .gauge .limit{position:absolute;top:9px;height:20px;width:1px;background:var(--bad)}
-  .gauge .limitlabel{position:absolute;top:0;white-space:nowrap;font:400 9px ui-monospace,monospace;letter-spacing:.05em;color:var(--bad)}
+  .gauge .limitlabel{position:absolute;top:47px;white-space:nowrap;font:400 9px ui-monospace,monospace;letter-spacing:.05em;color:var(--bad);transform:translateX(-50%)}
   .gauge .mark{position:absolute;top:12px;height:14px;width:3px;border-radius:2px;transition:left .12s linear;background:var(--accent)}
   .gauge .marklabel{position:absolute;top:-3px;white-space:nowrap;font:500 11px ui-monospace,monospace;transition:left .12s linear}
 
@@ -207,6 +207,8 @@
       <div class="result-value"><span class="num mono" id="distValue"></span><span class="unit mono" id="distUnit"></span></div>
       <div class="verdict-sub" id="verdictSub"></div>
       <div class="effort-line" id="effortLine"></div>
+      <div class="effort-line" id="lightTimeLine"></div>
+      <div class="effort-line" id="loudnessLine"></div>
       <div class="gauge" id="gauge">
         <div class="track"></div>
         <div class="reach" id="gReach"></div>
@@ -229,6 +231,8 @@
   </div>
 
   <p class="note">Sound travels at roughly 343&nbsp;m/s in dry air at 20&deg;C &mdash; a touch faster in warmer or more humid air, a touch slower in cold or dry air, but 343&nbsp;m/s is the standard reference figure used here. That's close enough to the folk rule &mdash; "5 seconds per mile" (343&nbsp;m/s &times; 5&nbsp;s &asymp; 1715&nbsp;m, against a mile's 1609&nbsp;m) or "3 seconds per kilometre" (343&nbsp;m/s &times; 3&nbsp;s &asymp; 1029&nbsp;m) &mdash; that either is a fine way to estimate a storm's distance while counting on your fingers. Treating the flash as instantaneous isn't a shortcut here, it's honest: light covers a kilometre in about 3.3&nbsp;microseconds, genuinely negligible next to the seconds thunder takes. The one real approximation is the gauge below &mdash; the d&nbsp;=&nbsp;v&middot;&Delta;t formula keeps climbing past what you can actually hear, since atmospheric absorption and upward refraction usually mute thunder beyond roughly 15&ndash;20&nbsp;km, well short of what a 60-second delay would imply. See <a href="https://en.wikipedia.org/wiki/Thunder" target="_blank" rel="noopener">Thunder</a> and <a href="https://en.wikipedia.org/wiki/Speed_of_sound" target="_blank" rel="noopener">Speed of sound</a> on Wikipedia.</p>
+
+  <p class="note">How loud thunder gets isn't a linear relationship with distance. Two separate losses shrink it: <em style="font-style:italic">geometric spreading</em>, where the sound pressure level falls off with the inverse square of distance &mdash; a drop of 6&nbsp;dB every time the distance doubles, the same rule that governs any point source (<a href="https://phys.libretexts.org/Bookshelves/Waves_and_Acoustics/Understanding_Sound_(Abbot)/06:_Loudness_perception/6.06:_Intensity_and_Distance" target="_blank" rel="noopener">Physics LibreTexts</a>) &mdash; and <em style="font-style:italic">atmospheric absorption</em>, a separate loss that's roughly linear in dB per kilometre but strongly frequency-dependent: higher frequencies are absorbed much faster than low ones. That second effect is also why a nearby strike cracks sharply while the same stroke rumbles by the time it travels several kilometres &mdash; the crack's higher frequencies get stripped out along the way, leaving mostly the low rumble (<a href="https://en.wikibooks.org/wiki/Engineering_Acoustics/Thunder_acoustics" target="_blank" rel="noopener">Engineering Acoustics: Thunder acoustics</a>). Peak loudness right at the lightning channel is commonly cited around 120&ndash;130&nbsp;dB, among the loudest natural sounds on Earth (<a href="https://www.britannica.com/topic/Why-Is-Thunder-So-Loud" target="_blank" rel="noopener">Britannica</a>) &mdash; and it isn't the same for every strike: a longer or more energetic discharge channel radiates more acoustic energy, so some claps are genuinely louder than others before distance even enters the picture. The estimated loudness figure above uses geometric spreading alone from an assumed 120&nbsp;dB at 10&nbsp;m; it leaves out the extra, frequency-dependent loss from atmospheric absorption, so real thunder at longer range usually runs a bit quieter than that number suggests.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -264,15 +268,22 @@
 <script>
 (function(){
   var V = 343; // m/s, fixed
+  var C = 299792458; // m/s, speed of light in vacuum
   var DTMIN = 0, DTMAX = 60;
   var AUDIBLE_LIMIT_M = 17500; // typical real-world audibility ceiling, ~15-20 km
   var GAUGE_MAX_M = 22000;
+  var SPL_REF = 120, R_REF = 10; // assumed reference: ~120 dB at 10 m from the channel
+
+  function estLoudnessDb(m){ return SPL_REF - 20*Math.log10(Math.max(m,R_REF)/R_REF); }
 
   function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
 
   function fmtDist(m){
     if(m < 1000) return [Math.round(m).toString(), 'm'];
     return [(m/1000).toFixed(2), 'km'];
+  }
+  function fmtMicros(us){
+    return (us < 10 ? us.toFixed(2) : Math.round(us)) + ' µs';
   }
 
   var NS='http://www.w3.org/2000/svg';
@@ -533,7 +544,7 @@
   });
 
   // ---- result + gauge ----
-  var distValueEl=$('distValue'), distUnitEl=$('distUnit'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+  var distValueEl=$('distValue'), distUnitEl=$('distUnit'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine'), lightTimeLineEl=$('lightTimeLine'), loudnessLineEl=$('loudnessLine');
   var gReach=$('gReach'), gLimit=$('gLimit'), gMark=$('gMark'), gMarkLabel=$('gMarkLabel');
   var gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
 
@@ -553,10 +564,19 @@
     }
     effortLineEl.textContent = Math.round(m/AUDIBLE_LIMIT_M*100)+'% of the typical audibility limit';
 
+    var lightUs = (m/C)*1e6;
+    lightTimeLineEl.textContent = m < 1
+      ? ''
+      : 'light crosses that same distance in ' + fmtMicros(lightUs) + ' — about 874,000× faster than the sound you’re timing';
+
+    loudnessLineEl.textContent = m < 1
+      ? ''
+      : 'estimated loudness here: ~' + Math.round(estLoudnessDb(m)) + ' dB, from geometric spreading alone (assumes ~120 dB at 10 m — see note)';
+
     var markPct = pos(m), limitPct = pos(AUDIBLE_LIMIT_M);
     gReach.style.width = Math.min(markPct,limitPct).toFixed(2)+'%';
     gLimit.style.left = limitPct.toFixed(2)+'%';
-    $('gLimitLabel').style.left = clamp(limitPct,10,72).toFixed(2)+'%';
+    $('gLimitLabel').style.left = clamp(limitPct,6,94).toFixed(2)+'%';
     gMark.style.left = markPct.toFixed(2)+'%';
     var labelPct = clamp(markPct,4,90);
     gMarkLabel.style.left = labelPct.toFixed(2)+'%';

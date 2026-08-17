@@ -104,7 +104,6 @@
   .gauge .tick{position:absolute;top:22px;width:1px;height:5px;background:var(--line2)}
   .gauge .ticklabel{position:absolute;top:24px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
   #cumGauge{height:62px}
-  .result2{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
 
   .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
   .note a{color:var(--muted2);text-decoration-color:var(--line2)}
@@ -221,11 +220,17 @@
            visibly enclose both the light line and the Parker line above ===== -->
       <rect x="128" y="64" width="12.8" height="54" rx="1.5" fill="color-mix(in srgb, var(--accent) 14%, transparent)" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2.5 2.5"/>
       <text x="148" y="90" class="mono" font-size="10.5" fill="var(--accent)">5,000 km &mdash; magnified ~81&times; below</text>
-      <path d="M 128 118 Q 90 178 80 236" fill="none" stroke="currentColor" stroke-opacity="0.16"/>
-      <path d="M 140.8 118 Q 700 178 1120 236" fill="none" stroke="currentColor" stroke-opacity="0.16"/>
 
-      <!-- ===== zoom: first 5,000 km, one shared ruler, all five slower travellers ===== -->
-      <text x="80" y="222" class="mono" font-size="10.5" fill="currentColor" opacity="0.4">THE FIRST 5,000 KM OF THE TRIP, MAGNIFIED</text>
+      <!-- ===== zoom: a full frame around the whole magnified ruler below, with straight
+           callout lines funnelling down from the small to-scale box above ===== -->
+      <rect x="60" y="200" width="1080" height="330" rx="4" fill="none" stroke="currentColor" stroke-opacity="0.18" stroke-width="1.25"/>
+      <line x1="128" y1="118" x2="60" y2="200" stroke="currentColor" stroke-opacity="0.16"/>
+      <line x1="140.8" y1="118" x2="1140" y2="200" stroke="currentColor" stroke-opacity="0.16"/>
+      <g transform="translate(80,216)" fill="none" stroke="currentColor" stroke-opacity="0.4" stroke-width="1.3">
+        <circle cx="0" cy="0" r="5"/>
+        <line x1="3.6" y1="3.6" x2="8" y2="8" stroke-linecap="round"/>
+      </g>
+      <text x="600" y="222" text-anchor="middle" class="mono" font-size="10.5" fill="currentColor" opacity="0.5">THE FIRST 5,000 KM OF THE TRIP, MAGNIFIED</text>
 
       <g class="lane" id="lane-parker">
         <text x="80" y="248" class="mono" font-size="13" font-weight="600" fill="var(--c-parker)">PARKER SOLAR PROBE</text>
@@ -287,27 +292,15 @@
     </div>
 
     <div class="result">
-      <div class="result-label">Light's position</div>
-      <div class="result-value"><span class="num mono" id="posValue"></span><span class="unit mono">km from Earth</span></div>
-      <div class="verdict-sub" id="tripNote"></div>
-      <div class="gauge">
+      <div class="result-label">Total distance light has crossed</div>
+      <div class="result-value"><span class="num mono" id="cumValue"></span><span class="unit mono">km</span></div>
+      <div class="verdict-sub" id="cumNote"></div>
+      <div class="gauge" id="cumGauge">
         <div class="track"></div>
-        <div class="mark" id="gMark"></div>
-        <div class="ticklabel" style="left:0;transform:translateX(0)">Earth</div>
-        <div class="ticklabel" style="left:100%;transform:translateX(-100%)">Moon</div>
-      </div>
-
-      <div class="result2">
-        <div class="result-label">Total distance light has crossed</div>
-        <div class="result-value"><span class="num mono" id="cumValue"></span><span class="unit mono">km</span></div>
-        <div class="verdict-sub" id="cumNote"></div>
-        <div class="gauge" id="cumGauge">
-          <div class="track"></div>
-          <div class="reach" id="cumReach"></div>
-          <div class="mark" id="cumMark"></div>
-          <div id="cumTicks"></div>
-          <div id="cumLabels"></div>
-        </div>
+        <div class="reach" id="cumReach"></div>
+        <div class="mark" id="cumMark"></div>
+        <div id="cumTicks"></div>
+        <div id="cumLabels"></div>
       </div>
     </div>
   </div>
@@ -375,9 +368,6 @@
   var playBtn = $('playBtn');
   var resetBtn = $('resetBtn');
   var clockReadout = $('clockReadout');
-  var posValueEl = $('posValue');
-  var tripNoteEl = $('tripNote');
-  var gMark = $('gMark');
   var cumValueEl = $('cumValue');
   var cumNoteEl = $('cumNote');
   var cumMark = $('cumMark');
@@ -465,15 +455,6 @@
     var tailLen = 36;
     trail.setAttribute('x1', phase <= T_LIGHT ? Math.max(TRACK_X0, x - tailLen) : Math.min(TRACK_X1, x + tailLen));
     trail.setAttribute('x2', x);
-
-    var distanceKm = frac * D;
-    posValueEl.textContent = Math.round(distanceKm).toLocaleString();
-    gMark.style.left = (frac*100).toFixed(2) + '%';
-
-    var trips = Math.floor(t / (2*T_LIGHT));
-    tripNoteEl.textContent = trips > 0
-      ? ('Light has made ' + trips.toLocaleString() + ' round trip' + (trips===1?'':'s') + ' to the Moon already.')
-      : 'Still on its first crossing.';
   }
 
   function renderLane(key){

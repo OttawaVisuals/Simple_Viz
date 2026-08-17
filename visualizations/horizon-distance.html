@@ -91,13 +91,13 @@
   .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
   .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
   .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
-  .gauge{position:relative;height:56px;margin-top:16px;max-width:420px}
+  .gauge{position:relative;height:66px;margin-top:16px;max-width:420px}
   .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
   .gauge .reach{position:absolute;top:14px;height:10px;border-radius:2px 0 0 2px;background:color-mix(in srgb, var(--accent) 16%, transparent);left:0}
   .gauge .tick{position:absolute;top:26px;width:1px;height:5px;background:var(--line2)}
   .gauge .ticklabel{position:absolute;top:33px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
   .gauge .limit{position:absolute;top:9px;height:20px;width:1px;background:var(--line2)}
-  .gauge .limitlabel{position:absolute;top:0;white-space:nowrap;font:400 9px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted2)}
+  .gauge .limitlabel{position:absolute;top:47px;white-space:nowrap;font:400 9px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted2);transform:translateX(-50%)}
   .gauge .mark{position:absolute;top:12px;height:14px;width:3px;border-radius:2px;background:var(--accent);transition:left .12s linear}
   .gauge .marklabel{position:absolute;top:-3px;white-space:nowrap;font:500 11px ui-monospace,monospace;color:var(--accent);transition:left .12s linear}
 
@@ -158,7 +158,7 @@
         <span class="eq">=</span>
         <span class="rad">
           <span class="radsign"><svg viewBox="0 0 22 54" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,32 5,32 11,50 22,0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg></span>
-          <span class="radbar"><span class="radinner"><span>2</span><em id="RTerm">R</em><em id="hTerm">h</em></span></span>
+          <span class="radbar"><span class="radinner"><span>2</span><em id="RTerm">R</em><em id="hTerm">h</em><span class="eq" style="padding:0 .08em">+</span><em id="hTerm2">h</em><sup>2</sup></span></span>
         </span>
       </div>
     </div>
@@ -234,7 +234,7 @@
     <button class="preset" data-p="iss">the ISS</button>
   </div>
 
-  <p class="note">Distance to the horizon uses the flat-horizon approximation <span class="mono">d = &radic;(2Rh)</span>, valid because eye height h is tiny compared to the world's own radius R across almost this whole range. The <span class="mono">d</span> shown is the straight-line distance from your eye to the horizon point. The exact form of that line is <span class="mono">d = &radic;(2Rh + h&sup2;)</span>; dropping the h&sup2; term changes the answer by well under 1% at any human or airliner height, though by the top of each world's slider it matters more &mdash; for Earth at 500&nbsp;km (roughly the ISS) the figure here reads about 2% low, and the distance measured <em style="font-style:italic">along the ground</em> (2,445&nbsp;km) is a further 3% shorter again than the sight line. Each world's slider is capped at the same h&divide;R fraction as Earth's, so switching worlds doesn't quietly make the approximation less honest. Jupiter has no solid surface; its "radius" and this page's h are both measured from the standard cloud-top reference level. The English Channel reference line stays fixed to Earth's real 34&nbsp;km width even when comparing other worlds' horizons, as a familiar yardstick rather than a claim about their own geography. This also ignores atmospheric refraction, which bends light slightly around the curve and extends the real visible horizon by roughly 7% beyond the geometric value calculated here. The hero diagram is a schematic, not to true scale &mdash; a world's actual curvature over these heights is far too gentle to draw a visible arc at 1:1. See <a href="https://en.wikipedia.org/wiki/Horizon#Distance_to_the_horizon" target="_blank" rel="noopener">Wikipedia: Horizon &mdash; Distance to the horizon</a>.</p>
+  <p class="note">Distance to the horizon is the exact straight-line distance from your eye to the horizon point, <span class="mono">d = &radic;(2Rh + h&sup2;)</span> &mdash; the tangent length from the right triangle formed by your eye, the world's centre, and the horizon point itself, not an approximation. Each world's slider is capped at the same h&divide;R fraction as Earth's, so switching worlds doesn't change how honest the picture is. Jupiter has no solid surface; its "radius" and this page's h are both measured from the standard cloud-top reference level. The English Channel reference line stays fixed to Earth's real 34&nbsp;km width even when comparing other worlds' horizons, as a familiar yardstick rather than a claim about their own geography. This still ignores atmospheric refraction, which bends light slightly around the curve and extends the real visible horizon by roughly 7% beyond the geometric value calculated here, and it's the straight sight-line distance rather than the distance measured <em style="font-style:italic">along the curved ground</em> &mdash; at Earth's 500&nbsp;km (roughly the ISS), that ground-arc distance is a further 3% shorter again. The hero diagram is schematic and its curvature exaggerated &mdash; a world's actual curve over these heights is far too gentle to draw at true scale &mdash; but the dashed sight line is always a genuine tangent to the circle drawn: as the slider moves, both the circle's curvature and the eye's height change together, computed from the same right-triangle geometry as the equation above, rather than a horizon point just eyeballed into a plausible-looking place. See <a href="https://en.wikipedia.org/wiki/Horizon#Distance_to_the_horizon" target="_blank" rel="noopener">Wikipedia: Horizon &mdash; Distance to the horizon</a>.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -289,7 +289,7 @@
 
   function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
 
-  function distanceFor(h){ return Math.sqrt(2*R*h); }
+  function distanceFor(h){ return Math.sqrt(2*R*h + h*h); }
 
   function fmtH(h){
     if(h < 1000) return [h < 10 ? h.toFixed(2) : h < 100 ? h.toFixed(1) : Math.round(h).toString(), 'm'];
@@ -321,42 +321,56 @@
   function d(){ return distanceFor(h()); }
 
   // ---- hero geometry ----
-  // Schematic side view: a shallow arc represents Earth's surface. Height above it is drawn
-  // on a compressed log-ish scale so the effect reads at both h=1m and h=500km. Not to true scale.
+  // Schematic side view built from a real circle, not a hand-tuned curve: the ground point G
+  // sits on a circle of schematic radius Rs centred directly below it; the eye E sits a
+  // schematic height hs straight above G (so E, G and the circle's centre are colinear); the
+  // horizon point H is the actual point of tangency from E onto the circle. That makes the
+  // dashed sight line E→H a true tangent by construction — it can't drift out of true no matter
+  // how Rs/hs are chosen. Both Rs (curvature) and hs (rise) respond to the height slider: as h
+  // grows the schematic world visibly curls up (Rs shrinks) at the same time the eye lifts
+  // (hs grows), rather than the horizon point sliding along a fixed arc for an arbitrary reason.
+  // Still not to true scale — real R is thousands of km and this Rs is a few hundred px.
   function geom(w, hv){
     var vbH = w < 620 ? 240 : 210;
     var baseY = vbH - 34;
     var arcSpan = w - 40;
     var x0 = 20, x1 = w - 20;
-    var arcRise = w < 620 ? 20 : 28; // how much the arc bows down at the edges, purely schematic
-    var cx = w/2, cy = baseY + arcRise*2.4; // large radius arc through (x0,baseY),(cx,baseY),(x1,baseY)
-    // quadratic bezier control for a shallow symmetric arc
-    var ctrlY = baseY - arcRise;
     var eyeX = x0 + arcSpan*0.16;
-    // observer height mapped to pixels on a log scale between hmin..hmax
-    var t = (state.he - LOGMIN) / (logMax() - LOGMIN); // 0..1
-    var maxRise = w < 620 ? 100 : 130;
-    var minRise = 10;
-    var eyeRise = minRise + t*(maxRise-minRise);
-    var eyeY = baseY - eyeRise;
-    // horizon point travels along the arc toward the right edge as t grows
-    var horizT = 0.34 + t*0.62; // fraction along arc from left
-    var horizX = x0 + arcSpan*horizT;
-    // horizon point y sits on the quadratic bezier: B(t)=(1-t)^2*P0+2(1-t)t*Pc+t^2*P2
-    function arcY(frac){
-      var p0=baseY, pc=ctrlY, p2=baseY;
-      return (1-frac)*(1-frac)*p0 + 2*(1-frac)*frac*pc + frac*frac*p2;
-    }
-    var horizY = arcY(horizT);
+    var t = (state.he - LOGMIN) / (logMax() - LOGMIN); // 0..1, log-scale height fraction
+
+    var narrow = w < 620;
+    var RsMax = narrow ? 900 : 1400, RsMin = narrow ? 340 : 500;
+    var hsMin = 8, hsMax = narrow ? 100 : 140;
+    var Rs = RsMax - t*(RsMax-RsMin);
+    var hs = hsMin + t*(hsMax-hsMin);
+
+    var cx = eyeX, cy = baseY + Rs; // circle centre, directly below the ground point G
+    var theta = Math.acos(clamp(Rs/(Rs+hs), -1, 1)); // tangent angle from the G direction
+    var eyeY = baseY - hs;
+    var horizX = cx + Rs*Math.sin(theta);
+    var horizY = cy - Rs*Math.cos(theta);
+
+    // Draw the visible arc from a bit left of G (reaching toward x0) to a bit past the
+    // tangent point H, so a sliver of "world" continues past the horizon.
+    var phiLeft = Math.asin(clamp((cx-x0)/Rs, -1, 1));
+    var phiRight = 0.16;
+    var aStart = -phiLeft, aEnd = theta + phiRight;
+    var p0x = cx + Rs*Math.sin(aStart), p0y = cy - Rs*Math.cos(aStart);
+    var p1x = cx + Rs*Math.sin(aEnd), p1y = cy - Rs*Math.cos(aEnd);
+    var arcPath = 'M'+p0x+','+p0y+' A'+Rs+','+Rs+' 0 0 1 '+p1x+','+p1y;
+    var fillPath = arcPath+' L'+p1x+','+vbH+' L'+p0x+','+vbH+' Z';
+
+    var refA = aStart*0.4;
+    var refX = cx + Rs*Math.sin(refA), refY = cy - Rs*Math.cos(refA);
+
     var dTxt = fmtD(distanceFor(hv));
     var hTxt = fmtH(hv);
     return {
-      w:w, vbH:vbH, x0:x0, x1:x1, baseY:baseY, ctrlY:ctrlY,
+      w:w, vbH:vbH, x0:x0, x1:x1, baseY:baseY,
       eyeX:eyeX, eyeY:eyeY, horizX:horizX, horizY:horizY,
       dTxt:dTxt.join(' '), hTxt:hTxt.join(' '),
-      arcPath: 'M'+x0+','+baseY+' Q'+cx+','+ctrlY+' '+x1+','+baseY,
-      fillPath: 'M'+x0+','+baseY+' Q'+cx+','+ctrlY+' '+x1+','+baseY+' L'+x1+','+vbH+' L'+x0+','+vbH+' Z',
-      refX: x0 + arcSpan*0.06, refY: baseY - 3
+      arcPath: arcPath, fillPath: fillPath,
+      refX: refX, refY: refY
     };
   }
 
@@ -396,12 +410,12 @@
     lblD.style.transform = 'translateX(-50%)';
     lblD.textContent = 'd = '+g.dTxt;
     lblScale.style.left = px(g.x0); lblScale.style.top = py(g.vbH-14);
-    lblScale.textContent = 'schematic — not to true scale';
+    lblScale.textContent = 'schematic — curvature exaggerated, sight line is a true tangent';
   }
 
   // ---- equation + legend ----
   var accent = 'var(--accent)';
-  var RTerm=$('RTerm'), hTerm=$('hTerm'), hLabel=$('hLabel'), RLabel=$('RLabel');
+  var RTerm=$('RTerm'), hTerm=$('hTerm'), hTerm2=$('hTerm2'), hLabel=$('hLabel'), RLabel=$('RLabel');
   var legendEl = $('legend');
 
   function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
@@ -410,6 +424,7 @@
     RTerm.style.color = activeColor('R');
     RLabel.style.color = activeColor('R');
     hTerm.style.color = activeColor('h');
+    hTerm2.style.color = activeColor('h');
     hLabel.style.color = activeColor('h');
 
     var hv = h();
@@ -500,7 +515,7 @@
     var limitPct = pos(REF.val);
     gReach.style.width = Math.min(markPct,100).toFixed(2)+'%';
     gLimit.style.left = limitPct.toFixed(2)+'%';
-    gLimitLabel.style.left = clamp(limitPct,8,72).toFixed(2)+'%';
+    gLimitLabel.style.left = clamp(limitPct,6,94).toFixed(2)+'%';
     gMark.style.left = markPct.toFixed(2)+'%';
     var labelPct = clamp(markPct,4,88);
     gMarkLabel.style.left = labelPct.toFixed(2)+'%';

@@ -170,7 +170,7 @@
   </div>
 
   <div class="hero" id="heroWrap">
-    <svg class="scene" id="heroSvg" viewBox="0 0 1200 560" role="img" aria-label="A beam of light bouncing in real time across the Earth-Moon distance, with faint lines beneath it showing how little the Parker Solar Probe and sound in air and water advance on that same scale. A to-scale zoom box near Earth expands into a shared ruler showing all five slower travellers moving at their true relative speeds.">
+    <svg class="scene" id="heroSvg" viewBox="0 0 1200 560" role="img" aria-label="A beam of light bouncing in real time across the Earth-Moon distance, with a faint line beneath it showing how little the Parker Solar Probe advances on that same scale. A to-scale zoom box near Earth encloses both lines and expands into a shared ruler showing all five slower travellers moving at their true relative speeds.">
       <defs>
         <radialGradient id="earthGrad" cx="35%" cy="30%" r="75%">
           <stop offset="0%" stop-color="var(--earth-ocean)"/>
@@ -206,32 +206,23 @@
         <circle id="mk-light" cx="128" cy="78" r="5.5" fill="var(--c-light)" filter="url(#glow)"/>
       </g>
 
-      <!-- lens callout: drawn to true scale (5,000 km at this track's own px/km) so its sliver
-           width is itself part of the honest picture, not a schematic box -->
-      <rect x="128" y="66" width="12.8" height="22" rx="1.5" fill="color-mix(in srgb, var(--accent) 14%, transparent)" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2.5 2.5"/>
-      <text x="148" y="72" class="mono" font-size="10.5" fill="var(--accent)">5,000 km &mdash; magnified ~81&times; below</text>
-      <path d="M 128 88 Q 90 165 80 236" fill="none" stroke="currentColor" stroke-opacity="0.16"/>
-      <path d="M 140.8 88 Q 700 165 1120 236" fill="none" stroke="currentColor" stroke-opacity="0.16"/>
-
-      <!-- ===== meanwhile, on the SAME full-scale line: three travellers that barely move ===== -->
+      <!-- ===== meanwhile, on the SAME full-scale line: the only traveller that moves enough
+           to see even here — drawn first so the zoom box below can enclose both this and
+           light's own line ===== -->
       <g class="lane" id="mainlane-parker">
-        <line x1="128" y1="152" x2="1110" y2="152" stroke="var(--c-parker)" stroke-opacity="0.15" stroke-width="1.5"/>
-        <text x="118" y="156" text-anchor="end" class="mono" font-size="10" fill="var(--c-parker)" opacity="0.85">PARKER</text>
-        <circle id="mainmk-parker" cx="128" cy="152" r="3.5" fill="var(--c-parker)"/>
-        <text id="mainreadout-parker" x="137" y="156" class="mono" font-size="10" fill="currentColor" opacity="0.55">0 km</text>
+        <line x1="128" y1="102" x2="1110" y2="102" stroke="var(--c-parker)" stroke-opacity="0.2" stroke-width="1.5"/>
+        <text x="118" y="106" text-anchor="end" class="mono" font-size="10" fill="var(--c-parker)" opacity="0.85">PARKER</text>
+        <circle id="mainmk-parker" cx="128" cy="102" r="3.5" fill="var(--c-parker)"/>
+        <text id="mainreadout-parker" x="137" y="106" class="mono" font-size="10" fill="currentColor" opacity="0.55">0 km</text>
       </g>
-      <g class="lane" id="mainlane-soundwater">
-        <line x1="128" y1="174" x2="1110" y2="174" stroke="var(--c-soundwater)" stroke-opacity="0.15" stroke-width="1.5"/>
-        <text x="118" y="178" text-anchor="end" class="mono" font-size="10" fill="var(--c-soundwater)" opacity="0.85">SOUND, WATER</text>
-        <circle id="mainmk-soundwater" cx="128" cy="174" r="3.5" fill="var(--c-soundwater)"/>
-        <text id="mainreadout-soundwater" x="137" y="178" class="mono" font-size="10" fill="currentColor" opacity="0.55">0 km</text>
-      </g>
-      <g class="lane" id="mainlane-soundair">
-        <line x1="128" y1="196" x2="1110" y2="196" stroke="var(--c-soundair)" stroke-opacity="0.15" stroke-width="1.5"/>
-        <text x="118" y="200" text-anchor="end" class="mono" font-size="10" fill="var(--c-soundair)" opacity="0.85">SOUND, AIR</text>
-        <circle id="mainmk-soundair" cx="128" cy="196" r="3.5" fill="var(--c-soundair)"/>
-        <text id="mainreadout-soundair" x="137" y="200" class="mono" font-size="10" fill="currentColor" opacity="0.55">0 km</text>
-      </g>
+
+      <!-- lens callout: drawn to true scale (5,000 km at this track's own px/km) so its sliver
+           width is itself part of the honest picture, not a schematic box — tall enough to
+           visibly enclose both the light line and the Parker line above ===== -->
+      <rect x="128" y="64" width="12.8" height="54" rx="1.5" fill="color-mix(in srgb, var(--accent) 14%, transparent)" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2.5 2.5"/>
+      <text x="148" y="90" class="mono" font-size="10.5" fill="var(--accent)">5,000 km &mdash; magnified ~81&times; below</text>
+      <path d="M 128 118 Q 90 178 80 236" fill="none" stroke="currentColor" stroke-opacity="0.16"/>
+      <path d="M 140.8 118 Q 700 178 1120 236" fill="none" stroke="currentColor" stroke-opacity="0.16"/>
 
       <!-- ===== zoom: first 5,000 km, one shared ruler, all five slower travellers ===== -->
       <text x="80" y="222" class="mono" font-size="10.5" fill="currentColor" opacity="0.4">THE FIRST 5,000 KM OF THE TRIP, MAGNIFIED</text>
@@ -321,7 +312,7 @@
     </div>
   </div>
 
-  <p class="note">Distance is the Moon's <a href="https://spaceplace.nasa.gov/moon-distance/en/" target="_blank" rel="noopener">average distance from Earth</a>; light speed is <a href="https://en.wikipedia.org/wiki/Speed_of_light" target="_blank" rel="noopener">299,792&nbsp;km/s</a> in vacuum, giving <b class="mono">t&nbsp;=&nbsp;d/v&nbsp;=&nbsp;384,400&nbsp;km&nbsp;&divide;&nbsp;299,792&nbsp;km/s&nbsp;=&nbsp;1.28&nbsp;s</b> one-way. The lower ruler is not a second trip: it is the first 5,000&nbsp;km of the route above, magnified about 81&times; so the slower travellers can be seen moving at all &mdash; the faint lines drawn just below light's own, on the full-scale line above, show the same three travellers over the same distance, which is exactly why the zoom exists. The speed control multiplies every clock equally; nothing is warped relative to anything else.</p>
+  <p class="note">Distance is the Moon's <a href="https://spaceplace.nasa.gov/moon-distance/en/" target="_blank" rel="noopener">average distance from Earth</a>; light speed is <a href="https://en.wikipedia.org/wiki/Speed_of_light" target="_blank" rel="noopener">299,792&nbsp;km/s</a> in vacuum, giving <b class="mono">t&nbsp;=&nbsp;d/v&nbsp;=&nbsp;384,400&nbsp;km&nbsp;&divide;&nbsp;299,792&nbsp;km/s&nbsp;=&nbsp;1.28&nbsp;s</b> one-way. The lower ruler is not a second trip: it is the first 5,000&nbsp;km of the route above, magnified about 81&times; so the slower travellers can be seen moving at all &mdash; the accent box above encloses that same 5,000&nbsp;km on the full-scale line, with the Parker Solar Probe's own faint line drawn right beside light's, the only traveller fast enough to visibly creep even at full scale. Sound and the rest only become visible once magnified, which is exactly why the zoom exists. The speed control multiplies every clock equally; nothing is warped relative to anything else.</p>
 
   <p class="note">Speeds and sources: Parker Solar Probe's 192.2&nbsp;km/s is its record closest-approach speed near the Sun in December 2024, not one it reaches near Earth &mdash; treated here as our fastest machine, hypothetically let loose on this trip (<a href="https://science.nasa.gov/science-research/heliophysics/nasas-parker-solar-probe-makes-history-with-closest-pass-to-sun/" target="_blank" rel="noopener">NASA</a>). The rifle bullet's 1&nbsp;km/s is a typical rifle muzzle velocity, not any one cartridge (<a href="https://en.wikipedia.org/wiki/Muzzle_velocity" target="_blank" rel="noopener">Wikipedia</a>). The jet airliner's 0.25&nbsp;km/s (900&nbsp;km/h) is a widebody's typical cruising speed (<a href="https://www.boeing.com/commercial/747-8/design-highlights" target="_blank" rel="noopener">Boeing 747-8</a>). Speed of sound in air, 343&nbsp;m/s at 20&deg;C (<a href="https://www.grc.nasa.gov/www/k-12/airplane/sound.html" target="_blank" rel="noopener">NASA Glenn</a>); in fresh water, 1,481&nbsp;m/s at 20&deg;C (<a href="https://www.engineeringtoolbox.com/sound-speed-water-d_598.html" target="_blank" rel="noopener">The Engineering ToolBox</a>) &mdash; sound genuinely travels faster through water than a rifle bullet does through air. The &ldquo;total distance crossed&rdquo; comparison below uses Mars, Jupiter, and Saturn's average <em style="font-style:italic">distance from the Sun</em>, not from Earth (232, 795, and 1,511&nbsp;million&nbsp;km &mdash; about 12.9, 44.2, and 84 light-minutes, <a href="https://spacemath.gsfc.nasa.gov/planets/10Page2.pdf" target="_blank" rel="noopener">NASA Goddard</a>): it's a benchmark for the size of the number light has racked up, not a claim about where it's actually headed.</p>
 
@@ -362,10 +353,10 @@
   var ZOOM_KM = 5000, ZOOM_X0 = 80, ZOOM_X1 = 1120;
   var lanes = {
     light:      { speed: 299792, name:'Light',                    val:'299,792 km/s', color:'var(--c-light)' },
-    parker:     { speed: 192,    zoomY: 266, mainY: 152, name:'Parker Solar Probe',      val:'192 km/s' },
-    soundwater: { speed: 1.481,  zoomY: 316, mainY: 174, name:'Speed of sound (water)',  val:'1.48 km/s' },
+    parker:     { speed: 192,    zoomY: 266, mainY: 102, name:'Parker Solar Probe',      val:'192 km/s' },
+    soundwater: { speed: 1.481,  zoomY: 316,             name:'Speed of sound (water)',  val:'1.48 km/s' },
     bullet:     { speed: 1,      zoomY: 366,             name:'Rifle bullet',            val:'1 km/s' },
-    soundair:   { speed: 0.343,  zoomY: 416, mainY: 196, name:'Speed of sound (air)',    val:'0.343 km/s' },
+    soundair:   { speed: 0.343,  zoomY: 416,             name:'Speed of sound (air)',    val:'0.343 km/s' },
     jet:        { speed: 0.25,   zoomY: 466,             name:'Jet airliner',            val:'0.25 km/s' }
   };
   var TRAVELLER_KEYS = ['light','parker','soundwater','bullet','soundair','jet'];
@@ -498,7 +489,7 @@
     readout.setAttribute('text-anchor', exited ? 'end' : 'start');
   }
 
-  // ---- the three travellers barely creeping along the same full-scale line as light ----
+  // ---- Parker, the one traveller that creeps visibly along the same full-scale line as light ----
   function renderMainLane(key){
     var lane = lanes[key];
     var distanceKm = Math.min(D, lane.speed * simSeconds);
@@ -564,8 +555,6 @@
     renderLane('soundair');
     renderLane('jet');
     renderMainLane('parker');
-    renderMainLane('soundwater');
-    renderMainLane('soundair');
     renderCum();
   }
 

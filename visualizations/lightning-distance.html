@@ -209,6 +209,7 @@
       <div class="effort-line" id="effortLine"></div>
       <div class="effort-line" id="lightTimeLine"></div>
       <div class="effort-line" id="loudnessLine"></div>
+      <div class="effort-line" id="freqLine"></div>
       <div class="gauge" id="gauge">
         <div class="track"></div>
         <div class="reach" id="gReach"></div>
@@ -232,7 +233,7 @@
 
   <p class="note">Sound travels at roughly 343&nbsp;m/s in dry air at 20&deg;C &mdash; a touch faster in warmer or more humid air, a touch slower in cold or dry air, but 343&nbsp;m/s is the standard reference figure used here. That's close enough to the folk rule &mdash; "5 seconds per mile" (343&nbsp;m/s &times; 5&nbsp;s &asymp; 1715&nbsp;m, against a mile's 1609&nbsp;m) or "3 seconds per kilometre" (343&nbsp;m/s &times; 3&nbsp;s &asymp; 1029&nbsp;m) &mdash; that either is a fine way to estimate a storm's distance while counting on your fingers. Treating the flash as instantaneous isn't a shortcut here, it's honest: light covers a kilometre in about 3.3&nbsp;microseconds, genuinely negligible next to the seconds thunder takes. The one real approximation is the gauge below &mdash; the d&nbsp;=&nbsp;v&middot;&Delta;t formula keeps climbing past what you can actually hear, since atmospheric absorption and upward refraction usually mute thunder beyond roughly 15&ndash;20&nbsp;km, well short of what a 60-second delay would imply. See <a href="https://en.wikipedia.org/wiki/Thunder" target="_blank" rel="noopener">Thunder</a> and <a href="https://en.wikipedia.org/wiki/Speed_of_sound" target="_blank" rel="noopener">Speed of sound</a> on Wikipedia.</p>
 
-  <p class="note">How loud thunder gets isn't a linear relationship with distance. Two separate losses shrink it: <em style="font-style:italic">geometric spreading</em>, where the sound pressure level falls off with the inverse square of distance &mdash; a drop of 6&nbsp;dB every time the distance doubles, the same rule that governs any point source (<a href="https://phys.libretexts.org/Bookshelves/Waves_and_Acoustics/Understanding_Sound_(Abbot)/06:_Loudness_perception/6.06:_Intensity_and_Distance" target="_blank" rel="noopener">Physics LibreTexts</a>) &mdash; and <em style="font-style:italic">atmospheric absorption</em>, a separate loss that's roughly linear in dB per kilometre but strongly frequency-dependent: higher frequencies are absorbed much faster than low ones. That second effect is also why a nearby strike cracks sharply while the same stroke rumbles by the time it travels several kilometres &mdash; the crack's higher frequencies get stripped out along the way, leaving mostly the low rumble (<a href="https://en.wikibooks.org/wiki/Engineering_Acoustics/Thunder_acoustics" target="_blank" rel="noopener">Engineering Acoustics: Thunder acoustics</a>). Peak loudness right at the lightning channel is commonly cited around 120&ndash;130&nbsp;dB, among the loudest natural sounds on Earth (<a href="https://www.britannica.com/topic/Why-Is-Thunder-So-Loud" target="_blank" rel="noopener">Britannica</a>) &mdash; and it isn't the same for every strike: a longer or more energetic discharge channel radiates more acoustic energy, so some claps are genuinely louder than others before distance even enters the picture. The estimated loudness figure above uses geometric spreading alone from an assumed 120&nbsp;dB at 10&nbsp;m; it leaves out the extra, frequency-dependent loss from atmospheric absorption, so real thunder at longer range usually runs a bit quieter than that number suggests.</p>
+  <p class="note">How loud thunder gets isn't a linear relationship with distance. Two separate losses shrink it: <em style="font-style:italic">geometric spreading</em>, where the sound pressure level falls off with the inverse square of distance &mdash; a drop of 6&nbsp;dB every time the distance doubles, the same rule that governs any point source (<a href="https://phys.libretexts.org/Bookshelves/Waves_and_Acoustics/Understanding_Sound_(Abbot)/06:_Loudness_perception/6.06:_Intensity_and_Distance" target="_blank" rel="noopener">Physics LibreTexts</a>) &mdash; and <em style="font-style:italic">atmospheric absorption</em>, a separate loss that's roughly linear in dB per kilometre but strongly frequency-dependent: higher frequencies are absorbed much faster than low ones. That second effect is also why a nearby strike cracks sharply while the same stroke rumbles by the time it travels several kilometres &mdash; the crack's higher frequencies get stripped out along the way, leaving mostly the low rumble (<a href="https://en.wikibooks.org/wiki/Engineering_Acoustics/Thunder_acoustics" target="_blank" rel="noopener">Engineering Acoustics: Thunder acoustics</a>). Peak loudness right at the lightning channel is commonly cited around 120&ndash;130&nbsp;dB, among the loudest natural sounds on Earth (<a href="https://www.britannica.com/topic/Why-Is-Thunder-So-Loud" target="_blank" rel="noopener">Britannica</a>) &mdash; and it isn't the same for every strike: a longer or more energetic discharge channel radiates more acoustic energy, so some claps are genuinely louder than others before distance even enters the picture. The estimated loudness figure above uses geometric spreading alone from an assumed 120&nbsp;dB at 10&nbsp;m; it leaves out the extra, frequency-dependent loss from atmospheric absorption, so real thunder at longer range usually runs a bit quieter than that number suggests. Put together, the full expression is <span class="mono">L(r)&nbsp;=&nbsp;L(r&#8320;)&nbsp;&minus;&nbsp;20&middot;log&#8321;&#8320;(r/r&#8320;)&nbsp;&minus;&nbsp;&alpha;(f)&middot;(r&nbsp;&minus;&nbsp;r&#8320;)</span>, where &alpha;(f) &mdash; the atmospheric absorption coefficient, in dB per unit distance &mdash; itself depends on frequency, temperature, humidity and pressure, formalized in the <a href="https://www.iso.org/standard/17426.html" target="_blank" rel="noopener">ISO 9613-1</a> standard as a sum of a classical (viscosity and heat conduction) term plus separate oxygen and nitrogen molecular-relaxation terms; it's this &alpha;(f) that decides, at any given distance, how much of each frequency survives &mdash; which is why the pitch of thunder itself shifts with distance, not just its loudness (the "pitch" line above reflects that). Measured thunder does have a "standard" pitch: a classic study found a dominant peak around 200&nbsp;Hz averaged across many recordings (<a href="https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1029/JZ072i024p06149" target="_blank" rel="noopener">Few, 1967</a>), though a strike's initial crack carries real energy well above that, and by several kilometres out only the lowest rumble, well under 200&nbsp;Hz, usually survives.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -544,7 +545,17 @@
   });
 
   // ---- result + gauge ----
-  var distValueEl=$('distValue'), distUnitEl=$('distUnit'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine'), lightTimeLineEl=$('lightTimeLine'), loudnessLineEl=$('loudnessLine');
+  var distValueEl=$('distValue'), distUnitEl=$('distUnit'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine'), lightTimeLineEl=$('lightTimeLine'), loudnessLineEl=$('loudnessLine'), freqLineEl=$('freqLine');
+
+  // Thunder's dominant pitch shifts down with distance because atmospheric absorption removes
+  // higher frequencies faster than low ones (see the note). The ~200 Hz figure is the classic
+  // measured average peak (Few 1967); the zone boundaries below are deliberately fuzzy, since
+  // the real cutoffs depend on humidity, the discharge itself, and aren't a single sharp line.
+  function freqDescription(m){
+    if(m < 1000) return 'this close, expect a sharp crack — real energy well above the ~200 Hz "thunder" pitch, into the kHz range';
+    if(m < 5000) return 'around here thunder settles into its classic rumble, dominant energy near 200 Hz';
+    return 'by this range, higher frequencies have mostly been absorbed away — what carries is a low rumble, well under 200 Hz';
+  }
   var gReach=$('gReach'), gLimit=$('gLimit'), gMark=$('gMark'), gMarkLabel=$('gMarkLabel');
   var gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
 
@@ -572,6 +583,8 @@
     loudnessLineEl.textContent = m < 1
       ? ''
       : 'estimated loudness here: ~' + Math.round(estLoudnessDb(m)) + ' dB, from geometric spreading alone (assumes ~120 dB at 10 m — see note)';
+
+    freqLineEl.textContent = m < 1 ? '' : ('pitch: ' + freqDescription(m));
 
     var markPct = pos(m), limitPct = pos(AUDIBLE_LIMIT_M);
     gReach.style.width = Math.min(markPct,limitPct).toFixed(2)+'%';

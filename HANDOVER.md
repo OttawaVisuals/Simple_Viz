@@ -164,8 +164,53 @@ a browser, no server or build step needed. Naming is kebab-case and descriptive
 
 ### `earth-moon-race.html` — "Earth to the Moon, at real speed"
 
-Shows four things crossing the real Earth–Moon distance (384,400 km) at their real speed:
-light, NASA's Parker Solar Probe, a rifle bullet, and a commercial jet.
+Shows six things crossing the real Earth–Moon distance (384,400 km) at their real speed:
+light, NASA's Parker Solar Probe, speed of sound in water, a rifle bullet, speed of sound
+in air, and a commercial jet.
+
+**2026-08-17 overhaul, one of the original pages, several rounds of user feedback:**
+- **Legend rebuilt as a d/v table.** Rows now show a `d`/`v` variable column (not just a
+  colored letter + name + value) so each row visibly ties to the `t = d/v` equation above
+  it — a shared `d` row (`384,400 km`, Earth–Moon distance) sits above six `v` rows ordered
+  fastest→slowest. Hovering any row now recolors the matching `d`/`v` term in the equation
+  (new `data-k` attributes on the `<em>`s), in addition to the existing lane-dimming.
+- **Added speed of sound in air (343 m/s) and water (1,481 m/s)** as two more travellers,
+  in both the zoom ruler and (per the user's choice) the full-scale overview. Sound in
+  water is genuinely faster than the rifle bullet (1.48 km/s vs 1 km/s) — called out
+  directly in the note as a fun, checkable fact.
+- **Zoom box redrawn to true scale.** It was a fixed 32×22 px box irrespective of what it
+  represented; it's now sized from the actual px/km of the full-scale track (5,000 km ×
+  0.00255 px/km ≈ 12.8 px), so its own sliver-thin width is part of the honest picture, not
+  a schematic placeholder. Bumped from 1,500 km to 5,000 km (~1.3% of the trip) at the
+  user's request. Also given an accent fill/stroke (was a plain gray dashed outline) and an
+  explicit "~81× magnified" caption for stronger visual framing, per user feedback that the
+  old box didn't read clearly as a zoom.
+- **Three faint lines added beneath light's own bounce on the full-scale track** — Parker,
+  sound (water), sound (air) — each with a tiny creeping marker and live km readout. At
+  normal 1×–8× speed they're indistinguishable from stationary; only Parker visibly crawls
+  across within a session even at 32×. This is deliberate: it's the visual argument for why
+  the zoom exists, requested directly by the user ("add lines under the speed of light").
+- **New cumulative-distance panel**, kept alongside (not replacing) the existing
+  bounce-resetting "light's position" readout per the user's choice of the smaller-scope
+  option. Tracks total km light has crossed since t=0 (`simSeconds × c`, monotonic, ignores
+  the bounce direction) against a log-scale gauge with Moon/Mars/Jupiter/Saturn milestones.
+  Mars/Jupiter/Saturn are each planet's **average distance from the Sun**, not from Earth —
+  stated explicitly in the note, since mixing that with the Earth-relative Moon distance
+  would otherwise misleadingly imply light is headed toward those planets from here; it's a
+  size-of-number benchmark only. Fixed one real bug during testing: alternating tick labels
+  by even/odd index (the pattern used elsewhere on the site) left Mars and Saturn's labels
+  overlapping in the narrower result column, since both landed on the "odd" row while sitting
+  close together on the log scale — replaced with an explicit per-milestone row (`ROW_TOP`)
+  instead of alternation, verified at 32× playback over a real ~2 hour run.
+- **All speed/distance figures now sourced** in a dedicated note paragraph: Moon distance
+  (NASA Space Place), Parker's record speed (NASA, Dec 2024 perihelion), rifle muzzle
+  velocity (Wikipedia), airliner cruise speed (Boeing 747-8), speed of sound in air (NASA
+  Glenn) and water (Engineering ToolBox), and the Mars/Jupiter/Saturn light-minute figures
+  (NASA Goddard). Previously only light speed and the Parker caveat were sourced inline.
+- Verified in-browser across light/dark mode, mobile width (375px), and a real long-running
+  32× session (Light's position readout occasionally renders with a font/glyph artifact
+  specific to this session's headless screenshot tool — confirmed via computed-style
+  inspection to be a rendering-only quirk, not a real transform/CSS bug).
 
 **Migrated to the [STYLE_GUIDE.md](STYLE_GUIDE.md) skeleton (2026-08-14).** Now uses the
 standard topbar → topgrid (title/sub | `t = d/v` equation | legend) → hero → resultrow →

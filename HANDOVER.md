@@ -90,11 +90,11 @@ tool can pick up mid-stream without re-reading the whole chat history.
   tests; the D1 migration executed successfully in SQLite. `git diff --check` passes.
 - The Cloudflare dashboard, D1 database, email route, production deployment, and production
   form submission have **not** been changed or tested. Those are the next-session steps.
-- Working tree is intentionally uncommitted for handover. Changed files are `HANDOVER.md`,
-  `STYLE_GUIDE.md`, `index.html`, and all 44 `visualizations/*.html`; new files are
-  `CLOUDFLARE_SETUP.md`, `functions/api/feedback.js`, and
-  `migrations/0001_feedback.sql`. Claude Code should begin with `git status` and inspect the
-  diff before committing.
+- That feedback-system work (the bullet above and the four above it) was committed at the
+  time; the working tree is clean as of this handoff. The most recent commit
+  (`249564d`, "Add about.html and a potato-into-a-hole trajectory page") is **local only —
+  one commit ahead of `origin/main`, not yet pushed.** Codex should start with `git status`
+  and `git log` to confirm current state before making changes.
 - There is no build step or test runner. Validate changes by opening the affected HTML files
   directly in a browser and running the local link/count checks when index or tracker data
   changes.

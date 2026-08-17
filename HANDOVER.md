@@ -35,16 +35,40 @@ tool can pick up mid-stream without re-reading the whole chat history.
   a narrower 760px prose width instead of the topgrid/hero/resultrow skeleton, since it has
   no equation or interactive figure. Linked from `index.html`'s footer ("Why this site
   exists").
-- **`visualizations/potato-trajectory.html`** ("Throwing a potato into a hole") — new page,
-  card 45 under **Fun physics**. Standard no-drag projectile motion (`x=v₀cosθ·t`,
-  `y=h₀+v₀sinθ·t−½gt²`), three sliders (release height 0–2 m, launch angle 0–85°, speed
-  1–10 m/s) against a **fixed target**: a hole 3.00 m away, 30 cm wide (an assumed
-  tolerance, stated as such), landed on by a 200 g potato (mass used only for the
-  impact-energy stat — without drag it never affects the trajectory itself, which the note
-  says explicitly so the fixed third slider-looking constant doesn't read as load-bearing
-  physics it isn't). Direct sibling of `straw-hose-flow.html`: both trace back to the same
-  *Taskmaster* "get an object to a target" format, cross-linked from each page's closing
-  note and from the new `about.html`.
+- **`visualizations/potato-trajectory.html`** ("Throwing a potato into a hole") — card 45
+  under **Fun physics**. **Reviewed and complete as of 2026-08-17** — Simon called this page
+  out as the model for what the site should be ("fun, interactive simple physics explained")
+  and it went through a follow-up tuning pass after the initial build (see below); no open
+  items remain. Standard no-drag projectile motion (`x=v₀cosθ·t`, `y=h₀+v₀sinθ·t−½gt²`),
+  three sliders (release height **0.5–1.5 m**, launch angle **0–75°**, speed 1–10 m/s)
+  against a **fixed target**: a hole 3.00 m away, **20 cm wide** (an assumed tolerance,
+  stated as such), landed on by a 200 g potato (mass used only for the impact-energy stat —
+  without drag it never affects the trajectory itself, which the note says explicitly so the
+  fixed third slider-looking constant doesn't read as load-bearing physics it isn't). Direct
+  sibling of `straw-hose-flow.html`: both trace back to the same *Taskmaster* "get an object
+  to a target" format, cross-linked from each page's closing note and from the new
+  `about.html`.
+  - **2026-08-17 tuning pass, four rounds of feedback:** (1) release-height range narrowed
+    from 0–2 m to 0.5–1.5 m and max angle from 85° to 75°, plus tighter chart padding above
+    the apex and a smaller `.hero` top margin, all to cut down page-height reflow while
+    dragging sliders (the SVG's `viewBox` height tracks the current trajectory's apex, so a
+    wide height/angle range made the page visibly jump during a drag); the "Straight in" and
+    "The lob, same hole" presets used `h₀=0`, now out of range, so their speeds were
+    recomputed by bisection for `h₀=0.5` (5.02 m/s and 6.57 m/s) to keep landing exactly on
+    the hole. (2) Hole narrowed 30→20 cm wide. (3) Added an "Energy to launch it" panel
+    (`KE=½mv₀²`, angle/height-independent — confirmed live in-browser that the number holds
+    steady while dragging the angle slider) with an estimated average force (energy ÷ an
+    assumed 0.6 m arm-swing distance, flagged as a rough estimate) and two fun comparisons
+    against gravitational PE (`mgh`) figures for a 4 kg cat climbing a 3 m tree and a 70 kg
+    adult stepping onto a 45 cm chair — a second note paragraph gives both equations, the
+    comparison assumptions/sources, and flags that these are mechanical work numbers, not
+    calories (muscle is ~20–25% efficient). (4) Diagram line contrast was weak in dark mode
+    (`--line2`, meant for thin UI hairlines, is low-contrast against the dark-navy bg); added
+    a dedicated `--diagram` token (`#8A8270` light / `#7C88A8` dark) for the ground line,
+    trajectory path, h₀ line, and hole outline, with stroke widths bumped ~0.25–0.5px. Also
+    added a concrete drag-effect number to the first note paragraph (a 6 cm-sphere, Cd=0.47
+    numerical sim of a 1 m/45°/5 m/s throw lands ~3 cm short of the no-drag distance, under
+    1%) instead of just asserting drag is negligible.
   - **Dynamic hero axis, both dimensions share one scale.** The horizontal domain
     recomputes each render as `max(hole+1.5, landing×1.15, 5)` m so the view zooms to fit
     whatever the current slider combination actually produces — tight around the hole for

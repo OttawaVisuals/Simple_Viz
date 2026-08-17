@@ -227,6 +227,20 @@ garden hose stays effortless, via the Hagen–Poiseuille law: ΔP = 8ηLQ/(πr�
 scales linearly with tube length but with the *inverse fourth power* of radius, so radius
 dominates.
 
+**Reviewed and complete as of 2026-08-17.** A follow-up pass (after the correctness/a11y
+sweeps below) sourced the mouth-pressure limits and fixed a gauge-label collision:
+- The suck/blow (PImax/PEmax) limits were previously asserted as "rough estimates" with no
+  citation. Now cited to [clinical maximal mouth-pressure
+  measurements](https://pmc.ncbi.nlm.nih.gov/articles/PMC4001942/), with the note stating
+  explicitly that sucking and blowing are *not* the same limit — adults typically manage
+  ~10 kPa sucking (PImax) vs. ~20 kPa blowing (PEmax), since exhale muscles are stronger
+  than inhale ones, which is why air's limit was already set higher than the three liquids'.
+- The `.gauge .limitlabel` ("mouth limit") moved from `top:0` (level with the marker label)
+  to below the axis (`top:47px`, `.gauge` height 56→66px), the same collision fix already
+  used on `shelf-sag.html`/`bike-gears.html` — previously it could visually merge with the
+  pressure-marker label whenever a result landed close to the limit.
+- The gauge is log-scale (9 decades, `LOGMIN=-1`/`LOGMAX=8`); this is now stated in the note.
+
 **v5 (current) is the canonical style reference for the whole site — see
 [STYLE_GUIDE.md](STYLE_GUIDE.md).** The user liked a hand-designed draft
 (`Drafts/Why the straw gives up.dc.html`, built in an external tool with a React-like

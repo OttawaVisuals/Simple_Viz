@@ -56,11 +56,11 @@
   .legend .name{font-size:12.5px;color:var(--muted2)}
   .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
 
-  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero{position:relative;width:100%;margin:clamp(12px,1.5vw,18px) 0 0}
   .hero svg{width:100%;height:auto;display:block}
   .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;text-align:center;transition:opacity .2s}
 
-  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(16px,2vw,24px);border-top:1px solid var(--line);padding-top:clamp(16px,2vw,22px)}
   @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
 
   .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
@@ -157,10 +157,14 @@
   <div class="hero" id="heroWrap">
     <div class="lbl" id="lblBig"></div>
     <div class="lbl" id="lblSmall"></div>
-    <svg id="heroSvg" role="img" aria-label="One large pizza circle compared against two smaller pizza circles, all drawn to true relative area.">
+    <div class="lbl" id="lblArea"></div>
+    <svg id="heroSvg" role="img" aria-label="One large pizza circle compared with two smaller pizza circles, plus an area-equivalent square overlaid by two stacked rectangles representing the smaller pizzas.">
       <circle id="circBig" fill="none" stroke-width="1.5"></circle>
       <circle id="circSmall1" fill="none" stroke-width="1.5"></circle>
       <circle id="circSmall2" fill="none" stroke-width="1.5"></circle>
+      <rect id="areaBig" fill="none" stroke="var(--accent)" stroke-width="1.5"></rect>
+      <rect id="areaSmall1" stroke="var(--fg)" stroke-width="1.25"></rect>
+      <rect id="areaSmall2" stroke="var(--fg)" stroke-width="1.25"></rect>
       <line id="vDivider" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 5"></line>
     </svg>
     <div class="lbl" id="lblVs" style="font-style:italic;font-family:Georgia,serif"></div>
@@ -257,36 +261,49 @@
 
   var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
   var circBig=$('circBig'), circSmall1=$('circSmall1'), circSmall2=$('circSmall2'), vDivider=$('vDivider');
-  var lblBig=$('lblBig'), lblSmall=$('lblSmall'), lblVs=$('lblVs');
+  var areaBig=$('areaBig'), areaSmall1=$('areaSmall1'), areaSmall2=$('areaSmall2');
+  var lblBig=$('lblBig'), lblSmall=$('lblSmall'), lblVs=$('lblVs'), lblArea=$('lblArea');
   var heroW = 0;
 
   // ---- hero geometry: viewBox width == measured CSS px width, so 1 unit = 1px ----
   function geom(w, big, small){
     var narrow = w < 620;
-    var vbH = narrow ? Math.round(w*0.72) : Math.round(w*0.5);
-    var padTop = narrow ? 30 : 26;
-    var padBot = narrow ? 34 : 30;
-    var usableH = vbH - padTop - padBot;
-    var maxD = 24; // reference diameter for scale, matches slider max
-    // Scale so the largest possible circle (24in big pizza, radius 12) fits usableH/2
-    var pxPerInch = (usableH/2) / (maxD/2);
-
-    var leftCx = w*0.27;
-    var rightCx = w*0.73;
-    var cy = padTop + usableH/2;
-
+    var vbH = narrow ? 330 : 230;
+    var dividerX = narrow ? 0 : w*0.64;
+    var dividerY = narrow ? 164 : 0;
+    var circleLeft = narrow ? 12 : 10;
+    var circleWidth = narrow ? w-24 : dividerX-24;
+    var circleTop = narrow ? 12 : 8;
+    var circleHeight = narrow ? 122 : 174;
+    var gap = narrow ? 7 : 11;
+    var pxPerInch = Math.min(circleHeight/Math.max(big,small),(circleWidth-2*gap)/(big+2*small));
     var rBig = (big/2)*pxPerInch;
     var rSmall = (small/2)*pxPerInch;
-    var gap = Math.max(rSmall*0.25, 6);
-    var sm1Cx = rightCx - rSmall - gap/2;
-    var sm2Cx = rightCx + rSmall + gap/2;
+    var usedWidth=2*rBig+4*rSmall+2*gap;
+    var startX=circleLeft+(circleWidth-usedWidth)/2;
+    var cy=circleTop+circleHeight/2;
+    var leftCx=startX+rBig;
+    var sm1Cx=startX+2*rBig+gap+rSmall;
+    var sm2Cx=sm1Cx+2*rSmall+gap;
+
+    var panelLeft=narrow?20:dividerX+22;
+    var panelWidth=narrow?w-40:w-panelLeft-20;
+    var panelTop=narrow?dividerY+18:12;
+    var panelBottom=narrow?vbH-30:vbH-30;
+    var ratioEach=area(small)/area(big), totalRatio=2*ratioEach;
+    var squareSide=Math.min(panelWidth-16,(panelBottom-panelTop)/Math.max(1,totalRatio));
+    var squareX=panelLeft+(panelWidth-squareSide)/2;
+    var squareY=panelBottom-squareSide;
+    var rectH=squareSide*ratioEach;
 
     return {
       w:w, vbH:vbH, cy:cy,
       leftCx:leftCx, rBig:rBig,
       sm1Cx:sm1Cx, sm2Cx:sm2Cx, rSmall:rSmall,
-      dividerX: w*0.5,
-      vsX: w*0.5, vsY: cy
+      dividerX:dividerX,dividerY:dividerY,narrow:narrow,
+      vsX:(leftCx+rBig+sm1Cx-rSmall)/2, vsY:cy,
+      squareX:squareX,squareY:squareY,squareSide:squareSide,rectH:rectH,
+      panelCx:panelLeft+panelWidth/2,panelBottom:panelBottom,totalRatio:totalRatio
     };
   }
 
@@ -308,22 +325,34 @@
       c.setAttribute('fill', 'color-mix(in srgb, var(--fg) 8%, transparent)');
     });
 
-    vDivider.setAttribute('x1', h.dividerX); vDivider.setAttribute('x2', h.dividerX);
-    vDivider.setAttribute('y1', 6); vDivider.setAttribute('y2', h.vbH-6);
+    areaBig.setAttribute('x',h.squareX);areaBig.setAttribute('y',h.squareY);areaBig.setAttribute('width',h.squareSide);areaBig.setAttribute('height',h.squareSide);
+    areaBig.setAttribute('fill','color-mix(in srgb, var(--accent) 8%, transparent)');
+    areaSmall1.setAttribute('x',h.squareX);areaSmall1.setAttribute('y',h.panelBottom-h.rectH);areaSmall1.setAttribute('width',h.squareSide);areaSmall1.setAttribute('height',h.rectH);
+    areaSmall2.setAttribute('x',h.squareX);areaSmall2.setAttribute('y',h.panelBottom-2*h.rectH);areaSmall2.setAttribute('width',h.squareSide);areaSmall2.setAttribute('height',h.rectH);
+    [areaSmall1,areaSmall2].forEach(function(r){r.setAttribute('fill','color-mix(in srgb, var(--fg) 10%, transparent)');});
+
+    if(h.narrow){
+      vDivider.setAttribute('x1',8);vDivider.setAttribute('x2',w-8);vDivider.setAttribute('y1',h.dividerY);vDivider.setAttribute('y2',h.dividerY);
+    }else{
+      vDivider.setAttribute('x1',h.dividerX);vDivider.setAttribute('x2',h.dividerX);vDivider.setAttribute('y1',6);vDivider.setAttribute('y2',h.vbH-6);
+    }
 
     var px = function(x){ return (x/w*100)+'%'; };
     var py = function(y){ return (y/h.vbH*100)+'%'; };
     lblBig.style.left = px(h.leftCx); lblBig.style.top = py(h.cy + h.rBig + 10);
     lblBig.style.transform = 'translateX(-50%)';
-    lblBig.textContent = 'one ' + state.big + '" pizza — ' + fmtArea(area(state.big)) + ' sq in';
+    lblBig.textContent = state.big + '" · ' + fmtArea(area(state.big)) + ' sq in';
 
     lblSmall.style.left = px((h.sm1Cx+h.sm2Cx)/2); lblSmall.style.top = py(h.cy + h.rSmall + 10);
     lblSmall.style.transform = 'translateX(-50%)';
-    lblSmall.textContent = 'two ' + state.small + '" pizzas — ' + fmtArea(2*area(state.small)) + ' sq in';
+    lblSmall.textContent = 'two ' + state.small + '" · ' + fmtArea(2*area(state.small)) + ' sq in';
 
     lblVs.style.left = px(h.vsX); lblVs.style.top = py(h.vsY);
     lblVs.style.transform = 'translate(-50%,-50%)';
     lblVs.textContent = 'vs';
+
+    lblArea.style.left=px(h.panelCx);lblArea.style.top=py(h.panelBottom+7);lblArea.style.transform='translateX(-50%)';
+    lblArea.textContent='two small = '+(h.totalRatio*100).toFixed(1)+'% of big';
   }
 
   // ---- equation colouring ----

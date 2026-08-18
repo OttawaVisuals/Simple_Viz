@@ -17,14 +17,14 @@ tool can pick up mid-stream without re-reading the whole chat history.
 
 - **`index.html` now only lists pages marked "reviewed and complete" in this file.** At
   Simon's request, the homepage's category grids (Everyday maths / Discoveries / Fun physics)
-  were cut down to reviewed pages only. Five are currently reviewed: `horizon-distance.html`,
-  `earth-moon-race.html`, `eratosthenes-shadow.html`, `straw-hose-flow.html`, and
-  `potato-trajectory.html`. The initial change removed the
+  were cut down to reviewed pages only. Six are currently reviewed: `horizon-distance.html`,
+  `shelf-sag.html`, `earth-moon-race.html`, `eratosthenes-shadow.html`,
+  `straw-hose-flow.html`, and `potato-trajectory.html`. The initial change removed the
   other ~45 built-but-not-yet-reviewed pages' cards entirely (not commented out; they're
   still fully built and still linked from `tracker.html`, just not surfaced on the public
   index until reviewed). Category counts, the results-count default text, and the topbar's
-  "N equations" count were all updated to match. The Featured section (already only these
-  first three featured pages was left as-is. **When a page gets marked reviewed and
+  "N equations" count were all updated to match. The three-card Featured section was left
+  as-is. **When a page gets marked reviewed and
   complete going forward, add its card back to the relevant category grid in `index.html`**
   (copy the pattern from one of the four current cards) — this is now a required step, not
   optional, since the homepage is the reviewed-only source of truth. The icon `<symbol>`
@@ -734,42 +734,20 @@ First page in the **Everyday maths** category; index card 04.
 
 ### `shelf-sag.html` — "A shelf that sags" (2026-08-15)
 
-Built to the [STYLE_GUIDE.md](STYLE_GUIDE.md) skeleton, no earlier draft. δ = PL³/(4Ebh³) —
-the standard δ = PL³/(48EI) with I = bh³/12 substituted in, so the h³ that does almost all
-the work is visible directly in the equation rather than hidden inside a symbol for I. Two
-sliders (load 5–100 kg, span 0.3–2.4 m) plus a Flat/On-edge orientation picker for a fixed
-real board. Card 05, under **Everyday maths**, right after bike-gears.
+**Reviewed and complete as of 2026-08-18.** Added to the reviewed-only homepage and removed
+from `unreviewed.html` after the off-centre-load, cross-section, and failure-model pass.
 
-- **Board and material are fixed, not sliders**: a standard "2×6" stud, actual dimensions
-  38×140 mm, in spruce–pine–fir framing lumber (E = 9.65 GPa, the NDS No. 2 grade design
-  value, ≈1.4 million psi). Flipping it from flat to on-edge swaps which dimension is h and
-  which is b, giving **≈13.6× stiffer** — a real, checkable number for this exact board,
-  used instead of the roundish "sixteen times" the roadmap entry had guessed before the page
-  existed.
-- **The hero draws the sag as a single stroked path**, not two parallel curved edges: the
-  standard simply-supported centre-load deflection shape y(x) = P·x(3L²−4x²)/(48EI) is
-  sampled at ~30 points and stroked with `stroke-width` set to the board's real height in
-  px — one path gets both the correct bowed shape and the correct relative thickness for
-  free. The true sag (µm to cm) is far too small to show at the same scale as a metre-long
-  span, so it's exaggerated by a magnification factor recomputed every render from the
-  current peak deflection (so the visible bow stays roughly constant size across the whole
-  slider range) and stated in-page ("sag shown magnified ~29× for visibility") next to the
-  real mm value — same honest-device shape as bike-gears' "magnified 13×" drivetrain
-  caption, just computed dynamically instead of from a fixed max.
-- **Gauge limit line moved below the axis from the start** (not retrofitted like bike-gears
-  and straw-hose-flow needed): the marker sits at or near the L/360 code-limit line for a
-  large fraction of the slider range, since crossing that line is the whole point of the
-  page, so the collision the other two pages hit had to be designed around up front rather
-  than patched after the fact.
-- **The extreme corner of the sliders is physically dishonest, and the note says so.** At
-  max span, max load, flat orientation, the linear formula predicts ~46 mm of sag (686% of
-  the limit) — a real board that thin would almost certainly crack long before bending that
-  far, since the equation has no failure model. The "the long span" preset deliberately lands
-  there and the note explains it directly, rather than narrowing the slider range to hide the
-  problem.
-- Presets: empty shelf (8 kg, within limit), a full bookshelf (60 kg flat, 103% of limit —
-  crosses the line), turned on edge (same 60 kg, edge orientation, 8% of limit — the direct
-  before/after), the long span (2.4 m, 100 kg flat, 686% — the dishonest-extreme case above).
+- Uses the simply supported, off-centre point-load equation
+  `δa = Pa²(L−a)²/(3EIL)`, with sliders for load, span, and load position.
+- Replaces the orientation buttons with a draggable rectangular cross-section selector for
+  independent width `b` and height `h`; `I = bh³/12` updates live.
+- The full piecewise deflection curve is sampled along the beam. Sag uses a fixed 12× visual
+  magnification rather than a constant-size bow, so changing inputs visibly changes the curve.
+- Adds `Mmax = Pa(L−a)/L` and `σmax = 6Mmax/(bh²)`. Beam regions above the representative
+  6.03 MPa No. 2 SPF bending design value turn red and receive a break marker. The copy is
+  explicit that this is a design comparison, not an exact fracture prediction.
+- Laptop layout uses three equal columns: compact stacked sliders, cross-section selector,
+  and results. Mobile returns to a single-column flow. General reading links use Wikipedia.
 
 ### `snells-law.html` — "Why the straw looks bent" (2026-08-15)
 

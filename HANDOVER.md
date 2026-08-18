@@ -472,6 +472,28 @@ constraints), then iterated with the user across several rounds:
   liquids, 0.3 L/s for air; human-limit zones: sucking easy <4 kPa / impossible >10 kPa,
   blowing easy <5 kPa / impossible >20 kPa (rough estimates, stated as such in-page); device
   suction estimates: household vacuum ≈20 kPa, shop-vac ≈30 kPa, industrial pump ≈90 kPa.
+- **2026-08-18 physics fix (Claude): water's turbulent-flow edge case.** The page's
+  Hagen–Poiseuille formula is only valid for laminar flow (Re≲2,300); comparing it against
+  `visualizations/straw-hose-flow-darcy.html` (built to fix air's compressibility issue)
+  prompted checking Reynolds numbers for the liquid presets too. Honey and milkshake stay
+  laminar (Re well under 15) across the entire slider range, so they're unaffected — but
+  water crosses Re≈4,245 at the diameter slider's narrow end, past the point where the
+  laminar formula is valid; the live page was silently extrapolating it there. Fixed in
+  `a8f3fa1` by switching liquids' `pressureFor()` to general Darcy–Weisbach with a
+  Reynolds-dependent friction factor (`f=64/Re` laminar, a smooth-pipe turbulent correlation
+  above Re=4,000, blended in between) — algebraically identical to Hagen–Poiseuille below
+  Re=2,300 (verified honey/milkshake output is byte-identical before/after), so only water's
+  narrow-diameter extreme actually changes: ~1.06 MPa instead of the previous ~402 kPa at
+  L=10 m, D=1.5 mm. Air is deliberately left on the original laminar-only formula — its
+  larger, separate problem is compressibility (density changing along the tube), which a
+  friction-factor correction alone doesn't fix; that's what the experimental Darcy variant
+  page is for. Added an honest in-page flag ("turbulent flow, Re≈…") in the effort-line
+  whenever the current slider combination leaves the laminar regime the displayed equation
+  illustrates, plus an explanation in the note paragraph, rather than silently changing the
+  number without disclosure. **Lesson:** density (ρ) was added to each `LIQ` entry for this,
+  but only water's value is actually load-bearing under the current slider ranges — worth
+  rechecking this analysis if the diameter/length slider bounds ever change, since a wider
+  range could push milkshake or honey into turbulent territory too.
 
 **Revision history (v2–v4, all superseded):** v2 added an illustrated scene, top-positioned
 controls, and tick-marked sliders after the user liked that direction in principle — but the

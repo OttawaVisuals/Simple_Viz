@@ -210,6 +210,13 @@ line, and a colored marker for the current value — built from plain absolutely
 `<div>`s with percentage `left`/`width`, not SVG (percentage positioning means it never needs
 a resize observer).
 
+**Put scale comparisons below the gauge/axis they explain.** A recurring layout mistake has
+been placing real-world comparisons (pools, pitches, landmarks, limits) above the bar, where
+they compete with the headline result and appear disconnected from the scale. The order is:
+headline result → essential interpretation → gauge/bar → comparison text and reference labels.
+If a reference label belongs to a specific tick, place it below that tick unless there is a
+verified non-overlapping reason to do otherwise.
+
 **Presets row** — text-styled buttons (no border/background, just an underline), each
 setting the full interactive state to a named real-world example in one click.
 

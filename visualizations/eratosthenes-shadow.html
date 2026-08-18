@@ -104,6 +104,26 @@
   .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
   .preset:hover{border-color:var(--accent);color:var(--accent)}
 
+  .fieldlog{margin-top:clamp(30px,3.4vw,46px);padding-top:clamp(20px,2.4vw,30px);border-top:1px solid var(--line)}
+  .fieldlog-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:12px}
+  .fieldlog h2{margin:0;font-size:clamp(21px,2.2vw,28px);font-weight:400;letter-spacing:-.02em}
+  .fieldlog-copy{margin:5px 0 0;font:12px/1.55 ui-monospace,monospace;color:var(--muted)}
+  .measure-table-wrap{overflow-x:auto}
+  .measure-table{width:100%;border-collapse:collapse;font:12px/1.35 ui-monospace,monospace}
+  .measure-table th{text-align:left;color:var(--muted);font-weight:500;letter-spacing:.06em;text-transform:uppercase;font-size:10px;padding:7px 6px;border-bottom:1px solid var(--line2);white-space:nowrap}
+  .measure-table td{padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+  .measure-table input{width:100%;min-width:112px;border:1px solid var(--line2);border-radius:3px;background:transparent;color:var(--fg);padding:7px 8px;font:12px/1.2 ui-monospace,monospace}
+  .measure-table input[type="datetime-local"]{min-width:190px}
+  .measure-table input:focus{border-color:var(--accent);outline:1px solid var(--accent);outline-offset:1px}
+  .station-cell{white-space:nowrap;color:var(--muted2)}
+  .row-remove,.add-measurement{cursor:pointer;border:0;background:none;color:var(--muted2);font:12px/1.4 ui-monospace,monospace;padding:2px 0;border-bottom:1px solid var(--line2)}
+  .row-remove:hover,.row-remove:focus-visible,.add-measurement:hover,.add-measurement:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+  .row-remove{border-bottom-color:transparent}
+  .fieldlog-actions{display:flex;align-items:baseline;gap:14px;margin-top:12px}
+  .save-status{font:11px/1.5 ui-monospace,monospace;color:var(--muted)}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  @media (max-width:700px){.fieldlog-head{align-items:start;flex-direction:column}}
+
   .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
   .note a{color:var(--muted2);text-decoration-color:var(--line2)}
   .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
@@ -152,12 +172,12 @@
 
     <div class="eqnbox">
       <div class="eqn">
-        <em>D</em>
+        <em>C</em>
         <span class="eq">=</span>
         <span class="frac">
           <span class="row num"><span>360&deg;</span><em id="dTerm">d</em></span>
           <span class="bar"></span>
-          <span class="row den"><em>&pi;</em><em id="thetaTerm">&Delta;&theta;</em></span>
+          <span class="row den"><em id="thetaTerm">&Delta;&theta;</em></span>
         </span>
       </div>
     </div>
@@ -172,16 +192,20 @@
     <div class="lbl" id="lblTheta"></div>
     <div class="lbl" id="lblGlobe" style="text-align:center;transform:translateX(-50%)">the same wedge, full scale</div>
     <div class="note-inline" id="lblScale">not to scale</div>
-    <svg id="heroSvg" role="img" aria-label="Two vertical sticks a known distance apart. The near-overhead sun casts no shadow on the left stick, but a shadow at an angle on the right one; that angle, multiplied out to 360 degrees, gives the size of the whole planet, shown as a highlighted wedge on the small globe.">
+    <svg id="heroSvg" role="img" aria-label="Two sticks sit a known distance apart on an exaggerated curved Earth surface. Each casts a shadow at its own angle; the difference between those angles forms a highlighted wedge on the small globe and is used to estimate Earth's circumference.">
       <circle id="globeCircle" fill="none" stroke="var(--line2)" stroke-width="1.25"></circle>
       <path id="globeWedge" fill="var(--accent)" opacity="0.22" stroke="none"></path>
       <circle id="globeDot1" r="2.5" fill="var(--fg)"></circle>
       <circle id="globeDot2" r="2.5" fill="var(--accent)"></circle>
       <line id="fan1" stroke="var(--line2)" stroke-width="1" stroke-dasharray="2 4"></line>
       <line id="fan2" stroke="var(--line2)" stroke-width="1" stroke-dasharray="2 4"></line>
-      <line id="groundLine" stroke="var(--line)" stroke-width="1.25"></line>
+      <path id="earthFill" fill="color-mix(in srgb, var(--accent) 5%, transparent)" stroke="none"></path>
+      <path id="groundLine" fill="none" stroke="var(--line2)" stroke-width="1.5"></path>
       <line id="ray1" stroke="var(--muted)" stroke-width="1.25" stroke-dasharray="3 4"></line>
+      <line id="rayVertGuide1" stroke="var(--line2)" stroke-width="1" stroke-dasharray="2 3"></line>
+      <path id="angleArc1" fill="none" stroke="var(--accent)" stroke-width="1.25"></path>
       <line id="stick1" stroke="var(--fg)" stroke-width="2.5" stroke-linecap="round"></line>
+      <line id="shadow1" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"></line>
       <circle id="base1" r="2.5" fill="var(--fg)"></circle>
       <line id="ray2" stroke="var(--muted)" stroke-width="1.25" stroke-dasharray="3 4"></line>
       <line id="rayVertGuide2" stroke="var(--line2)" stroke-width="1" stroke-dasharray="2 3"></line>
@@ -200,7 +224,7 @@
       <div class="ctrl" id="dCtrl">
         <div class="ctrl-head">
           <span class="ctrl-title">Distance apart <em id="dLabel">d</em></span>
-          <span class="ctrl-rel">d &prop; D</span>
+          <span class="ctrl-rel">d &prop; C, D</span>
         </div>
         <div class="readout mono" id="dReadout"></div>
         <div class="track" id="dTrack" tabindex="0" role="slider" aria-label="Distance between the two sticks">
@@ -211,18 +235,32 @@
         <div class="track-range"><span>100 km</span><span class="mid">how far apart the sticks are</span><span>2000 km</span></div>
       </div>
 
-      <div class="ctrl" id="thetaCtrl">
+      <div class="ctrl" id="theta1Ctrl">
         <div class="ctrl-head">
-          <span class="ctrl-title">Shadow angle <em id="thetaLabel">&Delta;&theta;</em></span>
-          <span class="ctrl-rel">&Delta;&theta;&#8315;&#185; &prop; D</span>
+          <span class="ctrl-title">Stick 1 angle <em id="theta1Label">&theta;&#8321;</em></span>
+          <span class="ctrl-rel">from vertical</span>
         </div>
-        <div class="readout mono" id="thetaReadout"></div>
-        <div class="track" id="thetaTrack" tabindex="0" role="slider" aria-label="Difference in shadow angle">
+        <div class="readout mono" id="theta1Readout"></div>
+        <div class="track" id="theta1Track" tabindex="0" role="slider" aria-label="Stick 1 shadow angle">
           <div class="rail"></div>
-          <div class="fill" id="thetaFill"></div>
-          <div class="thumb" id="thetaThumb"></div>
+          <div class="fill" id="theta1Fill"></div>
+          <div class="thumb" id="theta1Thumb"></div>
         </div>
-        <div class="track-range"><span>1&deg;</span><span class="mid">difference between the two shadows</span><span>20&deg;</span></div>
+        <div class="track-range"><span>0&deg;</span><span class="mid">first measured angle</span><span>20&deg;</span></div>
+      </div>
+
+      <div class="ctrl" id="theta2Ctrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Stick 2 angle <em id="theta2Label">&theta;&#8322;</em></span>
+          <span class="ctrl-rel">&Delta;&theta; = |&theta;&#8322; &minus; &theta;&#8321;|</span>
+        </div>
+        <div class="readout mono" id="theta2Readout"></div>
+        <div class="track" id="theta2Track" tabindex="0" role="slider" aria-label="Stick 2 shadow angle">
+          <div class="rail"></div>
+          <div class="fill" id="theta2Fill"></div>
+          <div class="thumb" id="theta2Thumb"></div>
+        </div>
+        <div class="track-range"><span>0&deg;</span><span class="mid">second measured angle</span><span>20&deg;</span></div>
       </div>
     </div>
 
@@ -251,7 +289,27 @@
     <button class="preset" data-p="close">150 km apart</button>
   </div>
 
-  <p class="note">Eratosthenes knew that at noon on the summer solstice, the sun sat directly overhead at Syene (near modern Aswan) &mdash; a vertical stick cast no shadow at all. On the same day, a stick in Alexandria, about 800 km north, cast a shadow 7.2&deg; off vertical. Since the sun's rays arrive essentially parallel (it's 150 million km away), that 7.2&deg; can only come from the ground itself curving between the two cities. A 7.2&deg; wedge is 1/50th of a full circle, so the whole circumference must be 50&times;800 km = 40,000 km &mdash; within a few tenths of a percent of the true value, using nothing but sticks and shadows. The diagram is schematic, not drawn to true curvature or scale; the small globe on the left shows the wedge these two sticks actually correspond to. This also assumes both sticks sit on the same meridian (line of longitude) and measure at the same solar noon, which Eratosthenes' setup approximated but didn't hit exactly &mdash; part of why his answer, while remarkably close, wasn't exact. Read more on <a href="https://en.wikipedia.org/wiki/Eratosthenes#Measurement_of_the_Earth's_circumference" target="_blank" rel="noopener">Wikipedia</a>.</p>
+  <section class="fieldlog" aria-labelledby="fieldlogHeading">
+    <div class="fieldlog-head">
+      <div>
+        <h2 id="fieldlogHeading">Log your own measurements</h2>
+        <p class="fieldlog-copy">Use the same date and local solar-noon time at both locations. Entries stay in this browser.</p>
+      </div>
+      <a href="https://shademap.app/" target="_blank" rel="noopener">Test a location and time in ShadeMap &nearr;</a>
+    </div>
+    <div class="measure-table-wrap">
+      <table class="measure-table">
+        <thead><tr><th>Measurement</th><th>Date and time</th><th>Latitude</th><th>Longitude</th><th>Angle from vertical</th><th aria-label="Actions"></th></tr></thead>
+        <tbody id="measurementRows"></tbody>
+      </table>
+    </div>
+    <div class="fieldlog-actions">
+      <button class="add-measurement" id="addMeasurement" type="button">+ Add measurement</button>
+      <span class="save-status" id="measurementStatus" role="status" aria-live="polite"></span>
+    </div>
+  </section>
+
+  <p class="note">Eratosthenes knew that at noon on the summer solstice, the sun sat directly overhead at Syene (near modern Aswan) &mdash; a vertical stick cast no shadow at all. On the same day, a stick in Alexandria, about 800 km north, cast a shadow 7.2&deg; off vertical. Since the sun's rays arrive essentially parallel (it's 150 million km away), that angle difference can only come from the ground curving between the two cities. A 7.2&deg; wedge is 1/50th of a full circle, so the circumference is 50&times;800 km = 40,000 km. The corresponding diameter is C/&pi;, about 12,732 km. The diagram exaggerates Earth&rsquo;s curvature and is not to scale; the small globe shows the actual wedge. This also assumes both sticks sit on the same meridian and are measured at the same solar noon. Read more on <a href="https://en.wikipedia.org/wiki/Eratosthenes#Measurement_of_the_Earth's_circumference" target="_blank" rel="noopener">Wikipedia</a>.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -286,7 +344,7 @@
 </main>
 <script>
 (function(){
-  var DMIN=100, DMAX=2000, TMIN=1, TMAX=20;
+  var DMIN=100, DMAX=2000, TMAX=20;
   var TRUE_DIAM = 12742; // km, mean
 
   function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
@@ -298,21 +356,22 @@
     return { x: cx + r*Math.cos(a), y: cy + r*Math.sin(a) };
   }
 
-  var state = { d:800, theta:7.2, active:null, drag:null, ghostD:null };
+  var state = { d:800, theta1:0, theta2:7.2, active:null, drag:null, ghostD:null };
   var heroW = 0;
 
   var $ = function(id){ return document.getElementById(id); };
   var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
   var globeCircle=$('globeCircle'), globeWedge=$('globeWedge'), globeDot1=$('globeDot1'), globeDot2=$('globeDot2');
   var fan1=$('fan1'), fan2=$('fan2');
-  var groundLine=$('groundLine');
-  var ray1=$('ray1'), stick1=$('stick1'), base1=$('base1');
+  var earthFill=$('earthFill'), groundLine=$('groundLine');
+  var ray1=$('ray1'), rayVertGuide1=$('rayVertGuide1'), angleArc1=$('angleArc1'), stick1=$('stick1'), shadow1=$('shadow1'), base1=$('base1');
   var ray2=$('ray2'), rayVertGuide2=$('rayVertGuide2'), angleArc=$('angleArc'), stick2=$('stick2'), shadow2=$('shadow2'), base2=$('base2');
   var dimBase=$('dimBase'), dimLeftV=$('dimLeftV'), dimRightV=$('dimRightV');
   var lblD=$('lblD'), lblTheta=$('lblTheta'), lblGlobe=$('lblGlobe'), lblScale=$('lblScale');
 
-  function diameter(){ return 360*state.d/(Math.PI*state.theta); }
-  function circumference(){ return 360*state.d/state.theta; }
+  function angleDifference(){ return Math.abs(state.theta2-state.theta1); }
+  function circumference(){ var t=angleDifference(); return t ? 360*state.d/t : Infinity; }
+  function diameter(){ return circumference()/Math.PI; }
 
   function geom(w){
     var narrow = w < 620;
@@ -339,13 +398,15 @@
     heroSvg.setAttribute('viewBox','0 0 '+w+' '+g.vbH);
     heroSvg.setAttribute('preserveAspectRatio','none');
 
-    var thetaRad = state.theta*Math.PI/180;
+    var theta1Rad = state.theta1*Math.PI/180;
+    var theta2Rad = state.theta2*Math.PI/180;
+    var deltaTheta = angleDifference();
 
     // globe inset
     globeCircle.setAttribute('cx', g.globeCx); globeCircle.setAttribute('cy', g.globeCy); globeCircle.setAttribute('r', g.globeR);
     var p1 = polarTop(g.globeCx, g.globeCy, g.globeR, 0);
-    var p2 = polarTop(g.globeCx, g.globeCy, g.globeR, state.theta);
-    var largeArc = state.theta > 180 ? 1 : 0;
+    var p2 = polarTop(g.globeCx, g.globeCy, g.globeR, deltaTheta);
+    var largeArc = deltaTheta > 180 ? 1 : 0;
     globeWedge.setAttribute('d', 'M '+g.globeCx+' '+g.globeCy+' L '+p1.x+' '+p1.y+' A '+g.globeR+' '+g.globeR+' 0 '+largeArc+' 1 '+p2.x+' '+p2.y+' Z');
     globeDot1.setAttribute('cx', p1.x); globeDot1.setAttribute('cy', p1.y);
     globeDot2.setAttribute('cx', p2.x); globeDot2.setAttribute('cy', p2.y);
@@ -357,31 +418,44 @@
     fan2.setAttribute('x1', g.globeCx+g.globeR*0.75); fan2.setAttribute('y1', g.globeCy+g.globeR*0.5);
     fan2.setAttribute('x2', g.panelStartX); fan2.setAttribute('y2', fanBotY);
 
-    // ground
-    groundLine.setAttribute('x1', g.panelStartX); groundLine.setAttribute('y1', g.groundY);
-    groundLine.setAttribute('x2', g.panelEndX); groundLine.setAttribute('y2', g.groundY);
+    // Exaggerated Earth arc. The small globe gives the true angular relationship.
+    var curveDepth = g.narrow ? 20 : 26;
+    var midX = (g.panelStartX+g.panelEndX)/2;
+    var halfSpan = (g.panelEndX-g.panelStartX)/2;
+    function surfaceY(x){ var u=(x-midX)/halfSpan; return g.groundY+curveDepth*u*u; }
+    var edgeY=g.groundY+curveDepth, controlY=g.groundY-curveDepth;
+    var surfacePath='M '+g.panelStartX+' '+edgeY+' Q '+midX+' '+controlY+' '+g.panelEndX+' '+edgeY;
+    groundLine.setAttribute('d', surfacePath);
+    earthFill.setAttribute('d', surfacePath+' L '+g.panelEndX+' '+g.vbH+' L '+g.panelStartX+' '+g.vbH+' Z');
 
-    // stick 1 (sun overhead, no shadow)
-    var tip1 = { x:g.stick1X, y:g.groundY-g.stickH };
-    stick1.setAttribute('x1', g.stick1X); stick1.setAttribute('y1', g.groundY);
+    // stick 1
+    var base1Y=surfaceY(g.stick1X);
+    var tip1 = { x:g.stick1X, y:base1Y-g.stickH };
+    stick1.setAttribute('x1', g.stick1X); stick1.setAttribute('y1', base1Y);
     stick1.setAttribute('x2', tip1.x); stick1.setAttribute('y2', tip1.y);
-    base1.setAttribute('cx', g.stick1X); base1.setAttribute('cy', g.groundY);
-    ray1.setAttribute('x1', tip1.x); ray1.setAttribute('y1', tip1.y-26);
+    base1.setAttribute('cx', g.stick1X); base1.setAttribute('cy', base1Y);
+    var ray1Len=30;
+    ray1.setAttribute('x1', tip1.x-ray1Len*Math.sin(theta1Rad)); ray1.setAttribute('y1', tip1.y-ray1Len*Math.cos(theta1Rad));
     ray1.setAttribute('x2', tip1.x); ray1.setAttribute('y2', tip1.y);
+    rayVertGuide1.setAttribute('x1',tip1.x);rayVertGuide1.setAttribute('y1',tip1.y-24);rayVertGuide1.setAttribute('x2',tip1.x);rayVertGuide1.setAttribute('y2',tip1.y);
+    var arc1R=18, arc1Start={x:tip1.x,y:tip1.y-arc1R}, arc1End={x:tip1.x-arc1R*Math.sin(theta1Rad),y:tip1.y-arc1R*Math.cos(theta1Rad)};
+    angleArc1.setAttribute('d','M '+arc1Start.x+' '+arc1Start.y+' A '+arc1R+' '+arc1R+' 0 0 0 '+arc1End.x+' '+arc1End.y);
+    shadow1.setAttribute('x1',g.stick1X);shadow1.setAttribute('y1',base1Y);shadow1.setAttribute('x2',g.stick1X+g.stickH*Math.tan(theta1Rad));shadow1.setAttribute('y2',base1Y);
 
-    // stick 2 (vertical), shadow cast by ray arriving at angle theta from vertical
-    var tip2 = { x:g.stick2X, y:g.groundY-g.stickH };
-    stick2.setAttribute('x1', g.stick2X); stick2.setAttribute('y1', g.groundY);
+    // stick 2
+    var base2Y=surfaceY(g.stick2X);
+    var tip2 = { x:g.stick2X, y:base2Y-g.stickH };
+    stick2.setAttribute('x1', g.stick2X); stick2.setAttribute('y1', base2Y);
     stick2.setAttribute('x2', tip2.x); stick2.setAttribute('y2', tip2.y);
-    base2.setAttribute('cx', g.stick2X); base2.setAttribute('cy', g.groundY);
+    base2.setAttribute('cx', g.stick2X); base2.setAttribute('cy', base2Y);
 
-    var shadowLen = g.stickH * Math.tan(thetaRad);
+    var shadowLen = g.stickH * Math.tan(theta2Rad);
     var shadowEndX = tip2.x + shadowLen;
-    shadow2.setAttribute('x1', g.stick2X); shadow2.setAttribute('y1', g.groundY);
-    shadow2.setAttribute('x2', shadowEndX); shadow2.setAttribute('y2', g.groundY);
+    shadow2.setAttribute('x1', g.stick2X); shadow2.setAttribute('y1', base2Y);
+    shadow2.setAttribute('x2', shadowEndX); shadow2.setAttribute('y2', base2Y);
 
     var rayLen = 30;
-    var ray2Start = { x: tip2.x - rayLen*Math.sin(thetaRad), y: tip2.y - rayLen*Math.cos(thetaRad) };
+    var ray2Start = { x: tip2.x - rayLen*Math.sin(theta2Rad), y: tip2.y - rayLen*Math.cos(theta2Rad) };
     ray2.setAttribute('x1', ray2Start.x); ray2.setAttribute('y1', ray2Start.y);
     ray2.setAttribute('x2', tip2.x); ray2.setAttribute('y2', tip2.y);
     rayVertGuide2.setAttribute('x1', tip2.x); rayVertGuide2.setAttribute('y1', tip2.y-24);
@@ -389,28 +463,28 @@
 
     var arcR = 18;
     var arcStart = { x: tip2.x, y: tip2.y-arcR };
-    var arcEnd = { x: tip2.x - arcR*Math.sin(thetaRad), y: tip2.y - arcR*Math.cos(thetaRad) };
+    var arcEnd = { x: tip2.x - arcR*Math.sin(theta2Rad), y: tip2.y - arcR*Math.cos(theta2Rad) };
     angleArc.setAttribute('d', 'M '+arcStart.x+' '+arcStart.y+' A '+arcR+' '+arcR+' 0 0 0 '+arcEnd.x+' '+arcEnd.y);
 
     // distance dimension line
-    dimBase.setAttribute('x1', g.stick1X); dimBase.setAttribute('y1', g.groundY+18);
-    dimBase.setAttribute('x2', g.stick2X); dimBase.setAttribute('y2', g.groundY+18);
+    dimBase.setAttribute('x1', g.stick1X); dimBase.setAttribute('y1', base1Y+18);
+    dimBase.setAttribute('x2', g.stick2X); dimBase.setAttribute('y2', base2Y+18);
     dimLeftV.setAttribute('x1', g.stick1X); dimLeftV.setAttribute('x2', g.stick1X);
-    dimLeftV.setAttribute('y1', g.groundY+12); dimLeftV.setAttribute('y2', g.groundY+24);
+    dimLeftV.setAttribute('y1', base1Y+12); dimLeftV.setAttribute('y2', base1Y+24);
     dimRightV.setAttribute('x1', g.stick2X); dimRightV.setAttribute('x2', g.stick2X);
-    dimRightV.setAttribute('y1', g.groundY+12); dimRightV.setAttribute('y2', g.groundY+24);
+    dimRightV.setAttribute('y1', base2Y+12); dimRightV.setAttribute('y2', base2Y+24);
 
     var px = function(x){ return (x/w*100)+'%'; };
     var py = function(y){ return (y/g.vbH*100)+'%'; };
-    lblD.style.left = px((g.stick1X+g.stick2X)/2); lblD.style.top = py(g.groundY+30);
+    lblD.style.left = px((g.stick1X+g.stick2X)/2); lblD.style.top = py(Math.max(base1Y,base2Y)+30);
     lblD.style.transform = 'translateX(-50%)';
     lblD.textContent = 'd = '+fmtKm(state.d)+' km';
     lblD.style.color = state.active==='d' ? 'var(--accent)' : 'var(--muted)';
 
     lblTheta.style.left = px(tip2.x - arcR - 4); lblTheta.style.top = py(tip2.y - arcR - 16);
     lblTheta.style.transform = 'translateX(-100%)';
-    lblTheta.textContent = 'Δθ = '+state.theta.toFixed(1)+'°';
-    lblTheta.style.color = state.active==='theta' ? 'var(--accent)' : 'var(--muted)';
+    lblTheta.textContent = 'Δθ = '+deltaTheta.toFixed(1)+'°';
+    lblTheta.style.color = (state.active==='theta1'||state.active==='theta2') ? 'var(--accent)' : 'var(--muted)';
 
     lblGlobe.style.left = px(g.globeCx); lblGlobe.style.top = py(g.globeCy+g.globeR+10);
     lblScale.style.left = px(g.panelEndX); lblScale.style.top = py(g.vbH-14);
@@ -420,21 +494,25 @@
   // ---- equation + legend colouring ----
   var accent = 'var(--accent)';
   var dTerm=$('dTerm'), thetaTerm=$('thetaTerm');
-  var dLabel=$('dLabel'), thetaLabel=$('thetaLabel');
+  var dLabel=$('dLabel'), theta1Label=$('theta1Label'), theta2Label=$('theta2Label');
   var legendEl = $('legend');
 
   function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
 
   function drawEquationAndLegend(){
     dTerm.style.color = activeColor('d');
-    thetaTerm.style.color = activeColor('theta');
+    var angleActive = state.active==='theta1'||state.active==='theta2';
+    thetaTerm.style.color = angleActive ? accent : 'var(--fg)';
     dLabel.style.color = activeColor('d');
-    thetaLabel.style.color = activeColor('theta');
+    theta1Label.style.color = activeColor('theta1');
+    theta2Label.style.color = activeColor('theta2');
 
     var rows = [
       {sym:'d', name:'distance between the sticks', val: fmtKm(state.d)+' km', key:'d'},
-      {sym:'Δθ', name:'difference in shadow angle', val: state.theta.toFixed(1)+'°', key:'theta'},
-      {sym:'D', name:"Earth's diameter (computed)", val: fmtKm(diameter())+' km', key:null}
+      {sym:'θ₁', name:'stick 1 angle', val: state.theta1.toFixed(1)+'°', key:'theta1'},
+      {sym:'θ₂', name:'stick 2 angle', val: state.theta2.toFixed(1)+'°', key:'theta2'},
+      {sym:'Δθ', name:'angle difference', val: angleDifference().toFixed(1)+'°', key:null},
+      {sym:'C', name:"Earth's circumference", val: isFinite(circumference()) ? fmtKm(circumference())+' km' : '—', key:null}
     ];
     legendEl.innerHTML = '';
     rows.forEach(function(row){
@@ -456,7 +534,7 @@
       var f = clamp((x-r.left)/r.width, 0, 1);
       var v = lo + f*(hi-lo);
       v = clamp(Math.round(v/step)*step, lo, hi);
-      if(key==='d') state.d = v; else state.theta = Math.round(v*10)/10;
+      if(key==='d') state.d = v; else state[key] = Math.round(v*10)/10;
       render();
     }
     track.addEventListener('pointerdown', function(e){
@@ -472,17 +550,17 @@
     track.addEventListener('pointerenter', function(){ state.active = key; render(); });
     track.addEventListener('keydown', function(e){
       var bigStep = e.shiftKey ? step*10 : step;
-      var cur = key==='d' ? state.d : state.theta;
+      var cur = state[key];
       var v = null;
       if(e.key==='ArrowLeft'||e.key==='ArrowDown') v = cur-bigStep;
       else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = cur+bigStep;
       else if(e.key==='Home') v = lo;
       else if(e.key==='End') v = hi;
-      if(v!==null){ e.preventDefault(); v = clamp(Math.round(v/step)*step, lo, hi); if(key==='d') state.d=v; else state.theta=Math.round(v*10)/10; render(); }
+      if(v!==null){ e.preventDefault(); v = clamp(Math.round(v/step)*step, lo, hi); if(key==='d') state.d=v; else state[key]=Math.round(v*10)/10; render(); }
     });
     return {
       draw: function(){
-        var cur = key==='d' ? state.d : state.theta;
+        var cur = state[key];
         var pct = clamp((cur-lo)/(hi-lo)*100, 0, 100).toFixed(2)+'%';
         fill.style.width = pct; thumb.style.left = pct;
         track.setAttribute('aria-valuemin', lo);
@@ -493,9 +571,10 @@
     };
   }
   var dSlider = makeSlider('d', $('dTrack'), $('dFill'), $('dThumb'), DMIN, DMAX, 10, function(v){ return fmtKm(v)+' km'; });
-  var thetaSlider = makeSlider('theta', $('thetaTrack'), $('thetaFill'), $('thetaThumb'), TMIN, TMAX, 0.1, function(v){ return v.toFixed(1)+' degrees'; });
+  var theta1Slider = makeSlider('theta1', $('theta1Track'), $('theta1Fill'), $('theta1Thumb'), 0, TMAX, 0.1, function(v){ return v.toFixed(1)+' degrees'; });
+  var theta2Slider = makeSlider('theta2', $('theta2Track'), $('theta2Fill'), $('theta2Thumb'), 0, TMAX, 0.1, function(v){ return v.toFixed(1)+' degrees'; });
 
-  [$('dCtrl'), $('thetaCtrl')].forEach(function(box){
+  [$('dCtrl'), $('theta1Ctrl'), $('theta2Ctrl')].forEach(function(box){
     box.addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
   });
 
@@ -509,6 +588,16 @@
 
   function drawResult(){
     var D = diameter();
+    if(!isFinite(D)){
+      dValueEl.textContent = '—';
+      dValueEl.style.color = 'var(--bad)';
+      verdictEl.textContent = '';
+      verdictSubEl.textContent = 'The two angles must differ to estimate Earth’s size.';
+      effortLineEl.textContent = 'Δθ = 0° makes the circumference undefined.';
+      gMark.style.display='none'; gMarkLabel.style.display='none'; gReach.style.width='0';
+      return;
+    }
+    gMark.style.display='block'; gMarkLabel.style.display='block';
     var errPct = (D-TRUE_DIAM)/TRUE_DIAM*100;
     var bad = Math.abs(errPct) > 15;
     var resultColor = bad ? 'var(--bad)' : 'var(--fg)';
@@ -549,16 +638,60 @@
   // ---- presets ----
   document.querySelectorAll('.preset').forEach(function(b){
     var presets = {
-      eratosthenes:{d:800,theta:7.2},
-      ten:{d:1112,theta:10},
-      close:{d:150,theta:1.35}
+      eratosthenes:{d:800,theta1:0,theta2:7.2},
+      ten:{d:1112,theta1:2.5,theta2:12.5},
+      close:{d:150,theta1:4.2,theta2:5.55}
     };
     b.addEventListener('click', function(){
       var p = presets[b.dataset.p];
-      state.d=p.d; state.theta=p.theta;
+      state.d=p.d; state.theta1=p.theta1; state.theta2=p.theta2;
       render();
     });
   });
+
+  // ---- field measurement log (local to this browser) ----
+  var MEASUREMENTS_KEY='eratosthenes-field-measurements';
+  var measurementRows=$('measurementRows'), measurementStatus=$('measurementStatus');
+  var measurements=[];
+  try { measurements=JSON.parse(localStorage.getItem(MEASUREMENTS_KEY)||'[]'); } catch(e){ measurements=[]; }
+  if(!Array.isArray(measurements)||!measurements.length){
+    measurements=[{datetime:'',lat:'',lon:'',angle:''},{datetime:'',lat:'',lon:'',angle:''}];
+  }
+  function saveMeasurements(){
+    try { localStorage.setItem(MEASUREMENTS_KEY,JSON.stringify(measurements)); measurementStatus.textContent='Saved locally'; }
+    catch(e){ measurementStatus.textContent='Could not save in this browser'; }
+  }
+  function measurementInput(type,value,label,step,min,max){
+    var input=document.createElement('input'); input.type=type; input.value=value;
+    input.setAttribute('aria-label',label);
+    if(step!==undefined) input.step=step;
+    if(min!==undefined) input.min=min;
+    if(max!==undefined) input.max=max;
+    return input;
+  }
+  function drawMeasurements(){
+    measurementRows.innerHTML='';
+    measurements.forEach(function(row,index){
+      var tr=document.createElement('tr');
+      var station=document.createElement('td'); station.className='station-cell'; station.textContent='Stick '+(index+1); tr.appendChild(station);
+      var fields=[
+        {key:'datetime',input:measurementInput('datetime-local',row.datetime,'Stick '+(index+1)+' date and time')},
+        {key:'lat',input:measurementInput('number',row.lat,'Stick '+(index+1)+' latitude','any','-90','90')},
+        {key:'lon',input:measurementInput('number',row.lon,'Stick '+(index+1)+' longitude','any','-180','180')},
+        {key:'angle',input:measurementInput('number',row.angle,'Stick '+(index+1)+' angle from vertical','0.1','0','90')}
+      ];
+      fields.forEach(function(field){
+        var td=document.createElement('td'); td.appendChild(field.input); tr.appendChild(td);
+        field.input.addEventListener('input',function(){ measurements[index][field.key]=field.input.value; saveMeasurements(); });
+      });
+      var action=document.createElement('td');
+      var remove=document.createElement('button'); remove.type='button'; remove.className='row-remove'; remove.textContent='Remove'; remove.setAttribute('aria-label','Remove stick '+(index+1)+' measurement');
+      remove.addEventListener('click',function(){ measurements.splice(index,1); if(!measurements.length) measurements.push({datetime:'',lat:'',lon:'',angle:''}); saveMeasurements(); drawMeasurements(); });
+      action.appendChild(remove); tr.appendChild(action); measurementRows.appendChild(tr);
+    });
+  }
+  $('addMeasurement').addEventListener('click',function(){ measurements.push({datetime:'',lat:'',lon:'',angle:''}); saveMeasurements(); drawMeasurements(); });
+  drawMeasurements();
 
   // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
   var STORAGE_KEY = 'eratosthenes-shadow-theme';
@@ -606,9 +739,10 @@
   function render(){
     drawHero();
     drawEquationAndLegend();
-    dSlider.draw(); thetaSlider.draw();
+    dSlider.draw(); theta1Slider.draw(); theta2Slider.draw();
     $('dReadout').textContent = fmtKm(state.d)+' km';
-    $('thetaReadout').textContent = state.theta.toFixed(1)+'°';
+    $('theta1Readout').textContent = state.theta1.toFixed(1)+'°';
+    $('theta2Readout').textContent = state.theta2.toFixed(1)+'°';
     drawResult();
   }
 

@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pipe Flow: Which Formula Applies — internal reference</title>
+<style>
+  /* Tokens, type and topbar kept byte-identical to index.html/about.html so this reads as
+     the same site, per STYLE_GUIDE.md. This is an internal dev reference, not a visualization
+     — not linked from index.html's public grid, not a "concept" page (no equation slider, no
+     single figure). Reused shell only. */
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+    --ok:#3F7A4F;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+      --ok:#7FBF8F;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    --ok:#7FBF8F;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:860px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+  :where(a,button,input,select,textarea,[tabindex]):focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+  .back{color:var(--muted)}
+  .back:hover{color:var(--accent)}
+
+  .head{margin:clamp(36px,7vw,64px) 0 clamp(28px,4vw,40px)}
+  .kicker{font:500 11px/1.3 ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  h1{font-weight:300;font-size:clamp(1.9rem,4.2vw,2.7rem);line-height:1.08;letter-spacing:-.02em;margin:10px 0 0}
+  .sub{font-size:clamp(.96rem,1.1vw,1.06rem);line-height:1.65;color:var(--muted2);margin:16px 0 0;max-width:72ch;text-wrap:pretty}
+
+  h2{font-weight:400;font-size:clamp(1.3rem,2.2vw,1.6rem);letter-spacing:-.01em;margin:0 0 14px;padding-top:clamp(40px,5vw,56px);border-top:1px solid var(--line)}
+  section:first-of-type h2{border-top:0;padding-top:0}
+  h3{font-family:ui-monospace,monospace;font-weight:500;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:28px 0 10px}
+
+  .prose{font-size:1rem;line-height:1.75;color:var(--fg)}
+  .prose p{margin:0 0 18px}
+  .prose p:last-child{margin-bottom:0}
+  .prose em{font-style:italic}
+  .prose a{border-bottom:1px solid var(--line2)}
+  .prose code, .eq{font-family:ui-monospace,monospace;font-size:.94em;background:color-mix(in srgb, var(--line2) 30%, transparent);padding:.1em .4em;border-radius:3px;white-space:nowrap}
+
+  .decision{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:4px;overflow:hidden;margin:20px 0}
+  .decision .step{display:grid;grid-template-columns:1.6em 1fr;gap:12px;background:var(--bg);padding:14px 16px}
+  .decision .num{font:500 13px ui-monospace,monospace;color:var(--accent)}
+  .decision .q{font-size:.98rem;line-height:1.55}
+  .decision .q b{font-weight:600}
+  .decision .branch{margin-top:6px;padding-left:14px;border-left:2px solid var(--line2);font-size:.92rem;color:var(--muted2);line-height:1.6}
+  .decision .branch b{color:var(--fg)}
+
+  table{width:100%;border-collapse:collapse;margin:18px 0;font-size:.92rem}
+  caption{text-align:left;font:500 11px ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font:500 11px ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+  td.mono, th.mono{font-family:ui-monospace,monospace;font-size:.88em}
+  tr:last-child td{border-bottom:0}
+  .status{display:inline-block;font:500 10.5px ui-monospace,monospace;letter-spacing:.04em;padding:2px 8px;border-radius:999px;border:1px solid var(--line2)}
+  .status.ok{color:var(--ok);border-color:var(--ok)}
+  .status.warn{color:var(--bad);border-color:var(--bad)}
+
+  .formula-box{margin:14px 0 22px;padding:16px 18px;border:1px solid var(--line);border-radius:4px}
+  .formula-box .eq{display:block;font-size:1.05rem;margin-bottom:10px;white-space:normal}
+  .formula-box .meta{font-size:.88rem;color:var(--muted);line-height:1.6}
+  .formula-box .meta b{color:var(--muted2);font-weight:600}
+
+  .callout{margin:18px 0;padding:14px 16px;border-left:3px solid var(--bad);background:color-mix(in srgb, var(--bad) 7%, transparent);border-radius:0 4px 4px 0;font-size:.94rem;line-height:1.6}
+  .callout b{color:var(--bad)}
+
+  .note{margin:clamp(40px,5vw,64px) 0 0;max-width:88ch;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .site-footer{margin-top:clamp(48px,6vw,72px);padding-top:16px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,40px);font:11.5px/1.7 ui-monospace,monospace;color:var(--muted)}
+  .site-footer a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .site-footer a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+
+  @media (max-width:700px){
+    .site-footer{grid-template-columns:1fr;gap:10px}
+    table{display:block;overflow-x:auto;white-space:nowrap}
+  }
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a class="back" href="index.html">&larr; Physics you can see</a>
+    <div class="topbar-right">
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="head">
+    <p class="kicker">Internal reference — not linked from the public homepage</p>
+    <h1>Pipe flow: which formula applies.</h1>
+    <p class="sub">A working decision tree for choosing between Hagen&ndash;Poiseuille, Darcy&ndash;Weisbach, and compressible pipe-flow models &mdash; written after fixing a real bug in <code>straw-hose-flow.html</code> that came from using the wrong one. Meant to be checked before building or reviewing any page that pushes a fluid through a tube.</p>
+  </div>
+
+  <div class="prose">
+    <section>
+      <h2>The decision tree</h2>
+      <p>Three questions, in order. Skipping the first two and jumping straight to Hagen&ndash;Poiseuille because it's the simplest formula is exactly the mistake that shipped in <code>straw-hose-flow.html</code> for water at narrow diameters.</p>
+
+      <div class="decision">
+        <div class="step">
+          <span class="num">1</span>
+          <div class="q">
+            <b>Is the fluid compressible in this context?</b>
+            <div class="branch"><b>Liquid</b> (water, milkshake, honey, &hellip;) &mdash; always incompressible at the pressures this site deals with. Go to question 2.</div>
+            <div class="branch"><b>Gas</b> (air) &mdash; incompressible <em>only if</em> the pressure drop is small relative to absolute pressure (&Delta;P &lt;&lt; P<sub>atm</sub>) and the exit speed stays well under Mach&nbsp;0.3. If either of those fails, skip questions 2&ndash;3 and go straight to the compressible section below.</div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="num">2</span>
+          <div class="q">
+            <b>What's the Reynolds number?</b> &mdash; <span class="eq">Re = &rho;vD/&mu;</span> (equivalently <span class="eq">Re = 4&rho;Q/(&pi;&mu;D)</span> from flow rate).
+            <div class="branch"><b>Re &lesssim; 2,300</b> &mdash; laminar. Use Hagen&ndash;Poiseuille.</div>
+            <div class="branch"><b>Re &gtrsim; 4,000</b> &mdash; turbulent. Use Darcy&ndash;Weisbach with a turbulent friction factor.</div>
+            <div class="branch"><b>2,300 &ndash; 4,000</b> &mdash; transitional. No exact theory exists here (real transition is intermittent, not a clean function of Re); an interpolated blend between the two is a reasonable engineering approximation, not physics.</div>
+          </div>
+        </div>
+        <div class="step">
+          <span class="num">3</span>
+          <div class="q">
+            <b>Did question 1 send you to the compressible branch?</b> Use the isothermal compressible pipe-flow equation instead of Darcy&ndash;Weisbach &mdash; but check the exit Mach number against the model's own limit before trusting the result (see below). Past that limit, only full Fanno flow is valid, and this site hasn't implemented it yet.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>The formulas</h2>
+
+      <h3>Hagen&ndash;Poiseuille &mdash; laminar, incompressible</h3>
+      <div class="formula-box">
+        <span class="eq">&Delta;P = 8&eta;LQ/(&pi;r&#8308;) = 128&eta;LQ/(&pi;D&#8308;)</span>
+        <div class="meta">The exact analytic solution for slow, steady, fully-developed laminar flow of a Newtonian fluid in a round tube. <b>Valid only when:</b> Re &lesssim; 2,300, fluid is incompressible, flow is fully developed (entrance length small vs. tube length). It is <em>not</em> a general-purpose "flow through a tube" formula &mdash; it's the laminar special case.</div>
+      </div>
+
+      <h3>Darcy&ndash;Weisbach &mdash; general, incompressible</h3>
+      <div class="formula-box">
+        <span class="eq">&Delta;P = f(L/D)(&rho;v&sup2;/2)</span>
+        <div class="meta">The general incompressible pipe-friction formula. Hagen&ndash;Poiseuille is the special case where <span class="eq">f = 64/Re</span> &mdash; substituting that in and simplifying reproduces the Hagen&ndash;Poiseuille formula exactly, so the two aren't competing equations, one is a special case of the other. For turbulent flow, <span class="eq">f</span> comes from an empirical correlation instead:
+          <ul style="margin:8px 0 0;padding-left:20px">
+            <li><b>Laminar</b> (Re&le;2,300): <span class="eq">f = 64/Re</span></li>
+            <li><b>Turbulent, smooth pipe</b> (Re&ge;4,000): Haaland's explicit approximation to Colebrook, <span class="eq">1/&radic;f = &minus;1.8&middot;log&#8321;&#8320;(6.9/Re)</span></li>
+            <li><b>Transitional</b> (2,300&ndash;4,000): smoothstep-blended between the two &mdash; an interpolation, not a derivation</li>
+          </ul>
+          This is what <code>straw-hose-flow.html</code>'s liquid branch now uses (fixed 2026-08-18) instead of a bare Hagen&ndash;Poiseuille call.
+        </div>
+      </div>
+
+      <h3>Isothermal compressible pipe flow &mdash; gases, meaningful &Delta;P</h3>
+      <div class="formula-box">
+        <span class="eq">p&#8321;&sup2; &minus; p&#8322;&sup2; = f(L/D)(&#7745;/A)&sup2;RT</span>
+        <div class="meta">Combines the Darcy&ndash;Weisbach friction relation with the ideal gas law and continuity, integrated along the pipe assuming constant temperature (reasonable at the speeds involved here, since the tube has time to exchange heat with its surroundings). Needed once a gas's pressure drop stops being a small fraction of absolute pressure &mdash; which happens fast for anything straw-scale, since narrow tubes need real pressure to push meaningful airflow through them. This is what <code>straw-hose-flow-darcy.html</code> implements for air.
+          <div class="callout"><b>Known limit, not yet enforced in code:</b> isothermal pipe flow chokes at <span class="eq">Ma = 1/&radic;&gamma; &asymp; 0.845</span> for air (&gamma;=1.4) &mdash; not at Ma=1 like the more familiar adiabatic case. Past that point no isothermal solution exists for the given boundary pressures, and the equation above will still happily return a number (checked 2026-08-18: short length + wide diameter + max pressure on <code>straw-hose-flow-darcy.html</code> returns <b>Mach 1.49</b>, which is not a physically possible isothermal-flow result). The page currently only flags "Mach&nbsp;&ge;0.3 &mdash; use full Fanno flow," which undersells this: past 0.845 the number isn't just imprecise, it doesn't correspond to any real flow. <b>Open fix, pinned:</b> detect and flag choking at Ma&nbsp;&asymp;&nbsp;0.845 explicitly, rather than reporting a number past it.</div>
+        </div>
+      </div>
+
+      <h3>Fanno flow &mdash; adiabatic compressible, high Mach</h3>
+      <div class="formula-box">
+        <span class="eq">Not implemented on this site yet.</span>
+        <div class="meta">The correct model once flow is fast enough, or the tube well-enough insulated, that the isothermal assumption itself breaks down (heat can't be exchanged fast enough to hold temperature constant). Chokes at Ma=1, the more familiar sonic limit. Needed for the high-Mach corner of the straw/hose problem that isothermal flow can't reach a valid answer for &mdash; see the open item above. Reference: <a href="https://ntrs.nasa.gov/api/citations/20190033458/downloads/20190033458.pdf?attachment=true" target="_blank" rel="noopener">NASA Fanno flow notes</a>.</div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Applied on this site</h2>
+      <table>
+        <caption>Formula used per page, as of 2026-08-18</caption>
+        <thead>
+          <tr><th>Page</th><th>Fluid</th><th>Formula</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a href="visualizations/straw-hose-flow.html">straw-hose-flow.html</a></td>
+            <td>Honey, milkshake</td>
+            <td class="mono">Hagen&ndash;Poiseuille</td>
+            <td><span class="status ok">correct</span> &mdash; Re stays under 15 across the full slider range, never leaves laminar</td>
+          </tr>
+          <tr>
+            <td><a href="visualizations/straw-hose-flow.html">straw-hose-flow.html</a></td>
+            <td>Water</td>
+            <td class="mono">Darcy&ndash;Weisbach, blended f(Re)</td>
+            <td><span class="status ok">fixed 2026-08-18</span> &mdash; was pure Hagen&ndash;Poiseuille, silently extrapolated past Re&asymp;4,245 at the diameter slider's narrow end</td>
+          </tr>
+          <tr>
+            <td><a href="visualizations/straw-hose-flow.html">straw-hose-flow.html</a></td>
+            <td>Air</td>
+            <td class="mono">Hagen&ndash;Poiseuille</td>
+            <td><span class="status warn">known limitation</span> &mdash; incompressible model applied to a compressible gas; out of scope for that page by design, see the Darcy variant below</td>
+          </tr>
+          <tr>
+            <td><a href="visualizations/straw-hose-flow-darcy.html">straw-hose-flow-darcy.html</a></td>
+            <td>Air</td>
+            <td class="mono">Isothermal compressible</td>
+            <td><span class="status warn">open bug</span> &mdash; friction-factor blending is correct, but reports results past the Ma&asymp;0.845 isothermal choking limit without flagging it; experimental, not on the public homepage</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Reynolds number, for reference</h2>
+      <table>
+        <caption>Regime thresholds</caption>
+        <thead><tr><th>Regime</th><th class="mono">Re range</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>Laminar</td><td class="mono">Re &lesssim; 2,300</td><td>Smooth, layered flow. Hagen&ndash;Poiseuille is exact here.</td></tr>
+          <tr><td>Transitional</td><td class="mono">2,300 &ndash; 4,000</td><td>Intermittent, not cleanly predictable from Re alone. Treat any formula here as an approximation.</td></tr>
+          <tr><td>Turbulent</td><td class="mono">Re &gtrsim; 4,000</td><td>Chaotic, higher effective friction than the laminar formula would predict if naively extrapolated.</td></tr>
+        </tbody>
+      </table>
+      <p>Rule of thumb for this site: viscous liquids (honey, milkshake) stay laminar almost no matter what you do to them within reasonable slider ranges &mdash; their high viscosity keeps Re tiny. Water and air are the ones worth checking by hand whenever a slider range changes, since both can plausibly cross into turbulent (or, for air, compressible) territory within numbers a visitor would actually pick.</p>
+    </section>
+  </div>
+
+  <p class="note">Sources: <a href="https://en.wikipedia.org/wiki/Hagen%E2%80%93Poiseuille_equation" target="_blank" rel="noopener">Hagen&ndash;Poiseuille equation</a> &middot; <a href="https://en.wikipedia.org/wiki/Darcy%E2%80%93Weisbach_equation" target="_blank" rel="noopener">Darcy&ndash;Weisbach equation</a> &middot; <a href="https://en.wikipedia.org/wiki/Reynolds_number" target="_blank" rel="noopener">Reynolds number</a> &middot; <a href="https://nvlpubs.nist.gov/nistpubs/TechnicalNotes/NIST.TN.2294.pdf" target="_blank" rel="noopener">NIST TN 2294</a> (isothermal compressible pipe flow, cited on the Darcy variant page) &middot; <a href="https://ntrs.nasa.gov/api/citations/20190033458/downloads/20190033458.pdf?attachment=true" target="_blank" rel="noopener">NASA Fanno flow notes</a>. The isothermal choking limit (Ma=1/&radic;&gamma;) is standard compressible-flow theory, covered in the same NIST note and any introductory gas-dynamics text (e.g. Shapiro, <em>The Dynamics and Thermodynamics of Compressible Fluid Flow</em>).</p>
+
+  <div class="site-footer">
+    <span>Internal reference for this repo &mdash; see HANDOVER.md for the incident this came from.</span>
+    <span>Not a visualization: no equation slider, no single figure, not linked from the public homepage.</span>
+  </div>
+
+</div>
+</main>
+<script>
+(function(){
+  var STORAGE_KEY = 'index-theme';
+  var themeToggle = document.getElementById('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    var applied = document.documentElement.getAttribute('data-theme');
+    if(applied) return applied;
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+})();
+</script>
+</html>

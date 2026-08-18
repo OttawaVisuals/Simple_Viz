@@ -72,6 +72,21 @@ tool can pick up mid-stream without re-reading the whole chat history.
   optional, since the homepage is the reviewed-only source of truth. The icon `<symbol>`
   sprite at the top of the file was left untouched (all ~48 icons still defined, most just
   unused for now) since removing them was pure churn with no visible benefit.
+- **`pipe-flow-reference.html`** (root level, 2026-08-18) is a new internal reference doc —
+  not a visualization, not linked from `index.html`'s public grid, not in `tracker.html`.
+  Written after the water turbulent-flow fix above, as a working decision tree for which
+  pipe-flow formula applies (Hagen–Poiseuille vs. Darcy–Weisbach vs. isothermal compressible
+  vs. Fanno flow), with a live-status table of which formula each straw/hose page actually
+  uses today. It also **pins the open bug found the same day in
+  `straw-hose-flow-darcy.html`**: the isothermal compressible model chokes at
+  Ma=1/√γ≈0.845 for air, but the page reports results past that (confirmed Mach 1.49 at
+  short-length/wide-diameter/max-pressure) without flagging that the number is physically
+  invalid there, not just imprecise — the existing "Mach≥0.3, use Fanno flow" copy undersells
+  it. Simon deferred that fix for the day; **check `pipe-flow-reference.html`'s "Applied on
+  this site" table before starting on it**, since the exact repro and the fix approach
+  (detect/flag choking explicitly rather than reporting past it) are recorded there, not just
+  in chat history. Update that table's status column whenever a formula changes on either
+  straw/hose page, the same way this file's own per-page entries are kept current.
 - **`visualizations/straw-hose-flow-darcy.html`** is an experimental, not-yet-reviewed
   duplicate of the completed straw/hose page. It replaces the invalid fixed-flow
   Hagen&ndash;Poiseuille air calculation with a low-Mach compressible Darcy&ndash;Weisbach solver:

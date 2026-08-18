@@ -260,7 +260,7 @@
       <option value="Discoveries">Discoveries</option>
       <option value="Fun physics">Fun physics</option>
     </select>
-    <span class="results-count" id="resultsCount" aria-live="polite">44 pages</span>
+    <span class="results-count" id="resultsCount" aria-live="polite">45 pages</span>
   </div>
 
   <section class="group" aria-labelledby="cat-everyday">
@@ -314,7 +314,7 @@
   <section class="group" aria-labelledby="cat-fun">
     <div class="cat-head">
       <h2 id="cat-fun">Fun physics</h2>
-      <span class="cat-count">Fourteen pages</span>
+      <span class="cat-count">Fifteen pages</span>
     </div>
     <div class="grid">
       <a class="concept" href="visualizations/pendulum-period.html"><span class="meta">31 / Oscillation</span><h3>A swing keeps its own time</h3><p>Pull a pendulum back further and watch its rhythm barely change &mdash; until you push past the angle where that stops being true.</p></a>
@@ -331,6 +331,7 @@
       <a class="concept" href="visualizations/animal-biomass.html"><span class="meta">42 / Scale</span><h3>All animal life, by weight</h3><p>Stack humans, livestock, and every wild mammal on Earth by total weight, not headcount.</p></a>
       <a class="concept" href="visualizations/cosmic-scale.html"><span class="meta">43 / Scale</span><h3>Closer to the smallest thing, or the biggest?</h3><p>Slide from the Planck length to the observable universe on one logarithmic ruler and see where anything &mdash; including you &mdash; actually falls.</p></a>
       <a class="concept" href="visualizations/bounce-restitution.html"><span class="meta">44 / Collisions</span><h3>Count the bounces</h3><p>Drop a real ball onto a real surface and watch each rebound keep the same fraction of the last one's height &mdash; then turn on a balloon drum and keep counting after your eyes give up.</p></a>
+      <a class="concept" href="visualizations/straw-hose-flow-darcy.html"><span class="meta">49 / Fluid flow</span><h3>Why the straw gives up &mdash; airflow model</h3><p>Apply the same mouth pressure to a narrow straw and a wide hose, then compare the airflow each can actually deliver using compressible Darcy&ndash;Weisbach.</p></a>
     </div>
   </section>
 
@@ -368,13 +369,14 @@
   var SVG_NS = 'http://www.w3.org/2000/svg';
   document.querySelectorAll('.concept[href^="visualizations/"]').forEach(function(card){
     var slug = card.getAttribute('href').split('/').pop().replace(/\.html$/, '');
+    var iconSlug = slug === 'straw-hose-flow-darcy' ? 'straw-hose-flow' : slug;
     var icon = document.createElementNS(SVG_NS, 'svg');
     var use = document.createElementNS(SVG_NS, 'use');
     icon.setAttribute('class', 'concept-icon');
     icon.setAttribute('viewBox', '0 0 120 64');
     icon.setAttribute('aria-hidden', 'true');
     icon.setAttribute('focusable', 'false');
-    use.setAttribute('href', '#icon-' + slug);
+    use.setAttribute('href', '#icon-' + iconSlug);
     icon.appendChild(use);
     card.insertBefore(icon, card.firstChild);
   });

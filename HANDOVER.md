@@ -19,7 +19,7 @@ tool can pick up mid-stream without re-reading the whole chat history.
   Simon's request, the homepage's category grids (Everyday maths / Discoveries / Fun physics)
   were cut down to just the four currently-reviewed pages — `horizon-distance.html`,
   `earth-moon-race.html`, `straw-hose-flow.html`, `potato-trajectory.html` — removing the
-  other ~44 built-but-not-yet-reviewed pages' cards entirely (not commented out; they're
+  other ~45 built-but-not-yet-reviewed pages' cards entirely (not commented out; they're
   still fully built and still linked from `tracker.html`, just not surfaced on the public
   index until reviewed). Category counts, the results-count default text, and the topbar's
   "N equations" count were all updated to match. The Featured section (already only these
@@ -29,6 +29,14 @@ tool can pick up mid-stream without re-reading the whole chat history.
   optional, since the homepage is the reviewed-only source of truth. The icon `<symbol>`
   sprite at the top of the file was left untouched (all ~48 icons still defined, most just
   unused for now) since removing them was pure churn with no visible benefit.
+- **`visualizations/straw-hose-flow-darcy.html`** is an experimental, not-yet-reviewed
+  duplicate of the completed straw/hose page. It replaces the invalid fixed-flow
+  Hagen&ndash;Poiseuille air calculation with a low-Mach compressible Darcy&ndash;Weisbach solver:
+  mouth pressure is the input and achievable airflow is the output. It iterates the Darcy
+  friction factor from Reynolds number, reports flow regime/exit velocity/Mach number, and
+  flags Mach&nbsp;0.3+ combinations as requiring full Fanno flow. It is linked from
+  `unreviewed.html` as page 49 and tracked in `tracker.html`; do not add it to the reviewed
+  homepage until its model and presentation receive a fresh review.
 - **`visualizations/starlight-spectrum.html`** ("Starlight has a barcode") — new page 46,
   added to **Discoveries** on `index.html` and `tracker.html`. Built directly to the
   [STYLE_GUIDE.md](STYLE_GUIDE.md) skeleton, no earlier draft; picked from three pitched

@@ -47,7 +47,6 @@
   .eqn{display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);font-size:clamp(30px,4vw,46px);line-height:1;font-weight:300}
   .eqn .eq{color:var(--muted)}
   .eqn em{font-style:italic;font-weight:300;transition:color .2s}
-  .unit-calc{margin-top:12px;font:11px/1.6 ui-monospace,monospace;color:var(--muted2);white-space:nowrap}
 
   .legendbox{padding-top:2px;align-self:center}
   .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
@@ -85,13 +84,13 @@
   .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px}
   .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
   .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
-  .gauge{position:relative;height:56px;margin-top:16px;max-width:420px}
+  .gauge{position:relative;height:66px;margin-top:16px;max-width:420px}
   .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
   .gauge .reach{position:absolute;top:14px;height:10px;border-radius:2px;background:color-mix(in srgb, var(--accent) 16%, transparent);left:0}
   .gauge .tick{position:absolute;top:26px;width:1px;height:5px;background:var(--line2)}
   .gauge .ticklabel{position:absolute;top:33px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
   .gauge .limit{position:absolute;top:9px;height:20px;width:1px;background:var(--muted2)}
-  .gauge .limitlabel{position:absolute;top:0;white-space:nowrap;font:400 9px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted2)}
+  .gauge .limitlabel{position:absolute;top:47px;white-space:nowrap;font:400 9px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted2);transform:translateX(-50%)}
   .gauge .mark{position:absolute;top:12px;height:14px;width:3px;border-radius:2px;transition:left .12s linear,background .12s linear}
   .gauge .marklabel{position:absolute;top:-3px;white-space:nowrap;font:500 11px ui-monospace,monospace;transition:left .12s linear,color .12s linear}
 
@@ -154,7 +153,6 @@
         <em id="fTerm">f</em>
         <em id="dxTerm">&Delta;x</em>
       </div>
-      <div class="unit-calc" id="unitCalc"></div>
     </div>
 
     <div class="legendbox">
@@ -299,7 +297,7 @@
   var dimBase=$('dimBase'), dimLeftV=$('dimLeftV'), dimRightV=$('dimRightV');
   var sideDivider=$('sideDivider'), sideCavity=$('sideCavity'), chocolateLine=$('chocolateLine'), sideWave=$('sideWave'), sideGuides=$('sideGuides'), sideSpots=$('sideSpots');
   var lblCorner=$('lblCorner'), lblSpotA=$('lblSpotA'), lblSpotB=$('lblSpotB'), lblSpotC=$('lblSpotC'), lblBracket=$('lblBracket'), lblTrue=$('lblTrue');
-  var lblSide=$('lblSide'), lblSideMeasure=$('lblSideMeasure'), unitCalc=$('unitCalc');
+  var lblSide=$('lblSide'), lblSideMeasure=$('lblSideMeasure');
 
   // ---- hero geometry: viewBox width == measured CSS px width, so 1 unit = 1px ----
   function geom(w){
@@ -427,12 +425,9 @@
     dxLabel.style.color = activeColor('dx');
     cTerm.style.color = 'var(--fg)';
     fTerm.style.color = 'var(--fg)';
-    var spacingM=state.spacing/100, est=cEstimate(state.spacing);
-    unitCalc.textContent='2 × 2.45×10⁹ Hz × '+spacingM.toFixed(4)+' m = '+(est/1e8).toFixed(4)+'×10⁸ m/s';
-
     var rows = [
-      {sym:'f', name:'microwave frequency (fixed, nameplate)', val:'2.45 GHz', key:null},
-      {sym:'Δx', name:'measured spot spacing', val: state.spacing.toFixed(2)+' cm', key:'dx'},
+      {sym:'f', name:'microwave frequency (fixed, nameplate)', val:'2.45×10⁹ Hz', key:null},
+      {sym:'Δx', name:'measured spot spacing', val: (state.spacing/100).toFixed(4)+' m', key:'dx'},
       {sym:'c', name:'speed of light (estimated)', val: fmtNum(cEstimate(state.spacing))+' m/s', key:null}
     ];
     legendEl.innerHTML = '';

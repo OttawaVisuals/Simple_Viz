@@ -17,13 +17,14 @@ tool can pick up mid-stream without re-reading the whole chat history.
 
 - **`index.html` now only lists pages marked "reviewed and complete" in this file.** At
   Simon's request, the homepage's category grids (Everyday maths / Discoveries / Fun physics)
-  were cut down to just the four currently-reviewed pages — `horizon-distance.html`,
-  `earth-moon-race.html`, `straw-hose-flow.html`, `potato-trajectory.html` — removing the
+  were cut down to reviewed pages only. Five are currently reviewed: `horizon-distance.html`,
+  `earth-moon-race.html`, `eratosthenes-shadow.html`, `straw-hose-flow.html`, and
+  `potato-trajectory.html`. The initial change removed the
   other ~45 built-but-not-yet-reviewed pages' cards entirely (not commented out; they're
   still fully built and still linked from `tracker.html`, just not surfaced on the public
   index until reviewed). Category counts, the results-count default text, and the topbar's
   "N equations" count were all updated to match. The Featured section (already only these
-  same four minus horizon-distance) was left as-is. **When a page gets marked reviewed and
+  first three featured pages was left as-is. **When a page gets marked reviewed and
   complete going forward, add its card back to the relevant category grid in `index.html`**
   (copy the pattern from one of the four current cards) — this is now a required step, not
   optional, since the homepage is the reviewed-only source of truth. The icon `<symbol>`
@@ -459,20 +460,21 @@ knowing even though its specific UI is gone:
 
 ### `eratosthenes-shadow.html` — "Two sticks measure a planet"
 
-Built directly to the [STYLE_GUIDE.md](STYLE_GUIDE.md) skeleton (2026-08-14), no earlier
-draft. Implements Eratosthenes' method: `D = 360°·d/(π·Δθ)`, where `d` is the distance
-between two sticks on the same meridian and `Δθ` is the difference in shadow angle between
-them at solar noon.
+**Reviewed and complete as of 2026-08-18.** Added to the reviewed-only homepage and removed
+from `unreviewed.html` after the final interaction and diagram pass.
 
-- **Two sliders** (`d`: 100–2000 km, `Δθ`: 1–20°) drive the equation directly — both are
-  independent inputs, not one computed from the other, matching the "distance + angle in,
-  diameter out" shape of the real method. Standard hover-linkage into the equation/legend
-  terms, per the style guide.
+Built directly to the [STYLE_GUIDE.md](STYLE_GUIDE.md) skeleton (2026-08-14), no earlier
+draft. Implements Eratosthenes' circumference method: `C = 360°·d/Δθ`, with diameter
+reported as `D = C/π`. Here `d` is the distance between two sticks on the same meridian and
+`Δθ = |θ₂ − θ₁|` is the difference between their shadow angles at solar noon.
+
+- **Three sliders** drive the equation directly: distance (`d`: 100–2000 km) plus separate
+  stick angles (`θ₁` and `θ₂`: 0–20°). Equal angles are handled explicitly instead of
+  dividing by zero.
 - **Hero diagram, two panels in one SVG**: a small full-Earth globe inset (left) with the
-  current `Δθ` shown as a highlighted wedge, connected via dashed fan lines (reusing
-  earth-moon-race's magnifying-lens convention) into a larger schematic ground-level scene
-  (right) — two vertical sticks, parallel dashed sun-ray guides from directly overhead, and
-  a highlighted shadow on the second stick sized by `h·tan(Δθ)`. The zoomed panel is
+  current `Δθ` shown as a highlighted wedge beside a larger schematic ground-level scene
+  (right) — two vertical sticks, individual sun-ray guides and shadows, and a visibly curved
+  Earth surface. The zoomed panel is
   explicitly **not to scale** (labeled in-page) — stick spacing maps to `d` only
   proportionally within a fixed panel width, not literally, since real `d` values (100s–1000s
   of km) can't be drawn to true scale next to a stick a few centimeters tall.
@@ -498,6 +500,9 @@ them at solar noon.
 - No measurement-error model: the equation is exact for any `d`/`Δθ` input, so presets differ
   only by which real numbers they use, not by correctness. The note explains, without
   modeling it, why small baselines are harder in practice (angle measurement precision).
+- A field log lets visitors enter date/time, coordinates, and angle measurements. Entries
+  persist only in that browser's `localStorage`; a ShadeMap link supports testing locations
+  and times.
 
 ### Style migration sweep (2026-08-14): `gravity-lab.html`, `mass-energy.html`, `planet-light-delay.html`
 

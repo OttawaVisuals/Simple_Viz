@@ -43,7 +43,7 @@
   h1 em{font-style:italic;font-weight:300}
   .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
 
-  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqnbox{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:100%}
   .eqn{display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);font-size:clamp(28px,3.6vw,42px);line-height:1;font-weight:300}
   .eqn .eq{color:var(--muted)}
   .eqn .frac{display:inline-flex;flex-direction:column;align-items:center}
@@ -53,6 +53,8 @@
   .eqn .frac .bar{height:1.5px;background:var(--fg);width:100%}
   .eqn em{font-style:italic;font-weight:300;transition:color .2s}
   .eqn sup{font-size:.5em;position:relative;top:-.5em}
+  .eqn sub{font-size:.5em}
+  .subeqn{margin-top:10px;font:16px/1 ui-monospace,monospace;color:var(--muted2)}
 
   .legendbox{padding-top:2px;align-self:center}
   .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
@@ -77,6 +79,16 @@
   .pick-buttons button{cursor:pointer;font-family:Georgia,serif;font-style:italic;font-size:15px;padding:6px 13px 7px;border-radius:999px;transition:all .18s ease;border:1px solid var(--border);background:transparent;color:var(--muted)}
   .pick-buttons button:hover{color:var(--fg)}
   .pick-note{margin-top:11px;font-size:13.5px;line-height:1.45;color:var(--muted)}
+  .section-picker{margin-top:10px;display:grid;grid-template-columns:minmax(170px,230px) 1fr;gap:14px;align-items:center}
+  .section-picker svg{display:block;width:100%;height:auto;touch-action:none;user-select:none}
+  .section-picker .selector-bg{fill:color-mix(in srgb,var(--line) 30%,transparent)}
+  .section-picker .selector-grid{stroke:var(--line2);stroke-width:1;stroke-dasharray:2 4}
+  .section-picker .selector-rect{fill:color-mix(in srgb,var(--accent) 16%,transparent);stroke:var(--accent);stroke-width:1.5}
+  .section-picker .selector-handle{fill:var(--bg);stroke:var(--accent);stroke-width:2;cursor:nwse-resize}
+  .section-picker .selector-axis{fill:var(--muted);font:10px ui-monospace,monospace}
+  .section-readout{font:12px/1.6 ui-monospace,monospace;color:var(--muted2)}
+  .section-readout strong{display:block;color:var(--fg);font-size:20px;font-weight:400}
+  @media (max-width:520px){.section-picker{grid-template-columns:1fr}.section-picker svg{max-width:230px}}
   .readout{font-family:ui-monospace,monospace;font-size:clamp(26px,2.8vw,34px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
   .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
   .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
@@ -93,6 +105,8 @@
   .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px}
   .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
   .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
+  .stress-eqn{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font:15px/1.5 ui-monospace,monospace;color:var(--muted2)}
+  .stress-eqn .stress-value{color:var(--fg)}
   .gauge{position:relative;height:66px;margin-top:16px;max-width:420px}
   .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
   .gauge .reach{position:absolute;top:14px;height:10px;border-radius:2px 0 0 2px;background:color-mix(in srgb, var(--accent) 16%, transparent);left:0}
@@ -155,19 +169,20 @@
   <div class="topgrid">
     <div class="headleft">
       <h1>A shelf that <em>sags</em>.</h1>
-      <p class="sub">Load the middle of a plank and it bows &mdash; how much depends on the load, the span between supports, and the board's height <em style="font-style:italic">cubed</em>. Turn the same plank on its edge and that one term does almost all the work.</p>
+      <p class="sub">Move a load along a plank and reshape its cross-section. The beam bends according to where the force lands &mdash; until bending stress reaches the wood's design limit.</p>
     </div>
 
     <div class="eqnbox">
       <div class="eqn">
-        <span><em>&delta;</em></span>
+        <span><em>&delta;</em><sub>a</sub></span>
         <span class="eq">=</span>
         <span class="frac">
-          <span class="row num"><em id="pTerm">P</em><em id="lTerm">L</em><sup>3</sup></span>
+          <span class="row num"><em id="pTerm">P</em><em id="aTerm">a</em><sup>2</sup><span>(</span><em id="laTerm">L&minus;a</em><span>)</span><sup>2</sup></span>
           <span class="bar"></span>
-          <span class="row den"><span class="eq">4</span><em id="eTerm">E</em><em id="bTerm">b</em><em id="hTerm">h</em><sup>3</sup></span>
+          <span class="row den"><span class="eq">3</span><em id="eTerm">E</em><em id="iTerm">I</em><em id="lTerm">L</em></span>
         </span>
       </div>
+      <div class="subeqn"><em id="iSubTerm">I</em> = <em id="bTerm">b</em><em id="hTerm">h</em><sup>3</sup> / 12</div>
     </div>
 
     <div class="legendbox">
@@ -179,15 +194,20 @@
     <div class="lbl" id="lblBoard"></div>
     <div class="lbl" id="lblSag" style="font-weight:500"></div>
     <div class="lbl" id="lblMag" style="transform:translateX(-100%)"></div>
-    <svg id="heroSvg" role="img" aria-label="A plank resting on two supports, bowing under a weight placed at its centre; the amount of bow is shown magnified for visibility.">
+    <svg id="heroSvg" role="img" aria-label="A simply supported plank bowing under an off-centre point load. The curve changes with calculated deflection, and any region above the bending design stress is highlighted.">
       <line id="baseLine" stroke="var(--line2)" stroke-width="1" stroke-dasharray="3 4"></line>
       <path id="beamPath" fill="none" stroke-linecap="round"></path>
+      <path id="overstressPath" fill="none" stroke="var(--bad)" stroke-linecap="round"></path>
       <polygon id="supL" fill="var(--bg)" stroke="var(--line2)" stroke-width="1.25"></polygon>
       <polygon id="supR" fill="var(--bg)" stroke="var(--line2)" stroke-width="1.25"></polygon>
       <line id="groundL" stroke="var(--line2)" stroke-width="1"></line>
       <line id="groundR" stroke="var(--line2)" stroke-width="1"></line>
       <line id="loadLine" stroke="var(--fg)" stroke-width="1.5"></line>
       <polygon id="loadHead" fill="var(--fg)"></polygon>
+      <g id="breakMark" opacity="0">
+        <line id="breakA" stroke="var(--bad)" stroke-width="2"></line>
+        <line id="breakB" stroke="var(--bad)" stroke-width="2"></line>
+      </g>
     </svg>
   </div>
 
@@ -199,7 +219,7 @@
           <span class="ctrl-rel">P &prop; &delta;</span>
         </div>
         <div class="readout mono" id="loadReadout"></div>
-        <div class="track" id="loadTrack" tabindex="0" role="slider" aria-label="Load at centre span">
+        <div class="track" id="loadTrack" tabindex="0" role="slider" aria-label="Point load">
           <div class="rail"></div>
           <div class="fill" id="loadFill"></div>
           <div class="thumb" id="loadThumb"></div>
@@ -221,21 +241,45 @@
         <div class="track-range"><span>0.3 m</span><span class="mid">double L &middot; 8&times; the sag</span><span>2.4 m</span></div>
       </div>
 
-      <div class="ctrl" id="orientCtrl">
+      <div class="ctrl" id="positionCtrl">
         <div class="ctrl-head">
-          <span class="ctrl-title">Orientation <em id="hLabel">h</em></span>
-          <span class="ctrl-rel">h&#8315;&sup3; &prop; &delta;</span>
+          <span class="ctrl-title">Load position <em id="aLabel">a</em></span>
+          <span class="ctrl-rel">from left support</span>
         </div>
-        <div class="pick-buttons" id="orientButtons"></div>
-        <div class="pick-note" id="orientNote"></div>
+        <div class="readout mono" id="positionReadout"></div>
+        <div class="track" id="positionTrack" tabindex="0" role="slider" aria-label="Distance of load from left support">
+          <div class="rail"></div>
+          <div class="fill" id="positionFill"></div>
+          <div class="thumb" id="positionThumb"></div>
+        </div>
+        <div class="track-range"><span>5%</span><span class="mid">centre gives the most sag</span><span>95%</span></div>
+      </div>
+
+      <div class="ctrl" id="sectionCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Cross-section <em id="sectionLabel">b &times; h</em></span>
+          <span class="ctrl-rel">drag the corner</span>
+        </div>
+        <div class="section-picker">
+          <svg id="sectionSvg" viewBox="0 0 220 150" role="group" aria-label="Beam cross-section selector">
+            <rect class="selector-bg" x="20" y="10" width="190" height="120"></rect>
+            <path class="selector-grid" d="M20 40H210M20 70H210M20 100H210M67.5 10V130M115 10V130M162.5 10V130"></path>
+            <rect class="selector-rect" id="sectionRect"></rect>
+            <circle class="selector-handle" id="sectionHandle" r="9" tabindex="0" role="button" aria-label="Resize beam cross-section; arrow keys adjust width and height"></circle>
+            <text class="selector-axis" x="115" y="145" text-anchor="middle">width b</text>
+            <text class="selector-axis" x="8" y="70" text-anchor="middle" transform="rotate(-90 8 70)">height h</text>
+          </svg>
+          <div class="section-readout"><strong id="sectionReadout"></strong><span id="sectionHint">20&ndash;200 mm each</span></div>
+        </div>
       </div>
     </div>
 
     <div class="result">
-      <div class="result-label">Sag at centre</div>
+      <div class="result-label">Deflection under the load</div>
       <div class="result-value"><span class="num mono" id="sagValue"></span><span class="unit mono">mm</span><span class="v" id="verdict"></span></div>
       <div class="verdict-sub" id="verdictSub"></div>
       <div class="effort-line" id="effortLine"></div>
+      <div class="stress-eqn"><span><em>M</em><sub>max</sub> = <em>Pa</em>(<em>L</em>&minus;<em>a</em>)/<em>L</em></span><br><span>&sigma;<sub>max</sub> = 6<em>M</em><sub>max</sub> / (<em>b</em><em>h</em>&sup2;)</span><br><span class="stress-value" id="stressValue"></span></div>
       <div class="gauge" id="gauge">
         <div class="track"></div>
         <div class="reach" id="gReach"></div>
@@ -254,11 +298,11 @@
     <span class="presets-title">Try</span>
     <button class="preset" data-p="empty">empty shelf</button>
     <button class="preset" data-p="books">a full bookshelf</button>
-    <button class="preset" data-p="edge">turned on edge</button>
+    <button class="preset" data-p="edge">tall and narrow</button>
     <button class="preset" data-p="long">the long span</button>
   </div>
 
-  <p class="note">For a simply supported beam with a load at its centre, <a href="https://en.wikipedia.org/wiki/Deflection_(engineering)" target="_blank" rel="noopener">beam deflection theory</a> gives &delta; = PL&sup3;/(48EI), where I = bh&sup3;/12 is the cross-section's second moment of area &mdash; substituting that in leaves &delta; = PL&sup3;/(4Ebh&sup3;), which is the form shown above so the h&sup3; is visible directly rather than hidden inside I. The board is a standard "2&times;6" stud, actual dimensions 38&times;140&nbsp;mm, in spruce&ndash;pine&ndash;fir framing lumber (E&nbsp;=&nbsp;9.65&nbsp;GPa, the No.&nbsp;2 grade design value). Turning it on edge swaps which dimension is h and which is b, making it about 13.6&times; stiffer &mdash; not because the wood changed, but because the equation's cubed term did. The gauge's limit line is L/360, a deflection commonly used in building codes as a serviceability limit for many spans. Only elastic bending is modelled: at the sliders' extreme corner (longest span, heaviest load, flat) the formula predicts several centimetres of sag, but a real board that thin would almost certainly crack or fail outright long before bending that far &mdash; the equation doesn't know that, so treat results far past the limit line as "this shape is a bad idea," not a literal prediction.</p>
+  <p class="note">For a simply supported beam with a point load <em>P</em> placed <em>a</em> metres from the left support, Euler&ndash;Bernoulli beam theory gives the deflection under that load as &delta;<sub>a</sub> = Pa&sup2;(L&minus;a)&sup2;/(3EIL). The drawn curve uses the corresponding piecewise equation along the whole span, not a fixed bow shape. For a rectangular section, I = bh&sup3;/12. The material is representative No.&nbsp;2 spruce&ndash;pine&ndash;fir: E&nbsp;=&nbsp;8.27&nbsp;GPa and reference bending value F<sub>b</sub>&nbsp;=&nbsp;6.03&nbsp;MPa (1.2&times;10<sup>6</sup> and 875&nbsp;psi). The red region begins where &sigma; = Mc/I exceeds F<sub>b</sub>; this is a conservative design threshold, not a prediction of the exact crack load. Real lumber strength varies with grade, knots, moisture, load duration, size, and restraint, and design requires the applicable adjustment factors. The L/360 line is a serviceability comparison for visible sag. Sag is shown at a fixed 12&times; magnification, capped after failure so extreme elastic predictions do not run off the diagram. Sources: <a href="https://citeseerx.ist.psu.edu/document?doi=178c22651b27fa123c2d2b0b41850a022e8efe65&repid=rep1&type=pdf" target="_blank" rel="noopener">beam equations</a> and the <a href="https://awc.org/resources/2024-nds-supplement/" target="_blank" rel="noopener">American Wood Council NDS Supplement</a>.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -294,16 +338,13 @@
 <script>
 (function(){
   // ---- real constants ----
-  var A_MM = 140, C_MM = 38;           // fixed board cross-section: actual "2x6" SPF stud dims
-  var E_PA = 9.65e9;                   // SPF No.2 design value, ~1.4 million psi
+  var E_PA = 8.27e9;                   // 1.2 million psi, representative No.2 SPF
+  var FB_PA = 6.03e6;                  // 875 psi reference bending value
   var G = 9.81;
   var LMIN=0.3, LMAX=2.4, PMIN=5, PMAX=100;
+  var BMIN=20, BMAX=200, HMIN=20, HMAX=200;
   var LIMIT_DIV = 360;                 // deflection limit = span / 360
-
-  var ORIENT = [
-    {key:'flat', name:'Flat', b:A_MM, h:C_MM, note:'The way you’d actually lay a shelf board &mdash; and the weak way round.'},
-    {key:'edge', name:'On edge', b:C_MM, h:A_MM, note:'The way joists are always installed. Same wood, same weight, far less sag.'}
-  ];
+  var SAG_MAG = 12;
 
   function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
   function ratioTxt(x){
@@ -322,33 +363,37 @@
   var NS='http://www.w3.org/2000/svg';
   function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
 
-  var state = { L:1.2, P:30, orient:0, active:null, drag:null, ghostD:null };
+  var state = { L:1.2, P:30, aFrac:0.5, b:140, h:38, active:null, drag:null, ghostD:null };
   var heroW = 0;
 
   var $ = function(id){ return document.getElementById(id); };
   var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
-  var baseLine=$('baseLine'), beamPath=$('beamPath');
+  var baseLine=$('baseLine'), beamPath=$('beamPath'), overstressPath=$('overstressPath');
   var supL=$('supL'), supR=$('supR'), groundL=$('groundL'), groundR=$('groundR');
   var loadLine=$('loadLine'), loadHead=$('loadHead');
+  var breakMark=$('breakMark'), breakA=$('breakA'), breakB=$('breakB');
   var lblBoard=$('lblBoard'), lblSag=$('lblSag'), lblMag=$('lblMag');
 
-  function orient(){ return ORIENT[state.orient]; }
   function I_mm4(b,h){ return b*Math.pow(h,3)/12; }
-  function deflectionFor(L,Pkg,b,h){
-    var I = I_mm4(b,h)/1e12;             // mm^4 -> m^4
-    var Pn = Pkg*G;
-    return Pn*Math.pow(L,3)/(48*E_PA*I); // metres
+  function I_m4(){ return I_mm4(state.b,state.h)/1e12; }
+  function loadA(){ return state.L*state.aFrac; }
+  function deflectionUnderLoad(){
+    var a=loadA(), right=state.L-a, Pn=state.P*G;
+    return Pn*a*a*right*right/(3*E_PA*I_m4()*state.L);
   }
-  function deflectionAt(xFrac,L,dMax){
-    // Standard shape for a centre point load on a simply supported beam,
-    // normalised so the peak equals dMax at x = L/2 and it returns to 0 at both ends.
-    var x = xFrac<=0.5 ? xFrac*L : (1-xFrac)*L;
-    var half = L/2;
-    var shapePeak = half*(3*L*L - 4*half*half); // = L^3/2, the value of x(3L^2-4x^2) at x=L/2
-    var shape = x*(3*L*L - 4*x*x);
-    return dMax * (shape/shapePeak);
+  function deflectionAt(x){
+    var L=state.L, a=loadA(), right=L-a, Pn=state.P*G, EI=E_PA*I_m4();
+    if(x<=a) return Pn*right*x*(L*L-right*right-x*x)/(6*L*EI);
+    var z=L-x;
+    return Pn*a*z*(L*L-a*a-z*z)/(6*L*EI);
   }
-  function deflection(){ var o=orient(); return deflectionFor(state.L, state.P, o.b, o.h); }
+  function momentAt(x){
+    var a=loadA(), right=state.L-a, Pn=state.P*G;
+    return x<=a ? Pn*right*x/state.L : Pn*a*(state.L-x)/state.L;
+  }
+  function stressAt(x){ return momentAt(x)*(state.h/2000)/I_m4(); }
+  function maxStress(){ return stressAt(loadA()); }
+  function deflection(){ return deflectionUnderLoad(); }
   function limit(){ return state.L/LIMIT_DIV; }
 
   // ---- hero geometry: viewBox width == measured CSS px width, so 1 unit = 1px ----
@@ -358,31 +403,29 @@
     var pxPerM = spanAvail/LMAX;
     var startX = PAD, spanPx = state.L*pxPerM, endX = startX+spanPx;
     var Y0 = 96, vbH = 224;
-    var o = orient();
-    var hPx = clamp(o.h*(pxPerM/1000), 3, 46);
-
-    var dMax = deflection();
-    // The sag is exaggerated for visibility (real values run micrometres to centimetres against
-    // a metre-scale span) but the multiplier is recomputed from the current dMax so the visible
-    // amount stays roughly constant across the whole slider range — only its true size, printed
-    // beside it, tells you how big it really is.
-    var desiredPx = 34;
-    var magPxPerM = dMax>1e-7 ? Math.min(desiredPx/dMax, 4e6) : 0;
-    var magX = pxPerM>0 ? magPxPerM/pxPerM : 0;
-
-    var N=28, pts=[];
+    var hPx = clamp(state.h*(pxPerM/1000), 3, 46);
+    var dLoad = deflection();
+    var magPxPerM = pxPerM*SAG_MAG;
+    var maxSagPx = 92;
+    var N=64, pts=[], failD='', wasFail=false, trueMax=0;
     for(var i=0;i<=N;i++){
       var f = i/N;
-      var d = deflectionAt(f, state.L, dMax);
-      pts.push([ (startX+f*spanPx).toFixed(2), (Y0 + d*magPxPerM).toFixed(2) ]);
+      var x=f*state.L, d=deflectionAt(x);
+      trueMax=Math.max(trueMax,d);
+      var px=(startX+f*spanPx).toFixed(2), py=(Y0+Math.min(d*magPxPerM,maxSagPx)).toFixed(2);
+      pts.push([px,py]);
+      var failed=stressAt(x)>=FB_PA;
+      if(failed) failD+=(wasFail?'L':'M')+px+','+py;
+      wasFail=failed;
     }
     var pathD = 'M'+pts.map(function(p){ return p[0]+','+p[1]; }).join('L');
-    var midDeflPx = deflectionAt(0.5, state.L, dMax)*magPxPerM;
+    var loadX=startX+state.aFrac*spanPx;
+    var loadDeflPx=Math.min(dLoad*magPxPerM,maxSagPx);
 
     return {
       w:w, vbH:vbH, startX:startX, endX:endX, spanPx:spanPx, pxPerM:pxPerM, Y0:Y0,
-      hPx:hPx, pathD:pathD, midX:startX+spanPx/2, midDeflPx:midDeflPx, magX:magX,
-      dMax:dMax, o:o
+      hPx:hPx, pathD:pathD, failD:failD, loadX:loadX, loadDeflPx:loadDeflPx,
+      dLoad:dLoad, capped:trueMax*magPxPerM>maxSagPx
     };
   }
 
@@ -398,6 +441,8 @@
     beamPath.setAttribute('d', h.pathD);
     beamPath.setAttribute('stroke', 'var(--fg)');
     beamPath.setAttribute('stroke-width', h.hPx);
+    overstressPath.setAttribute('d', h.failD);
+    overstressPath.setAttribute('stroke-width', h.hPx+1);
 
     var supW = 9, supH = 16;
     supL.setAttribute('points', (h.startX-supW)+','+(h.Y0+supH)+' '+(h.startX+supW)+','+(h.Y0+supH)+' '+h.startX+','+h.Y0);
@@ -407,42 +452,50 @@
     groundR.setAttribute('x1', h.endX-14); groundR.setAttribute('x2', h.endX+14);
     groundR.setAttribute('y1', h.Y0+supH); groundR.setAttribute('y2', h.Y0+supH);
 
-    var armTop = h.Y0-44, armBot = h.Y0+h.midDeflPx-2;
-    loadLine.setAttribute('x1', h.midX); loadLine.setAttribute('x2', h.midX);
+    var armTop = h.Y0-44, armBot = h.Y0+h.loadDeflPx-2;
+    loadLine.setAttribute('x1', h.loadX); loadLine.setAttribute('x2', h.loadX);
     loadLine.setAttribute('y1', armTop); loadLine.setAttribute('y2', armBot);
     var ah=7;
-    loadHead.setAttribute('points', (h.midX-ah/2)+','+(armBot-ah)+' '+(h.midX+ah/2)+','+(armBot-ah)+' '+h.midX+','+armBot);
+    loadHead.setAttribute('points', (h.loadX-ah/2)+','+(armBot-ah)+' '+(h.loadX+ah/2)+','+(armBot-ah)+' '+h.loadX+','+armBot);
+    var broken=maxStress()>=FB_PA, bx=h.loadX, by=h.Y0+h.loadDeflPx;
+    breakMark.setAttribute('opacity',broken?'1':'0');
+    breakA.setAttribute('x1',bx-7);breakA.setAttribute('y1',by-7);breakA.setAttribute('x2',bx+7);breakA.setAttribute('y2',by+7);
+    breakB.setAttribute('x1',bx+7);breakB.setAttribute('y1',by-7);breakB.setAttribute('x2',bx-7);breakB.setAttribute('y2',by+7);
 
     var px = function(x){ return (x/w*100)+'%'; };
     var py = function(y){ return (y/h.vbH*100)+'%'; };
     lblBoard.style.left = px(h.startX); lblBoard.style.top = py(h.Y0-58);
-    lblBoard.textContent = h.o.b+' × '+h.o.h+' mm · '+h.o.name.toLowerCase();
-    lblSag.style.left = px(h.midX+12); lblSag.style.top = py(h.Y0+h.midDeflPx-7);
-    lblSag.textContent = fmtMM(h.dMax)+' mm';
+    lblBoard.textContent = state.b+' × '+state.h+' mm cross-section';
+    lblSag.style.left = px(h.loadX+12); lblSag.style.top = py(h.Y0+h.loadDeflPx-7);
+    lblSag.textContent = fmtMM(h.dLoad)+' mm'+(broken?' · limit exceeded':'');
     lblMag.style.left = px(h.endX); lblMag.style.top = py(h.vbH-16);
-    lblMag.textContent = 'sag shown magnified ~'+ratioTxt(h.magX)+' for visibility';
+    lblMag.textContent = 'sag shown '+SAG_MAG+'×'+(h.capped?' · capped after failure':'');
   }
 
   // ---- equation + legend colouring ----
   var accent = 'var(--accent)';
-  var pTerm=$('pTerm'), lTerm=$('lTerm'), bTerm=$('bTerm'), hTerm=$('hTerm');
-  var pLabel=$('pLabel'), lLabel=$('lLabel'), hLabel=$('hLabel');
+  var pTerm=$('pTerm'), lTerm=$('lTerm'), aTerm=$('aTerm'), laTerm=$('laTerm');
+  var iTerm=$('iTerm'), iSubTerm=$('iSubTerm'), bTerm=$('bTerm'), hTerm=$('hTerm');
+  var pLabel=$('pLabel'), lLabel=$('lLabel'), aLabel=$('aLabel'), sectionLabel=$('sectionLabel');
   var legendEl = $('legend');
 
   function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
 
   function drawEquationAndLegend(){
     pTerm.style.color = activeColor('P'); lTerm.style.color = activeColor('L');
-    bTerm.style.color = activeColor('orient'); hTerm.style.color = activeColor('orient');
-    pLabel.style.color = activeColor('P'); lLabel.style.color = activeColor('L'); hLabel.style.color = activeColor('orient');
+    aTerm.style.color=activeColor('aFrac');laTerm.style.color=state.active==='aFrac'||state.active==='L'?accent:'var(--fg)';
+    iTerm.style.color=activeColor('section');iSubTerm.style.color=activeColor('section');
+    bTerm.style.color = activeColor('section'); hTerm.style.color = activeColor('section');
+    pLabel.style.color = activeColor('P'); lLabel.style.color = activeColor('L'); aLabel.style.color=activeColor('aFrac'); sectionLabel.style.color=activeColor('section');
 
-    var o = orient();
+    var a=loadA();
     var rows = [
-      {sym:'P', name:'load at centre span', val:state.P+' kg', key:'P'},
+      {sym:'P', name:'point load', val:state.P+' kg', key:'P'},
+      {sym:'a', name:'distance from left support', val:a.toFixed(2)+' m', key:'aFrac'},
       {sym:'L', name:'span between supports', val:state.L.toFixed(2)+' m', key:'L'},
-      {sym:'E', name:'modulus, SPF framing lumber', val:'9.65 GPa', key:null},
-      {sym:'b', name:'board width (across the page)', val:o.b+' mm', key:'orient'},
-      {sym:'h', name:'board height (bending direction)', val:o.h+' mm', key:'orient'}
+      {sym:'E', name:'modulus, No. 2 SPF', val:'8.27 GPa', key:null},
+      {sym:'b×h', name:'rectangular cross-section', val:state.b+'×'+state.h+' mm', key:'section'},
+      {sym:'I', name:'second moment of area', val:(I_mm4(state.b,state.h)/1e6).toFixed(2)+'×10⁶ mm⁴', key:'section'}
     ];
     legendEl.innerHTML = '';
     rows.forEach(function(row){
@@ -456,23 +509,34 @@
     });
   }
 
-  // ---- orientation picker ----
-  var orientButtons = $('orientButtons'), orientNote=$('orientNote');
-  ORIENT.forEach(function(o,i){
-    var b = document.createElement('button');
-    b.textContent = o.name;
-    b.addEventListener('click', function(){ state.orient=i; state.active='orient'; render(); });
-    b.addEventListener('pointerenter', function(){ state.active='orient'; render(); });
-    orientButtons.appendChild(b);
+  // ---- draggable rectangular cross-section ----
+  var sectionSvg=$('sectionSvg'), sectionRect=$('sectionRect'), sectionHandle=$('sectionHandle');
+  function sectionPoint(){
+    return {x:20+(state.b-BMIN)/(BMAX-BMIN)*190,y:130-(state.h-HMIN)/(HMAX-HMIN)*120};
+  }
+  function setSectionFromPointer(clientX,clientY){
+    var r=sectionSvg.getBoundingClientRect();
+    var x=(clientX-r.left)/r.width*220, y=(clientY-r.top)/r.height*150;
+    state.b=clamp(Math.round((BMIN+clamp((x-20)/190,0,1)*(BMAX-BMIN))/2)*2,BMIN,BMAX);
+    state.h=clamp(Math.round((HMIN+clamp((130-y)/120,0,1)*(HMAX-HMIN))/2)*2,HMIN,HMAX);
+    state.active='section';render();
+  }
+  var sectionDragging=false;
+  sectionSvg.addEventListener('pointerdown',function(e){sectionDragging=true;state.drag='section';state.ghostD=deflection();if(sectionSvg.setPointerCapture)sectionSvg.setPointerCapture(e.pointerId);setSectionFromPointer(e.clientX,e.clientY);});
+  sectionSvg.addEventListener('pointermove',function(e){if(sectionDragging)setSectionFromPointer(e.clientX,e.clientY);});
+  function endSectionDrag(){if(sectionDragging){sectionDragging=false;state.drag=null;render();}}
+  sectionSvg.addEventListener('pointerup',endSectionDrag);sectionSvg.addEventListener('pointercancel',endSectionDrag);
+  sectionHandle.addEventListener('keydown',function(e){
+    var step=e.shiftKey?10:2, handled=true;
+    if(e.key==='ArrowLeft')state.b-=step;else if(e.key==='ArrowRight')state.b+=step;else if(e.key==='ArrowDown')state.h-=step;else if(e.key==='ArrowUp')state.h+=step;else handled=false;
+    if(handled){e.preventDefault();state.b=clamp(state.b,BMIN,BMAX);state.h=clamp(state.h,HMIN,HMAX);state.active='section';render();}
   });
-  function drawOrientButtons(){
-    Array.prototype.forEach.call(orientButtons.children, function(b,i){
-      var active = i===state.orient;
-      b.style.background = active ? 'color-mix(in srgb, var(--accent) 16%, var(--bg))' : 'transparent';
-      b.style.borderColor = active ? 'var(--accent)' : 'var(--border)';
-      b.style.color = active ? 'var(--fg)' : 'var(--muted)';
-    });
-    orientNote.innerHTML = orient().note;
+  function drawSection(){
+    var p=sectionPoint();
+    sectionRect.setAttribute('x',20);sectionRect.setAttribute('y',p.y);sectionRect.setAttribute('width',p.x-20);sectionRect.setAttribute('height',130-p.y);
+    sectionHandle.setAttribute('cx',p.x);sectionHandle.setAttribute('cy',p.y);
+    sectionHandle.setAttribute('aria-valuetext',state.b+' millimetres wide by '+state.h+' millimetres high');
+    $('sectionReadout').textContent=state.b+' × '+state.h+' mm';
   }
 
   // ---- sliders ----
@@ -483,8 +547,9 @@
       var f = clamp((x-r.left)/r.width, 0, 1);
       var v = lo + f*(hi-lo);
       if(key==='L') v = clamp(Math.round(v*100)/100, lo, hi);
+      else if(key==='aFrac') v = clamp(Math.round(v*100)/100, lo, hi);
       else v = clamp(Math.round(v), lo, hi);
-      if(key==='L') state.L = v; else state.P = v;
+      state[key] = v;
       render();
     }
     track.addEventListener('pointerdown', function(e){
@@ -499,8 +564,8 @@
     track.addEventListener('pointercancel', endDrag);
     track.addEventListener('pointerenter', function(){ state.active = key; render(); });
     track.addEventListener('keydown', function(e){
-      var step = key==='L' ? (e.shiftKey?0.5:0.1) : (e.shiftKey?10:1);
-      var cur = key==='L' ? state.L : state.P;
+      var step = key==='L' ? (e.shiftKey?0.5:0.1) : key==='aFrac' ? (e.shiftKey?0.1:0.01) : (e.shiftKey?10:1);
+      var cur = state[key];
       var v = null;
       if(e.key==='ArrowLeft'||e.key==='ArrowDown') v = cur-step;
       else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = cur+step;
@@ -508,32 +573,33 @@
       else if(e.key==='End') v = hi;
       if(v!==null){
         e.preventDefault();
-        v = key==='L' ? clamp(Math.round(v*100)/100, lo, hi) : clamp(Math.round(v), lo, hi);
-        if(key==='L') state.L=v; else state.P=v;
+        v = key==='L'||key==='aFrac' ? clamp(Math.round(v*100)/100, lo, hi) : clamp(Math.round(v), lo, hi);
+        state[key]=v;
         render();
       }
     });
     return {
       draw: function(){
-        var cur = key==='L' ? state.L : state.P;
+        var cur = state[key];
         var pct = ((cur-lo)/(hi-lo)*100).toFixed(2)+'%';
         fill.style.width = pct; thumb.style.left = pct;
         track.setAttribute('aria-valuemin', lo);
         track.setAttribute('aria-valuemax', hi);
         track.setAttribute('aria-valuenow', cur);
-        track.setAttribute('aria-valuetext', key==='L' ? cur.toFixed(2)+' metres' : cur.toFixed(0)+' kilograms');
+        track.setAttribute('aria-valuetext', key==='L' ? cur.toFixed(2)+' metres' : key==='aFrac' ? loadA().toFixed(2)+' metres from the left support' : cur.toFixed(0)+' kilograms');
       }
     };
   }
   var spanSlider = makeSlider('L', $('spanTrack'), $('spanFill'), $('spanThumb'), LMIN, LMAX);
   var loadSlider = makeSlider('P', $('loadTrack'), $('loadFill'), $('loadThumb'), PMIN, PMAX);
+  var positionSlider = makeSlider('aFrac', $('positionTrack'), $('positionFill'), $('positionThumb'), 0.05, 0.95);
 
-  [$('loadCtrl'), $('spanCtrl'), $('orientCtrl')].forEach(function(box){
+  [$('loadCtrl'), $('spanCtrl'), $('positionCtrl'), $('sectionCtrl')].forEach(function(box){
     box.addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
   });
 
   // ---- result box ----
-  var sagValueEl=$('sagValue'), verdictEl=$('verdict'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+  var sagValueEl=$('sagValue'), verdictEl=$('verdict'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine'), stressValueEl=$('stressValue');
   var gReach=$('gReach'), gLimit=$('gLimit'), gLimitLabel=$('gLimitLabel'), gGhost=$('gGhost'), gMark=$('gMark'), gMarkLabel=$('gMarkLabel');
   var gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
   var GMAXPCT = 200;
@@ -543,22 +609,26 @@
   function drawResult(){
     var d = deflection(), lim = limit();
     var pct = lim>0 ? (d/lim*100) : 0;
-    var over = d > lim;
+    var over = d > lim, stress=maxStress(), broken=stress>=FB_PA;
     var RED = 'var(--bad)';
-    var resultColor = over ? RED : 'var(--fg)';
+    var resultColor = over||broken ? RED : 'var(--fg)';
 
     sagValueEl.textContent = fmtMM(d);
     sagValueEl.style.color = resultColor;
 
-    verdictEl.textContent = over ? 'Sags too much.' : 'Within limit.';
+    verdictEl.textContent = broken ? 'Bending limit exceeded.' : over ? 'Sags too much.' : 'Within limits.';
     verdictEl.style.color = resultColor;
-    verdictSubEl.textContent = over
+    verdictSubEl.textContent = broken
+      ? 'The red beam region is above the 6.03 MPa reference bending value.'
+      : over
       ? 'Past the L/360 line most building codes use for a stiff-feeling span.'
-      : 'A serviceable amount of bow for this span.';
+      : 'Below both the serviceability and bending-stress comparisons.';
 
     effortLineEl.textContent = pct>=1000
       ? (pct/100).toFixed(0)+'× the code limit'
       : Math.max(1,Math.round(pct))+'% of the code limit';
+    stressValueEl.textContent='σmax = '+(stress/1e6).toFixed(2)+' MPa · '+Math.round(stress/FB_PA*100)+'% of 6.03 MPa';
+    stressValueEl.style.color=broken?RED:'var(--fg)';
 
     var markPct = pos(pct), limitPct = pos(100);
     gReach.style.width = limitPct.toFixed(2)+'%';
@@ -595,15 +665,15 @@
 
   // ---- presets ----
   var PRESETS = {
-    empty: {L:1.2, P:8,  o:0},
-    books: {L:1.2, P:60, o:0},
-    edge:  {L:1.2, P:60, o:1},
-    long:  {L:2.4, P:100, o:0}
+    empty: {L:1.2, P:8,  a:0.5, b:140, h:38},
+    books: {L:1.2, P:60, a:0.5, b:140, h:38},
+    edge:  {L:1.2, P:60, a:0.5, b:38, h:140},
+    long:  {L:2.4, P:100,a:0.7, b:140, h:38}
   };
   document.querySelectorAll('.preset').forEach(function(b){
     b.addEventListener('click', function(){
       var p = PRESETS[b.dataset.p];
-      state.L=p.L; state.P=p.P; state.orient=p.o;
+      state.L=p.L; state.P=p.P; state.aFrac=p.a; state.b=p.b; state.h=p.h;
       render();
     });
   });
@@ -654,10 +724,11 @@
   function render(){
     drawHero();
     drawEquationAndLegend();
-    drawOrientButtons();
-    spanSlider.draw(); loadSlider.draw();
+    drawSection();
+    spanSlider.draw(); loadSlider.draw(); positionSlider.draw();
     $('loadReadout').textContent = state.P+' kg';
     $('spanReadout').textContent = state.L.toFixed(2)+' m';
+    $('positionReadout').textContent = loadA().toFixed(2)+' m';
     drawResult();
   }
 

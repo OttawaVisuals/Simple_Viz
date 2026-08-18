@@ -197,8 +197,6 @@
       <path id="globeWedge" fill="var(--accent)" opacity="0.22" stroke="none"></path>
       <circle id="globeDot1" r="2.5" fill="var(--fg)"></circle>
       <circle id="globeDot2" r="2.5" fill="var(--accent)"></circle>
-      <line id="fan1" stroke="var(--line2)" stroke-width="1" stroke-dasharray="2 4"></line>
-      <line id="fan2" stroke="var(--line2)" stroke-width="1" stroke-dasharray="2 4"></line>
       <path id="earthFill" fill="color-mix(in srgb, var(--accent) 5%, transparent)" stroke="none"></path>
       <path id="groundLine" fill="none" stroke="var(--line2)" stroke-width="1.5"></path>
       <line id="ray1" stroke="var(--muted)" stroke-width="1.25" stroke-dasharray="3 4"></line>
@@ -362,7 +360,6 @@
   var $ = function(id){ return document.getElementById(id); };
   var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
   var globeCircle=$('globeCircle'), globeWedge=$('globeWedge'), globeDot1=$('globeDot1'), globeDot2=$('globeDot2');
-  var fan1=$('fan1'), fan2=$('fan2');
   var earthFill=$('earthFill'), groundLine=$('groundLine');
   var ray1=$('ray1'), rayVertGuide1=$('rayVertGuide1'), angleArc1=$('angleArc1'), stick1=$('stick1'), shadow1=$('shadow1'), base1=$('base1');
   var ray2=$('ray2'), rayVertGuide2=$('rayVertGuide2'), angleArc=$('angleArc'), stick2=$('stick2'), shadow2=$('shadow2'), base2=$('base2');
@@ -410,13 +407,6 @@
     globeWedge.setAttribute('d', 'M '+g.globeCx+' '+g.globeCy+' L '+p1.x+' '+p1.y+' A '+g.globeR+' '+g.globeR+' 0 '+largeArc+' 1 '+p2.x+' '+p2.y+' Z');
     globeDot1.setAttribute('cx', p1.x); globeDot1.setAttribute('cy', p1.y);
     globeDot2.setAttribute('cx', p2.x); globeDot2.setAttribute('cy', p2.y);
-
-    var fanTopY = g.groundY - g.stickH - (g.narrow?34:44);
-    var fanBotY = g.groundY + 14;
-    fan1.setAttribute('x1', g.globeCx+g.globeR*0.75); fan1.setAttribute('y1', g.globeCy-g.globeR*0.6);
-    fan1.setAttribute('x2', g.panelStartX); fan1.setAttribute('y2', fanTopY);
-    fan2.setAttribute('x1', g.globeCx+g.globeR*0.75); fan2.setAttribute('y1', g.globeCy+g.globeR*0.5);
-    fan2.setAttribute('x2', g.panelStartX); fan2.setAttribute('y2', fanBotY);
 
     // Exaggerated Earth arc. The small globe gives the true angular relationship.
     var curveDepth = g.narrow ? 20 : 26;

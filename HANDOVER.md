@@ -13,7 +13,37 @@ tool can pick up mid-stream without re-reading the whole chat history.
   filtering) with a "not a secure connection" warning — that's a corporate network/proxy
   issue on his end, not a site or Cloudflare cert problem; nothing to action here.
 
-## Current handoff — 2026-08-17
+## Current handoff — 2026-08-18
+
+- **`visualizations/braking-distance.html` received a full review and interaction pass today**
+  across commits `5907b00`, `6e54faf`, and `cea829c` (all pushed to `main`). Final page state:
+  - The title correctly says **braking distance**, since reaction distance grows linearly with
+    speed and total stopping distance therefore does not simply quadruple when speed doubles.
+  - Controls are a compact laptop 2×2 grid: speed + surface on the first row,
+    perception–reaction time + vehicle mass on the second. The 0.2–2.0 s reaction range is
+    carefully described: 0.2 s is a simple laboratory visual response, not an F1 road-hazard
+    response; 1.5 s is the common baseline; 2.0 s is the conservative elderly/inexperienced
+    scenario cited in the page note.
+  - Mass does **not** alter distance in the tire-friction-limited model because mass cancels;
+    it remains adjustable because it scales kinetic energy. Results show reaction distance,
+    braking distance, dissipated translational kinetic energy, and total stopping distance.
+  - The main car animation has reaction above the road and braking below it, with no pitch
+    reference marker. Directly beneath it, one full-width dual-axis chart shows speed and
+    kinetic energy versus distance; pointer hover reports exact distance, speed, and energy.
+  - The result gauge is followed—not preceded—by dynamic distance comparisons against a 50 m
+    Olympic pool, 105 m football pitch, and 400 m track lap. The recurring rule that comparison
+    text belongs below the gauge/axis it explains is recorded in `STYLE_GUIDE.md`.
+  - The energy comparison uses the approximate metabolic cost for a 70 kg person running on
+    level ground (about 1 kcal/kg/km), with assumptions and sources linked in-page.
+  - Verified in-browser at 1,024 px, 736 px, and 360 px; light/dark themes; pointer tooltip;
+    keyboard slider changes; no horizontal overflow or console errors. At 1,024×900 the full
+    control/result block ends inside the viewport.
+- **Continuation status:** no known braking-page bug remains. Simon has not explicitly used the
+  project's “reviewed and complete” wording, so do not add this page to the reviewed-only
+  homepage unless he confirms that status. The repository was clean and `main` matched
+  `origin/main` before this handover-only update.
+
+## Previous handoff — 2026-08-17
 
 - **`index.html` now only lists pages marked "reviewed and complete" in this file.** At
   Simon's request, the homepage's category grids (Everyday maths / Discoveries / Fun physics)

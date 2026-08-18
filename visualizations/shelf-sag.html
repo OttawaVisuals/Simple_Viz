@@ -80,7 +80,7 @@
   .pick-buttons button{cursor:pointer;font-family:Georgia,serif;font-style:italic;font-size:15px;padding:6px 13px 7px;border-radius:999px;transition:all .18s ease;border:1px solid var(--border);background:transparent;color:var(--muted)}
   .pick-buttons button:hover{color:var(--fg)}
   .pick-note{margin-top:11px;font-size:13.5px;line-height:1.45;color:var(--muted)}
-  .section-picker{margin-top:10px;display:grid;grid-template-columns:1fr;gap:10px;align-items:start}
+  .section-picker{margin-top:10px;display:grid;grid-template-columns:minmax(150px,190px) 1fr;gap:12px;align-items:center}
   .section-picker svg{display:block;width:100%;height:auto;touch-action:none;user-select:none}
   .section-picker .selector-bg{fill:color-mix(in srgb,var(--line) 30%,transparent)}
   .section-picker .selector-grid{stroke:var(--line2);stroke-width:1;stroke-dasharray:2 4}
@@ -89,7 +89,16 @@
   .section-picker .selector-axis{fill:var(--muted);font:10px ui-monospace,monospace}
   .section-readout{font:12px/1.6 ui-monospace,monospace;color:var(--muted2)}
   .section-readout strong{display:block;color:var(--fg);font-size:20px;font-weight:400}
-  @media (max-width:620px){.ctrls{grid-template-columns:1fr}.section-picker svg{max-width:260px}}
+  @media (min-width:981px){
+    .slider-stack{gap:14px}
+    .slider-stack .ctrl{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"head head" "track value" "range range";column-gap:14px;align-items:center}
+    .slider-stack .ctrl-head{grid-area:head}
+    .slider-stack .readout{grid-area:value;margin:0;min-width:7ch;text-align:right;font-size:22px}
+    .slider-stack .track{grid-area:track;margin-top:0}
+    .slider-stack .track-range{grid-area:range}
+    .section-picker svg{max-width:190px}
+  }
+  @media (max-width:620px){.ctrls{grid-template-columns:1fr}.section-picker{grid-template-columns:1fr}.section-picker svg{max-width:230px}}
   .readout{font-family:ui-monospace,monospace;font-size:clamp(26px,2.8vw,34px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
   .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
   .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}

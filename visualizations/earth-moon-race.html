@@ -288,7 +288,7 @@
         <button id="resetBtn" type="button">Reset</button>
         <span class="clock mono" id="clockReadout">0.0 s elapsed</span>
       </div>
-      <div class="speed-buttons" id="speedButtons"></div>
+      <div class="speed-buttons" id="speedButtons" role="group" aria-label="Playback speed"></div>
     </div>
 
     <div class="result">
@@ -433,6 +433,7 @@
   // ---- speed picker (pill buttons) ----
   SPEEDS.forEach(function(s, i){
     var b = document.createElement('button');
+    b.type = 'button';
     b.textContent = s + '×';
     b.addEventListener('click', function(){ speedIdx = i; drawSpeedButtons(); });
     speedButtonsEl.appendChild(b);
@@ -443,6 +444,7 @@
       b.style.background = active ? 'color-mix(in srgb, var(--accent) 22%, var(--bg))' : 'transparent';
       b.style.borderColor = active ? 'var(--accent)' : 'var(--border)';
       b.style.color = active ? 'var(--fg)' : 'var(--muted)';
+      b.setAttribute('aria-pressed', active ? 'true' : 'false');
     });
   }
 

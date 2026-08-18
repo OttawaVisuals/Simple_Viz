@@ -203,7 +203,7 @@
           <span class="ctrl-title">Fluid <em id="etaLabel">&eta;</em></span>
           <span class="ctrl-rel">&eta; &prop; &Delta;P</span>
         </div>
-        <div class="fluid-buttons" id="fluidButtons"></div>
+        <div class="fluid-buttons" id="fluidButtons" role="group" aria-label="Fluid"></div>
         <div class="fluid-note" id="fluidNote"></div>
       </div>
 
@@ -497,6 +497,7 @@
   var fluidButtons = $('fluidButtons'), fluidNote=$('fluidNote');
   LIQ.forEach(function(f,i){
     var b = document.createElement('button');
+    b.type = 'button';
     b.textContent = f.name;
     b.addEventListener('click', function(){ state.fluid=i; state.active='eta'; render(); });
     b.addEventListener('pointerenter', function(){ state.active='eta'; render(); });
@@ -508,6 +509,7 @@
       b.style.background = active ? 'color-mix(in srgb, '+f.color+' 22%, var(--bg))' : 'transparent';
       b.style.borderColor = active ? f.color : 'var(--border)';
       b.style.color = active ? 'var(--fg)' : 'var(--muted)';
+      b.setAttribute('aria-pressed', active ? 'true' : 'false');
     });
     fluidNote.textContent = liq().note;
   }

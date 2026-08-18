@@ -172,7 +172,7 @@
     <div class="lbl" id="lblH"></div>
     <div class="lbl" id="lblD" style="font-weight:500;color:var(--muted2)"></div>
     <div class="lbl" id="lblScale" style="color:var(--muted)"></div>
-    <svg id="heroSvg" role="img" aria-label="A side-view diagram of an observer at height h above Earth's curved surface, with a line of sight running to the horizon at distance d.">
+    <svg id="heroSvg" role="img" aria-label="A side-view horizon diagram for the selected world.">
       <path id="earthArc" fill="none" stroke="var(--line2)" stroke-width="1.5"></path>
       <path id="earthFill" fill="var(--bg)"></path>
       <line id="sightLine" stroke="var(--accent)" stroke-width="1.25" stroke-dasharray="4 4"></line>
@@ -190,7 +190,7 @@
         <div class="ctrl-head">
           <span class="ctrl-title">World <em id="RLabel">R</em></span>
         </div>
-        <div class="object-buttons" id="bodyButtons"></div>
+        <div class="object-buttons" id="bodyButtons" role="group" aria-label="World"></div>
       </div>
 
       <div class="ctrl" id="hCtrl">
@@ -393,6 +393,8 @@
     var hv = h();
     var g = geom(w, hv);
 
+    heroSvg.setAttribute('aria-label', 'A side-view diagram of an observer at height h above '+state.body+'\u2019s curved surface, with a line of sight running to the horizon at distance d.');
+
     heroSvg.setAttribute('viewBox','0 0 '+w+' '+g.vbH);
     heroSvg.setAttribute('preserveAspectRatio','none');
 
@@ -559,6 +561,7 @@
   var bodyButtons = $('bodyButtons');
   BODY_ORDER.forEach(function(name){
     var b = document.createElement('button');
+    b.type = 'button';
     b.textContent = name;
     b.dataset.body = name;
     b.addEventListener('click', function(){ selectBody(name); });
@@ -570,6 +573,7 @@
       b.style.background = active ? 'color-mix(in srgb, var(--accent) 22%, var(--bg))' : 'transparent';
       b.style.borderColor = active ? 'var(--accent)' : 'var(--border)';
       b.style.color = active ? 'var(--fg)' : 'var(--muted)';
+      b.setAttribute('aria-pressed', active ? 'true' : 'false');
     });
   }
   function selectBody(name){

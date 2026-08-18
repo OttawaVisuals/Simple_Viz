@@ -42,6 +42,10 @@ tool can pick up mid-stream without re-reading the whole chat history.
   project's “reviewed and complete” wording, so do not add this page to the reviewed-only
   homepage unless he confirms that status. The repository was clean and `main` matched
   `origin/main` before this handover-only update.
+- **Other pages completed and explicitly reviewed today:** `eratosthenes-shadow.html`,
+  `shelf-sag.html`, `pizza-area.html`, and `microwave-chocolate.html`. Their final designs,
+  equations, responsive checks, and source notes are recorded in the page-specific entries
+  below. All four are on the reviewed-only homepage; no follow-up work is currently open.
 
 ## Previous handoff — 2026-08-17
 

@@ -38,10 +38,18 @@ tool can pick up mid-stream without re-reading the whole chat history.
   - Verified in-browser at 1,024 px, 736 px, and 360 px; light/dark themes; pointer tooltip;
     keyboard slider changes; no horizontal overflow or console errors. At 1,024×900 the full
     control/result block ends inside the viewport.
-- **Continuation status:** no known braking-page bug remains. Simon has not explicitly used the
-  project's “reviewed and complete” wording, so do not add this page to the reviewed-only
-  homepage unless he confirms that status. The repository was clean and `main` matched
-  `origin/main` before this handover-only update.
+- **Update — same day:** a follow-up review pass (via Claude) found a real overlap bug the
+  earlier pass missed: the gauge's dynamic "▲ m total" marker label and the static
+  "football pitch · 105 m" reference label share one row above the track and collided
+  whenever total stopping distance landed near 105 m — including the default "highway, dry
+  road" preset (91 m), so most first-time visitors would see it. Fixed in commit `b95e531` by
+  measuring both labels' pixel widths (canvas `measureText`) and stacking the marker label
+  above the reference label only when they'd actually collide; non-colliding cases are
+  unchanged. Verified across all four presets, drag positions, light/dark theme, and
+  mobile/desktop widths.
+- **Continuation status:** Simon confirmed "reviewed and complete" for this page. It has been
+  moved from `unreviewed.html` to the homepage's Everyday maths group (`03 / Motion`) in
+  `index.html`, with page/category counts updated in both files. No known bug remains.
 - **Other pages completed and explicitly reviewed today:** `eratosthenes-shadow.html`,
   `shelf-sag.html`, `pizza-area.html`, and `microwave-chocolate.html`. Their final designs,
   equations, responsive checks, and source notes are recorded in the page-specific entries

@@ -43,10 +43,11 @@
   h1 em{font-style:italic;font-weight:300}
   .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
 
-  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqnbox{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:100%}
   .eqn{display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);font-size:clamp(30px,4vw,46px);line-height:1;font-weight:300}
   .eqn .eq{color:var(--muted)}
   .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .unit-calc{margin-top:12px;font:11px/1.6 ui-monospace,monospace;color:var(--muted2);white-space:nowrap}
 
   .legendbox{padding-top:2px;align-self:center}
   .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
@@ -153,6 +154,7 @@
         <em id="fTerm">f</em>
         <em id="dxTerm">&Delta;x</em>
       </div>
+      <div class="unit-calc" id="unitCalc"></div>
     </div>
 
     <div class="legendbox">
@@ -167,16 +169,18 @@
     <div class="lbl" id="lblSpotC" style="transform:translateX(-50%)"></div>
     <div class="lbl" id="lblBracket" style="transform:translateX(-50%);font-weight:500"></div>
     <div class="lbl" id="lblTrue" style="transform:translateX(-50%)"></div>
-    <svg id="heroSvg" role="img" aria-label="A top-down view of a microwave tray showing an alternating hot and cool standing-wave pattern. Two melted spots are marked, with a bracket showing the distance a user measured between them.">
+    <div class="note-inline" id="lblSide">side view &mdash; standing wave above the chocolate</div>
+    <div class="lbl" id="lblSideMeasure" style="transform:translateX(-50%)">adjacent hot spots = &lambda;/2</div>
+    <svg id="heroSvg" role="img" aria-label="A top-down microwave tray shows alternating hot spots and the measured spacing. A side view below shows a standing wave with adjacent antinodes aligned to melted spots half a wavelength apart.">
       <defs>
         <linearGradient id="wavegrad" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="#6B4A34"></stop>
-          <stop offset="50%" stop-color="#E8863A"></stop>
-          <stop offset="100%" stop-color="#6B4A34"></stop>
+          <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.06"></stop>
+          <stop offset="50%" stop-color="var(--accent)" stop-opacity="0.58"></stop>
+          <stop offset="100%" stop-color="var(--accent)" stop-opacity="0.06"></stop>
         </linearGradient>
       </defs>
-      <rect id="trayBg" fill="var(--bg)" stroke="var(--line2)" stroke-width="1.25" rx="6"></rect>
-      <rect id="wavePattern" fill="url(#wavegrad)" opacity="0.8"></rect>
+      <rect id="trayBg" fill="color-mix(in srgb, var(--accent) 3%, var(--bg))" stroke="var(--line2)" stroke-width="1.25" rx="6"></rect>
+      <rect id="wavePattern" fill="url(#wavegrad)"></rect>
       <rect id="trayOutline" fill="none" stroke="var(--line2)" stroke-width="1.25" rx="6"></rect>
       <line id="trueGuide" stroke="var(--line2)" stroke-width="1.25" stroke-dasharray="3 4"></line>
       <circle id="spotA" r="6" fill="var(--bg)" stroke="var(--fg)" stroke-width="2"></circle>
@@ -186,6 +190,12 @@
       <line id="dimBase" stroke-linecap="round"></line>
       <line id="dimLeftV" stroke="var(--accent)" stroke-width="1"></line>
       <line id="dimRightV" stroke="var(--accent)" stroke-width="1"></line>
+      <line id="sideDivider" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 5"></line>
+      <rect id="sideCavity" fill="none" stroke="var(--line2)" stroke-width="1.25" rx="5"></rect>
+      <line id="chocolateLine" stroke="var(--fg)" stroke-width="4" stroke-linecap="round"></line>
+      <path id="sideWave" fill="none" stroke="var(--accent)" stroke-width="2"></path>
+      <g id="sideGuides" stroke="var(--line2)" stroke-width="1" stroke-dasharray="2 3"></g>
+      <g id="sideSpots" fill="var(--accent)"></g>
     </svg>
   </div>
 
@@ -231,7 +241,7 @@
     <button class="preset" data-p="long">measured a bit long</button>
   </div>
 
-  <p class="note">Sometimes called the "chocolate speed of light experiment" (marshmallows and cheese work too). A spinning turntable smears the standing-wave pattern evenly across a whole rotation, which is exactly why ovens have one &mdash; to heat food evenly, the opposite of what this experiment wants &mdash; so the first step is always to remove it. With the turntable out, running the oven briefly on a flat tray melts the food in stripes at the wave's antinodes, spaced exactly half a wavelength (&lambda;/2) apart. A household microwave's magnetron runs at a fixed, nameplate-printed frequency of f&nbsp;=&nbsp;2.45&nbsp;GHz, part of the unlicensed ISM radio band, so &lambda; = c/f &asymp; 12.24 cm and &lambda;/2 &asymp; 6.12 cm (about 2.4 inches) &mdash; measure that spacing with a ruler, multiply by 2f, and you have an estimate of c using nothing but a kitchen appliance and dessert. A ruler reading off by a couple of millimetres, real magnetrons drifting a percent or two from their nominal frequency, and the melted spots themselves blurring rather than forming sharp points all add real error on top of the arithmetic, which is why the "short" and "long" presets above land several percent off despite using the same simple method. Read more about the fixed 2.45 GHz band on <a href="https://en.wikipedia.org/wiki/Microwave_oven" target="_blank" rel="noopener">Wikipedia's microwave oven article</a>.</p>
+  <p class="note">Sometimes called the "chocolate speed of light experiment" (marshmallows and cheese work too). A spinning turntable smears the standing-wave pattern evenly across a whole rotation, which is exactly why ovens have one &mdash; to heat food evenly, the opposite of what this experiment wants &mdash; so the first step is always to remove it. With the turntable out, running the oven briefly on a flat tray melts the food in stripes at the wave's antinodes, spaced exactly half a wavelength (&lambda;/2) apart. A household microwave's magnetron runs at a fixed, nameplate-printed frequency of f&nbsp;=&nbsp;2.45&nbsp;GHz, so &lambda; = c/f &asymp; 12.24 cm and &lambda;/2 &asymp; 6.12 cm. The equation requires compatible SI units: frequency is converted to hertz and spacing to metres before multiplying. If GHz and cm are multiplied directly, 1&nbsp;GHz&middot;cm = 10<sup>7</sup>&nbsp;m/s. For example, 2&nbsp;&times;&nbsp;2.45&nbsp;&times;&nbsp;6.39 = 31.311 therefore means 31.311&nbsp;&times;&nbsp;10<sup>7</sup>&nbsp;m/s = 3.1311&nbsp;&times;&nbsp;10<sup>8</sup>&nbsp;m/s. A ruler reading off by a couple of millimetres, real magnetrons drifting from their nominal frequency, and blurred melted spots all add real error. Read more on <a href="https://en.wikipedia.org/wiki/Microwave_oven" target="_blank" rel="noopener">Wikipedia's microwave oven article</a>.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -287,7 +297,9 @@
   var trayBg=$('trayBg'), wavePattern=$('wavePattern'), trayOutline=$('trayOutline'), wavegrad=$('wavegrad');
   var trueGuide=$('trueGuide'), spotA=$('spotA'), spotB=$('spotB'), spotTrueB=$('spotTrueB'), spotC=$('spotC');
   var dimBase=$('dimBase'), dimLeftV=$('dimLeftV'), dimRightV=$('dimRightV');
+  var sideDivider=$('sideDivider'), sideCavity=$('sideCavity'), chocolateLine=$('chocolateLine'), sideWave=$('sideWave'), sideGuides=$('sideGuides'), sideSpots=$('sideSpots');
   var lblCorner=$('lblCorner'), lblSpotA=$('lblSpotA'), lblSpotB=$('lblSpotB'), lblSpotC=$('lblSpotC'), lblBracket=$('lblBracket'), lblTrue=$('lblTrue');
+  var lblSide=$('lblSide'), lblSideMeasure=$('lblSideMeasure'), unitCalc=$('unitCalc');
 
   // ---- hero geometry: viewBox width == measured CSS px width, so 1 unit = 1px ----
   function geom(w){
@@ -313,11 +325,12 @@
     var bracketEndX = peakX[0] + spacingPx;
 
     var dimY = trayTop + trayH + (narrow?30:34);
-    var vbH = dimY + (narrow?36:32);
+    var sideTop=dimY+(narrow?38:36), sideH=narrow?88:96;
+    var vbH = sideTop+sideH+18;
 
     return { w:w, vbH:vbH, narrow:narrow, trayX:trayX, trayTop:trayTop, trayW:trayW, trayH:trayH,
       patternX:patternX, patternW:patternW, periodPx:periodPx, peakX:peakX,
-      bracketEndX:bracketEndX, dimY:dimY };
+      bracketEndX:bracketEndX, dimY:dimY, sideTop:sideTop, sideH:sideH };
   }
 
   function drawHero(){
@@ -361,6 +374,26 @@
     var dimColor = state.active==='dx' ? 'var(--accent)' : 'var(--muted2)';
     dimLeftV.setAttribute('stroke', dimColor); dimRightV.setAttribute('stroke', dimColor);
 
+    // Side view: the electric-field standing wave above a flat chocolate surface.
+    var sideMid=g.sideTop+35, sideAmp=Math.min(22,g.sideH*0.24), chocolateY=g.sideTop+g.sideH-17;
+    sideDivider.setAttribute('x1',g.trayX);sideDivider.setAttribute('x2',g.trayX+g.trayW);sideDivider.setAttribute('y1',g.sideTop-12);sideDivider.setAttribute('y2',g.sideTop-12);
+    sideCavity.setAttribute('x',g.trayX);sideCavity.setAttribute('y',g.sideTop);sideCavity.setAttribute('width',g.trayW);sideCavity.setAttribute('height',g.sideH);
+    chocolateLine.setAttribute('x1',g.trayX+8);chocolateLine.setAttribute('x2',g.trayX+g.trayW-8);chocolateLine.setAttribute('y1',chocolateY);chocolateLine.setAttribute('y2',chocolateY);
+    var wavePts=[];
+    for(var wi=0;wi<=96;wi++){
+      var wx=g.patternX+g.patternW*wi/96;
+      var wy=sideMid-sideAmp*Math.sin(Math.PI*(wx-g.patternX)/g.periodPx);
+      wavePts.push((wi?'L':'M')+wx.toFixed(2)+','+wy.toFixed(2));
+    }
+    sideWave.setAttribute('d',wavePts.join(''));
+    var guides='',spots='';
+    g.peakX.forEach(function(x,i){
+      var waveY=sideMid-sideAmp*Math.sin(Math.PI*(i+0.5));
+      guides+='<line x1="'+x.toFixed(2)+'" y1="'+waveY.toFixed(2)+'" x2="'+x.toFixed(2)+'" y2="'+(chocolateY-4).toFixed(2)+'"></line>';
+      spots+='<circle cx="'+x.toFixed(2)+'" cy="'+chocolateY.toFixed(2)+'" r="4"></circle>';
+    });
+    sideGuides.innerHTML=guides;sideSpots.innerHTML=spots;
+
     var px = function(x){ return (x/w*100)+'%'; };
     var py = function(y){ return (y/g.vbH*100)+'%'; };
 
@@ -377,6 +410,8 @@
     lblBracket.style.left = px((g.peakX[0]+g.bracketEndX)/2); lblBracket.style.top = py(g.dimY + 8);
     lblBracket.textContent = 'Δx = ' + state.spacing.toFixed(2) + ' cm (measured)';
     lblBracket.style.color = state.active==='dx' ? 'var(--accent)' : 'var(--muted)';
+    lblSide.style.left=px(g.trayX+8);lblSide.style.top=py(g.sideTop+5);
+    lblSideMeasure.style.left=px((g.peakX[0]+g.peakX[1])/2);lblSideMeasure.style.top=py(chocolateY+7);
   }
 
   // ---- equation + legend colouring ----
@@ -392,6 +427,8 @@
     dxLabel.style.color = activeColor('dx');
     cTerm.style.color = 'var(--fg)';
     fTerm.style.color = 'var(--fg)';
+    var spacingM=state.spacing/100, est=cEstimate(state.spacing);
+    unitCalc.textContent='2 × 2.45×10⁹ Hz × '+spacingM.toFixed(4)+' m = '+(est/1e8).toFixed(4)+'×10⁸ m/s';
 
     var rows = [
       {sym:'f', name:'microwave frequency (fixed, nameplate)', val:'2.45 GHz', key:null},

@@ -15,6 +15,20 @@ tool can pick up mid-stream without re-reading the whole chat history.
 
 ## Current handoff — 2026-08-17
 
+- **`index.html` now only lists pages marked "reviewed and complete" in this file.** At
+  Simon's request, the homepage's category grids (Everyday maths / Discoveries / Fun physics)
+  were cut down to just the four currently-reviewed pages — `horizon-distance.html`,
+  `earth-moon-race.html`, `straw-hose-flow.html`, `potato-trajectory.html` — removing the
+  other ~44 built-but-not-yet-reviewed pages' cards entirely (not commented out; they're
+  still fully built and still linked from `tracker.html`, just not surfaced on the public
+  index until reviewed). Category counts, the results-count default text, and the topbar's
+  "N equations" count were all updated to match. The Featured section (already only these
+  same four minus horizon-distance) was left as-is. **When a page gets marked reviewed and
+  complete going forward, add its card back to the relevant category grid in `index.html`**
+  (copy the pattern from one of the four current cards) — this is now a required step, not
+  optional, since the homepage is the reviewed-only source of truth. The icon `<symbol>`
+  sprite at the top of the file was left untouched (all ~48 icons still defined, most just
+  unused for now) since removing them was pure churn with no visible benefit.
 - **`visualizations/starlight-spectrum.html`** ("Starlight has a barcode") — new page 46,
   added to **Discoveries** on `index.html` and `tracker.html`. Built directly to the
   [STYLE_GUIDE.md](STYLE_GUIDE.md) skeleton, no earlier draft; picked from three pitched
@@ -521,6 +535,15 @@ Built in parallel directly to the [STYLE_GUIDE.md](STYLE_GUIDE.md) skeleton, no 
 
 - **`horizon-distance.html`** ("Why standing up lets you see farther") — `d = √(2Rh)`, R=6,371 km fixed, single **log-scale** height slider (1 m–500 km) since the effect spans person-height to ISS-altitude. Hero diagram is an explicitly-labeled schematic (not to true scale, per CLAUDE.md's honest-device guidance) since h ranges over 5+ orders of magnitude vs R. Gauge compares against English Channel width. Presets: beach/standing/lighthouse/airplane/ISS.
 - **`lightning-distance.html`** ("How far away was that lightning?") — `d = v·Δt`, v=343 m/s fixed, single linear Δt slider (0–60s). Hero has a play button that animates a sound wavefront outward at a timing proportional to real Δt (60s maps to ~4s of animation). Linear (not log) gauge flags the ~15–20 km real-world thunder-audibility limit, well short of what the raw formula alone would suggest at high Δt. Confirms the folk "5 seconds per mile" rule.
+  - **Not reviewed/complete as of 2026-08-17** (explicitly flagged by Simon — needs more review before
+    it's treated as finished, unlike the four pages marked reviewed and complete elsewhere in this
+    file). A 2026-08-17 pass fixed the same gauge-label collision as the other pages, added
+    light-crossing-time/loudness/pitch result lines, and added a mirrored frequency-spectrum chart
+    (source spectrum vs. distance-attenuated spectrum) using three published dB/km figures at 1/2/4
+    kHz interpolated log-log, rather than the full ISO 9613-1 formula (which didn't reproduce
+    published reference values when checked numerically — see the git log for that session's detail).
+    That's a lot of new content added in one session without a fresh-eyes pass; treat it as
+    provisional until reviewed again.
 - **`braking-distance.html`** ("Why speed quadruples your stopping distance") — `d = v²/(2μg)`, speed slider (10–200 km/h) + surface pill-picker (dry/wet/snow/ice μ values). Also computes and displays reaction distance (1.5s typical reaction time) alongside pure braking distance, so the result reflects real stopping-distance charts rather than just the idealized equation. Car animation uses a two-phase tween (linear during reaction, quadratic ease-out during braking) matching constant-deceleration kinematics.
 - **`rocket-equation.html`** ("Why one more passenger costs so much fuel") — Tsiolkovsky `Δv = vₑ·ln(m₀/mf)`, log-scale mass-ratio slider (1.1–30) + engine pill-picker (solid/kerosene-LOX/hydrogen-LOX/ion). Gauge marks 9,400 m/s as the Δv needed to reach LEO (includes gravity/drag losses, not just orbital velocity). Ion drive is hard-coded to always show "Can't launch." regardless of its Δv number, since real ion engines can't produce enough thrust to lift off a planet even though their high exhaust velocity makes the raw Δv figure look sufficient — a case where the honest caveat had to override the naive gauge comparison.
 - **`keplers-third-law.html`** ("Why Mercury's year is 88 days") — simplified solar-system form `T = a^1.5` (T in years, a in AU), sourced from the general `T² = 4π²a³/GM` and stated as such in the note. Log-scale semi-major-axis slider (0.2–50 AU), 9 presets (8 planets + Pluto). Gauge places the current period among real planets' periods on a log scale rather than using possible/impossible framing.

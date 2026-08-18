@@ -65,21 +65,28 @@
   .hero svg{width:100%;height:auto;display:block}
   .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
 
-  .charts{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,3vw,44px);margin-top:clamp(18px,2.2vw,28px)}
-  .chart h2{margin:0 0 7px;font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .charts{margin-top:clamp(12px,1.6vw,20px)}
+  .chart-head{display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:7px}
+  .chart h2{margin:0;font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .chart-legend{display:flex;gap:16px;flex-wrap:wrap;font:10.5px ui-monospace,monospace;color:var(--muted)}
+  .chart-legend span{display:inline-flex;align-items:center;gap:6px}
+  .chart-legend i{width:18px;height:2px;display:inline-block;background:var(--accent)}
+  .chart-legend .energy i{height:0;background:none;border-top:2px dashed var(--bad)}
   .chart svg{display:block;width:100%;height:auto;overflow:visible}
   .chart .frame,.chart .grid{fill:none;stroke:var(--line);shape-rendering:crispEdges}
   .chart .grid{stroke-dasharray:2 4}
   .chart .axis-text,.chart .axis-title,.chart .phase-label{fill:var(--muted);font:10.5px ui-monospace,monospace}
   .chart .axis-title{fill:var(--muted2)}
-  .chart .series{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+  .chart .series{fill:none;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+  .chart .series.speed{stroke:var(--accent)}
+  .chart .series.energy{stroke:var(--bad);stroke-dasharray:7 5}
   .chart .phase{stroke:var(--line2);stroke-width:1;stroke-dasharray:3 4}
-  @media (max-width:700px){.charts{grid-template-columns:1fr}}
 
-  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
-  @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
+  .resultrow{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,4vw,56px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:760px){.resultrow{grid-template-columns:1fr}}
 
-  .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
+  .ctrls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(22px,2.4vw,30px) clamp(18px,2vw,26px);align-content:start}
+  @media (max-width:460px){.ctrls{grid-template-columns:1fr}}
   .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
   .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
   .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;transition:color .2s}
@@ -209,13 +216,15 @@
   </div>
 
   <div class="charts" aria-label="Speed and kinetic energy over stopping distance">
-    <section class="chart" id="speedChartWrap">
-      <h2>Speed over distance</h2>
-      <svg id="speedChart" role="img" aria-label="Speed stays constant during reaction, then falls to zero during braking."></svg>
-    </section>
-    <section class="chart" id="energyChartWrap">
-      <h2>Kinetic energy over distance</h2>
-      <svg id="energyChart" role="img" aria-label="Kinetic energy stays constant during reaction, then is dissipated during braking."></svg>
+    <section class="chart" id="motionChartWrap">
+      <div class="chart-head">
+        <h2>Speed and kinetic energy over distance</h2>
+        <div class="chart-legend" aria-hidden="true">
+          <span><i></i>speed</span>
+          <span class="energy"><i></i>kinetic energy</span>
+        </div>
+      </div>
+      <svg id="motionChart" role="img" aria-label="Speed and kinetic energy stay constant during reaction, then both fall to zero during braking. Kinetic energy falls linearly while speed follows a curve."></svg>
     </section>
   </div>
 
@@ -235,6 +244,15 @@
         <div class="track-range"><span>10 km/h</span><span class="mid">double v &middot; 4&times; the braking distance</span><span>200 km/h</span></div>
       </div>
 
+      <div class="ctrl" id="surfCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Surface <em id="muLabel">&mu;</em></span>
+          <span class="ctrl-rel">1/&mu; &prop; d</span>
+        </div>
+        <div class="fluid-buttons" id="surfButtons"></div>
+        <div class="fluid-note" id="surfNote"></div>
+      </div>
+
       <div class="ctrl" id="reactionCtrl">
         <div class="ctrl-head">
           <span class="ctrl-title">Perception&ndash;reaction time <em>t</em></span>
@@ -247,15 +265,6 @@
           <div class="thumb" id="reactionThumb"></div>
         </div>
         <div class="track-range"><span>0.2 s &middot; lab response</span><span class="mid">1.5 s baseline</span><span>2.0 s</span></div>
-      </div>
-
-      <div class="ctrl" id="surfCtrl">
-        <div class="ctrl-head">
-          <span class="ctrl-title">Surface <em id="muLabel">&mu;</em></span>
-          <span class="ctrl-rel">1/&mu; &prop; d</span>
-        </div>
-        <div class="fluid-buttons" id="surfButtons"></div>
-        <div class="fluid-note" id="surfNote"></div>
       </div>
 
       <div class="ctrl" id="massCtrl">
@@ -289,6 +298,7 @@
         </div>
       </div>
       <div class="verdict-sub" id="verdictSub"></div>
+      <div class="effort-line" id="distanceCompareLine"></div>
       <div class="effort-line" id="effortLine"></div>
       <div class="gauge" id="gauge">
         <div class="track"></div>
@@ -312,7 +322,7 @@
     <button class="preset" data-p="double">double the speed, still dry</button>
   </div>
 
-  <p class="note">Braking distance follows d = v&sup2;/(2&mu;g), from Newton's laws under constant deceleration &mu;g &mdash; see <a href="https://en.wikipedia.org/wiki/Braking_distance" target="_blank" rel="noopener">Braking distance</a>. In this tire-friction-limited model, both kinetic energy and available friction force scale with mass, so mass cancels from distance; it still scales the <a href="https://en.wikipedia.org/wiki/Kinetic_energy" target="_blank" rel="noopener">kinetic energy</a> that must be dissipated. The reaction slider spans a roughly 0.2 s laboratory simple-response benchmark (not real hazard perception) to the 2.0 s value sometimes used for elderly or inexperienced drivers; 1.5 s is a common crash-reconstruction baseline. See <a href="https://en.wikipedia.org/wiki/Mental_chronometry" target="_blank" rel="noopener">mental chronometry</a> and the reaction-time discussion in <a href="https://en.wikipedia.org/wiki/Braking_distance#Total_stopping_distance" target="_blank" rel="noopener">total stopping distance</a>. The running comparison assumes a 70 kg person and about 1 kcal/kg/km on level ground, a rough metabolic cost supported by <a href="https://doi.org/10.1152/jappl.1963.18.2.367" target="_blank" rel="noopener">Margaria et al.</a> Real cars vary with tires, slope, aerodynamics, brake capacity, ABS, and heat; regenerative braking may recover some energy instead of dissipating it as heat.</p>
+  <p class="note">Braking distance follows d = v&sup2;/(2&mu;g), from Newton's laws under constant deceleration &mu;g &mdash; see <a href="https://en.wikipedia.org/wiki/Braking_distance" target="_blank" rel="noopener">Braking distance</a>. In this tire-friction-limited model, both kinetic energy and available friction force scale with mass, so mass cancels from distance; it still scales the <a href="https://en.wikipedia.org/wiki/Kinetic_energy" target="_blank" rel="noopener">kinetic energy</a> that must be dissipated. The reaction slider spans a roughly 0.2 s laboratory simple-response benchmark (not real hazard perception) to the 2.0 s value sometimes used for elderly or inexperienced drivers; 1.5 s is a common crash-reconstruction baseline. See <a href="https://en.wikipedia.org/wiki/Mental_chronometry" target="_blank" rel="noopener">mental chronometry</a> and the reaction-time discussion in <a href="https://en.wikipedia.org/wiki/Braking_distance#Total_stopping_distance" target="_blank" rel="noopener">total stopping distance</a>. Distance comparisons use a 50 m <a href="https://en.wikipedia.org/wiki/Olympic-size_swimming_pool" target="_blank" rel="noopener">Olympic-size pool</a>, a 105 m football pitch, and one 400 m lap of a standard <a href="https://en.wikipedia.org/wiki/Running_track" target="_blank" rel="noopener">running track</a>. The running-energy comparison assumes a 70 kg person and about 1 kcal/kg/km on level ground, a rough metabolic cost supported by <a href="https://doi.org/10.1152/jappl.1963.18.2.367" target="_blank" rel="noopener">Margaria et al.</a> Real cars vary with tires, slope, aerodynamics, brake capacity, ABS, and heat; regenerative braking may recover some energy instead of dissipating it as heat.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -660,7 +670,7 @@
 
   // ---- result box ----
   var dValueEl=$('dValue'), reactionValueEl=$('reactionValue'), energyValueEl=$('energyValue'), energyUnitEl=$('energyUnit');
-  var verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+  var verdictSubEl=$('verdictSub'), distanceCompareEl=$('distanceCompareLine'), effortLineEl=$('effortLine');
   var gReach=$('gReach'), gLimit=$('gLimit'), gLimitLabel=$('gLimitLabel'), gGhost=$('gGhost'), gMark=$('gMark'), gMarkLabel=$('gMarkLabel');
   var gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
 
@@ -683,6 +693,8 @@
     }
 
     verdictSubEl.textContent = 'Total stopping distance ≈ '+fmtM(totalD)+' m.';
+    function comparisonRatio(value){ return value<0.1?value.toFixed(2):(value<10?value.toFixed(1):Math.round(value).toLocaleString()); }
+    distanceCompareEl.textContent = '≈ '+comparisonRatio(totalD/50)+' Olympic pools · '+comparisonRatio(totalD/PITCH_M)+' football pitches · '+comparisonRatio(totalD/400)+' track laps.';
     var runKm=energyJ/(70*4184);
     effortLineEl.textContent = 'That energy is roughly what a 70 kg person uses to run '+(runKm<10?runKm.toFixed(1):Math.round(runKm).toLocaleString())+' km.';
 
@@ -728,20 +740,22 @@
     if(value>=10) return value.toFixed(0);
     return value.toFixed(1);
   }
-  function drawDistanceChart(svg, wrap, kind){
-    var w=Math.max(300,wrap.clientWidth||520), h=188;
-    var m={l:58,r:12,t:12,b:38}, pw=w-m.l-m.r, ph=h-m.t-m.b;
+  function drawCharts(){
+    var svg=$('motionChart'), wrap=$('motionChartWrap');
+    var w=Math.max(300,wrap.clientWidth||900), h=196;
+    var m={l:58,r:66,t:12,b:38}, pw=w-m.l-m.r, ph=h-m.t-m.b;
     var reactionD=reactionDistance(), brakingD=brakingDistance(), totalD=reactionD+brakingD;
-    var maxY=kind==='speed' ? state.v : kineticEnergy()/1000;
+    var maxSpeed=state.v, maxEnergy=kineticEnergy()/1000;
     function sx(x){ return m.l+(x/totalD)*pw; }
-    function sy(y){ return m.t+ph-(y/maxY)*ph; }
-    var yLabel=kind==='speed'?'Speed (km/h)':'Kinetic energy (kJ)';
+    function syFraction(f){ return m.t+ph-f*ph; }
     var parts=[];
-    parts.push('<title>'+yLabel+' over stopping distance</title>');
+    parts.push('<title>Speed and kinetic energy over stopping distance</title>');
+    parts.push('<desc>Both remain constant during reaction. During braking, kinetic energy falls linearly to zero while speed follows a curved path.</desc>');
     [0,.5,1].forEach(function(f){
-      var y=sy(maxY*f);
+      var y=syFraction(f);
       parts.push('<line class="grid" x1="'+m.l+'" x2="'+(m.l+pw)+'" y1="'+y+'" y2="'+y+'"></line>');
-      parts.push('<text class="axis-text" x="'+(m.l-8)+'" y="'+(y+3.5)+'" text-anchor="end">'+chartNumber(maxY*f)+'</text>');
+      parts.push('<text class="axis-text" x="'+(m.l-8)+'" y="'+(y+3.5)+'" text-anchor="end">'+chartNumber(maxSpeed*f)+'</text>');
+      parts.push('<text class="axis-text" x="'+(m.l+pw+8)+'" y="'+(y+3.5)+'" text-anchor="start">'+chartNumber(maxEnergy*f)+'</text>');
     });
     [0,.5,1].forEach(function(f){
       var x=sx(totalD*f), anchor=f===0?'start':f===1?'end':'middle';
@@ -750,29 +764,22 @@
     parts.push('<rect class="frame" x="'+m.l+'" y="'+m.t+'" width="'+pw+'" height="'+ph+'"></rect>');
     var rx=sx(reactionD);
     parts.push('<line class="phase" x1="'+rx+'" x2="'+rx+'" y1="'+m.t+'" y2="'+(m.t+ph)+'"></line>');
-    var phaseAnchor=reactionD/totalD>.78?'end':'start';
+    var phaseAnchor=reactionD/totalD>.82?'end':'start';
     var phaseX=rx+(phaseAnchor==='start'?5:-5);
-    parts.push('<text class="phase-label" x="'+phaseX+'" y="'+(m.t+12)+'" text-anchor="'+phaseAnchor+'">brakes applied</text>');
-    var points=[];
-    if(kind==='speed'){
-      points.push([0,state.v],[reactionD,state.v]);
-      for(var i=1;i<=48;i++){
-        var f=i/48;
-        points.push([reactionD+brakingD*f,state.v*Math.sqrt(Math.max(0,1-f))]);
-      }
-    } else {
-      points=[[0,maxY],[reactionD,maxY],[totalD,0]];
+    parts.push('<text class="phase-label" x="'+phaseX+'" y="'+(m.t+13)+'" text-anchor="'+phaseAnchor+'">brakes applied</text>');
+    var speedPoints=[[0,1],[reactionD,1]], energyPoints=[[0,1],[reactionD,1],[totalD,0]];
+    for(var i=1;i<=64;i++){
+      var f=i/64;
+      speedPoints.push([reactionD+brakingD*f,Math.sqrt(Math.max(0,1-f))]);
     }
-    var d=points.map(function(p,i){return (i?'L':'M')+sx(p[0]).toFixed(1)+','+sy(p[1]).toFixed(1);}).join(' ');
-    parts.push('<path class="series" d="'+d+'"></path>');
+    function path(points){ return points.map(function(p,i){return (i?'L':'M')+sx(p[0]).toFixed(1)+','+syFraction(p[1]).toFixed(1);}).join(' '); }
+    parts.push('<path class="series speed" d="'+path(speedPoints)+'"></path>');
+    parts.push('<path class="series energy" d="'+path(energyPoints)+'"></path>');
     parts.push('<text class="axis-title" x="'+(m.l+pw/2)+'" y="'+(h-3)+'" text-anchor="middle">Distance from hazard (m)</text>');
-    parts.push('<text class="axis-title" transform="translate(13 '+(m.t+ph/2)+') rotate(-90)" text-anchor="middle">'+yLabel+'</text>');
+    parts.push('<text class="axis-title" transform="translate(13 '+(m.t+ph/2)+') rotate(-90)" text-anchor="middle">Speed (km/h)</text>');
+    parts.push('<text class="axis-title" transform="translate('+(w-13)+' '+(m.t+ph/2)+') rotate(90)" text-anchor="middle">Kinetic energy (kJ)</text>');
     svg.setAttribute('viewBox','0 0 '+w+' '+h);
     svg.innerHTML=parts.join('');
-  }
-  function drawCharts(){
-    drawDistanceChart($('speedChart'),$('speedChartWrap'),'speed');
-    drawDistanceChart($('energyChart'),$('energyChartWrap'),'energy');
   }
 
   // ---- presets ----
@@ -840,7 +847,7 @@
   }
 
   new ResizeObserver(measure).observe(heroWrap);
-  new ResizeObserver(function(){ drawCharts(); }).observe($('speedChartWrap'));
+  new ResizeObserver(function(){ drawCharts(); }).observe($('motionChartWrap'));
   window.addEventListener('resize', measure);
   [60,250,900].forEach(function(t){ setTimeout(measure, t); });
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);

@@ -395,13 +395,17 @@
     var px = function(x){ return (x/w*100)+'%'; };
     var py = function(y){ return (y/g.vbH*100)+'%'; };
 
-    lblCorner.style.left = px(g.trayX); lblCorner.style.top = py(6);
+    lblCorner.style.left = px(g.trayX); lblCorner.style.top = py(2);
     lblSpotA.style.left = px(g.peakX[0]); lblSpotA.style.top = py(g.trayTop - 16);
     lblSpotB.style.left = px(g.peakX[1]); lblSpotB.style.top = py(g.trayTop - 16);
     lblSpotC.style.left = px(g.peakX[2]); lblSpotC.style.top = py(g.trayTop - 16);
+    lblSpotA.textContent = g.narrow ? 'A' : 'melted spot A';
+    lblSpotB.textContent = g.narrow ? 'B' : 'melted spot B';
     lblSpotC.textContent = g.narrow ? '' : 'spot C';
 
-    lblTrue.style.left = px((g.peakX[0]+g.peakX[1])/2); lblTrue.style.top = py(cy - g.trayH/2 - 24);
+    // sits on its own row below lblCorner so the two captions never overlap (both can
+    // otherwise land on the same y when trayTop is small)
+    lblTrue.style.left = px((g.peakX[0]+g.peakX[1])/2); lblTrue.style.top = py(17);
     lblTrue.textContent = 'λ/2 = ' + HALF_LAMBDA_CM.toFixed(2) + ' cm (true)';
     lblTrue.style.opacity = g.narrow ? 0 : 1;
 

@@ -13,7 +13,183 @@ tool can pick up mid-stream without re-reading the whole chat history.
   filtering) with a "not a secure connection" warning — that's a corporate network/proxy
   issue on his end, not a site or Cloudflare cert problem; nothing to action here.
 
-## Current handoff — 2026-08-18
+## Backlog — pitched ideas not yet built (added 2026-08-19)
+
+Four ideas Simon pitched for future pages; none started as of this entry except the heat
+pump page, begun the same day (see the handoff entry below).
+
+- **Heat pump "science, not magic."** How a heat pump delivers >100% "efficiency" (COP > 1)
+  without breaking energy conservation — it moves heat from the outside atmosphere in
+  addition to converting the electricity it uses, so the delivered heat is electricity-in
+  plus free ambient heat, not electricity alone.
+- **Fun unit converter.** Convert an energy quantity (J, kWh, etc.) into relatable everyday
+  equivalents — e.g. "how many hamsters running in a wheel for 15 minutes." Needs a page
+  format decision (single equation + slider doesn't obviously fit a converter with many
+  target units — may want a picker of "convert to" categories instead).
+- **E=mc² page addition.** Add energy-released-per-fuel-type comparisons (uranium fission,
+  petroleum, natural gas, ...) to the existing mass-energy page rather than a new page —
+  check `mass-energy.html` (or its current filename in `visualizations/`) for whether this
+  fits as a second section, per the "second section extends the skeleton" pattern used on
+  `starlight-spectrum.html`/`time-dilation.html`.
+- **"It IS Rocket Science" page addition.** Add other planets/bodies (Moon, Mars, Jupiter,
+  etc.) to show how surface gravity `g` changes required escape/orbital velocity — again
+  likely a second-section addition to the existing page rather than a new file; find the
+  page's actual current filename before starting (name may differ from the pitch title).
+
+## Current handoff — 2026-08-19
+
+- **`visualizations/heat-pump-magic.html`** ("Heat pumps don't create heat") — new page 50,
+  added to **Discoveries** on `unreviewed.html` (not yet reviewed, so not on `index.html`)
+  and `tracker.html`. Built from the first backlog idea above, directly to the
+  [STYLE_GUIDE.md](STYLE_GUIDE.md) skeleton.
+  - **The core answer to "how can COP exceed 100%?"**: COP = Q<sub>H</sub>/W, and energy
+    conservation gives Q<sub>H</sub> = W + Q<sub>C</sub> — delivered heat is the electrical
+    work *plus* heat absorbed from the outside air, not electricity alone. The equation box
+    shows the idealized **Carnot ceiling**, T<sub>H</sub>/(T<sub>H</sub>&minus;T<sub>C</sub>)
+    in kelvin (indoor target fixed at 21°C) — this stays clean/idealized like straw-hose's
+    laminar equation, while the actual reported COP uses a realistic correction, footnoted in
+    the note exactly like straw-hose's turbulent-flow correction.
+  - **Realistic COP model, revised same day.** The first version derived the "real" COP from
+    physics (a fixed 5°C heat-exchanger approach temperature plus a fixed 30% fraction of the
+    resulting ideal figure), hand-tuned to land in a plausible range — Simon asked for an
+    actual cited COP curve instead. Replaced with a piecewise-linear interpolation
+    (`COP_CURVE` control points) through the midpoint of each range in [Daikin Quebec's
+    published outdoor-temperature/COP table](https://daikinquebec.net/en/heat-pump/cop/):
+    +8°C→4.00, 0°C→3.25, −8°C→2.75, −15°C→2.25. The page's slider range (−20°C to +15°C) goes
+    slightly past that table at both ends, so the two endpoints are extrapolated using the
+    slope of the nearest real segment rather than invented independently: −20°C→1.89
+    (continuing the −15↔−8°C slope down), +15°C→4.66 (continuing the 0↔+8°C slope up). The
+    equation box still shows the idealized Carnot ceiling unchanged (T<sub>H</sub>/(T<sub>H</sub>−T<sub>C</sub>)
+    ≈ COP 7 at −20°C/21°C, which Simon spot-checked by hand) — the note now states plainly
+    that the result-box number is read off the cited curve, not derived from that ceiling,
+    and that the gap between the two is the honest measure of how far a real machine falls
+    short of the theoretical best case. `GMAX` (the gauge's ×-scale) was tightened 6→5 to
+    match the new, slightly lower COP ceiling (4.66 max vs. the old model's 5.6).
+  - **Device picker** (Heat pump / Electric heater) directly demonstrates the answer: the
+    electric resistance heater is pinned at COP 1.00 always (no refrigeration cycle, no free
+    ambient heat), contrasted against the heat pump's COP that climbs with outdoor
+    temperature. Switching devices also hides/shows the ambient-heat arrow in the hero
+    diagram and dims the cloud icon.
+  - **Hero diagram**: an energy-flow figure (cloud/outside air → heat pump unit → house),
+    with a third vertical arrow for electricity in from a plug icon below the unit. Arrow
+    stroke-width scales with each energy term's relative size (W fixed at 1 unit, Q<sub>C</sub>
+    and Q<sub>H</sub> scaled off the live COP), animated with the site's standard flowing-dash
+    pattern, gated behind `prefers-reduced-motion` per STYLE_GUIDE.md.
+  - **Gauge is a stacked/segmented bar** (0–6×, linear, not log — the whole range fits in one
+    decade so straw-hose's log gauge pattern didn't apply), not the usual reach+limit design:
+    a "paid" segment (always 0–1×, electricity) and a "free" segment (1×–COP×, ambient heat)
+    stack together, with a reference tick at 1× labeled "electric heater" for direct
+    comparison. **Two real label-collision bugs caught and fixed during in-browser testing:**
+    (1) the "N×" mark label and the "electric heater" reference label sit at nearly the same
+    gauge position whenever COP is close to 1 (the electric-heater device's default case) —
+    fixed by stacking the mark label above the reference row (`top:-17px` vs `-3px`) whenever
+    they're within 22% of gauge width of each other, tuned up from an initial 12% threshold
+    that still let a COP-1.76 case collide. (2) On narrow/mobile widths the hero's "Qc · N kWh,
+    free" and "Qh · N kWh delivered" labels are wider than their own arrow's span and
+    overflowed into the heat-pump box / house icon — fixed by constraining each label's
+    `width` to its arrow's actual span (computed in the same `geom()` function that sizes the
+    arrow) and letting it wrap (`white-space:normal`, `text-align:center`) instead of a fixed
+    unconstrained nowrap string.
+  - New hand-drawn icon added to `unreviewed.html`'s sprite (`icon-heat-pump-magic`): a cloud
+    blob → arrow → unit box → arrow → house, matching the hero diagram's own visual metaphor
+    at icon scale.
+  - Verified in-browser: both themes, desktop and 375px mobile widths, all four presets (mild
+    fall day 10°C, typical winter day &minus;5°C, deep freeze &minus;20°C, compare-electric),
+    keyboard slider End-key to max (15°C, COP 4.66× — confirmed it stays within the gauge's
+    5× scale with no clipping), no console errors. Re-verified after the COP-curve swap:
+    −20°C reads 1.89× and 10°C reads 4.19× (between the table's 0°C/3.25 and +8°C/4.00
+    points, as expected), no new label collisions introduced by the lower `GMAX`.
+  - **Third pass, same day: comparison chart + title change + trimmed note, all at Simon's
+    request.**
+    - **Title changed** from "Heat pumps don't create heat." to **"Heat Pump ~~magic~~
+      *Science*"** — literal strikethrough on "magic" (`<del>`, styled with `--bad` as the
+      strike color) and italic on "Science" (`<em>`), matching the phrasing from this file's
+      own backlog entry for the page's original pitch. The explanatory sentence that used to
+      be the h1 ("They move it. Put in 1 kWh...") moved down into the `.sub` paragraph as
+      "Heat pumps don't create heat — they move it..." so it still reads standalone now that
+      the h1 no longer sets up the "they" antecedent.
+    - **New COP-vs-temperature comparison chart**, added beside the flow-diagram hero (new
+      `.herorow` 2-column grid wrapping both, stacking to 1 column under 900px — a deliberate
+      deviation from STYLE_GUIDE.md's single full-width hero, matching CLAUDE.md's "deviate if
+      the concept calls for it" allowance). Hand-authored inline SVG, no chart library: three
+      curves over −20°C to +20°C — gas furnace (flat 0.90, doesn't depend on outdoor temp),
+      the real heat-pump curve (same `realisticCOP()`/`COP_CURVE` used elsewhere on the page),
+      and the Carnot ceiling (`carnotCOP()`). **The Carnot curve is genuinely unbounded** as
+      T<sub>C</sub>→T<sub>H</sub> (21°C), so plotting it on the same linear 0–10× axis as the
+      other two — which is what makes the comparison legible — means it must go off-scale
+      well before the domain's warm end. Handled honestly rather than clipped silently: the
+      chart's y-cap (`CHART_YMAX=10`) and the exact temperature where Carnot crosses it
+      (`CARNOT_CAP_T`, solved algebraically from `T_H`/`CHART_YMAX` rather than hardcoded) are
+      computed together, the dashed Carnot line simply stops being drawn past that point, and
+      a small arrow glyph marks where it runs off the top. A text line below the chart
+      (`#chartCurrent`) states all three current values in words regardless of scale — e.g.
+      "Carnot ceiling ≈294.1× (off scale)" at 20°C — so the answer is never just implied by a
+      line vanishing off the edge. Slider range extended −20…+15°C → **−20…+20°C** to match
+      the chart's requested domain; `COP_CURVE`'s warm-end extrapolated point moved from
+      +15°C/4.66 to +20°C/5.13 (same 0↔+8°C slope continued further, so +15°C still
+      interpolates to the same 4.66 as before — no discontinuity introduced), and the gauge's
+      `GMAX` bumped 5→6 to keep clearing the new 5.13 ceiling with margin.
+    - **Note paragraph shortened** from ~230 words to ~110 — cut the step-by-step numeric
+      walk-through of the COP curve's control points (now redundant with the chart itself)
+      and tightened the energy-conservation explanation to one sentence, while keeping both
+      citations (Carnot/Wikipedia, Daikin Quebec) and the "one product line, not a universal
+      curve" caveat.
+    - Verified in-browser: both themes, desktop and 375px mobile (chart restacks correctly
+      below the flow diagram, all labels wrap without collision), −20°C/10°C/20°C slider
+      positions (7.17×/on-chart, in-between, ≈294× off-chart-with-arrow respectively), no
+      console errors.
+  - **Fourth pass, same day: vertical centering + a third heating device (natural gas), both
+    at Simon's request.**
+    - **`.herorow` centered vertically** (`align-items:start`→`center`) so the shorter flow
+      diagram sits centered against the taller chart column instead of pinned to its top edge
+      — a one-line CSS change, no JS involved since the diagram's own internal labels are
+      absolutely positioned relative to its own box and unaffected by the box's position
+      within the row.
+    - **`DEVICES` gained a third entry, `gas` ("Natural gas"), fixed at COP 0.90** (the same
+      `GAS_COP` constant the comparison chart's flat line already used) — the first device on
+      this page with COP genuinely below 1, which needed real new machinery, not just a third
+      button: `cop()` gained a `state.device==='gas'` branch; `dev()` was rewritten to look up
+      by `key` instead of assuming a hardcoded `state.device==='hp'?0:1` index (that
+      shortcut would have silently mis-resolved for gas); the input icon switches between the
+      existing plug (electricity) and a new hand-drawn flame path (fuel) via `d.icon`/`d.key`;
+      the unit label reads "furnace" for gas, "heat pump"/"heater" as before otherwise; and
+      the input arrow's label switches from "W · 1.00 kWh" to "Fuel · 1.00 kWh equiv." to be
+      honest that fuel and electricity are being compared on a common energy basis, not that
+      gas is literally metered in kWh.
+    - **New loss arrow and label** (`lossLine`/`lblLoss`), the "new line of loss" Simon asked
+      for: exits the unit box upward (mirroring the input arrow's "upward into the box" from
+      below, so the two read as a matched pair) with width scaled to `1−COP` and opacity/
+      visibility gated on `c<1` — invisible for heat pump/electric, visible only for gas.
+      Needed real headroom above the unit box that didn't exist before: `geom()`'s `cy`/`vbH`
+      both grew by ~10px (`70/150`→`78/160` narrow, `80/170`→`88/180` wide) to reserve that
+      space unconditionally, so toggling to gas doesn't reflow/resize the diagram relative to
+      the other two devices.
+    - **Gauge became a genuine three-way split**, not just a bigger legend: previously the
+      "paid" segment always spanned a fixed 0→1× (implicitly assuming COP≥1) with "free"
+      making up any excess above it. For gas that assumption is wrong — paid-for energy can
+      go **unrecovered**. Rewrote the segment math in `drawResult()` as a branch on `c>=1`:
+      the ≥1 case keeps the old paid(0→1)+free(1→COP) split; the new <1 case draws
+      paid/delivered from 0→COP and a `.loss` segment (new `var(--bad)` fill, new `#gLoss`
+      div) from COP→1, i.e. the paid-for energy that never became heat. The gauge's reference
+      tick/label was renamed from "electric heater" to the device-agnostic **"1× = fully paid
+      for"**, since that tick is now a meaningful anchor for three devices, not a callout to
+      one specific one. `verdictSub`/`effortLine` text and the result number's color
+      (`--accent` above 1, `--bad` below 1, `--fg` at exactly 1) all gained a third branch to
+      match.
+    - Added a "compare: natural gas" preset alongside the existing electric one, and extended
+      the note's existing gas-furnace sentence (already there from the chart-adding pass) to
+      point at the new loss arrow and mention all three devices are toggleable.
+    - Verified in-browser: gas device shows flame icon, red loss arrow + "lost · 0.10 kWh"
+      label, red gauge segment ending exactly at the "1×" tick, 90% headline in `--bad`, in
+      both themes and at 375px mobile (loss label wraps to two lines without clipping the top
+      of the diagram); electric heater and heat pump re-verified unaffected (zero-width loss
+      segment, correct icon/label switching back); no console errors.
+  - **Not yet reviewed** — still a first-pass build, not marked complete. Open item for a
+    future review pass: the Daikin table's numbers are one specific product line, not a
+    universal curve — worth deciding whether to keep it as the page's single reference or
+    add a second real curve (e.g. a cold-climate model) for contrast.
+
+## Previous handoff — 2026-08-18
 
 - **Sitewide: every visualization page's topbar back-link replaced with the `mc madeclear`
   brand mark**, at Simon's request ("remove the link to the github (top left of pages) and

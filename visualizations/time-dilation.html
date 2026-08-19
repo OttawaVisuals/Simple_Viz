@@ -107,6 +107,16 @@
   .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
   .preset:hover{border-color:var(--accent);color:var(--accent)}
 
+  .lightclock{margin-top:clamp(30px,3.4vw,46px);padding-top:clamp(20px,2.4vw,30px);border-top:1px solid var(--line)}
+  .lightclock h2{font-weight:300;font-size:clamp(1.3rem,2vw,1.7rem);letter-spacing:-.02em;margin:0}
+  .lightclock .sub{margin:8px 0 0;max-width:none}
+  .lchero{margin-top:clamp(20px,2.8vw,32px)}
+  .lchero svg{width:100%;height:auto;display:block}
+  .lc-caption{margin:8px 0 0;font-size:11.5px;color:var(--muted);font-family:ui-monospace,monospace}
+  .lc-derive{margin:12px 0 0;font-size:13.5px;line-height:1.6;color:var(--muted2);font-family:ui-monospace,monospace}
+  .lc-reset{cursor:pointer;border:0;background:none;padding:0 0 2px;margin:14px 0 0;font:12px ui-monospace,monospace;color:var(--muted);border-bottom:1px solid var(--line2)}
+  .lc-reset:hover,.lc-reset:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+
   .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
   .note a{color:var(--muted2);text-decoration-color:var(--line2)}
   .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
@@ -226,8 +236,20 @@
     <button class="preset" data-p="jet">commercial jet</button>
     <button class="preset" data-p="iss">the ISS</button>
     <button class="preset" data-p="gps">a GPS satellite</button>
+    <button class="preset" data-p="probe">Parker Solar Probe</button>
     <button class="preset" data-p="v9">v/c = 0.9</button>
     <button class="preset" data-p="v99">v/c = 0.99</button>
+  </div>
+
+  <div class="lightclock">
+    <h2>Where <em>&gamma;</em> actually comes from</h2>
+    <p class="sub">Picture a &ldquo;light clock&rdquo;: two mirrors facing each other, with one photon bouncing between them &mdash; one round trip is one tick. Riding along with the clock, the photon just goes straight up and down. Watching it fly past at speed <em>v</em>, the photon has to cover that same up&ndash;down distance <em>plus</em> the sideways drift &mdash; a longer diagonal path, at the same fixed speed <em>c</em>. Same speed, longer path, more time per tick &mdash; that's the whole effect, geometrically.</p>
+    <div class="hero lchero" id="lcWrap">
+      <svg id="lcSvg" role="img" aria-label="A light clock at rest, bouncing a photon straight up and down between two mirrors, beside the same clock moving sideways, where the photon traces a longer diagonal zigzag path between the same two mirrors."></svg>
+    </div>
+    <p class="lc-caption">Schematic, not to scale &mdash; the sideways drift is exaggerated so the diagonal stays visible at every speed; it tracks the <em>v</em> slider above.</p>
+    <p class="lc-derive mono" id="lcDerive"></p>
+    <button class="lc-reset" id="lcResetBtn" type="button">&#8634; reset to slowest &amp; re-sync the clocks</button>
   </div>
 
   <p class="note">The Lorentz factor &gamma; = 1/&radic;(1&minus;v&sup2;/c&sup2;) comes from <a href="https://en.wikipedia.org/wiki/Time_dilation" target="_blank" rel="noopener">special relativity</a>, the theory Albert Einstein published in 1905. A clock moving at speed v ticks slow by a factor of 1/&gamma; as measured by a stationary observer &mdash; so over &tau; seconds of the moving clock's own (proper) time, the stationary clock counts &gamma;&middot;&tau;, an extra (&gamma;&minus;1)&middot;&tau;. This page only models that velocity term. GPS satellites' real onboard clock correction (about +38 &micro;s/day, running fast overall) also includes general-relativity <em style="font-style:italic">gravitational</em> time dilation &mdash; clocks run faster higher up in a weaker gravity well &mdash; which is a separate, larger effect this page does not model; don't read this page's velocity-only &minus;7&nbsp;&micro;s/day figure as the real GPS correction on its own. The "1 year" reference duration is a Julian year (365.25 days = 31,557,600 s). Orbital speeds (ISS, GPS) are treated as constant for this estimate, using the standard instantaneous-velocity time-dilation formula even though orbital motion is technically accelerating, not inertial.</p>
@@ -275,6 +297,12 @@
   var LOG_LO = -7, LOG_SPLIT = Math.log10(0.5), LOG_HI = -3; // v/c floor 1e-7, split at 0.5, ceiling 1-v/c=0.001 (v/c=0.999)
 
   function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+
+  // Measures label pixel widths so the gauge's tick labels (jet/ISS/GPS/Solar Probe/0.9c/
+  // 0.99c) can detect when neighbors would collide — GPS and ISS sit close together on the
+  // gauge's wide log scale — and stack onto a second row instead of overlapping.
+  var measureCtx = document.createElement('canvas').getContext('2d');
+  function textPx(text, font){ measureCtx.font = font; return measureCtx.measureText(text).width; }
 
   function vcFromP(p){
     p = clamp(p,0,PMAX);
@@ -458,6 +486,143 @@
     lblTimeB.textContent = movingYears.toFixed(2)+' yr elapsed (own time)';
   }
 
+  // ---- light-clock diagram: stationary mirror pair (photon bounces straight up/down)
+  // beside the same clock moving sideways at the slider's v (photon traces a longer
+  // diagonal zigzag) — the geometric derivation of gamma, not just the stated formula.
+  var lcWrap=$('lcWrap'), lcSvg=$('lcSvg'), lcDerive=$('lcDerive');
+  var LC_SEGS = 4; // two round trips drawn in the moving panel
+  var lc = {};
+  (function buildLightClock(){
+    lc.statTop = el('line',{stroke:'var(--line2)','stroke-width':2});
+    lc.statBot = el('line',{stroke:'var(--line2)','stroke-width':2});
+    lc.movTop = el('line',{stroke:'var(--line2)','stroke-width':2});
+    lc.movBot = el('line',{stroke:'var(--line2)','stroke-width':2});
+    lc.movPath = el('polyline',{fill:'none',stroke:'var(--muted2)','stroke-width':1.5,'stroke-linejoin':'round'});
+    lc.triV = el('line',{stroke:'var(--muted)','stroke-width':1,'stroke-dasharray':'3,3'});
+    lc.triH = el('line',{stroke:'var(--muted)','stroke-width':1,'stroke-dasharray':'3,3'});
+    lc.statDot = el('circle',{r:4,fill:'var(--fg)'});
+    lc.movDot = el('circle',{r:4,fill:'var(--fg)'});
+    lc.statTitle = el('text',{fill:'var(--muted2)','font-size':11,'font-family':'ui-monospace,monospace','text-anchor':'middle'});
+    lc.movTitle = el('text',{fill:'var(--fg)','font-size':11,'font-family':'ui-monospace,monospace','text-anchor':'middle'});
+    lc.statL = el('text',{fill:'var(--muted)','font-size':11,'font-family':'ui-monospace,monospace','text-anchor':'end'});
+    lc.triVL = el('text',{fill:'var(--muted)','font-size':11,'font-family':'ui-monospace,monospace','text-anchor':'end'});
+    lc.triHL = el('text',{fill:'var(--muted)','font-size':11,'font-family':'ui-monospace,monospace','text-anchor':'middle'});
+    lc.triCL = el('text',{fill:'var(--accent)','font-size':11,'font-family':'ui-monospace,monospace','text-anchor':'middle'});
+    [lc.statTop,lc.statBot,lc.movTop,lc.movBot,lc.movPath,lc.triV,lc.triH,
+     lc.statDot,lc.movDot,lc.statTitle,lc.movTitle,lc.statL,lc.triVL,lc.triHL,lc.triCL
+    ].forEach(function(node){ lcSvg.appendChild(node); });
+  })();
+
+  var lcGeomCache=null, lcPts=null;
+  function lcGeom(w){
+    var narrow = w<620;
+    var L = clamp(narrow ? w*0.10 : w*0.062, 32, 58);
+    var padTop=26, padBot=18;
+    var cy = padTop+L;
+    var vbH = cy+L+padBot;
+    var statW = narrow ? 76 : 112;
+    var statX0 = 6;
+    var gapBetween = narrow ? 30 : 50;
+    var movX0 = statX0+statW+gapBetween;
+    var movAvail = Math.max(w-movX0-10, 60);
+    return {w:w, vbH:vbH, L:L, cy:cy, statX0:statX0, statW:statW, movX0:movX0, movAvail:movAvail};
+  }
+
+  function drawLightClock(){
+    var w = lcWrap.clientWidth || heroW || 1100;
+    var g = lcGeom(w);
+    lcGeomCache = g;
+    lcSvg.setAttribute('viewBox','0 0 '+w+' '+g.vbH);
+
+    var vc = vcFromP(state.p), gam = gammaOf(vc);
+    var accentOn = state.active==='v';
+
+    // stationary panel
+    var sx1=g.statX0, sx2=g.statX0+g.statW, scx=(sx1+sx2)/2;
+    lc.statTop.setAttribute('x1',sx1); lc.statTop.setAttribute('x2',sx2);
+    lc.statTop.setAttribute('y1',g.cy-g.L); lc.statTop.setAttribute('y2',g.cy-g.L);
+    lc.statBot.setAttribute('x1',sx1); lc.statBot.setAttribute('x2',sx2);
+    lc.statBot.setAttribute('y1',g.cy+g.L); lc.statBot.setAttribute('y2',g.cy+g.L);
+    lc.statTitle.setAttribute('x',scx); lc.statTitle.setAttribute('y',g.cy-g.L-10);
+    lc.statTitle.textContent='Stationary';
+    lc.statL.setAttribute('x',sx2+14); lc.statL.setAttribute('y',g.cy+3.5);
+    lc.statL.setAttribute('text-anchor','start');
+    lc.statL.textContent='L';
+
+    // moving panel: a zigzag path drifting right as the clock ticks, horizontal
+    // step per half-tick scaled directly by v/c (0 at rest, fills the panel near c)
+    var leftPad=6, rightPad=6;
+    var maxHalf = (g.movAvail-leftPad-rightPad)/LC_SEGS;
+    var halfStep = vc*maxHalf;
+    var x0 = g.movX0+leftPad;
+    var pts=[[x0,g.cy+g.L]];
+    var up=true, cx=x0;
+    for(var i=0;i<LC_SEGS;i++){ cx+=halfStep; pts.push([cx, up?g.cy-g.L:g.cy+g.L]); up=!up; }
+    lcPts = pts;
+    var mx1=g.movX0, mx2=pts[pts.length-1][0]+rightPad;
+    lc.movTop.setAttribute('x1',mx1); lc.movTop.setAttribute('x2',mx2);
+    lc.movTop.setAttribute('y1',g.cy-g.L); lc.movTop.setAttribute('y2',g.cy-g.L);
+    lc.movBot.setAttribute('x1',mx1); lc.movBot.setAttribute('x2',mx2);
+    lc.movBot.setAttribute('y1',g.cy+g.L); lc.movBot.setAttribute('y2',g.cy+g.L);
+    lc.movPath.setAttribute('points', pts.map(function(p){ return p[0].toFixed(1)+','+p[1].toFixed(1); }).join(' '));
+    lc.movPath.setAttribute('stroke', accentOn?'var(--accent)':'var(--muted2)');
+    var mcx=(mx1+mx2)/2;
+    lc.movTitle.setAttribute('x',mcx); lc.movTitle.setAttribute('y',g.cy-g.L-10);
+    lc.movTitle.setAttribute('fill', accentOn?'var(--accent)':'var(--fg)');
+    lc.movTitle.textContent='Moving — v = '+fmtVc(vc)+' c';
+
+    // first half-tick triangle: vertical leg L, horizontal leg vt, hypotenuse ct
+    var p0=pts[0], p1=pts[1];
+    lc.triV.setAttribute('x1',p1[0]); lc.triV.setAttribute('x2',p1[0]);
+    lc.triV.setAttribute('y1',p1[1]); lc.triV.setAttribute('y2',p0[1]);
+    lc.triH.setAttribute('x1',p0[0]); lc.triH.setAttribute('x2',p1[0]);
+    lc.triH.setAttribute('y1',p0[1]); lc.triH.setAttribute('y2',p0[1]);
+    lc.triVL.setAttribute('x',p1[0]-6); lc.triVL.setAttribute('y',(p0[1]+p1[1])/2+3.5);
+    lc.triVL.textContent='L';
+    lc.triHL.setAttribute('x',(p0[0]+p1[0])/2); lc.triHL.setAttribute('y',p0[1]+16);
+    lc.triHL.textContent = halfStep<18 ? 'vt' : 'v·t';
+    var midx=(p0[0]+p1[0])/2, midy=(p0[1]+p1[1])/2;
+    lc.triCL.setAttribute('x',midx+ (halfStep<18?10:16)); lc.triCL.setAttribute('y',midy-4);
+    lc.triCL.setAttribute('fill', accentOn?'var(--accent)':'var(--muted2)');
+    lc.triCL.textContent = halfStep<18 ? 'ct' : 'c·t';
+
+    lcDerive.innerHTML = '(c&middot;t)&sup2; = (v&middot;t)&sup2; + L&sup2; &nbsp;&rArr;&nbsp; t = t&#8320;&middot;&gamma;, with &gamma; = '+fmtGammaLegend(gam)+' at v = '+fmtVc(vc)+' c &mdash; the same factor as the result below.';
+
+    // Both dots represent the same photon speed c, so they must move at the same pixel
+    // speed — the moving dot only *appears* slower per tick because its zigzag path (the
+    // hypotenuse, c·t) is physically longer than the stationary one-way hop (L). Deriving
+    // each panel's tick length from real path distance (instead of two independent fixed
+    // timers) is what makes the moving clock visibly lag, matching the physics instead of
+    // contradicting it.
+    lc.Dstat = 2*g.L; // one-way mirror-to-mirror distance, stationary panel
+    var segLen = Math.sqrt(halfStep*halfStep + (2*g.L)*(2*g.L));
+    lc.Dmov = LC_SEGS*segLen; // one-way distance across the full drawn zigzag
+
+    updateLightClockDots();
+  }
+
+  var lcStatAccum=0, lcMovAccum=0;
+  var LC_SPEED = 60; // shared px/s "photon speed" driving both dots — see note above
+  function triWave(t){ return t<0.5 ? t*2 : (1-t)*2; }
+  function updateLightClockDots(){
+    if(!lcGeomCache || !lcPts) return;
+    var g=lcGeomCache;
+    var sx=g.statX0+g.statW/2;
+    var phaseStat = (lc.Dstat>0) ? (lcStatAccum/(2*lc.Dstat))%1 : 0;
+    // starts at the bottom mirror, same as the moving panel's path (pts[0]), so both dots
+    // depart together at phase 0 instead of starting at opposite mirrors
+    var sy=g.cy+g.L - triWave(phaseStat)*2*g.L;
+    lc.statDot.setAttribute('cx',sx); lc.statDot.setAttribute('cy',sy);
+
+    var phaseMov = (lc.Dmov>0) ? (lcMovAccum/(2*lc.Dmov))%1 : 0;
+    var segF=triWave(phaseMov)*LC_SEGS;
+    var idx=Math.min(Math.floor(segF),LC_SEGS-1);
+    var local=segF-idx;
+    var p0=lcPts[idx], p1=lcPts[idx+1];
+    var mx=p0[0]+(p1[0]-p0[0])*local, my=p0[1]+(p1[1]-p0[1])*local;
+    lc.movDot.setAttribute('cx',mx); lc.movDot.setAttribute('cy',my);
+  }
+
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var rafId=null, lastTs=null;
   function tick(ts){
@@ -466,6 +631,9 @@
     var dt=(ts-lastTs)/1000; lastTs=ts;
     simYears += dt/3; // one full lap of the stationary hand every 3 real seconds
     updateHands();
+    lcStatAccum += LC_SPEED*dt;
+    lcMovAccum += LC_SPEED*dt;
+    updateLightClockDots();
   }
 
   // ---- equation + legend colouring ----
@@ -548,7 +716,7 @@
   var gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
   var GAUGE_REFS = [
     {key:'jet', label:'jet'}, {key:'iss', label:'ISS'}, {key:'gps', label:'GPS'},
-    {key:'v9', label:'0.9c'}, {key:'v99', label:'0.99c'}
+    {key:'probe', label:'Solar Probe'}, {key:'v9', label:'0.9c'}, {key:'v99', label:'0.99c'}
   ];
 
   function drawResult(){
@@ -594,6 +762,36 @@
       gTicksEl.innerHTML = t; gTicksEl.dataset.built='1';
       gLabelsEl.innerHTML = l;
     }
+    layoutGaugeTickLabels();
+  }
+
+  // Adjacent presets (GPS at 3,874 m/s and the ISS at 7,660 m/s) sit close together on the
+  // gauge's wide log scale and their labels can overlap at narrower widths. Re-measured on
+  // every draw (so it tracks resize, unlike the tick positions above which are only built
+  // once) — greedily assigns colliding labels to a second row instead of leaving them
+  // overlapping.
+  function layoutGaugeTickLabels(){
+    var gaugeEl = $('gauge');
+    var gaugeWidthPx = gaugeEl.clientWidth || 460;
+    var labelEls = gLabelsEl.children;
+    var items = GAUGE_REFS.map(function(ref, i){
+      var p0 = pFromVc(PRESETS[ref.key].vc);
+      var leftPx = p0/PMAX*gaugeWidthPx;
+      var w = textPx(ref.label, '400 9.5px ui-monospace, monospace');
+      return {i:i, leftPx:leftPx, w:w};
+    });
+    items.sort(function(a,b){ return a.leftPx-b.leftPx; });
+    var GAP = 6;
+    var rowRight = [-Infinity,-Infinity];
+    items.forEach(function(it){
+      var left = it.leftPx-it.w/2, right = it.leftPx+it.w/2;
+      var row = left >= rowRight[0]+GAP ? 0 : left >= rowRight[1]+GAP ? 1 : (rowRight[0]<=rowRight[1] ? 0 : 1);
+      rowRight[row] = right;
+      it.row = row;
+    });
+    var stacked = items.some(function(it){ return it.row===1; });
+    items.forEach(function(it){ labelEls[it.i].style.top = it.row===1 ? '45px' : ''; });
+    gaugeEl.style.height = stacked ? '68px' : '';
   }
 
   // ---- presets (real, verified speeds) ----
@@ -601,6 +799,7 @@
     jet: {vc: 250/C},
     iss: {vc: 7660/C},
     gps: {vc: 3874/C},
+    probe: {vc: 192000/C}, // Parker Solar Probe's record speed near the Sun — see earth-moon-race.html
     v9:  {vc: 0.9},
     v99: {vc: 0.99}
   };
@@ -612,6 +811,19 @@
       state.active = 'v';
       render();
     });
+  });
+
+  // ---- light-clock reset: jump to the slowest speed and zero both animation-distance
+  // accumulators, so the two dots start a fresh tick together instead of wherever they'd
+  // drifted to under the previous (possibly much faster) speed.
+  $('lcResetBtn').addEventListener('click', function(){
+    state.p = 0;
+    state.presetKey = null;
+    state.active = 'v';
+    lcStatAccum = 0;
+    lcMovAccum = 0;
+    simYears = 0;
+    render();
   });
 
   // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
@@ -660,6 +872,7 @@
     vSlider.draw();
     $('vReadout').textContent = fmtVc(vcFromP(state.p))+' c · '+fmtVms(vcFromP(state.p)*C);
     drawResult();
+    drawLightClock();
   }
 
   state.p = pFromVc(0.8); // default: a visibly noticeable but not extreme dilation

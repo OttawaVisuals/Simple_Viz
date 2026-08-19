@@ -217,6 +217,16 @@ headline result → essential interpretation → gauge/bar → comparison text a
 If a reference label belongs to a specific tick, place it below that tick unless there is a
 verified non-overlapping reason to do otherwise.
 
+**A second section's `<p class="sub">` should use the full column width, not the topgrid's
+52ch measure.** The base `.sub` rule (in the `.topgrid` header) caps line length at `52ch`
+because it sits beside an equation/legend column and needs to stay narrow. A second section
+added lower on the page (`starsection`, `lightclock`, or similar — see
+[`starlight-spectrum.html`](visualizations/starlight-spectrum.html) and
+[`time-dilation.html`](visualizations/time-dilation.html)) is full-width on its own row, so
+inheriting that cap just leaves empty space beside the text for no reason. Override it
+explicitly: `.yoursection .sub{max-width:none}`, alongside the smaller top margin these
+sections already use.
+
 **Presets row** — text-styled buttons (no border/background, just an underline), each
 setting the full interactive state to a named real-world example in one click.
 

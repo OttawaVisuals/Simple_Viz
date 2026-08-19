@@ -15,6 +15,81 @@ tool can pick up mid-stream without re-reading the whole chat history.
 
 ## Current handoff — 2026-08-18
 
+- **`visualizations/time-dilation.html` gained a light-clock derivation diagram** (new
+  `.lightclock` section, added after the existing presets row and before the closing note,
+  matching `starlight-spectrum.html`'s "second section extends the skeleton" precedent). The
+  page's existing analog-clock hero already showed *that* moving clocks run slow, tied to the
+  velocity slider; this section shows *why*, geometrically — two mirrors with one photon
+  bouncing between them (one round trip = one tick). A small stationary panel bounces the
+  photon straight up/down; beside it, the same clock moving at the slider's current v draws a
+  static zigzag path (two round trips, `LC_SEGS=4` segments) whose horizontal step per
+  half-tick is `v/c × maxHalfStep` — 0 at rest, filling the panel near c — with an animated dot
+  ping-ponging along it (decorative pacing, not tied to real elapsed time, same category as the
+  existing clock-hand loop). The first half-tick is annotated as a right triangle (`L`
+  vertical, `v·t` horizontal, `c·t` hypotenuse), and a derivation line beneath states
+  `(c·t)² = (v·t)² + L² ⇒ t = t₀·γ` with the live γ value, tying directly back to the Lorentz
+  factor already shown in the equation/result above rather than introducing a second,
+  disconnected number. Explicitly labeled "schematic, not to scale" per the site's honesty
+  convention (the linear `v/c × maxHalfStep` mapping is illustrative, not the real path-length
+  ratio). Verified in-browser via `getBBox()` checks (no dedicated screenshot tool available
+  this session, same limitation noted for other animated pages): no label overlap at desktop
+  (1163px) or mobile (375px) width, at both slider extremes (`jet` preset ≈8×10⁻⁷c and `v99`
+  preset =0.99c — including the near-zero case where the two adjacent "L" labels sit only 4px
+  apart but don't touch), in both themes, no console errors, zigzag path/mirrors stay inside
+  the SVG viewBox at every width.
+  - **Follow-up pass, same day:** three fixes/additions after Simon tried the page.
+    (1) The `.lightclock .sub` paragraph inherited the topgrid header's `.sub{max-width:52ch}`
+    rule, leaving dead space beside the text since this section is full-width on its own row
+    (no adjacent equation/legend column to make room for). Added `.lightclock .sub{max-width:
+    none}` — recorded as a general pattern in
+    [STYLE_GUIDE.md](STYLE_GUIDE.md#component-patterns) ("A second section's `<p class="sub">`
+    should use the full column width") so future second sections (`starsection`-style) don't
+    repeat it. (2) Added a "↺ reset to slowest & re-sync the clocks" button
+    (`#lcResetBtn`) inside `.lightclock`: sets `state.p=0` and zeroes both `lcStatAccum`/
+    `lcMovAccum` animation-distance accumulators (plus `simYears`, so the main hero clock
+    hands reset too), because dragging the speed slider around leaves the two dots at
+    arbitrary, unequal points in their own tick cycles — without a reset there was no way to
+    cleanly demonstrate "at low speed these tick at the same rate." Fixing this surfaced a
+    second, real bug: the moving panel's static path starts at the *bottom* mirror
+    (`pts[0]=[x0,cy+L]`) while the stationary dot's phase-0 position was the *top* mirror, so
+    right after reset the two dots sat at opposite mirrors — same tick rate, opposite phase,
+    which still visually reads as "not synced." Fixed by flipping the stationary dot's phase
+    mapping (`sy = cy+L − triWave(phase)·2L`, was `cy−L + triWave(phase)·2L`) to also start at
+    the bottom. Verified via `getBoundingClientRect()`-equivalent (`circle` cy/cx read
+    directly): both dots land on the identical y-coordinate immediately after reset and stay
+    matched 400ms later at low speed. (3) Added the Parker Solar Probe as a sixth preset
+    (192 km/s, the same record-near-Sun figure already sourced in `earth-moon-race.html`) and
+    gauge tick, answering Simon's actual question — yes, even the fastest human-made object is
+    measurably time-dilated, just barely: verified ≈6.47 s/year, ≈17.7 ms/day, "Small." tier
+    (between GPS and 0.9c on the gauge).
+  - **ISS/GPS gauge tick-label collision, fixed same day.** The ISS and GPS labels overlapped
+    by ~9px at default width — pre-existing, independent of the probe addition (each tick's
+    position only depends on its own preset, not on `GAUGE_REFS` order/count). This was first
+    flagged as a background task and picked up in a separate `git worktree`, but that worktree
+    had branched from the last *committed* state (`b144839`) — since the light-clock diagram,
+    reset button, and Probe preset above were all still uncommitted in the main working tree at
+    that point, the worktree's copy of `time-dilation.html` had none of them, and its fix was
+    applied to that stale file (confirmed: zero matches for `lightclock`/`Solar
+    Probe`/`lcResetBtn` in its diff). Re-applied the same fix directly against the current file
+    instead of merging that branch: a new `layoutGaugeTickLabels()` measures each `.ticklabel`'s
+    pixel width via a cached canvas `measureText` context, sorts by gauge position, and greedily
+    assigns colliding labels to a second row (`top:45px`, gauge height `56px→68px` when
+    stacked) — reusing the same measure-and-stack pattern as `braking-distance.html` (commit
+    `b95e531`). Called every `drawResult()` (not gated behind the one-time tick-building block)
+    so it re-resolves on resize instead of freezing at first-render width. Verified via
+    `getBoundingClientRect()`: ISS now sits on row 2 while GPS/jet/Solar Probe/0.9c/0.99c stay
+    on row 1 with no overlaps, at both desktop and 375px mobile widths and in both themes; no
+    console errors. **Lesson for next time:** a background task run in a worktree only sees
+    committed history — if a suggested fix targets a file with uncommitted local changes,
+    either commit first or expect the worktree's result to need re-applying, not merging.
+  - **Marked reviewed and complete.** Added to the reviewed-only homepage's **Discoveries**
+    group in `index.html` (card `24 / Relativity`, third page in that category — category count
+    bumped "Two pages"→"Three pages", the topbar's "Nine equations"→"Ten equations", and the
+    search bar's live "9 pages"→"10 pages"), and removed from `unreviewed.html`'s draft list
+    (count "40 pages"→"39 pages"). `tracker.html`'s `PAGES` array already listed
+    `time-dilation.html` under Discoveries from the original eighteen-page batch, so no change
+    needed there. No open items remain.
+
 - **`visualizations/braking-distance.html` received a full review and interaction pass today**
   across commits `5907b00`, `6e54faf`, and `cea829c` (all pushed to `main`). Final page state:
   - The title correctly says **braking distance**, since reaction distance grows linearly with

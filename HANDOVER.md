@@ -15,6 +15,43 @@ tool can pick up mid-stream without re-reading the whole chat history.
 
 ## Current handoff — 2026-08-18
 
+- **Sitewide: every visualization page's topbar back-link replaced with the `mc madeclear`
+  brand mark**, at Simon's request ("remove the link to the github (top left of pages) and
+  replace with the mc logo/name and link to the main page"). Previously each page's top-left
+  was a plain `&larr; Physics you can see` text link to `../index.html`, with a JS fallback
+  that swapped it to a GitHub-repo link whenever the page was opened somewhere that relative
+  path wouldn't resolve (published standalone, e.g. as an Artifact) — documented in
+  STYLE_GUIDE.md's old "Back link" section. That fallback is exactly what Simon wanted gone.
+  Replaced across all 49 files in `visualizations/` with `index.html`'s own hand-drawn `mc`
+  icon + "madeclear" wordmark (`<a class="brand" href="../index.html">…</a>`), scaled to ~72%
+  size to fit the topbar's thin row, always pointing at `../index.html` with no JS fallback —
+  see STYLE_GUIDE.md's updated "Back link" entry for the exact markup/CSS to copy into future
+  pages. Applied mechanically with a small Perl script (`fix_topbar.pl`, not committed — lived
+  in the session scratchpad) since the pattern was byte-identical across every "normal" file;
+  `straw-hose-flow-darcy.html`'s single-line minified markup and its own differently-shaped
+  minified fallback (`var back=$('backLink')...`, missed by the first pass's more specific
+  pattern match since it wasn't literally `backLink.href = ...`) were fixed by hand — that
+  file's separate footer "GitHub" link was deliberately left alone since it's unrelated to the
+  top-left request. **Two real bugs caught while scripting this, both from the same root
+  cause:** `local $/` (slurp mode, needed to read a whole file at once) silently makes Perl's
+  `chomp()` a no-op, since `chomp` strips whatever `$/` currently holds and `$/` was undef —
+  the first attempt left a stray blank line after every `</a>` tag from an un-chomped trailing
+  newline in the replacement HTML, and separately corrupted the em dash in `aria-label="Made
+  clear — home"` into mojibake because the script lacked `use utf8;` (needed so literal
+  non-ASCII characters in Perl source are read as UTF-8 rather than raw bytes before being
+  re-encoded on write). Caught both on the first single-file trial run before the 47-file batch
+  application — restored from a backup copy and fixed the script rather than needing to revert
+  47 files after the fact. Verified after the full rollout: `grep` for `backLink` and for the
+  `github.com/OttawaVisuals` fallback URL across every file (clean except the intentional
+  darcy footer link), div tag-balance counts per file, no console errors and correct rendering
+  in-browser at desktop/375px width and both themes on several sampled pages
+  (`straw-hose-flow-darcy.html`, `pizza-area.html`, `half-life.html`, `time-dilation.html`).
+- **`index.html`'s Featured section: swapped the straw card for the pizza one**, at Simon's
+  request ("remove the straw from the main page (replace with the pizza)"). `straw-hose-flow.
+  html` remains linked from its own reviewed category card further down the page (Fun physics)
+  and from `about.html`'s origin story — only the homepage's three-card Featured spotlight
+  changed, now: pizza-area, potato-trajectory, earth-moon-race.
+
 - **`visualizations/time-dilation.html` gained a light-clock derivation diagram** (new
   `.lightclock` section, added after the existing presets row and before the closing note,
   matching `starlight-spectrum.html`'s "second section extends the skeleton" precedent). The

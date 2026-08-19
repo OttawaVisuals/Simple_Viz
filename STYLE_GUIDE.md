@@ -91,9 +91,9 @@ in-page toggle, see below) must work:
 
 Top to bottom, in this order:
 
-1. **`.topbar`** — back link (`&larr; Physics you can see`) on the left, a small-caps
-   monospace tag naming the underlying law/equation plus the theme toggle button on the
-   right.
+1. **`.topbar`** — the `mc madeclear` brand mark (linking to `../index.html`) on the left, a
+   small-caps monospace tag naming the underlying law/equation plus the theme toggle button
+   on the right.
 2. **`.topgrid`** — a 3-column row: title + one-paragraph subtitle (widest column) | the
    equation, centered both axes in its box | a compact legend table translating each
    equation symbol to its current value.
@@ -245,29 +245,41 @@ validation, strict size and value limits, a hidden honeypot, and a daily HMAC du
 that never stores the underlying IP address or user-agent string. Add Turnstile only if
 observed spam justifies making this explicit exception.
 
-**Back link** — `<a href="../index.html" id="backLink">&larr; Physics you can see</a>` in the
-topbar only resolves when the file is actually sitting in `visualizations/` next to the site
-index — true when opened straight from the repo (the primary use case per CLAUDE.md) or from
-a real deployment at the same relative layout, but not when the page is published standalone
-(e.g. as an Artifact), where there's no sibling `index.html` to reach and the link 404s. Every
-page detects this and falls back to the GitHub repo instead of leaving a dead link — add this
-right after the theme-toggle's `applyTheme(currentTheme());` call:
+**Back link — the `mc madeclear` brand mark**, not a text link. Every page's topbar links
+back to the homepage using the same hand-drawn wordmark `index.html` itself uses in its own
+topbar, scaled down to fit the thin `.topbar` row (removed 2026-08-18; a plain `&larr; Physics
+you can see` text link with a GitHub-repo JS fallback for standalone/Artifact publishes was
+used before that — the fallback needed a runtime check since `../index.html` only resolves
+when the file is actually sitting in `visualizations/` next to the site index, which the brand
+mark sidesteps by simply always pointing home):
 
-```js
-(function(){
-  var backLink = document.getElementById('backLink');
-  if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
-    backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
-    backLink.target = '_blank';
-    backLink.rel = 'noopener';
-    backLink.textContent = 'Simple Viz on GitHub ↗';
-  }
-})();
+```html
+<a class="brand" href="../index.html" aria-label="Made clear — home">
+  <svg class="brand-icon" viewBox="0 0 58 28" aria-hidden="true">
+    <text x="22" y="16">mc</text>
+    <path d="M1 22 C3 22 3 16 5 16 S7 26 9 26 S11 13 13 13 S15 23 17 23 S19 18 21 18 L57 18"/>
+  </svg>
+  <span class="brand-word" aria-hidden="true"><span>m</span><span class="sub">ade</span><span>c</span><span class="sub">lear</span></span>
+</a>
 ```
 
-The check is a pure `location.pathname` regex — no `fetch` probe, since `fetch` to a relative
-path on a `file://` page is blocked by CORS in Chrome and would false-negative on exactly the
-"open the file directly" case this is meant to protect.
+```css
+.brand{display:flex;align-items:center;gap:8px;color:var(--fg);text-transform:none;letter-spacing:0}
+.brand:hover{color:var(--accent)}
+.brand-icon{display:block;width:42px;height:20px;overflow:visible}
+.brand-icon text{fill:currentColor;font:italic 16px Georgia,"Iowan Old Style","Palatino Linotype",serif}
+.brand-icon path{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.brand-word{display:flex;align-items:baseline;font:italic 18px/1 Georgia,"Iowan Old Style","Palatino Linotype",serif;white-space:nowrap}
+.brand-word .sub{font-size:.54em;line-height:1;transform:translateY(.38em);margin-right:.18em;color:inherit}
+```
+
+These sizes are index.html's own `.brand`/`.brand-icon`/`.brand-word` rules scaled to about
+72% (58px→42px icon width, 22px→16px/25px→18px type) so the taller wordmark still fits the
+topbar's thin 11px-row height without forcing it to grow much; `.topbar`'s own
+`align-items:baseline` needs to become `align-items:center` for the same reason, or the
+wordmark sits too high against the theme-toggle/tag text on its right. No JS or fallback
+needed — a single fixed `href` is enough now that there's no GitHub-repo alternative to fall
+back to.
 
 ## JS architecture notes
 

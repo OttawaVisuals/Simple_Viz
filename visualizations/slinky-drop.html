@@ -29,8 +29,15 @@
   main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
   .wrap{max-width:1320px;margin:0 auto}
 
-  .topbar{display:flex;justify-content:space-between;align-items:baseline;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
   .topbar a{text-decoration:none}
+  .brand{display:flex;align-items:center;gap:8px;color:var(--fg);text-transform:none;letter-spacing:0}
+  .brand:hover{color:var(--accent)}
+  .brand-icon{display:block;width:42px;height:20px;overflow:visible}
+  .brand-icon text{fill:currentColor;font:italic 16px Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  .brand-icon path{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .brand-word{display:flex;align-items:baseline;font:italic 18px/1 Georgia,"Iowan Old Style","Palatino Linotype",serif;white-space:nowrap}
+  .brand-word .sub{font-size:.54em;line-height:1;transform:translateY(.38em);margin-right:.18em;color:inherit}
   .topbar-right{display:flex;align-items:baseline;gap:16px}
   .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
   .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
@@ -144,7 +151,13 @@
 <div class="wrap">
 
   <div class="topbar">
-    <a href="../index.html" id="backLink">&larr; Physics you can see</a>
+    <a class="brand" href="../index.html" aria-label="Made clear — home">
+      <svg class="brand-icon" viewBox="0 0 58 28" aria-hidden="true">
+        <text x="22" y="16">mc</text>
+        <path d="M1 22 C3 22 3 16 5 16 S7 26 9 26 S11 13 13 13 S15 23 17 23 S19 18 21 18 L57 18"/>
+      </svg>
+      <span class="brand-word" aria-hidden="true"><span>m</span><span class="sub">ade</span><span>c</span><span class="sub">lear</span></span>
+    </a>
     <div class="topbar-right">
       <span>Slinky drop</span>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
@@ -662,20 +675,6 @@
     applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
   });
   applyTheme(currentTheme());
-
-  // The relative "../index.html" link only resolves when this file is sitting in
-  // Simple_Viz/visualizations/ next to the site index. Published standalone (e.g. as an
-  // Artifact) there's no sibling index to reach, so fall back to the GitHub repo instead of
-  // leaving a link that 404s.
-  (function(){
-    var backLink = document.getElementById('backLink');
-    if(!/\/visualizations\/[^\/]+\.html?$/i.test(location.pathname)){
-      backLink.href = 'https://github.com/OttawaVisuals/Simple_Viz';
-      backLink.target = '_blank';
-      backLink.rel = 'noopener';
-      backLink.textContent = 'Simple Viz on GitHub ↗';
-    }
-  })();
 
   function measure(){
     var w = heroWrap.clientWidth;

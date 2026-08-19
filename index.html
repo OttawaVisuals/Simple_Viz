@@ -2,23 +2,25 @@
 <html lang="en">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="assets/brand/favicon.ico">
 <title>Physics You Can See</title>
 <style>
   /* Tokens, type and topbar are the shared set from STYLE_GUIDE.md — kept byte-identical to
      straw-hose-flow.html so the index reads as the same site as the pages it links to. */
   :root{
     --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
-    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--sun:#B78316;--track:#E2DDD2;
   }
   @media (prefers-color-scheme:dark){
     :root:not([data-theme="light"]){
       --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
-      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--sun:#E5B94B;--track:#28304A;
     }
   }
   :root[data-theme="dark"]{
     --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
-    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--sun:#E5B94B;--track:#28304A;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
@@ -43,7 +45,7 @@
   .brand-icon text{fill:currentColor;font:italic 22px Georgia,"Iowan Old Style","Palatino Linotype",serif}
   .brand-icon path{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   .brand-word{display:flex;align-items:baseline;font:italic 25px/1 Georgia,"Iowan Old Style","Palatino Linotype",serif;white-space:nowrap}
-  .brand-word .sub{font-size:.54em;line-height:1;transform:translateY(.38em);margin-right:.18em;color:inherit}
+  .brand-word .sub{font-size:.54em;line-height:1;transform:translateY(.5em);margin-left:.12em;margin-right:.28em;color:inherit}
 
   /* Title block: the site's one "title + one subtitle paragraph", sized a step larger than a
      visualization page's h1 since this is the cover rather than a figure caption. */
@@ -137,25 +139,41 @@
   <svg class="icon-sprite" aria-hidden="true">
     <defs>
       <symbol id="icon-horizon-distance" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M9 55Q60 8 111 55"/><circle cx="24" cy="34" r="3" fill="var(--accent)" stroke="var(--accent)"/><path d="M24 37v12M18 49h12M24 34L88 25" stroke="var(--accent)"/><path d="M88 25l5 2M88 25l2-5"/>
+        <path d="M5 62A80 80 0 0 1 115 62" stroke-width="1.35"/>
+        <path d="M20 51L12.5 38" stroke="var(--accent)" stroke-width="1.8"/>
+        <path d="M12.5 38L64 40" stroke="var(--accent)" stroke-width="1.8"/>
+        <circle cx="12.5" cy="38" r="2" fill="var(--accent)" stroke="none"/><circle cx="64" cy="40" r="2" fill="var(--accent)" stroke="none"/>
       </symbol>
       <symbol id="icon-lightning-distance" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M18 30c-7-8 4-17 12-12 4-10 21-7 21 4 10-2 15 12 6 17H21"/><path d="M39 34l-7 12h7l-5 11 16-17h-8l5-6" fill="var(--accent)" stroke="var(--accent)"/><path d="M70 25q14 7 0 14M79 19q24 13 0 27M89 13q34 19 0 39"/>
       </symbol>
       <symbol id="icon-braking-distance" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M15 42h56l-4-12-12-6H35l-9 6-11 3z"/><circle cx="29" cy="43" r="6"/><circle cx="59" cy="43" r="6"/><path d="M75 43h10M91 43h7M104 43h4" stroke="var(--accent)" stroke-width="3"/><path d="M77 25l8 8M86 22l6 7" stroke="var(--bad)"/>
+        <path d="M8 23h34l-3-7-8-4H19l-6 4-5 2z" stroke-width="1.25"/><circle cx="17" cy="24" r="3" stroke-width="1.25"/><circle cx="34" cy="24" r="3" stroke-width="1.25"/>
+        <path d="M8 49h34l-3-7-8-4H19l-6 4-5 2z" stroke-width="1.25"/><circle cx="17" cy="50" r="3" stroke-width="1.25"/><circle cx="34" cy="50" r="3" stroke-width="1.25"/>
+        <path d="M46 24h19" stroke="var(--accent)" stroke-width="1.8"/><path d="M46 50h65" stroke="var(--accent)" stroke-width="1.8"/>
+        <path d="M46 20v8M65 20v8M46 46v8M111 46v8" stroke="var(--accent)" stroke-width="1.25"/>
+        <path d="M50 13h8M50 39h8M62 39h8" stroke-width="1.2"/>
       </symbol>
       <symbol id="icon-bike-gears" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="35" cy="33" r="19"/><circle cx="35" cy="33" r="7"/><circle cx="89" cy="33" r="11"/><circle cx="89" cy="33" r="4"/><path d="M35 14L89 22M35 52l54-8" stroke="var(--accent)"/><path d="M35 9v5M35 52v5M11 33h5M54 33h5M89 18v4M89 44v4M74 33h4M100 33h4"/>
       </symbol>
       <symbol id="icon-shelf-sag" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 21v35M108 21v35M12 24q48 30 96 0"/><path d="M51 8h18v18H51z" fill="var(--accent)" stroke="var(--accent)"/><path d="M60 27v14M55 36l5 5 5-5" stroke="var(--bad)"/>
+        <path d="M10 31Q60 52 110 31" stroke="var(--accent)" stroke-width="1.8"/>
+        <path d="M10 31l-7 12h14zM110 31l-7 12h14z" stroke-width="1.3"/>
+        <rect x="52" y="26" width="16" height="16" stroke-width="1.3"/>
+        <path d="M60 43v12M56 51l4 4 4-4" stroke="var(--accent)" stroke-width="1.5"/>
+        <path d="M10 27h100" stroke-dasharray="3 4" stroke-width=".8"/>
       </symbol>
       <symbol id="icon-compound-interest" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M13 53h96M17 53V41h13v12M39 53V34h13v19M61 53V24h13v29M83 53V10h13v43"/><path d="M20 38C42 37 54 30 67 22S87 9 103 8" stroke="var(--accent)" stroke-width="3"/><path d="M97 5l6 3-3 6" stroke="var(--accent)"/>
       </symbol>
       <symbol id="icon-pizza-area" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="35" cy="32" r="23"/><path d="M35 9v46M12 32h46"/><circle cx="84" cy="22" r="13"/><circle cx="96" cy="46" r="13"/><circle cx="29" cy="25" r="2" fill="var(--accent)" stroke="var(--accent)"/><circle cx="84" cy="22" r="3" fill="var(--accent)" stroke="var(--accent)"/><circle cx="96" cy="46" r="3" fill="var(--accent)" stroke="var(--accent)"/>
+        <circle cx="31" cy="32" r="25" stroke="var(--accent)" stroke-width="1.8"/><circle cx="31" cy="32" r="21" stroke-width="1.35"/>
+        <path d="M31 32V11M31 32L49 21M31 32L49 43M31 32V53M31 32L13 43M31 32L13 21" stroke-width=".9"/>
+        <g fill="var(--accent)" stroke="none"><circle cx="23" cy="20" r="2"/><circle cx="40" cy="26" r="2"/><circle cx="38" cy="43" r="2"/><circle cx="21" cy="40" r="2"/></g>
+        <path d="M60 26l8 6-8 6" stroke="var(--accent)" stroke-width="1.7"/>
+        <circle cx="86" cy="18" r="13" stroke-width="1.35"/><circle cx="86" cy="18" r="10" stroke-width="1.35"/><path d="M86 18V8M86 18l9 5M86 18l-9 5" stroke-width=".8"/>
+        <circle cx="99" cy="47" r="13" stroke-width="1.35"/><circle cx="99" cy="47" r="10" stroke-width="1.35"/><path d="M99 47V37M99 47l9 5M99 47l-9 5" stroke-width=".8"/>
       </symbol>
       <symbol id="icon-mpg-trap" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M19 12h29v44H19zM25 18h17v12H25zM48 21h7l7 8v19c0 7 10 7 10 0V29"/><path d="M54 18l8 7"/><path d="M85 13c-7 11-13 18-13 27a13 13 0 0026 0c0-9-6-16-13-27z" fill="var(--accent)" stroke="var(--accent)"/><path d="M79 42h12" stroke="var(--bg)"/>
@@ -173,7 +191,13 @@
         <path d="M15 26h13l15-12v36L28 38H15z" fill="var(--accent)" stroke="var(--accent)"/><path d="M54 25q10 7 0 14M65 18q22 14 0 28M78 11q34 21 0 42"/><path d="M94 52V33h7v19M106 52V20h7v32" stroke="var(--accent)"/>
       </symbol>
       <symbol id="icon-earth-moon-race" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="19" cy="32" r="15"/><path d="M8 25l10 3 4-7 8 5-2 9 5 5M12 41l9-3 4 8"/><circle cx="103" cy="32" r="8"/><path d="M35 32h58" stroke="var(--accent)" stroke-width="3"/><path d="M46 27l6 5-6 5M61 27l6 5-6 5M76 27l6 5-6 5" stroke="var(--accent)"/>
+        <circle cx="15" cy="32" r="13" stroke-width="1.35"/>
+        <path d="M5 27l9 2 4-6 6 4-2 7 4 3M9 39l8-3 3 6" stroke-width=".9"/>
+        <circle cx="107" cy="32" r="7" stroke-width="1.35"/>
+        <path d="M29 19h70M29 32h70M29 45h70" stroke-width=".8"/>
+        <path d="M29 19h70" stroke="var(--accent)" stroke-width="1.8"/><circle cx="99" cy="19" r="2.6" fill="var(--accent)" stroke="none"/>
+        <path d="M29 32h31" stroke="var(--accent)" stroke-width="1.5"/><path d="M57 29l4 3-4 3" stroke="var(--accent)" stroke-width="1.25"/>
+        <path d="M29 45h12" stroke="var(--accent)" stroke-width="1.3"/><circle cx="41" cy="45" r="2" fill="var(--accent)" stroke="none"/>
       </symbol>
       <symbol id="icon-planet-light-delay" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="18" cy="32" r="8" fill="var(--accent)" stroke="var(--accent)"/><path d="M18 17v-6M18 53v-6M3 32h6M27 32h6M8 22l-4-4M28 42l4 4M8 42l-4 4M28 22l4-4" stroke="var(--accent)"/><path d="M34 32h42"/><circle cx="83" cy="32" r="7" stroke-dasharray="3 3"/><circle cx="103" cy="22" r="7"/><path d="M88 28l10-5M91 21l7 2-2 7" stroke="var(--accent)"/>
@@ -184,15 +208,23 @@
       <symbol id="icon-gravity-lab" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="27" cy="32" r="17"/><circle cx="94" cy="32" r="10"/><path d="M49 32h30" stroke="var(--accent)"/><path d="M56 26l-7 6 7 6M72 26l7 6-7 6" stroke="var(--accent)"/><circle cx="27" cy="32" r="4" fill="var(--accent)" stroke="var(--accent)"/><circle cx="94" cy="32" r="3" fill="var(--accent)" stroke="var(--accent)"/>
       </symbol>
-      <symbol id="icon-heat-pump-magic" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="14" cy="30" r="7"/><circle cx="22" cy="26" r="9"/><circle cx="30" cy="30" r="7"/><rect x="11" y="30" width="23" height="7" rx="3"/>
-        <path d="M38 33h12M46 28l4 5-4 5" stroke="var(--accent)"/>
-        <rect x="52" y="20" width="20" height="24" rx="3"/>
-        <path d="M76 33h12M84 28l4 5-4 5" stroke="var(--accent)"/>
-        <polygon points="90,24 104,12 118,24"/><rect x="94" y="24" width="20" height="20"/>
+      <symbol id="icon-heat-pump-magic" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M69 29l20-17 20 17M74 27v27h30V27" stroke-width="1.2"/>
+        <path d="M79 42c5-5 5 5 10 0s5 5 10 0" stroke="var(--bad)" stroke-width="1"/>
+        <path d="M7 17c0-4 4-7 8-6 2-5 10-5 12 0 5-2 10 2 9 7H8" stroke-width="1"/>
+        <path d="M21 21c-4 3 4 5 0 8s4 4 0 7M18 32l3 4 3-4" stroke="var(--accent)" stroke-width=".9"/>
+        <rect x="8" y="38" width="38" height="19" rx="2" stroke-width="1.15"/>
+        <path d="M13 44h11M13 49h11" stroke-width=".65" opacity=".65"/>
+        <circle cx="36" cy="47.5" r="6.5" stroke-width=".9"/><circle cx="36" cy="47.5" r="1.5" stroke-width=".7"/>
+        <path d="M36 41c2 2.5 2.5 4 0 6.5M42.5 47.5c-2.5 2-4 2.5-6.5 0M36 54c-2-2.5-2.5-4 0-6.5M29.5 47.5c2.5-2 4-2.5 6.5 0" stroke="var(--accent)" stroke-width=".65"/>
+        <path d="M49 43h16M60 38l5 5-5 5" stroke="var(--bad)" stroke-width="1.2"/>
       </symbol>
-      <symbol id="icon-eratosthenes-shadow" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 57Q60 8 108 57"/><path d="M35 32v20M81 31l8 18" stroke-width="3"/><path d="M23 6l18 26M38 6l18 22M53 6l18 20M68 6l18 22" stroke="var(--accent)"/><path d="M35 52h14M89 49l10-5"/>
+      <!-- Provisional: user approved this simplified direction but may revisit it. -->
+      <symbol id="icon-eratosthenes-shadow" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 53A85 85 0 0 1 115 53" stroke-width=".8"/>
+        <path d="M22 50l7 3 6-1 5 4 8-1M53 39l5 2 4-2 5 3M76 47l6 3 7-1 5 4" stroke-width=".55" opacity=".55"/>
+        <path d="M70 33.4L72.12 15.52M94 39.9L101.2 23.41" stroke="var(--accent)" stroke-width="1.1"/>
+        <path d="M12 8L34 37.9M35 8L54 33.8M58 8L70.93 25.59M81 8L97.9 31" stroke="var(--sun)" stroke-width=".55" stroke-dasharray="1.3 2.6"/>
       </symbol>
       <symbol id="icon-snells-law" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M8 32h104"/><path d="M25 9l33 23 22 25" stroke="var(--accent)" stroke-width="3"/><path d="M58 9v46" stroke-dasharray="3 4"/><path d="M91 9l-17 23 27 18"/><path d="M80 27l-6 5 8 1"/>
@@ -212,8 +244,13 @@
       <symbol id="icon-earth-black-hole" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="28" cy="32" r="20"/><path d="M17 22l10 3 4-7 9 6-3 9 8 5M17 42l10-3 5 8"/><path d="M53 32h23M69 25l7 7-7 7" stroke="var(--accent)"/><circle cx="96" cy="32" r="10" fill="currentColor"/><ellipse cx="96" cy="32" rx="20" ry="5" stroke="var(--accent)"/>
       </symbol>
-      <symbol id="icon-time-dilation" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="35" cy="32" r="22"/><path d="M35 16v16l9 6"/><circle cx="87" cy="32" r="17"/><path d="M87 20v12l4 3" stroke="var(--accent)"/><path d="M68 18h-9M65 28H53M67 41H56" stroke="var(--accent)"/><path d="M83 10l4-4 4 4"/>
+      <!-- Provisional: user selected the light-clock direction but may revisit it. -->
+      <symbol id="icon-time-dilation" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 12h36M12 52h36M72 12h36M72 52h36" stroke-width="1.15"/>
+        <path d="M30 14v36M76 50L88 14l16 36" stroke="var(--accent)" stroke-width="1" stroke-dasharray="2 2.5"/>
+        <circle cx="30" cy="32" r="2" fill="var(--accent)" stroke="none"/>
+        <circle cx="86" cy="20" r="2" fill="var(--accent)" stroke="none"/>
+        <path d="M75 7h30M100 4l5 3-5 3" stroke="var(--accent)" stroke-width="1"/>
       </symbol>
       <symbol id="icon-bayes-theorem" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <g fill="currentColor" stroke="none"><circle cx="18" cy="17" r="3"/><circle cx="32" cy="17" r="3"/><circle cx="46" cy="17" r="3"/><circle cx="60" cy="17" r="3"/><circle cx="74" cy="17" r="3"/><circle cx="88" cy="17" r="3"/><circle cx="102" cy="17" r="3"/><circle cx="18" cy="32" r="3"/><circle cx="32" cy="32" r="3"/><circle cx="46" cy="32" r="3"/><circle cx="60" cy="32" r="3"/><circle cx="74" cy="32" r="3"/><circle cx="88" cy="32" r="3"/><circle cx="102" cy="32" r="3"/><circle cx="18" cy="47" r="3"/><circle cx="32" cy="47" r="3"/><circle cx="46" cy="47" r="3"/><circle cx="60" cy="47" r="3"/><circle cx="74" cy="47" r="3"/><circle cx="88" cy="47" r="3"/><circle cx="102" cy="47" r="3"/></g><circle cx="18" cy="17" r="7" stroke="var(--accent)"/><circle cx="32" cy="17" r="7" stroke="var(--bad)"/>
@@ -254,8 +291,15 @@
       <symbol id="icon-guitar-string" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M9 14h102M9 50h102M17 14v36M103 14v36"/><path d="M17 32c9-22 18 22 27 0s18 22 27 0 18 22 32 0" stroke="var(--accent)" stroke-width="3"/><path d="M26 10v8M50 10v8M74 10v8M96 10v8"/>
       </symbol>
-      <symbol id="icon-microwave-chocolate" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="11" y="14" width="57" height="39" rx="3"/><rect x="18" y="21" width="34" height="25"/><circle cx="60" cy="25" r="3"/><path d="M58 36h5M58 42h5"/><path d="M77 43h35M80 43V28h29v15"/><circle cx="88" cy="36" r="4" fill="var(--accent)" stroke="var(--accent)"/><circle cx="102" cy="36" r="4" fill="var(--accent)" stroke="var(--accent)"/><path d="M88 24h14M88 20v8M102 20v8" stroke="var(--accent)"/>
+      <symbol id="icon-microwave-chocolate" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="7" y="14" width="40" height="36" rx="2" stroke-width="1.1"/>
+        <rect x="13" y="20" width="24" height="22" stroke-width=".8"/>
+        <circle cx="42" cy="23" r="2"/><path d="M40 32h4M40 38h4" stroke-width=".7"/>
+        <path d="M52 23c7 0 7 18 14 18s7-18 14-18" stroke="var(--accent)" stroke-width="1"/>
+        <path d="M83 26h30v20H83zM98 26v20" stroke-width=".9"/>
+        <ellipse cx="90" cy="36" rx="4" ry="3" stroke="var(--bad)" stroke-width=".9"/>
+        <ellipse cx="106" cy="36" rx="4" ry="3" stroke="var(--bad)" stroke-width=".9"/>
+        <path d="M90 21h16M90 24v-6M106 24v-6" stroke-width=".7"/>
       </symbol>
       <symbol id="icon-slinky-drop" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M28 8h64"/><path d="M60 8c-22 5-22 10 0 15s22 10 0 15-22 10 0 15 22 5 0 7" stroke="var(--accent)" stroke-width="3"/><path d="M34 17v32M28 43l6 6 6-6"/><path d="M86 17v15M80 26l6 6 6-6"/>
@@ -276,7 +320,11 @@
         <path d="M8 55h104"/><path d="M12 14C27 14 27 55 42 55S50 30 61 30s8 25 19 25 5-14 15-14 4 14 13 14" stroke="var(--accent)" stroke-width="3"/><circle cx="12" cy="14" r="5" fill="var(--accent)" stroke="var(--accent)"/><circle cx="61" cy="30" r="4"/><circle cx="95" cy="41" r="3"/>
       </symbol>
       <symbol id="icon-potato-trajectory" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M8 55h104M93 55h19M98 55v-7h9v7"/><path d="M18 49C35 12 65 10 102 48" stroke="var(--accent)" stroke-width="3"/><path d="M18 49C44 31 70 28 102 48" stroke-dasharray="4 4"/><path d="M13 47c2-6 8-8 12-4 4 5 0 11-6 11-4 0-7-3-6-7z" fill="var(--accent)" stroke="var(--accent)"/><path d="M98 42l4 6-7 1" stroke="var(--accent)"/>
+        <path d="M7 55h87M109 55h4" stroke-width="1.3"/><ellipse cx="101" cy="55" rx="8" ry="2.5" stroke="var(--accent)" stroke-width="1.7"/>
+        <path d="M18 50C38 12 73 11 101 52" stroke="var(--accent)" stroke-width="1.8"/>
+        <path d="M18 50l15-16M18 50h20" stroke-width="1.3"/><path d="M27 49a10 10 0 014-7" stroke="var(--accent)" stroke-width="1.3"/>
+        <path d="M13 48c1-4 6-6 10-4 4 3 2 9-3 10-4 1-8-2-7-6z" fill="color-mix(in srgb, var(--accent) 22%, transparent)" stroke="var(--accent)" stroke-width="1.3"/>
+        <path d="M95 47l6 5-7 1" stroke="var(--accent)" stroke-width="1.4"/>
       </symbol>
     </defs>
   </svg>
@@ -290,7 +338,7 @@
       <span class="brand-word" aria-hidden="true"><span>m</span><span class="sub">ade</span><span>c</span><span class="sub">lear</span></span>
     </a>
     <div class="topbar-right">
-      <span class="count">Eleven equations</span>
+      <span class="count">Twelve equations</span>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
     </div>
   </div>
@@ -320,7 +368,7 @@
       <option value="Discoveries">Discoveries</option>
       <option value="Fun physics">Fun physics</option>
     </select>
-    <span class="results-count" id="resultsCount" aria-live="polite">11 pages</span>
+    <span class="results-count" id="resultsCount" aria-live="polite">12 pages</span>
   </div>
 
   <section class="group" aria-labelledby="cat-everyday">
@@ -340,11 +388,12 @@
   <section class="group" aria-labelledby="cat-discoveries">
     <div class="cat-head">
       <h2 id="cat-discoveries">Discoveries</h2>
-      <span class="cat-count">Four pages</span>
+      <span class="cat-count">Five pages</span>
     </div>
     <p class="cat-sub">The equations that changed what we knew &mdash; each one reduced to the quantities you can move yourself.</p>
     <div class="grid">
       <a class="concept" href="visualizations/earth-moon-race.html"><span class="meta">13 / Speed</span><h3>Earth to the Moon, at real speed</h3><p>Watch light cross the Earth&ndash;Moon gap, and magnify the tiny first part of the same journey for slower travellers.</p></a>
+      <a class="concept" href="visualizations/mass-energy.html"><span class="meta">15 / Mass and energy</span><h3>How much energy is in matter?</h3><p>Turn an ordinary amount of mass into the energy hidden in E = mc<sup>2</sup>, then compare it against what real fuels &mdash; and everyday quantities like a Ford F-150 tank or a marathon &mdash; actually deliver.</p></a>
       <a class="concept" href="visualizations/eratosthenes-shadow.html"><span class="meta">17 / Geometry</span><h3>Two sticks measure a planet</h3><p>Compare shadow angles at two cities a known distance apart, the way Eratosthenes sized up the Earth around 240 BC.</p></a>
       <a class="concept" href="visualizations/time-dilation.html"><span class="meta">24 / Relativity</span><h3>Moving clocks run slow</h3><p>Drag a clock&rsquo;s speed toward light itself and watch two ticking dials &mdash; one stationary, one moving &mdash; pull apart.</p></a>
       <a class="concept" href="visualizations/heat-pump-magic.html"><span class="meta">50 / Thermodynamics</span><h3>Heat Pump <del>magic</del> <em>Science</em></h3><p>Drag the outside temperature down and watch a heat pump keep delivering more heat than the electricity it uses &mdash; then compare it against an electric heater and a gas furnace.</p></a>

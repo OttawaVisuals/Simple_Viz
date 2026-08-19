@@ -31,10 +31,121 @@ pump page, begun the same day (see the handoff entry below).
   check `mass-energy.html` (or its current filename in `visualizations/`) for whether this
   fits as a second section, per the "second section extends the skeleton" pattern used on
   `starlight-spectrum.html`/`time-dilation.html`.
-- **"It IS Rocket Science" page addition.** Add other planets/bodies (Moon, Mars, Jupiter,
-  etc.) to show how surface gravity `g` changes required escape/orbital velocity — again
-  likely a second-section addition to the existing page rather than a new file; find the
-  page's actual current filename before starting (name may differ from the pitch title).
+- **"It IS Rocket Science" page — built, 2026-08-19**, as a new file:
+  `visualizations/escaping-a-planet.html`. Superseded a same-day plan to reframe the existing
+  `escape-velocity.html` in place (that reframe was tried, then reverted via `git checkout`
+  once the scope grew into something that needed its own page — `escape-velocity.html` is
+  back to its original "Why the Moon lost its atmosphere" content, untouched).
+  - **Two-phase physics, not just v<sub>esc</sub>.** Phase 1 (powered ascent) numerically
+    integrates `a = F/m − GM/r²` as fuel drains (`m0=dry+fuel`, `mdot=F/vₑ`,
+    `burnTime=fuel/mdot`) over 2,000 fixed steps — that step count matters: an earlier 140-step
+    version under-shot cutoff velocity by ~2% (verified by hand in Python against a
+    fine-step reference), bumped to 2,000 once the discrepancy was caught, which the
+    JS integrator now matches within noise at every step count tested. A rocket whose thrust
+    doesn't exceed its own weight at liftoff (`F ≤ m0·GM/r²`) never leaves the pad at all —
+    a real, distinct outcome state, not just a low number. Phase 2 (coast) needs no simulation:
+    specific energy `ε = ½v² − GM/r` is conserved after engine cutoff, so escape (`ε≥0`) or
+    the exact apex altitude (`r_apex = −GM/ε`) both fall out algebraically from the cutoff
+    state alone.
+  - **Energy-budget bar is the literal KE/PE animation Simon asked for**, replacing the usual
+    single-value gauge. Derived identity: normalizing by the surface potential-well depth
+    `GM/r₀` (equivalently `v_esc₀²/2`) splits the escape condition into two independent
+    fractions that sum cleanly — `f_height = 1 − r₀/r` (pure function of altitude) and
+    `f_speed = v²/v_esc₀²` (pure function of speed) — with escape at `f_height+f_speed ≥ 1`.
+    Verified by hand that this decomposition is algebraically identical to the `ε≥0` condition
+    before building the stacked-bar UI on top of it. The bar animates live during both the
+    launch button's powered-ascent phase (real per-step values from the integration) and its
+    coast phase (stylized on-screen climb rate, but `v` at each displayed point is still solved
+    exactly from energy conservation at that point's `r`, so the bar never drifts from the true
+    physics even though the pacing is illustrative — same "honest device" pattern
+    `escape-velocity.html` already used for its apex-height animation).
+  - **Five independent controls** (planet picker; rocket dry mass and thrust as separate log
+    sliders per Simon's explicit request, not bundled into one rocket-size preset; a fuel-type
+    picker; fuel mass) plus five presets spanning all three outcome states: Saturn V 1st stage
+    and Falcon 9 single-stage (both fall back — realistic, since this page's single-stage
+    simplification is exactly why real rockets stage), Apollo LM ascent stage from the Moon
+    (falls back in this vertical-only model even though the real vehicle reached lunar orbit —
+    called out explicitly in the note as a limitation of ignoring sideways/orbital motion), an
+    oversized hypothetical rocket from Earth (escapes, labeled as beyond any rocket actually
+    built), and an ion-thrust attempt from Earth (never lifts off — thrust-to-weight 0.34,
+    demonstrating that ion engines' huge exhaust velocity is irrelevant without enough thrust,
+    a direct callback to `rocket-equation.html`'s own ion-drive caveat). Fuel exhaust
+    velocities (solid/kerolox/hydrolox/ion) are the same numbers as `rocket-equation.html` for
+    cross-page consistency. The closing note cross-links to `rocket-equation.html`.
+  - Verified in-browser: all five presets checked programmatically against the outcome they're
+    meant to demonstrate (escape/fall-back/never-lifts-off), no console errors, no horizontal
+    overflow at desktop (1280px) or mobile (375px) widths, launch-button animation runs start
+    to finish and resets cleanly, theme toggle works. No visual screenshot was possible this
+    session (Browser pane compositing unavailable), so layout was checked via
+    `getBoundingClientRect()` label-collision/overflow queries instead, consistent with this
+    project's established fallback for that tooling gap. **Not yet reviewed** — first-pass
+    build, not added to `index.html`'s reviewed grid yet.
+  - **Follow-up pass, same day: three fixes shipped, then a design conversation paused
+    mid-stream — Simon is picking this back up "a different day."**
+    - **Shipped and live in the file:** (1) thrust was on a slider but never appeared in the
+      equations — added a third equation line, `a = F/m − GM/r²` (the literal acceleration
+      being integrated), with `F` wired into the existing hover-highlight system alongside the
+      thrust slider, plus new legend rows for `F` and rocket mass (wet→dry). (2) Added an
+      opening note sentence making explicit that `v_esc` only ever applies to an *unpowered*
+      object, and that the verdict here only compares speed to it from engine cutoff onward —
+      during the burn the rocket isn't racing that number, thrust is fighting gravity directly.
+      (3) Added a closing note paragraph fact-checking the page against Artemis II (the
+      current-day most-recent Artemis mission, launched April 2026 — not Artemis I, which an
+      earlier draft would have defaulted to): SLS core stage MECO ≈161 km altitude / ≈7.6 km/s,
+      and the separate trans-lunar-injection burn (Artemis I's published figures, same mission
+      architecture) raised Orion from ≈7.8 to ≈10.1 km/s — genuinely *below* Earth's
+      11.19 km/s escape velocity, which is the correct real-world result: reaching the Moon is
+      a lower-energy three-body problem (timed to meet the Moon), not literal two-body Earth
+      escape, and the note says so explicitly rather than leaving the "shortfall" looking like
+      a page error. All three verified in-browser (legend/equation render correctly, no console
+      errors). Sources: [NASASpaceFlight, Artemis I launch](https://www.nasaspaceflight.com/2022/11/artemis-i-launch-nov/),
+      [AVweb, Artemis II core stage](https://avweb.com/aviation-news/space-flight/boeing-built-core-stage-powers-historic-artemis-ii-launch/),
+      [Space.com, Artemis I TLI burn](https://www.space.com/artemis-1-orion-spacecraft-headed-for-moon).
+    - **Open, unresolved design question — no code changed for this part.** Simon felt the
+      thrust slider made the page too complicated and proposed dropping it, replacing it with a
+      direct **altitude-cutoff** input (assume all fuel is spent by a chosen altitude) alongside
+      planet/fuel-type/masses. Worked through two variants in conversation, neither implemented:
+      1. **Drop thrust, accept an idealized instantaneous-kick-at-cutoff-altitude model.**
+         `Δv = vₑ·ln(m₀/mf)` (unchanged) is delivered entirely at the user-chosen cutoff
+         altitude, as if the rocket coasted there for free and only "pays" in speed once it
+         arrives — the same idealization the classic `v_esc` formula already makes, just moved
+         up from the surface. This removes gravity-loss modeling entirely (more optimistic than
+         reality) and removes the "never leaves the pad" outcome (no thrust-vs-weight check
+         left to make it possible). Clean, closed-form, no numerical integration needed at all.
+      2. **Infer thrust from the other four parameters instead of dropping it**, i.e. solve
+         `F` such that the existing powered-ascent integration lands exactly on the chosen
+         cutoff altitude. Checked numerically in Python before ruling it out as the default
+         plan: altitude-vs-thrust is **not monotonic** for a fixed rocket/fuel/planet — it rises
+         slightly just above the liftoff threshold, peaks (≈309 km for the Saturn-V-scale test
+         case, around TWR≈1.1–1.2), then falls as thrust increases further, asymptoting toward
+         0 km as F→∞. Consequences: every rocket has a **hard ceiling on reachable cutoff
+         altitude** that no amount of thrust can exceed (a chosen altitude above that ceiling
+         has zero solutions), and altitudes near the ceiling have **two** valid thrust values
+         (different burn profiles reaching the same altitude with different cutoff velocities,
+         needing an arbitrary tie-break — probably always the higher-thrust root). That ceiling
+         would have to be computed and the slider's range clamped dynamically per
+         planet/fuel/mass combination just to keep the UI honest — comparable numerical
+         complexity to keeping thrust as a direct input, while being less legible to the user
+         (a slider that mysteriously stops responding past an invisible, ever-shifting limit).
+         Recommended against this option for that reason; leaned back toward variant 1.
+      - Also discussed, not yet acted on: Simon's observation that fuel *mass* alone doesn't
+        represent a fuel's energy capacity. Clarified that `Δv = vₑ·ln(m₀/mf)` is a pure
+        momentum-conservation result, not an energy equation — it doesn't know or care how
+        energetic the propellant is chemically. `m_fuel` only supplies leverage (mass ratio);
+        the propellant's actual energy content is folded entirely into `vₑ` (measured per
+        real engine/fuel combination, not derivable from energy density alone, since some
+        chemical energy is lost to heat/incomplete expansion rather than becoming directed
+        exhaust speed). No page change implied by this — it was context for evaluating variant
+        1 above, confirming that dropping thrust doesn't lose any *energy* information the page
+        was actually modeling, since it never modeled fuel energy density in the first place.
+    - **Next session should start here**: decide between variant 1 (recommended — simpler,
+      closed-form, drops the "never lifts off" state) and keeping thrust as currently built: no
+      code has changed since the three shipped fixes above. If variant 1 is chosen, the thrust
+      slider, its legend/equation rows, the `F/m − GM/r²` powered-ascent integration, and the
+      "never lifts off" outcome branch all get replaced by a single altitude-cutoff slider and
+      the closed-form `v_cutoff = Δv` substitution described above — a substantial rewrite of
+      `simulate()`, not a small edit, since the two-phase (numeric burn + exact coast)
+      structure collapses into one exact calculation throughout.
 
 ## Current handoff — 2026-08-19
 
@@ -188,6 +299,52 @@ pump page, begun the same day (see the handoff entry below).
     future review pass: the Daikin table's numbers are one specific product line, not a
     universal curve — worth deciding whether to keep it as the page's single reference or
     add a second real curve (e.g. a cold-climate model) for contrast.
+
+- **`visualizations/mass-energy.html`** ("How much energy is in matter?") received a full
+  redesign pass today, directly answering this file's own backlog idea above ("E=mc²
+  page addition"). **Reviewed and complete as of 2026-08-19** — moved from
+  `unreviewed.html`'s Discoveries list into `index.html`'s reviewed Discoveries group
+  (card `15 / Mass and energy`, category count "Four pages"→"Five pages", topbar "Eleven
+  equations"→"Twelve equations", search bar's live "11 pages"→"12 pages";
+  `unreviewed.html`'s Discoveries count "Eighteen pages"→"Seventeen pages" and its total
+  "39 pages"→"38 pages"). `tracker.html`'s `PAGES` array already listed the page under
+  Discoveries, so no change needed there.
+  - **What real fuel/process actually delivers, against the same theoretical mc².** Added a
+    "Real process" picker (TNT, gasoline, uranium-235 fission, hydrogen fusion,
+    matter-antimatter annihilation) whose specific-energy figures (J/kg) are standard
+    combustion/nuclear-physics constants, cited with links in the page's Sources note
+    (TNT_equivalent, Gasoline#Energy_content, Nuclear_fission, and the proton-proton chain,
+    all Wikipedia). The single hero animation (merged from an earlier two-animation draft
+    at Simon's request) shows one bar: a dim "ghost" fill for the full theoretical mc² at
+    the current mass, with a bright accent sliver inside it sized to the selected process's
+    actual fraction — same visual, same scale, so the gap between theory and reality is
+    literally the size of the sliver rather than two separate numbers to compare mentally.
+  - **Result box replaced with a 3-column equivalency table** (Category | Full mc² | selected
+    fuel), computed live off both the mass slider and the fuel picker: total energy, then
+    four real-world comparisons — years of China's total annual energy supply (168,386,888 TJ,
+    2023, IEA World Energy Balances — also the figure used to calibrate the "1.5×" mass
+    preset), years of an average Canadian home's energy use (87.6 GJ, 2023, Natural Resources
+    Canada), round trips Vancouver↔Montreal in a Ford F-150 (~4,600 km one-way, ~12.5 L/100km
+    combined, stated as an assumption), marathons run by an average human (~2,600 kcal, a
+    commonly-cited estimate), and hamsters running a wheel for 30 minutes (~1 W mechanical
+    output, explicitly flagged in the Sources note as an order-of-magnitude estimate, not a
+    measured figure). Each equivalency row carries a small hand-authored inline SVG icon
+    (China map outline, house, pickup truck, running figure, hamster wheel) — no icon library,
+    consistent with the site's SVG-only constraint. The "Total energy" row is set in a larger
+    font than the rest of the table to read as the headline figure.
+  - **Layout, iterated twice at Simon's request.** First pass put the mass slider and fuel
+    picker side-by-side above a full-width table; second pass (this entry's final state) wraps
+    both in one `.resultrow` — mass slider stacked above the fuel picker on the left half,
+    equivalency table on the right half, equal `1fr 1fr` columns, stacking to one column under
+    820px. The table's own explanatory sentence ("The full mc² column is theoretical...") was
+    moved to sit below the table rather than above it, also per request.
+  - Verified in-browser at each iteration: both themes, desktop (1400px) and mobile (375px)
+    widths, fuel-pill switching updates the hero sliver/table/labels together, presets
+    (including the "1.5× China's yearly energy" mass preset, landing on exactly a 1.50×
+    reading), row-icon rendering (18×18px via `getBoundingClientRect()`), total-row font size
+    (18px), equal grid-column widths (`getComputedStyle` on `.resultrow`), no console errors,
+    no page-level horizontal overflow on mobile (table scrolls inside its own
+    `.equiv-scroll` container instead).
 
 ## Previous handoff — 2026-08-18
 
@@ -1546,6 +1703,18 @@ under **Fun physics**, right after `cosmic-scale.html`.
 - Browser verification: 45 links / 45 symbols / 45 rendered icons; light and dark themes;
   search still returns the correct count and card; mobile at 390 px is a single column with
   no horizontal overflow; no console warnings or errors. `git diff --check` also passes.
+- The `eratosthenes-shadow.html` homepage icon was replaced with the user-selected thin-line
+  Earth-curve, two-stick, and dotted-sun-ray version on 2026-08-19. Treat this icon as
+  **provisional**: the user approved using it now but explicitly noted it may be revisited.
+- The `time-dilation.html` homepage icon now uses the user-selected light-clock comparison:
+  a vertical light path beside the longer diagonal path of a moving clock. This choice is
+  also **provisional** and may be revisited.
+- The `heat-pump-magic.html` homepage icon now uses the user-selected outdoor-unit concept:
+  atmospheric heat flows from a cloud into a compact 2:1 heat-pump unit, whose fan sits on
+  the right, and the unit delivers heat into a house.
+- The `microwave-chocolate.html` homepage icon now uses the user-selected side-by-side
+  concept: a microwave emits a blue wave toward a segmented chocolate bar with two warm
+  melt spots and a measurement bracket.
 
 ## Roadmap
 

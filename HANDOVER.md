@@ -18,6 +18,29 @@ tool can pick up mid-stream without re-reading the whole chat history.
 Four ideas Simon pitched for future pages; none started as of this entry except the heat
 pump page, begun the same day (see the handoff entry below).
 
+**Six more pitched 2026-08-19** (a follow-up conversation with a colleague about the heat
+pump page), none started:
+- **Reynolds number.** Laminar vs. turbulent flow transition — natural companion to the
+  existing `straw-hose-flow.html`/`straw-hose-flow-darcy.html` pair and `pipe-flow-reference.
+  html`'s decision tree; could reuse those pages' flow-regime math rather than deriving fresh.
+- **Piping visuals (flow, head).** Head loss / pump curves — likely overlaps mechanically
+  with the Reynolds-number page and the existing Darcy–Weisbach work in
+  `straw-hose-flow-darcy.html`; worth scoping together rather than as three separate pages.
+- **Hot-shower wait-time animation.** How long you wait for hot water at the tap, and why
+  it's longer than "just the pipe volume ÷ flow rate" suggests once pipe friction/losses are
+  modeled honestly — same friction machinery as the piping/Reynolds ideas above.
+- **Dew point on a window, with selectors.** Indoor temp/humidity vs. window surface
+  temperature (a proxy for outdoor temp/insulation) — condensation appears once the window
+  surface drops below the dew point. Room for a genuinely satisfying visual (fogging glass).
+- **Absolute/relative humidity and windchill/humidex animations.** Two related but distinct
+  psychrometric concepts; could be one page with a mode toggle or two short pages.
+- **ASHRAE 55 occupant thermal comfort.** The most involved idea pitched: a room-box diagram
+  where the user repositions a person inside it and sets wall/ceiling/floor/outdoor
+  temperatures, evaluated against the ASHRAE 55 comfort model (mean radiant temperature,
+  operative temperature, PMV/PPD). Needs real research into the standard's actual formulas
+  before scoping — flagged as the most ambitious of the six, likely deserves its own design
+  pass rather than starting straight into `<canvas>`/SVG.
+
 - **Heat pump "science, not magic."** How a heat pump delivers >100% "efficiency" (COP > 1)
   without breaking energy conservation — it moves heat from the outside atmosphere in
   addition to converting the electricity it uses, so the delivered heat is electricity-in
@@ -147,7 +170,77 @@ pump page, begun the same day (see the handoff entry below).
       `simulate()`, not a small edit, since the two-phase (numeric burn + exact coast)
       structure collapses into one exact calculation throughout.
 
+**Three more pitched 2026-08-20** (Simon, noted for action later; none started):
+- **Index page as a tile grid.** Rework `index.html` from its current list/card layout into
+  a denser tile grid — about **5 tiles per row** — with a **Featured 5** row at the top and a
+  **Most visited 5** row beneath it. **Remove the per-card numbering.** Add a **randomizer**
+  control that re-shuffles the tile order on click. **Category becomes tile colour** rather
+  than a separate label/grouping heading. Open questions to settle when building: where
+  "most visited" data comes from (no analytics in this repo by constraint — likely a
+  hand-maintained list, or `localStorage` visit counts on the client), and how the existing
+  three category groupings (Everyday maths / Discoveries / Fun physics) survive if colour is
+  doing the categorising.
+- **`time-dilation.html` light clock — animate the moving clock's mirrors.** In the light-clock
+  derivation diagram, the two horizontal bars (mirrors) of the *moving* clock should visibly
+  travel left to right as the light bounces, so the diagonal path reads as a consequence of
+  the clock's motion rather than a static drawing.
+- **`microwave-chocolate.html` — other frequencies.** Add non-microwave-oven frequencies
+  (Wi-Fi 2.4 GHz, and at least one other band) alongside the oven's 2.45 GHz, each with the
+  caveat framing: *"if you could melt chocolate with your Wi-Fi, this would be the melt-spot
+  spacing."* The half-wavelength melt-spot measurement is the same calculation; only the
+  frequency changes, so this is most likely a selector on the existing figure rather than a
+  new page.
+
 ## Current handoff — 2026-08-19
+
+- **`visualizations/thermal-comfort-pmv.html`** ("The room feels colder than the thermostat
+  says") — new page 51, built directly from this file's own backlog idea above ("ASHRAE 55
+  occupant thermal comfort"), the most ambitious of the six ideas pitched the same day. Added
+  to **Discoveries** on `unreviewed.html` and `tracker.html` (not yet reviewed, so not on
+  `index.html`).
+  - **Research pass done first, in-conversation, before any code.** Verified the full Fanger
+    heat-balance formula set (respiration/convection/radiation/evaporation terms, the
+    clothing-surface-temperature iteration, PPD's closed form) against the EnergyPlus
+    Engineering Reference and ISO 7730/ASHRAE 55 sources, then implemented the classic
+    published iterative `pmv_ppd_iso` algorithm (the same one used across CBE's thermal
+    comfort tool, pythermalcomfort, and Fanger's own reference program) rather than a
+    simplified or re-derived approximation — this is exact, not illustrative, unlike most of
+    this page's honest-device simplifications elsewhere.
+  - **The room-box, built as a draggable-person SVG diagram**, not the usual single equation
+    figure. Four surface-temperature sliders (ceiling, floor, interior walls, window) tint a
+    room cross-section via a theme-aware `color-mix` temperature scale (cold→neutral→hot,
+    anchored at 21°C, using `--accent`/`--line2`/`--bad` so it never needs a light/dark pair).
+    The person (SVG `<g role="slider">`, pointer-drag + arrow-key accessible) walks between
+    the window wall and the far wall; four radiant lines from the person to each surface are
+    drawn live, stroke-width scaled to that surface's angle factor, so the MRT weighting is
+    *visible*, not just a number changing.
+  - **Mean radiant temperature uses a simplified angle-factor model**, stated as such in the
+    note: `Fp_window = 0.06 + 0.16(1-x)`, fixed `Fp_ceil = Fp_floor = 0.12`, and the remainder
+    assigned to the far/side walls combined — normalizes to 1 by construction, and captures
+    the real, honest direction (closer to the window → more weight on the window's
+    temperature) without claiming real solid-angle geometry. `t_r⁴ = ΣFp·(T+273)⁴` per ISO
+    7730; operative temperature approximated as `(t_a+t_r)/2` (valid at the low air speeds
+    this page's slider range covers).
+  - **Local-discomfort flags** (draft risk, floor temperature outside 19–29°C, cold-window
+    radiant asymmetry) sit below the main PMV/PPD gauge as a second, independent readout —
+    deliberately included so a state can read PMV≈0 "Neutral" while still flagging real
+    discomfort next to the window, the actual pedagogical point of building this as a room
+    with a draggable person rather than a bare equation page. All three are explicitly
+    labeled in the note as simplified proxies for ASHRAE 55's real local-discomfort limits,
+    not direct implementations of them.
+  - **Two real bugs caught and fixed during in-browser verification, both label-overflow at
+    the 375px mobile width**: (1) the Window/Wall surface labels were centered on their own
+    (narrow) band, so at mobile width "Window" hung off the left edge of the viewport and
+    "Wall" off the right — fixed by anchoring them inward (`translateX(0)`/`translateX(-100%)`
+    pinned to the room's left/right edge) instead of centering. (2) The live "Air · RH · m/s"
+    label and the Window/Wall labels shared the same vertical row at narrow width and
+    overlapped — fixed by moving the air label down to its own line, clear of both.
+  - Verified in-browser: both themes, desktop (800px) and mobile (375px) widths, the "desk
+    pushed against the window" preset (PMV drops to −0.65, ASHRAE 55 verdict correctly flips
+    to non-compliant, cold-window asymmetry flag fires), direct pointer-drag of the person
+    (PMV recovers to −0.42 moving away from the window), no horizontal overflow at 375px
+    (`scrollWidth`/`clientWidth` both 375), no console errors. **Not yet reviewed** — first-pass
+    build, not added to `index.html`'s reviewed grid.
 
 - **`visualizations/heat-pump-magic.html`** ("Heat pumps don't create heat") — new page 50,
   added to **Discoveries** on `unreviewed.html` (not yet reviewed, so not on `index.html`)
@@ -299,6 +392,58 @@ pump page, begun the same day (see the handoff entry below).
     future review pass: the Daikin table's numbers are one specific product line, not a
     universal curve — worth deciding whether to keep it as the page's single reference or
     add a second real curve (e.g. a cold-climate model) for contrast.
+  - **Fifth pass, 2026-08-19: refrigeration-cycle diagram + "more details" disclosure**, both
+    from the colleague-feedback backlog note above.
+    - **New `.refrig` full-width section** (after the presets row, before the note — the
+      "second section extends the skeleton" pattern, mirroring `time-dilation.html`'s
+      `.lightclock`), showing the four-stage loop (evaporator &rarr; compressor &rarr;
+      condenser &rarr; expansion valve) as an SVG rectangle, same measured-width/viewBox +
+      HTML-label-overlay technique as the hero (`geomRefrig()`/`drawRefrig()` mirror
+      `geom()`/`drawHero()`). Deliberately **independent of the device picker** — it always
+      shows the heat pump's own cycle regardless of which of the three devices is selected,
+      with the sub-paragraph stating directly that the electric heater and gas furnace skip
+      this loop entirely. Only the evaporator label's outdoor-temperature readout is live
+      (tied to the T<sub>C</sub> slider); the rest is static since the cycle's stages don't
+      change. Segment color codes hot/cold side (blue=cold, orange=hot, reusing the hero's
+      existing Q<sub>C</sub>/Q<sub>H</sub> colors) and dash density codes vapor/liquid
+      (loose dash=vapor, tight dash=liquid), explained in a `.refrig-legend` below the
+      diagram rather than four more inline labels risking collision — a deliberate
+      simplification after concluding four positioned flow-state labels around the loop was
+      collision-prone for the time available; the loop's four *box* labels (name + one-line
+      state) still position individually, verified collision-free. Dash animation reuses the
+      existing `tick()`/`reduceMotion` rAF loop (same accessibility gate, no new one added).
+    - **New `<details class="more">` disclosure** after the note, before feedback — first use
+      of a collapsible on the site (checked: no `<details>`/`<summary>` pattern existed
+      anywhere in `visualizations/` or `STYLE_GUIDE.md` before this). Styled to match the
+      mono/uppercase text-button language (`.theme-toggle`-adjacent), custom `+`/&minus;`
+      indicator swapped via `.more[open]` rather than the native marker triangle. **Real bug
+      caught and fixed during in-browser testing**: the first draft set `.more-body{display:
+      grid}` unconditionally, which — because that author rule has higher specificity than
+      the browser's default `details:not([open]) > *` hiding rule — kept the body visible
+      even while the `<details>` was closed. Fixed by making the state explicit instead of
+      relying on the UA default: `.more-body{display:none}` / `.more[open] .more-body{display:
+      grid}`. Three items inside: (1) outside-air volume processed, a cited CFM/ton range
+      (Trane) with a stated 3-ton/2,000 m&sup3;/h "typical" assumption; (2) heat available in
+      that air, **live-computed** from `state.Tc` — air density via the ideal-gas law
+      (&rho;=P/(R&middot;T)) &times; c<sub>p</sub>=1,005 J/(kg&middot;K), multiplied by the
+      assumed airflow and a stated 4&deg;C evaporator air-side temperature drop — then
+      explicitly cross-checked against this page's own `realisticCOP()`-derived Q<sub>C</sub>
+      at the same temperature, with the note stating plainly the two won't match exactly
+      (illustrative sensible-heat estimate, not a coil design) but should land in the same
+      order of magnitude; (3) heat-exchanger surface area, a face-area &times; fin-multiplier
+      order-of-magnitude estimate (~8&ndash;15 m&sup2;) since no authoritative single-number
+      source for residential outdoor-coil surface area turned up in research — flagged
+      in-page as an estimate, not a spec, per the site's honesty convention (same pattern as
+      `mass-energy.html`'s hamster-wheel figure).
+    - Verified in-browser: both themes (button-toggle checked, computed colors resolve
+      correctly, no transparent/unset values), desktop (1280px) and mobile (375px, no
+      horizontal overflow), all four refrig-diagram labels confirmed inside their boxes with
+      zero label-label overlap at both widths (`getBoundingClientRect()`/viewBox-scaled
+      checks — no screenshot tool available this session, same fallback used elsewhere in
+      this file), the details toggle opens/closes with the indicator and content swapping
+      together, the live air-energy paragraph and the diagram's evaporator label both update
+      together when a preset changes T<sub>C</sub> (checked against the "deep freeze" preset,
+      &minus;20&deg;C), no console errors at any point.
 
 - **`visualizations/mass-energy.html`** ("How much energy is in matter?") received a full
   redesign pass today, directly answering this file's own backlog idea above ("E=mc²

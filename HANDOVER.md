@@ -195,6 +195,45 @@ pump page), none started:
 
 ## Current handoff — 2026-08-20
 
+- **`visualizations/thermal-comfort-pmv.html` follow-up pass: wall and window surface
+  temperatures are now calculated, not set directly**, at Simon's explicit request ("with
+  indoor temperature, outdoor temperature and R/U value, can we calculate the surface
+  temperatures?"). Replaces the previous page's direct `tWindow` slider with four
+  physically-grounded inputs — outdoor temperature, wall insulation (imperial R-value, since
+  that's what's printed on Canadian insulation batts), window size (as % of the exterior
+  wall), and window U-value — feeding a real steady-state conduction derivation instead of a
+  free-standing number.
+  - **Formulas**: wall surface temp uses `T_surf = T_in − (T_in−T_out)·R_si/R_total`, where
+    `R_si = 0.12` and `R_so = 0.03` m²·K/W are the standard ASHRAE interior/exterior air-film
+    resistances and `R_total` adds the user's R-value (converted from imperial via ÷5.678)
+    between them. Window surface temp is simpler since a U-value already is the whole-assembly
+    figure: heat flux is `U·(T_in−T_out)`, and the same `R_si` fraction of that gives the glass
+    temperature — no iteration needed for either, unlike the PMV solver itself.
+  - **Window size deliberately does not enter either formula** — a bigger window isn't colder
+    glass, just more of it. Verified this is genuinely true (not an oversight) before wiring it
+    up: size instead changes two other things that are shown explicitly, both new to this pass:
+    (1) the angle-factor split in the room-box's MRT calculation — `angleFactors()` now divides
+    the exterior-wall-facing factor between window and opaque wall by the glazing fraction, so
+    a bigger window increases its own weight in t_r without changing its temperature; (2) the
+    total heat-loss share readout ("window is 45% of that wall's area but carries 84% of its
+    heat loss"), computed against a fixed representative 7 m² wall segment since the page has
+    no absolute room dimensions elsewhere.
+  - **Hero diagram**: the room-box's exterior-wall band now renders as two nested rects — the
+    full band tinted by the derived wall-surface temperature, with a second rect inset and
+    vertically centered inside it (height = glazing fraction × band height) tinted by the
+    derived window temperature — so window size is visibly, proportionally represented, not
+    just stated in a readout. Gained a fifth radiant ray (`rayExtWall`) alongside the
+    pre-existing window/interior-wall/ceiling/floor rays.
+  - Hand-verified the math against the live page before trusting it: cozy preset (22°C indoor,
+    −10°C outdoor, R-20 wall, U-1.8 window) predicted wall 20.95°C / window 15.09°C by hand,
+    page showed 21.0°C / 15.1°C; window preset (22°C indoor, −20°C outdoor, R-12 wall, U-2.8
+    window, 45% glazing) predicted wall 19.77°C / window 7.89°C / 83.8% heat-loss share, page
+    showed 19.8°C / 7.9°C / 84% — all within rounding.
+  - Verified in-browser: both themes, desktop and 375px mobile widths (the longer "Interior
+    wall" relabel — was "Wall", renamed to disambiguate from the new exterior-wall label —
+    stays inside the viewport at the right-anchored edge), the 3-box control layout collapses
+    to one column below 480px, all four presets, no console errors. **Not yet reviewed.**
+
 - **`time-dilation.html`: the moving light clock's mirrors now travel.** Previously the moving
   panel drew its two mirrors as one static full-width rail spanning the whole zigzag, which hid
   the very thing the diagram exists to show — the diagonal path is a *consequence* of the clock

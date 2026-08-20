@@ -1,0 +1,882 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why you can feel cold next to a warm room</title>
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .brand{display:flex;align-items:center;gap:8px;color:var(--fg);text-transform:none;letter-spacing:0}
+  .brand:hover{color:var(--accent)}
+  .brand-icon{display:block;width:42px;height:20px;overflow:visible}
+  .brand-icon text{fill:currentColor;font:italic 16px Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  .brand-icon path{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .brand-word{display:flex;align-items:baseline;font:italic 18px/1 Georgia,"Iowan Old Style","Palatino Linotype",serif;white-space:nowrap}
+  .brand-word .sub{font-size:.54em;line-height:1;transform:translateY(.38em);margin-right:.18em;color:inherit}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  .topgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
+
+  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqn{display:flex;align-items:center;flex-wrap:wrap;justify-content:center;gap:clamp(6px,1vw,10px);font-size:clamp(19px,2vw,25px);line-height:1.15;font-weight:300}
+  .eqn .eq{color:var(--muted)}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .eqn sup{font-size:.62em;position:relative;top:-.6em}
+  .eqn .grp{white-space:nowrap}
+
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:1.6em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:8px 2px}
+  .legend .sym{font-size:16px;font-weight:300;transition:color .2s}
+  .legend .sym sub{font-size:.65em}
+  .legend .name{font-size:12px;color:var(--muted2)}
+  .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero svg{width:100%;height:auto;display:block}
+  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.03em;color:var(--muted2);white-space:nowrap;transition:opacity .2s;text-align:center}
+  .hero .airlbl{position:absolute;font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+  .roomdrag{cursor:grab;touch-action:none}
+  .roomdrag:active{cursor:grabbing}
+
+  .resultrow{display:grid;grid-template-columns:1.5fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:760px){.resultrow{grid-template-columns:1fr}}
+
+  .ctrlgroups{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:clamp(18px,2.2vw,28px)}
+  @media (max-width:480px){.ctrlgroups{grid-template-columns:1fr}}
+  .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+
+  .mini{margin-bottom:14px}
+  .mini:last-child{margin-bottom:0}
+  .mini-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .mini-label{font-size:13px;color:var(--muted2)}
+  .mini-val{font:400 11.5px ui-monospace,monospace;color:var(--muted)}
+  .mtrack{position:relative;height:24px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:2px}
+  .mtrack .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
+  .mtrack .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
+  .mtrack .thumb{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
+
+  .pickgrp{margin-bottom:16px}
+  .pickgrp:last-child{margin-bottom:0}
+  .pill-buttons{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .pill-buttons button{cursor:pointer;font-family:ui-monospace,monospace;font-size:12px;padding:5px 11px;border-radius:999px;transition:all .18s ease;border:1px solid var(--border);background:transparent;color:var(--muted)}
+  .pill-buttons button:hover{color:var(--fg)}
+  .pill-buttons button[aria-pressed="true"]{background:color-mix(in srgb, var(--accent) 18%, var(--bg));border-color:var(--accent);color:var(--fg)}
+
+  .result{text-align:left}
+  .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
+  .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
+  .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px}
+  .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
+  .aux-line{font-size:12.5px;color:var(--muted);margin-top:8px}
+  .gauge{position:relative;height:60px;margin-top:16px;max-width:460px}
+  .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
+  .gauge .band{position:absolute;top:14px;height:10px;background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .gauge .tick{position:absolute;top:26px;width:1px;height:5px;background:var(--line2)}
+  .gauge .ticklabel{position:absolute;top:33px;white-space:nowrap;font:400 9.5px ui-monospace,monospace;color:var(--muted)}
+  .gauge .mark{position:absolute;top:12px;height:14px;width:3px;border-radius:2px;transition:left .12s linear}
+  .gauge .marklabel{position:absolute;top:-3px;white-space:nowrap;font:500 11px ui-monospace,monospace;transition:left .12s linear}
+  .flags{margin-top:14px;display:grid;gap:5px}
+  .flag{font-size:12.5px;line-height:1.4;color:var(--bad)}
+  .flag.ok{color:var(--muted)}
+
+  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+  .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
+  .preset:hover{border-color:var(--accent);color:var(--accent)}
+
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+
+  .feedback{margin-top:clamp(40px,4.6vw,64px);padding-top:20px;border-top:1px solid var(--line)}
+  .feedback-head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:20px}
+  .feedback-kicker{margin:0 0 5px;font:10px/1.3 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .feedback h2{margin:0;font-size:clamp(21px,2.2vw,28px);font-weight:400;letter-spacing:-.02em}
+  .feedback-copy{margin:5px 0 0;font:12px/1.6 ui-monospace,monospace;color:var(--muted)}
+  .feedback-choices{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+  .feedback-choice{appearance:none;border:1px solid var(--line2);border-radius:999px;background:transparent;color:var(--muted2);padding:7px 12px;font:12px/1 ui-monospace,monospace;cursor:pointer}
+  .feedback-choice:hover,.feedback-choice:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
+  .feedback-choice[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--bg))}
+  .feedback-form{margin-top:18px;max-width:760px}
+  .feedback-form[hidden]{display:none}
+  .feedback-form label{display:block;margin-bottom:7px;font:12px/1.5 ui-monospace,monospace;color:var(--muted2)}
+  .feedback-form label span{color:var(--muted)}
+  .feedback-form textarea{box-sizing:border-box;width:100%;min-height:84px;resize:vertical;border:1px solid var(--line2);border-radius:3px;background:transparent;color:var(--fg);padding:10px 11px;font:14px/1.5 Georgia,serif}
+  .feedback-form textarea:focus{border-color:var(--accent);outline:1px solid var(--accent);outline-offset:2px}
+  .feedback-actions{display:flex;align-items:baseline;gap:14px;margin-top:9px}
+  .feedback-send{appearance:none;border:0;border-bottom:1px solid var(--line2);background:transparent;color:var(--muted2);padding:2px 0;font:12px/1.4 ui-monospace,monospace;cursor:pointer}
+  .feedback-send:hover,.feedback-send:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+  .feedback-send:disabled{cursor:wait;opacity:.55}
+  .feedback-status{font:11px/1.5 ui-monospace,monospace;color:var(--muted)}
+  .feedback-trap{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}
+  .footer{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,40px);font:11.5px/1.7 ui-monospace,monospace;color:var(--muted)}
+  .footer a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .footer a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  @media (max-width:700px){.feedback-head{grid-template-columns:1fr}.feedback-choices{justify-content:flex-start}.footer{grid-template-columns:1fr;gap:10px}}
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a class="brand" href="../index.html" aria-label="Made clear — home">
+      <svg class="brand-icon" viewBox="0 0 58 28" aria-hidden="true">
+        <text x="22" y="16">mc</text>
+        <path d="M1 22 C3 22 3 16 5 16 S7 26 9 26 S11 13 13 13 S15 23 17 23 S19 18 21 18 L57 18"/>
+      </svg>
+      <span class="brand-word" aria-hidden="true"><span>m</span><span class="sub">ade</span><span>c</span><span class="sub">lear</span></span>
+    </a>
+    <div class="topbar-right">
+      <span>Fanger PMV/PPD &middot; ASHRAE 55</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>The room feels <em>colder</em> than the thermostat says.</h1>
+      <p class="sub">Comfort isn't just air temperature &mdash; it's a heat balance with everything around you, including the cold glass of a window. Drag the person toward it and watch the number move, even with the air temperature untouched.</p>
+    </div>
+
+    <div class="eqnbox">
+      <div class="eqn">
+        <span class="grp"><span>PMV</span> <span class="eq">=</span></span>
+        <span class="grp">[0.303<em>e</em><sup>&minus;0.036<em id="Mterm1">M</em></sup> + 0.028]</span>
+        <span class="eq">&times;</span>
+        <span class="grp">(<em id="Mterm2">M</em> &minus; <em id="Lterm">L</em>)</span>
+      </div>
+    </div>
+
+    <div class="legendbox">
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="hero" id="heroWrap">
+    <div class="lbl" id="lblCeil"></div>
+    <div class="lbl" id="lblFloor"></div>
+    <div class="lbl" id="lblExtWall"></div>
+    <div class="lbl" id="lblWindow"></div>
+    <div class="lbl" id="lblWall"></div>
+    <div class="airlbl" id="lblAir"></div>
+    <svg id="heroSvg" role="img" aria-label="A room cross-section with a draggable person; surface colors show ceiling, floor, exterior-wall, window and interior-wall temperature, the exterior wall and window temperatures derived from indoor/outdoor temperature and insulation, and lines from the person show how strongly each surface radiates toward them.">
+      <rect id="roomBg" fill="var(--bg)"></rect>
+      <rect id="bandWindow" stroke="var(--line2)" stroke-width="1"></rect>
+      <rect id="bandGlass" stroke="var(--line2)" stroke-width="1"></rect>
+      <rect id="bandWall" stroke="var(--line2)" stroke-width="1"></rect>
+      <rect id="bandCeil" stroke="var(--line2)" stroke-width="1"></rect>
+      <rect id="bandFloor" stroke="var(--line2)" stroke-width="1"></rect>
+      <rect id="roomOutline" fill="none" stroke="var(--line2)" stroke-width="1.25"></rect>
+      <line id="rayWindow" stroke-linecap="round"></line>
+      <line id="rayExtWall" stroke-linecap="round"></line>
+      <line id="rayWall" stroke-linecap="round"></line>
+      <line id="rayCeil" stroke-linecap="round"></line>
+      <line id="rayFloor" stroke-linecap="round"></line>
+      <g id="personG" class="roomdrag" tabindex="0" role="slider" aria-label="Person's position in the room, from the window to the far wall">
+        <circle id="personHead" fill="var(--fg)"></circle>
+        <path id="personBody" fill="var(--fg)"></path>
+        <circle id="personHit" fill="transparent" r="20"></circle>
+      </g>
+    </svg>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrlgroups">
+      <div class="ctrl">
+        <div class="ctrl-title">Exterior wall &amp; window</div>
+        <div id="extSliders"></div>
+      </div>
+      <div class="ctrl">
+        <div class="ctrl-title">Other room surfaces</div>
+        <div id="surfSliders"></div>
+      </div>
+      <div class="ctrl">
+        <div class="ctrl-title">Air</div>
+        <div id="airSliders"></div>
+        <div class="pickgrp" style="margin-top:18px">
+          <div class="ctrl-title" style="margin-bottom:8px">Clothing <em id="cloLabel" style="font-family:Georgia,serif;font-style:italic;text-transform:none">I<sub>cl</sub></em></div>
+          <div class="pill-buttons" id="cloButtons" role="group" aria-label="Clothing"></div>
+        </div>
+        <div class="pickgrp" style="margin-top:16px">
+          <div class="ctrl-title" style="margin-bottom:8px">Activity <em id="metLabel" style="font-family:Georgia,serif;font-style:italic;text-transform:none">M</em></div>
+          <div class="pill-buttons" id="metButtons" role="group" aria-label="Activity"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-label">Predicted mean vote</div>
+      <div class="result-value"><span class="num mono" id="pmvValue"></span><span class="v" id="pmvLabel"></span></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+      <div class="gauge" id="gauge">
+        <div class="track"></div>
+        <div class="band" id="gBand"></div>
+        <div class="mark" id="gMark"></div>
+        <div class="marklabel mono" id="gMarkLabel"></div>
+        <div id="gTicks"></div>
+        <div id="gLabels"></div>
+      </div>
+      <div class="aux-line mono" id="auxLine"></div>
+      <div class="aux-line mono" id="auxLine2"></div>
+      <div class="flags" id="flags"></div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-p="cozy">a well-balanced office</button>
+    <button class="preset" data-p="window">a desk pushed against the window</button>
+    <button class="preset" data-p="hot">an overheated meeting room</button>
+    <button class="preset" data-p="fan">summer heat with a fan on</button>
+  </div>
+
+  <p class="note">The <a href="https://en.wikipedia.org/wiki/Thermal_comfort" target="_blank" rel="noopener">Fanger PMV/PPD model</a> (ISO 7730, adopted by <a href="https://en.wikipedia.org/wiki/ASHRAE_55" target="_blank" rel="noopener">ASHRAE 55</a>) puts a full body heat balance &mdash; metabolic heat in, against respiration, convection, radiation and sweat losses out &mdash; onto a &minus;3&hellip;+3 comfort scale, then converts that into PPD, the percentage of people predicted to be dissatisfied (PPD = 100 &minus; 95&middot;e<sup>&minus;0.03353&middot;PMV<sup>4</sup>&minus;0.2179&middot;PMV<sup>2</sup></sup>, never zero &mdash; nobody makes everyone happy). A room is compliant when &minus;0.5 &le; PMV &le; +0.5 and PPD &le; 10%, shown as the shaded band on the gauge above. <strong>The wall and window surface temperatures are calculated, not set directly.</strong> Steady-state conduction gives T<sub>surface</sub> = T<sub>in</sub> &minus; (T<sub>in</sub> &minus; T<sub>out</sub>)&middot;R<sub>si</sub>/R<sub>total</sub>, where R<sub>si</sub> = 0.12 m&sup2;&middot;K/W is the standard interior air-film resistance and R<sub>total</sub> adds the wall's own R-value (converted from the imperial units on the slider) plus a 0.03 m&sup2;&middot;K/W exterior air film. Windows are simpler, since a U-value already is the whole-assembly figure: heat flux is just U&middot;(T<sub>in</sub>&minus;T<sub>out</sub>), and the same R<sub>si</sub> fraction of that gives the interior glass temperature. <strong>Window size deliberately does not appear in either formula</strong> &mdash; a bigger pane isn't colder glass, it's just more of it. What size actually changes: how much of the room's radiant "view" is glazing versus opaque wall (feeding t<sub>r</sub> below), and what share of the wall assembly's total heat loss the window carries, both shown in the readout under the gauge. <strong>Mean radiant temperature</strong> (t<sub>r</sub>) is the piece that makes the room-box worth dragging a person around in: it's a weighted average of the ceiling, floor, window, exterior-wall and interior-wall temperatures, weighted by how much of each one you can actually "see" from where you're sitting (angle factor). This page uses a simplified, illustrative angle-factor model &mdash; a real one needs the exact geometry and distance to every surface &mdash; but the direction is honest: standing closer to a cold window increases its weight in t<sub>r</sub> and pulls your comfort down, even though the thermostat (air temperature) hasn't moved at all. Operative temperature is approximated as the simple average of air and radiant temperature, valid when air speed is low. Clothing (clo) and activity (met) values are standard reference figures from <a href="https://en.wikipedia.org/wiki/Clothing_insulation" target="_blank" rel="noopener">ASHRAE's clothing-insulation tables</a> and <a href="https://en.wikipedia.org/wiki/Metabolic_equivalent_of_task" target="_blank" rel="noopener">metabolic-rate tables</a>, not measurements of any specific outfit or person. The draft, floor-temperature and radiant-asymmetry flags below the gauge are simplified proxies for ASHRAE 55's separate local-discomfort limits (draft rate, floor 19&ndash;29&deg;C, radiant asymmetry &lt;5&deg;C for a cool surface) &mdash; real assessments measure them directly rather than approximating from the inputs here. R-values are entered in the imperial units (ft&sup2;&middot;&deg;F&middot;h/Btu) common on Canadian insulation batts and converted internally (1 = 0.176 m&sup2;&middot;K/W).</p>
+
+  <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
+    <div class="feedback-head">
+      <div>
+        <p class="feedback-kicker">Private feedback</p>
+        <h2 id="feedbackHeading">Was this clear?</h2>
+        <p class="feedback-copy">Your response is private and helps improve this page.</p>
+      </div>
+      <div class="feedback-choices" role="group" aria-label="Clarity rating">
+        <button class="feedback-choice" type="button" data-rating="clear" aria-pressed="false">Yes</button>
+        <button class="feedback-choice" type="button" data-rating="almost" aria-pressed="false">Almost</button>
+        <button class="feedback-choice" type="button" data-rating="not-yet" aria-pressed="false">Not yet</button>
+      </div>
+    </div>
+    <form class="feedback-form" hidden>
+      <label for="feedbackComment">What could be clearer? <span>Optional, 1,200 characters maximum.</span></label>
+      <textarea id="feedbackComment" name="comment" maxlength="1200" placeholder="A confusing step, a possible mistake, or an idea..."></textarea>
+      <label class="feedback-trap" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
+      <div class="feedback-actions">
+        <button class="feedback-send" type="submit">Send private feedback</button>
+        <span class="feedback-status" role="status" aria-live="polite"></span>
+      </div>
+    </form>
+  </section>
+
+  <div class="footer">
+    <span>Designed and maintained by Simon using AI-assisted development. Sources and approximations are stated on each page.</span>
+    <span>Spot a mistake or have an idea? Write to <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.</span>
+  </div>
+
+</div>
+</main>
+<script>
+(function(){
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+  function cFmt(v){ return v.toFixed(1)+'°C'; }
+
+  // ---- reference tables ----
+  var CLOTHING = [
+    {name:'T-shirt & shorts', clo:0.3},
+    {name:'Light summer wear', clo:0.5},
+    {name:'Shirt & trousers', clo:0.7},
+    {name:'Business suit', clo:1.0},
+    {name:'Suit + sweater', clo:1.3},
+    {name:'Heavy winter clothing', clo:1.7}
+  ];
+  var ACTIVITY = [
+    {name:'Reclining', met:0.8},
+    {name:'Seated, relaxed', met:1.0},
+    {name:'Sedentary office work', met:1.1},
+    {name:'Standing, light work', met:1.4},
+    {name:'Walking ~1.1 m/s', met:2.0}
+  ];
+
+  // ---- state ----
+  var state = {
+    ta:22, rh:40, vel:0.10,
+    tOut:-10, wallR:20, windowU:1.8, glazing:25,
+    tCeil:22, tFloor:21, tWall:21,
+    personX:0.5,
+    clo:3, met:2,
+    active:null, drag:null
+  };
+  var R_SI = 0.12, R_SO = 0.03; // ASHRAE interior/exterior air-film resistances, m²·K/W
+  var IMPERIAL_R_TO_RSI = 5.678263;
+
+  var $ = function(id){ return document.getElementById(id); };
+
+  // ---- Fanger PMV/PPD (classic ISO 7730 iterative algorithm) ----
+  function pmvPpd(ta, tr, vel, rh, met, clo, wme){
+    wme = wme || 0;
+    var pa = rh * 10 * Math.exp(16.6536 - 4030.183 / (ta + 235));
+    var icl = 0.155 * clo;
+    var m = met * 58.15;
+    var w = wme * 58.15;
+    var mw = m - w;
+    var fcl = icl <= 0.078 ? 1 + 1.29 * icl : 1.05 + 0.645 * icl;
+    var hcf = 12.1 * Math.sqrt(vel);
+    var taa = ta + 273;
+    var tra = tr + 273;
+    var tcla = taa + (35.5 - ta) / (3.5 * icl + 0.1);
+    var p1 = icl * fcl;
+    var p2 = p1 * 3.96;
+    var p3 = p1 * 100;
+    var p4 = p1 * taa;
+    var p5 = 308.7 - 0.028 * mw + p2 * Math.pow(tra / 100, 4);
+    var xn = tcla / 100;
+    var xf = xn;
+    var eps = 0.00015;
+    var n = 0, hc;
+    do {
+      xf = (xf + xn) / 2;
+      hc = Math.max(hcf, 2.38 * Math.pow(Math.abs(100 * xf - taa), 0.25));
+      xn = (p5 + p4 * hc - p2 * Math.pow(xf, 4)) / (100 + p3 * hc);
+      n++;
+      if (n > 150) break;
+    } while (Math.abs(xn - xf) > eps);
+    var tcl = 100 * xn - 273;
+    var hl1 = 3.05 * 0.001 * (5733 - 6.99 * mw - pa);
+    var hl2 = mw > 58.15 ? 0.42 * (mw - 58.15) : 0;
+    var hl3 = 1.7 * 0.00001 * m * (5867 - pa);
+    var hl4 = 0.0014 * m * (34 - ta);
+    var hl5 = 3.96 * fcl * (Math.pow(xn, 4) - Math.pow(tra / 100, 4));
+    var hl6 = fcl * hc * (tcl - ta);
+    var ts = 0.303 * Math.exp(-0.036 * m) + 0.028;
+    var L = hl1 + hl2 + hl3 + hl4 + hl5 + hl6;
+    var pmv = ts * (mw - L);
+    var ppd = 100 - 95 * Math.exp(-0.03353 * Math.pow(pmv, 4) - 0.2179 * Math.pow(pmv, 2));
+    return { pmv: pmv, ppd: ppd, tcl: tcl, L: L, M: m };
+  }
+
+  // ---- exterior wall & window surface temperature, from steady-state conduction ----
+  // T_surf = T_in - (T_in - T_out) * R_interior-film / R_total  (ISO 6946 / ASHRAE Fundamentals)
+  // Window size does NOT appear here: glass temperature only depends on U-value and the two
+  // air temperatures, not how big the window is. Size instead changes (a) how much of the
+  // room's radiant "view" is glazing vs opaque wall, via the angle factors below, and
+  // (b) what share of the wall assembly's total heat loss the window is responsible for.
+  function wallWindowSurfaceTemps(){
+    var rsiWall = state.wallR / IMPERIAL_R_TO_RSI;
+    var rTotalWall = R_SI + rsiWall + R_SO;
+    var qWall = (state.ta - state.tOut) / rTotalWall;           // W/m²
+    var tExtWall = state.ta - qWall * R_SI;
+
+    var qWindow = state.windowU * (state.ta - state.tOut);      // W/m²
+    var tWindow = state.ta - qWindow * R_SI;
+
+    var A_TOTAL = 7;                                            // m², a representative exterior-wall segment
+    var aWindow = (state.glazing / 100) * A_TOTAL, aWall = A_TOTAL - aWindow;
+    var qTotalWindow = qWindow * aWindow, qTotalWall = qWall * aWall;
+    var shareWindow = qTotalWindow / (qTotalWindow + qTotalWall) * 100;
+
+    return { tExtWall:tExtWall, tWindow:tWindow, qWall:qWall, qWindow:qWindow, shareWindow:shareWindow };
+  }
+
+  // ---- simplified angle-factor MRT from room surfaces + person position ----
+  function angleFactors(x, glazingFrac){
+    var fExtWallTotal = 0.06 + 0.16 * (1 - x);
+    var fCeil = 0.12, fFloor = 0.12;
+    var fIntWall = 1 - fExtWallTotal - fCeil - fFloor;
+    var fWindow = fExtWallTotal * glazingFrac;
+    var fExtWallOpaque = fExtWallTotal - fWindow;
+    return { window: fWindow, extWall: fExtWallOpaque, ceil: fCeil, floor: fFloor, wall: fIntWall };
+  }
+  function meanRadiantTemp(surf){
+    var f = angleFactors(state.personX, state.glazing / 100);
+    var sum = f.window * Math.pow(surf.tWindow + 273, 4)
+            + f.extWall * Math.pow(surf.tExtWall + 273, 4)
+            + f.ceil * Math.pow(state.tCeil + 273, 4)
+            + f.floor * Math.pow(state.tFloor + 273, 4)
+            + f.wall * Math.pow(state.tWall + 273, 4);
+    return Math.pow(sum, 0.25) - 273;
+  }
+
+  function compute(surf){
+    var tr = meanRadiantTemp(surf);
+    var clo = CLOTHING[state.clo].clo, met = ACTIVITY[state.met].met;
+    var r = pmvPpd(state.ta, tr, Math.max(state.vel, 0.001), state.rh, met, clo, 0);
+    var to = (state.ta + tr) / 2;
+    return { tr: tr, to: to, pmv: r.pmv, ppd: r.ppd, L: r.L, M: r.M, clo: clo, met: met, surf: surf };
+  }
+
+  // ---- temperature -> theme-aware color ----
+  function tempColorStyle(t){
+    var COLD_T = -10, NEU_T = 21, HOT_T = 32;
+    if (t <= NEU_T){
+      var pct = clamp((t - COLD_T) / (NEU_T - COLD_T), 0, 1) * 100;
+      return 'color-mix(in srgb, var(--line2) ' + pct.toFixed(1) + '%, var(--accent))';
+    }
+    var pct2 = clamp((t - NEU_T) / (HOT_T - NEU_T), 0, 1) * 100;
+    return 'color-mix(in srgb, var(--bad) ' + pct2.toFixed(1) + '%, var(--line2))';
+  }
+
+  // ---- hero room geometry ----
+  var heroWrap = $('heroWrap'), heroSvg = $('heroSvg');
+  var roomBg = $('roomBg'), bandWindow = $('bandWindow'), bandGlass = $('bandGlass'), bandWall = $('bandWall'), bandCeil = $('bandCeil'), bandFloor = $('bandFloor'), roomOutline = $('roomOutline');
+  var rayWindow = $('rayWindow'), rayExtWall = $('rayExtWall'), rayWall = $('rayWall'), rayCeil = $('rayCeil'), rayFloor = $('rayFloor');
+  var personG = $('personG'), personHead = $('personHead'), personBody = $('personBody'), personHit = $('personHit');
+  var lblCeil = $('lblCeil'), lblFloor = $('lblFloor'), lblExtWall = $('lblExtWall'), lblWindow = $('lblWindow'), lblWall = $('lblWall'), lblAir = $('lblAir');
+  var heroW = 0;
+
+  function geomRoom(w){
+    var narrow = w < 620;
+    var vbH = narrow ? 190 : 230;
+    var top = 14, bottom = vbH - 14, left = 8, right = w - 8;
+    var ceilH = narrow ? 16 : 22, floorH = narrow ? 16 : 22;
+    var windowW = narrow ? 26 : 40, wallW = narrow ? 22 : 32;
+    var roomLeft = left + windowW, roomRight = right - wallW;
+    var roomTop = top + ceilH, roomBot = bottom - floorH;
+    var spanLeft = roomLeft + 16, spanRight = roomRight - 16;
+    var personY = roomBot - 2;
+    return { vbW:w, vbH:vbH, top:top, bottom:bottom, left:left, right:right, ceilH:ceilH, floorH:floorH,
+      windowW:windowW, wallW:wallW, roomLeft:roomLeft, roomRight:roomRight, roomTop:roomTop, roomBot:roomBot,
+      spanLeft:spanLeft, spanRight:spanRight, personY:personY };
+  }
+
+  function drawHero(surf){
+    var w = heroW || heroWrap.clientWidth || 1100;
+    var h = geomRoom(w);
+    heroSvg.setAttribute('viewBox', '0 0 ' + w + ' ' + h.vbH);
+    heroSvg.setAttribute('preserveAspectRatio', 'none');
+
+    roomBg.setAttribute('x', h.left); roomBg.setAttribute('y', h.top);
+    roomBg.setAttribute('width', h.right - h.left); roomBg.setAttribute('height', h.bottom - h.top);
+
+    var bandH = h.bottom - h.top;
+    var glazingFrac = clamp(state.glazing / 100, 0, 1);
+    var winH = bandH * glazingFrac;
+    var winY = h.top + (bandH - winH) / 2;
+
+    bandWindow.setAttribute('x', h.left); bandWindow.setAttribute('y', h.top);
+    bandWindow.setAttribute('width', h.windowW); bandWindow.setAttribute('height', bandH);
+    bandWindow.setAttribute('fill', tempColorStyle(surf.tExtWall));
+
+    bandGlass.setAttribute('x', h.left); bandGlass.setAttribute('y', winY);
+    bandGlass.setAttribute('width', h.windowW); bandGlass.setAttribute('height', winH);
+    bandGlass.setAttribute('fill', tempColorStyle(surf.tWindow));
+
+    bandWall.setAttribute('x', h.right - h.wallW); bandWall.setAttribute('y', h.top);
+    bandWall.setAttribute('width', h.wallW); bandWall.setAttribute('height', bandH);
+    bandWall.setAttribute('fill', tempColorStyle(state.tWall));
+
+    bandCeil.setAttribute('x', h.left); bandCeil.setAttribute('y', h.top);
+    bandCeil.setAttribute('width', h.right - h.left); bandCeil.setAttribute('height', h.ceilH);
+    bandCeil.setAttribute('fill', tempColorStyle(state.tCeil));
+
+    bandFloor.setAttribute('x', h.left); bandFloor.setAttribute('y', h.bottom - h.floorH);
+    bandFloor.setAttribute('width', h.right - h.left); bandFloor.setAttribute('height', h.floorH);
+    bandFloor.setAttribute('fill', tempColorStyle(state.tFloor));
+
+    roomOutline.setAttribute('x', h.left); roomOutline.setAttribute('y', h.top);
+    roomOutline.setAttribute('width', h.right - h.left); roomOutline.setAttribute('height', h.bottom - h.top);
+
+    var px = h.spanLeft + state.personX * (h.spanRight - h.spanLeft);
+    var py = h.personY;
+    personHead.setAttribute('cx', px); personHead.setAttribute('cy', py - 21); personHead.setAttribute('r', 5.5);
+    personBody.setAttribute('d', 'M ' + (px-6) + ' ' + py + ' L ' + (px+6) + ' ' + py + ' L ' + (px+4) + ' ' + (py-15) + ' L ' + (px-4) + ' ' + (py-15) + ' Z');
+    personHit.setAttribute('cx', px); personHit.setAttribute('cy', py - 10);
+
+    var f = angleFactors(state.personX, glazingFrac);
+    function ray(line, x2, y2, factor, temp){
+      line.setAttribute('x1', px); line.setAttribute('y1', py - 10);
+      line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+      line.setAttribute('stroke-width', (2 + factor * 44).toFixed(1));
+      line.setAttribute('stroke', tempColorStyle(temp));
+      line.setAttribute('opacity', 0.55);
+    }
+    var wallStripY = h.top + (winY - h.top) / 2;
+    ray(rayWindow, h.roomLeft, winY + winH / 2, f.window, surf.tWindow);
+    ray(rayExtWall, h.roomLeft, wallStripY, f.extWall, surf.tExtWall);
+    ray(rayWall, h.roomRight, py - 10, f.wall, state.tWall);
+    ray(rayCeil, px, h.roomTop, f.ceil, state.tCeil);
+    ray(rayFloor, px, h.roomBot, f.floor, state.tFloor);
+
+    var pctX = function(x){ return (x / w * 100) + '%'; };
+    var pctY = function(y){ return (y / h.vbH * 100) + '%'; };
+    lblCeil.style.left = pctX((h.roomLeft + h.roomRight) / 2); lblCeil.style.top = pctY(h.top + 3);
+    lblCeil.style.transform = 'translateX(-50%)';
+    lblCeil.textContent = 'Ceiling ' + cFmt(state.tCeil);
+    lblFloor.style.left = pctX((h.roomLeft + h.roomRight) / 2); lblFloor.style.top = pctY(h.bottom - h.floorH + 3);
+    lblFloor.style.transform = 'translateX(-50%)';
+    lblFloor.textContent = 'Floor ' + cFmt(state.tFloor);
+    lblExtWall.style.left = pctX(h.left + 3); lblExtWall.style.top = pctY(h.roomTop + 4);
+    lblExtWall.style.transform = 'translateX(0)';
+    lblExtWall.textContent = 'Wall ' + cFmt(surf.tExtWall);
+    lblWindow.style.left = pctX(h.left + 3); lblWindow.style.top = pctY(h.roomTop + 42);
+    lblWindow.style.transform = 'translateX(0)';
+    lblWindow.textContent = 'Window ' + cFmt(surf.tWindow);
+    lblWall.style.left = pctX(h.right - 3); lblWall.style.top = pctY(h.roomTop + 4);
+    lblWall.style.transform = 'translateX(-100%)';
+    lblWall.textContent = 'Interior wall ' + cFmt(state.tWall);
+    lblAir.style.left = pctX((h.roomLeft + h.roomRight) / 2); lblAir.style.top = pctY(h.roomTop + 26);
+    lblAir.style.transform = 'translateX(-50%)';
+    lblAir.textContent = 'In ' + cFmt(state.ta) + ' · Out ' + cFmt(state.tOut) + ' · ' + Math.round(state.rh) + '% RH · ' + state.vel.toFixed(2) + ' m/s';
+  }
+
+  // ---- person drag ----
+  (function(){
+    var dragging = false;
+    function setFromClientX(clientX){
+      var r = heroSvg.getBoundingClientRect();
+      var w = heroW || heroWrap.clientWidth || 1100;
+      var scaleX = r.width / w;
+      var h = geomRoom(w);
+      var localX = (clientX - r.left) / scaleX;
+      var f = clamp((localX - h.spanLeft) / (h.spanRight - h.spanLeft), 0, 1);
+      state.personX = Math.round(f * 100) / 100;
+      render();
+    }
+    personG.addEventListener('pointerdown', function(e){
+      dragging = true;
+      if (personG.setPointerCapture) personG.setPointerCapture(e.pointerId);
+      setFromClientX(e.clientX);
+    });
+    personG.addEventListener('pointermove', function(e){ if (dragging) setFromClientX(e.clientX); });
+    function endDrag(){ dragging = false; }
+    personG.addEventListener('pointerup', endDrag);
+    personG.addEventListener('pointercancel', endDrag);
+    personG.addEventListener('keydown', function(e){
+      var step = e.shiftKey ? 0.1 : 0.02;
+      var v = null;
+      if (e.key === 'ArrowLeft') v = state.personX - step;
+      else if (e.key === 'ArrowRight') v = state.personX + step;
+      else if (e.key === 'Home') v = 0;
+      else if (e.key === 'End') v = 1;
+      if (v !== null){ e.preventDefault(); state.personX = clamp(Math.round(v*100)/100, 0, 1); render(); }
+    });
+  })();
+
+  // ---- generic mini sliders ----
+  var SLIDER_DEFS = [
+    { key:'ta', parent:'airSliders', label:'Air temperature', lo:15, hi:30, step:0.5, fmt:cFmt, unitText:'degrees Celsius' },
+    { key:'rh', parent:'airSliders', label:'Relative humidity', lo:10, hi:80, step:1, fmt:function(v){ return Math.round(v)+'%'; }, unitText:'percent' },
+    { key:'vel', parent:'airSliders', label:'Air speed', lo:0, hi:1.0, step:0.05, fmt:function(v){ return v.toFixed(2)+' m/s'; }, unitText:'metres per second' },
+    { key:'tCeil', parent:'surfSliders', label:'Ceiling', lo:15, hi:30, step:0.5, fmt:cFmt, unitText:'degrees Celsius' },
+    { key:'tFloor', parent:'surfSliders', label:'Floor', lo:10, hi:30, step:0.5, fmt:cFmt, unitText:'degrees Celsius' },
+    { key:'tWall', parent:'surfSliders', label:'Interior walls', lo:10, hi:30, step:0.5, fmt:cFmt, unitText:'degrees Celsius' },
+    { key:'tOut', parent:'extSliders', label:'Outdoor temperature', lo:-30, hi:15, step:1, fmt:cFmt, unitText:'degrees Celsius' },
+    { key:'wallR', parent:'extSliders', label:'Wall insulation', lo:2, hi:50, step:1, fmt:function(v){ return 'R-'+Math.round(v); }, unitText:'imperial R-value' },
+    { key:'glazing', parent:'extSliders', label:'Window size', lo:5, hi:70, step:5, fmt:function(v){ return Math.round(v)+'% of wall'; }, unitText:'percent of the exterior wall' },
+    { key:'windowU', parent:'extSliders', label:'Window U-value', lo:0.6, hi:5.8, step:0.1, fmt:function(v){ return v.toFixed(1)+' W/m²K'; }, unitText:'watts per square metre-kelvin' }
+  ];
+  var sliderRefs = {};
+  SLIDER_DEFS.forEach(function(def){
+    var parent = $(def.parent);
+    var wrap = document.createElement('div'); wrap.className = 'mini';
+    var head = document.createElement('div'); head.className = 'mini-head';
+    var label = document.createElement('span'); label.className = 'mini-label'; label.textContent = def.label;
+    var val = document.createElement('span'); val.className = 'mini-val mono';
+    head.appendChild(label); head.appendChild(val);
+    var track = document.createElement('div'); track.className = 'mtrack'; track.tabIndex = 0;
+    track.setAttribute('role', 'slider'); track.setAttribute('aria-label', def.label);
+    var rail = document.createElement('div'); rail.className = 'rail';
+    var fill = document.createElement('div'); fill.className = 'fill';
+    var thumb = document.createElement('div'); thumb.className = 'thumb';
+    track.appendChild(rail); track.appendChild(fill); track.appendChild(thumb);
+    wrap.appendChild(head); wrap.appendChild(track);
+    parent.appendChild(wrap);
+
+    function setFromClientX(clientX){
+      var r = track.getBoundingClientRect();
+      var f = clamp((clientX - r.left) / r.width, 0, 1);
+      var v = def.lo + f * (def.hi - def.lo);
+      v = clamp(Math.round(v / def.step) * def.step, def.lo, def.hi);
+      state[def.key] = v; render();
+    }
+    var dragging = false;
+    track.addEventListener('pointerdown', function(e){ dragging = true; if (track.setPointerCapture) track.setPointerCapture(e.pointerId); setFromClientX(e.clientX); });
+    track.addEventListener('pointermove', function(e){ if (dragging) setFromClientX(e.clientX); });
+    function end(){ dragging = false; }
+    track.addEventListener('pointerup', end); track.addEventListener('pointercancel', end);
+    track.addEventListener('keydown', function(e){
+      var step = e.shiftKey ? def.step * 5 : def.step;
+      var cur = state[def.key], v = null;
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') v = cur - step;
+      else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') v = cur + step;
+      else if (e.key === 'Home') v = def.lo;
+      else if (e.key === 'End') v = def.hi;
+      if (v !== null){ e.preventDefault(); state[def.key] = clamp(Math.round(v/def.step)*def.step, def.lo, def.hi); render(); }
+    });
+
+    sliderRefs[def.key] = { track:track, fill:fill, thumb:thumb, val:val, def:def };
+  });
+
+  function drawSliders(){
+    Object.keys(sliderRefs).forEach(function(key){
+      var ref = sliderRefs[key], def = ref.def, cur = state[key];
+      var pct = ((cur - def.lo) / (def.hi - def.lo) * 100).toFixed(2) + '%';
+      ref.fill.style.width = pct; ref.thumb.style.left = pct;
+      ref.val.textContent = def.fmt(cur);
+      ref.track.setAttribute('aria-valuemin', def.lo);
+      ref.track.setAttribute('aria-valuemax', def.hi);
+      ref.track.setAttribute('aria-valuenow', cur);
+      ref.track.setAttribute('aria-valuetext', def.fmt(cur));
+    });
+  }
+
+  // ---- clothing / activity pickers ----
+  var cloButtons = $('cloButtons'), metButtons = $('metButtons');
+  CLOTHING.forEach(function(c, i){
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = c.name;
+    b.addEventListener('click', function(){ state.clo = i; render(); });
+    cloButtons.appendChild(b);
+  });
+  ACTIVITY.forEach(function(a, i){
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = a.name;
+    b.addEventListener('click', function(){ state.met = i; render(); });
+    metButtons.appendChild(b);
+  });
+  function drawPickers(){
+    Array.prototype.forEach.call(cloButtons.children, function(b, i){ b.setAttribute('aria-pressed', i === state.clo ? 'true' : 'false'); });
+    Array.prototype.forEach.call(metButtons.children, function(b, i){ b.setAttribute('aria-pressed', i === state.met ? 'true' : 'false'); });
+  }
+
+  // ---- equation + legend ----
+  var Mterm1 = $('Mterm1'), Mterm2 = $('Mterm2'), Lterm = $('Lterm');
+  var legendEl = $('legend');
+  function drawEquationAndLegend(r){
+    var accent = 'var(--accent)';
+    var mColor = state.active === 'M' ? accent : 'var(--fg)';
+    var lColor = state.active === 'L' ? accent : 'var(--fg)';
+    Mterm1.style.color = mColor; Mterm2.style.color = mColor; Lterm.style.color = lColor;
+
+    var rows = [
+      { symHtml:'M', name:'metabolic heat production', val: r.M.toFixed(1) + ' W/m²', key:'M' },
+      { symHtml:'I<sub>cl</sub>', name:'clothing insulation', val: r.clo.toFixed(1) + ' clo', key:null },
+      { symHtml:'t<sub>r</sub>', name:'mean radiant temperature', val: r.tr.toFixed(1) + '°C', key:null },
+      { symHtml:'L', name:'total heat loss', val: r.L.toFixed(1) + ' W/m²', key:'L' }
+    ];
+    legendEl.innerHTML = '';
+    rows.forEach(function(row){
+      var div = document.createElement('div'); div.className = 'row';
+      var sym = document.createElement('em'); sym.className = 'sym'; sym.innerHTML = row.symHtml;
+      sym.style.color = row.key === 'M' ? mColor : row.key === 'L' ? lColor : 'var(--fg)';
+      var name = document.createElement('span'); name.className = 'name'; name.textContent = row.name;
+      var val = document.createElement('span'); val.className = 'val mono'; val.textContent = row.val;
+      div.appendChild(sym); div.appendChild(name); div.appendChild(val);
+      legendEl.appendChild(div);
+    });
+  }
+
+  // ---- result / gauge ----
+  var pmvValueEl = $('pmvValue'), pmvLabelEl = $('pmvLabel'), verdictSubEl = $('verdictSub'), auxLineEl = $('auxLine'), auxLine2El = $('auxLine2'), flagsEl = $('flags');
+  var gBand = $('gBand'), gMark = $('gMark'), gMarkLabel = $('gMarkLabel'), gTicksEl = $('gTicks'), gLabelsEl = $('gLabels');
+  var GMIN = -3, GMAX = 3;
+  var LEVELS = [
+    { max:-2.5, label:'Cold' }, { max:-1.5, label:'Cool' }, { max:-0.5, label:'Slightly cool' },
+    { max:0.5, label:'Neutral' }, { max:1.5, label:'Slightly warm' }, { max:2.5, label:'Warm' }, { max:Infinity, label:'Hot' }
+  ];
+  function pmvLabelText(v){ for (var i=0;i<LEVELS.length;i++){ if (v <= LEVELS[i].max) return LEVELS[i].label; } return 'Hot'; }
+  function pos(v){ return clamp((v - GMIN) / (GMAX - GMIN), 0, 1) * 100; }
+
+  function drawResult(r){
+    var compliant = r.pmv >= -0.5 && r.pmv <= 0.5 && r.ppd <= 10;
+    var resultColor = compliant ? 'var(--fg)' : 'var(--bad)';
+
+    pmvValueEl.textContent = (r.pmv >= 0 ? '+' : '') + r.pmv.toFixed(2);
+    pmvValueEl.style.color = resultColor;
+    pmvLabelEl.textContent = pmvLabelText(r.pmv);
+    pmvLabelEl.style.color = resultColor;
+
+    verdictSubEl.textContent = 'PPD ' + r.ppd.toFixed(1) + '% dissatisfied — ' +
+      (compliant ? 'meets ASHRAE 55 (±0.5 PMV, ≤10% PPD).' : 'outside ASHRAE 55’s ±0.5 PMV / 10% PPD comfort zone.');
+    verdictSubEl.style.color = resultColor;
+
+    var markPct = pos(r.pmv);
+    gMark.style.left = markPct.toFixed(2) + '%';
+    gMark.style.background = resultColor;
+    var labelPct = clamp(markPct, 6, 88);
+    gMarkLabel.style.left = labelPct.toFixed(2) + '%';
+    gMarkLabel.style.transform = markPct > 72 ? 'translateX(-100%)' : markPct < 15 ? 'translateX(0)' : 'translateX(-50%)';
+    gMarkLabel.style.color = resultColor;
+    gMarkLabel.textContent = r.pmv.toFixed(2);
+
+    if (!gBand.dataset.built){
+      var bandL = pos(-0.5), bandR = pos(0.5);
+      gBand.style.left = bandL.toFixed(2) + '%';
+      gBand.style.width = (bandR - bandL).toFixed(2) + '%';
+      var ticksHtml = '', labelsHtml = '';
+      for (var v = GMIN; v <= GMAX; v++){
+        var left = pos(v).toFixed(2) + '%';
+        ticksHtml += '<div class="tick" style="left:' + left + '"></div>';
+        var tx = v === GMIN ? 'translateX(0)' : v === GMAX ? 'translateX(-100%)' : 'translateX(-50%)';
+        labelsHtml += '<div class="ticklabel" style="left:' + left + ';transform:' + tx + '">' + v + '</div>';
+      }
+      gTicksEl.innerHTML = ticksHtml; gLabelsEl.innerHTML = labelsHtml;
+      gBand.dataset.built = '1';
+    }
+
+    auxLineEl.textContent = 'Mean radiant ' + r.tr.toFixed(1) + '°C · Operative ' + r.to.toFixed(1) + '°C · Wall surface ' + r.surf.tExtWall.toFixed(1) + '°C · Window surface ' + r.surf.tWindow.toFixed(1) + '°C';
+    auxLine2El.textContent = 'The window is ' + Math.round(state.glazing) + '% of that wall’s area, but carries ' + r.surf.shareWindow.toFixed(0) + '% of its heat loss.';
+
+    // local-discomfort flags (simplified proxies, see note)
+    var flags = [];
+    if (state.vel > 0.15 && state.ta < 22.5) flags.push('Draft risk — air speed at this temperature may register as a chilling draft, not just cool air.');
+    if (state.tFloor < 19 || state.tFloor > 29) flags.push('Floor temperature (' + cFmt(state.tFloor) + ') is outside ASHRAE 55’s comfortable 19–29°C range for bare or lightly-shod feet.');
+    var effAsym = (state.tWall - r.surf.tWindow) * (0.4 + 0.6 * (1 - state.personX));
+    if (r.surf.tWindow < state.tWall && effAsym > 5) flags.push('Cold-window asymmetry (≈' + effAsym.toFixed(1) + '°C) may feel uncomfortable here even though PMV alone looks fine.');
+    flagsEl.innerHTML = '';
+    if (flags.length === 0){
+      var d = document.createElement('div'); d.className = 'flag ok'; d.textContent = 'No local-discomfort flags at this position.';
+      flagsEl.appendChild(d);
+    } else {
+      flags.forEach(function(f){ var d = document.createElement('div'); d.className = 'flag'; d.textContent = '⚠ ' + f; flagsEl.appendChild(d); });
+    }
+  }
+
+  // ---- presets ----
+  var PRESETS = {
+    cozy:   { ta:22, tOut:-10, wallR:20, windowU:1.8, glazing:25, tCeil:22, tFloor:21, tWall:21, rh:40, vel:0.10, personX:0.5, clo:3, met:2 },
+    window: { ta:22, tOut:-20, wallR:12, windowU:2.8, glazing:45, tCeil:22, tFloor:20, tWall:21, rh:40, vel:0.12, personX:0.08, clo:3, met:2 },
+    hot:    { ta:27, tOut:32,  wallR:20, windowU:1.8, glazing:25, tCeil:27, tFloor:26, tWall:26, rh:60, vel:0.05, personX:0.5, clo:2, met:2 },
+    fan:    { ta:29, tOut:34,  wallR:12, windowU:2.8, glazing:40, tCeil:28, tFloor:27, tWall:28, rh:55, vel:0.80, personX:0.5, clo:1, met:1 }
+  };
+  document.querySelectorAll('.preset').forEach(function(b){
+    b.addEventListener('click', function(){
+      var p = PRESETS[b.dataset.p];
+      Object.keys(p).forEach(function(k){ state[k] = p[k]; });
+      render();
+    });
+  });
+
+  // ---- theme toggle ----
+  var STORAGE_KEY = 'thermal-comfort-pmv-theme';
+  var themeToggle = $('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    var applied = document.documentElement.getAttribute('data-theme');
+    if (applied) return applied;
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){ applyTheme(currentTheme() === 'dark' ? 'light' : 'dark'); });
+  applyTheme(currentTheme());
+
+  // ---- render loop ----
+  function measure(){
+    var w = heroWrap.clientWidth;
+    if (w && w !== heroW){ heroW = w; render(); }
+  }
+  function render(){
+    var surf = wallWindowSurfaceTemps();
+    var r = compute(surf);
+    drawHero(surf);
+    drawEquationAndLegend(r);
+    drawSliders();
+    drawPickers();
+    drawResult(r);
+  }
+
+  new ResizeObserver(measure).observe(heroWrap);
+  window.addEventListener('resize', measure);
+  [60, 250, 900].forEach(function(t){ setTimeout(measure, t); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  render();
+})();
+</script>
+<script>
+(function(){
+  var root = document.querySelector('[data-feedback]');
+  if (!root) return;
+  var form = root.querySelector('.feedback-form');
+  var choices = Array.prototype.slice.call(root.querySelectorAll('.feedback-choice'));
+  var textarea = root.querySelector('textarea');
+  var status = root.querySelector('.feedback-status');
+  var send = root.querySelector('.feedback-send');
+  var rating = '';
+
+  choices.forEach(function(choice){
+    choice.addEventListener('click', function(){
+      rating = choice.dataset.rating;
+      choices.forEach(function(item){ item.setAttribute('aria-pressed', item === choice ? 'true' : 'false'); });
+      form.hidden = false;
+      status.textContent = '';
+    });
+  });
+
+  function pageSlug(){
+    var file = location.pathname.split('/').pop() || '';
+    return file.replace(/\.html?$/i, '').toLowerCase() || 'visualization';
+  }
+
+  function currentContext(){
+    var values = [];
+    Array.prototype.forEach.call(document.querySelectorAll('[role="slider"]'), function(slider){
+      var label = slider.getAttribute('aria-label') || 'Control';
+      var value = slider.getAttribute('aria-valuetext') || slider.getAttribute('aria-valuenow');
+      if (value) values.push(label + ': ' + value);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('select'), function(select){
+      var label = select.getAttribute('aria-label') || select.name || 'Selection';
+      var option = select.options[select.selectedIndex];
+      if (option) values.push(label + ': ' + option.textContent.trim());
+    });
+    return values.slice(0, 20);
+  }
+
+  form.addEventListener('submit', function(event){
+    event.preventDefault();
+    if (!rating) return;
+    if (location.protocol === 'file:'){
+      status.textContent = 'Feedback can be sent from madeclear.ca.';
+      return;
+    }
+    send.disabled = true;
+    status.textContent = 'Sending…';
+    fetch('/api/feedback', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {'content-type':'application/json'},
+      body: JSON.stringify({
+        page: pageSlug(),
+        rating: rating,
+        comment: textarea.value,
+        website: form.elements.website.value,
+        context: currentContext()
+      })
+    }).then(function(response){
+      if (!response.ok) throw new Error('request failed');
+      status.textContent = 'Thank you — your feedback is private.';
+      textarea.value = '';
+    }).catch(function(){
+      status.innerHTML = 'Could not send. Try <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.';
+    }).then(function(){ send.disabled = false; });
+  });
+})();
+</script>
+</html>

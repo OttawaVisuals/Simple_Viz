@@ -75,6 +75,12 @@ in-page toggle, see below) must work:
 - Per-concept accent colors (e.g. the four fluid colors in straw-hose-flow) sit outside this
   token set as their own hex constants, since they carry semantic meaning (identifying a
   specific fluid/object) rather than being theme chrome.
+- **`index.html` only:** the homepage tile grid colors each tile by category
+  (`--cat-everyday` / `--cat-discoveries` / `--cat-fun`, added 2026-08-20 at the user's
+  request). Each tile rebinds `--accent` locally to its category hue, which also recolors the
+  accent strokes inside the shared icon sprite. This is a cover-page device for telling twelve
+  tiles apart at a glance — **do not carry category colors into a visualization page**, where
+  the single-`--accent` rule above still holds.
 
 ## Typography
 

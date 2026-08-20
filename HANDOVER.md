@@ -171,7 +171,9 @@ pump page), none started:
       structure collapses into one exact calculation throughout.
 
 **Three more pitched 2026-08-20** (Simon, noted for action later; none started):
-- **Index page as a tile grid.** Rework `index.html` from its current list/card layout into
+- **Index page as a tile grid — built 2026-08-20** (see the handoff entry below; the
+  "most visited" row is the one part deliberately deferred). Original pitch: rework
+  `index.html` from its current list/card layout into
   a denser tile grid — about **5 tiles per row** — with a **Featured 5** row at the top and a
   **Most visited 5** row beneath it. **Remove the per-card numbering.** Add a **randomizer**
   control that re-shuffles the tile order on click. **Category becomes tile colour** rather
@@ -191,7 +193,99 @@ pump page), none started:
   frequency changes, so this is most likely a selector on the existing figure rather than a
   new page.
 
-## Current handoff — 2026-08-19
+## Current handoff — 2026-08-20
+
+- **`index.html` rebuilt as a tile grid.** The catalogue is now a single flat grid of tiles
+  instead of three hairline-rule lists, per Simon's pitch (see the 2026-08-20 backlog entry
+  above). What changed, and the decisions behind each:
+  - **Five tiles per row** at desktop (`repeat(5,minmax(0,1fr))`), stepping to 4 / 3 / 2 at
+    1180 / 920 / 640 px. `grid-auto-rows:1fr` keeps every tile in a grid the same height so a
+    two-line title and a four-line one still read as one even field.
+  - **Featured is now five** (was three): `pizza-area`, `earth-moon-race`, `straw-hose-flow`,
+    `heat-pump-magic`, `potato-trajectory` — the three existing picks plus the reference
+    implementation and the newest page. Featured tiles are the same component one step larger
+    (84 px icons vs 64, slightly bigger title).
+  - **The three category sections are gone.** Simon chose one flat grid, with colour carrying
+    the category — that is also what makes the randomiser meaningful, since it can shuffle the
+    whole catalogue rather than shuffling within three groups. The `<select>` category filter
+    still narrows the grid, so the grouping is still reachable, and the per-category lede
+    paragraphs (`.cat-sub`) collapsed into one line under "All pages".
+  - **Numbering removed.** The old `01 / Geometry` meta line is now just the category name,
+    printed in that category's colour. Keeping a text label matters: it means the colour is
+    never the only thing carrying the meaning, so no separate colour legend is needed.
+  - **Category colour** uses three new token pairs (`--cat-everyday` / `--cat-discoveries` /
+    `--cat-fun`), light and dark. Each tile does `--accent:var(--cat)` locally; because custom
+    properties inherit into a `<use>` shadow tree, that single line also recolours the accent
+    strokes inside the shared icon sprite, so artwork, border, tint and hover all agree with
+    **no per-icon edits**. Light-mode Discoveries was darkened from `#9A6A12` to `#8A5E0C`
+    during the build — at 10.5 px the first value only reached ~4.3:1 on `--bg`. See
+    STYLE_GUIDE.md for the "index only, don't carry this into a visualization page" note.
+  - **Tiles are tinted, not hairline.** A 1 px border at 30 % of the category colour over a
+    6 % tint, deepening to 60 % / 13 % on hover, 10 px radius, no shadow. This is a knowing
+    step toward "cards", which CLAUDE.md's principles warn against — it is what "tiles with
+    category colours" actually asks for, and it stays flat and shadow-free.
+  - **Icon + title only.** Simon chose this over showing descriptions: at ~250 px wide the old
+    blurbs ran 6–8 lines. The descriptions were not deleted — they moved to a `data-desc`
+    attribute, and the search box still matches against them (verified: searching "marathon"
+    still finds `mass-energy.html`, whose blurb mentions it but whose title does not).
+  - **Descriptions return as a tooltip** (added later the same day at Simon's request). One
+    shared `#tileTip` element, positioned per tile, rather than a node per card; it reads the
+    same `data-desc`. It opens on hover **and on keyboard focus** — hover-only content is
+    unreachable by keyboard — sets `aria-describedby` on the tile while open, flips above the
+    tile when there is no room below, and closes on leave/blur/Escape/filter change. Two bugs
+    were caught and fixed during the build, both worth knowing about if this code is touched:
+    tabbing to a tile scrolls it into view, and the original scroll handler hid the tooltip the
+    instant a keyboard user reached it (it now *follows* a focused tile and only dismisses a
+    hover-opened one); and the fade-in was gated on `requestAnimationFrame`, which never runs
+    in a backgrounded document, so the tooltip could sit stuck at `opacity:0` — it now flushes
+    layout by reading `offsetHeight` instead. `pointerenter` ignores `pointerType === 'touch'`,
+    since on a touch device the tap just opens the page.
+  - **The shuffle is animated** (same request). FLIP: measure every tile's rect, re-append in
+    the new order, then animate each tile from its old position back to zero with the Web
+    Animations API, so you watch the tiles travel to their new slots instead of the grid
+    blinking. A mid-keyframe `scale(.93)` and 16 px lift give it the arc of a card being dealt;
+    a per-tile random delay up to 110 ms staggers them. Any in-flight animation on a tile is
+    cancelled before a new one starts, so back-to-back clicks do not stack (verified: 11
+    animations max, every tile at rest with `transform:none`, no overlaps). Honours
+    `prefers-reduced-motion: reduce` by reordering with no animation, and Reset order animates
+    the same way.
+  - **Shuffle / Reset order** are text-styled `.text-btn` controls in the browse row, matching
+    the theme toggle. Deliberately *not* pills: STYLE_GUIDE.md only sanctions pill buttons for
+    small discrete-option selectors, and these are actions. Shuffle is Fisher–Yates over the
+    tile array followed by re-appending (appending an element already in the grid moves it, so
+    no removal pass). The authored order is kept in `defaultOrder`, and "Reset order" is hidden
+    until the first shuffle.
+  - **Deferred: the "Most visited" row of five.** Simon chose to skip it for now rather than
+    invent a ranking — this repo carries no analytics by constraint. An HTML comment marks the
+    slot between Featured and All pages. If it is picked up later, the option discussed was
+    localStorage click counts recorded by the index itself, shown as "most opened from this
+    device" with a hand-picked default until enough clicks accumulate.
+  - **Verification** (local static server, no console errors): tooltip verified on hover and
+    focus, centred 11 px below its tile at 320 px wide, flipping above in the last row, and
+    dismissed by blur / Escape / filtering; shuffle and reset verified as above. Note that the
+    browser pane was not compositing in this session, so `document.hidden` was true throughout:
+    the WAAPI timeline and CSS transitions were frozen, and real `focus` events did not fire
+    (`document.hasFocus()` false). Those paths were checked by driving `animation.currentTime`
+    by hand (correct interpolation at the midpoint, lands on `transform:none`) and by
+    dispatching synthetic focus events. **The motion and the tooltip have never actually been
+    watched playing** — worth a human look. 5 columns at 1440 px with zero
+    horizontal overflow, 2 columns at 375 px likewise; 12 catalogue tiles + 5 featured tiles,
+    17 icons injected and 0 broken sprite references; shuffle reorders the same set and Reset
+    restores the authored order exactly; search "chocolate" → 1 page, category "Fun physics" →
+    3 pages, cleared filters → 12 pages; both themes resolve their category tokens.
+    **Not verified visually** — the browser pane could not composite screenshots in this
+    session, so every check above is DOM/computed-style based. Worth a human look at the tint
+    strength and the icon-in-category-colour treatment before considering this settled.
+  - **Adding a newly reviewed page now** (this supersedes the mechanics in the 2026-08-17
+    entry below, which still refers to three category grids): append one `<a class="tile"
+    data-cat="…" data-desc="…" href="visualizations/<slug>.html">` to `#catalogueGrid`, add a
+    matching `<symbol id="icon-<slug>">` to the sprite if one does not exist, and bump the
+    "Twelve pages" / "Twelve equations" / results-count default. The icon is wired up by slug
+    automatically, so no mapping table needs touching. `data-cat` must be spelled exactly
+    `Everyday maths`, `Discoveries`, or `Fun physics` — the string drives both the filter and
+    the tile colour.
+
+## Previous handoff — 2026-08-19
 
 - **`visualizations/thermal-comfort-pmv.html`** ("The room feels colder than the thermostat
   says") — new page 51, built directly from this file's own backlog idea above ("ASHRAE 55

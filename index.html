@@ -11,16 +11,19 @@
   :root{
     --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
     --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--sun:#B78316;--track:#E2DDD2;
+    --cat-everyday:#2F6BD8;--cat-discoveries:#8A5E0C;--cat-fun:#A83D2A;
   }
   @media (prefers-color-scheme:dark){
     :root:not([data-theme="light"]){
       --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
       --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--sun:#E5B94B;--track:#28304A;
+    --cat-everyday:#6FA0F2;--cat-discoveries:#E5B94B;--cat-fun:#E68075;
     }
   }
   :root[data-theme="dark"]{
     --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
     --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--sun:#E5B94B;--track:#28304A;
+    --cat-everyday:#6FA0F2;--cat-discoveries:#E5B94B;--cat-fun:#E68075;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
@@ -57,44 +60,58 @@
   .browse-tools input{flex:1 1 260px;min-width:0}
   .browse-tools select{flex:0 1 190px}
   .results-count{font:11px ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-  .concept.is-hidden{display:none}
+  .text-btn{cursor:pointer;border:0;background:none;padding:0;margin:0;font:11px ui-monospace,"Cascadia Code",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid transparent}
+  .text-btn:hover{color:var(--accent);border-color:var(--accent)}
+  .text-btn[hidden]{display:none}
+  .tile.is-hidden{display:none}
 
-  /* Category groups: a serif heading, a count in mono, one line of lede, then the grid.
-     Typography and a single hairline do the separating — no cards, no boxes. */
-  .group{margin-top:clamp(46px,6vw,80px)}
-  .group:first-of-type{margin-top:0}
-  .cat-head{display:flex;justify-content:space-between;align-items:baseline;gap:20px}
-  .cat-head h2{font-weight:300;font-size:clamp(1.25rem,2.2vw,1.55rem);letter-spacing:-.02em;margin:0}
+  /* Tiles. Colour carries the category, which is the one deliberate departure from the
+     style guide's "one saturated colour" rule (user request, 2026-08-20). Each tile rebinds
+     --accent locally to its own category hue; custom properties inherit into the <use> shadow
+     tree, so the accent strokes inside the shared icon sprite recolour to match the tile with
+     no per-icon edits. The category name is printed on the tile too, so the colour is never
+     the only thing carrying the meaning. */
+  .tile[data-cat="Everyday maths"]{--cat:var(--cat-everyday)}
+  .tile[data-cat="Discoveries"]{--cat:var(--cat-discoveries)}
+  .tile[data-cat="Fun physics"]{--cat:var(--cat-fun)}
+
+  .section-head{display:flex;justify-content:space-between;align-items:baseline;gap:20px}
+  .section-head h2{font-weight:300;font-size:clamp(1.25rem,2.2vw,1.55rem);letter-spacing:-.02em;margin:0}
   .cat-count{font:11px ui-monospace,"Cascadia Code",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
-  .cat-sub{margin:11px 0 20px;font-size:.95rem;line-height:1.6;color:var(--muted2);max-width:56ch;text-wrap:pretty}
+  .cat-sub{margin:11px 0 20px;font-size:.95rem;line-height:1.6;color:var(--muted2);max-width:60ch;text-wrap:pretty}
 
-  /* Featured: three hand-picked pages, same hairline-card language as the catalogue below but
-     larger, in their own row above the search/filter so a first-time visitor lands on a
-     representative sample instead of an alphabetic accident. */
-  .featured{margin:0 0 clamp(46px,6vw,80px)}
-  .featured .cat-head{margin-bottom:11px}
-  .featured-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 clamp(28px,4vw,44px);border-bottom:1px solid var(--line)}
-  .featured .concept{padding:26px 0 32px}
-  .featured .concept-icon{height:96px}
-  .featured .concept h3{font-size:clamp(1.14rem,1.5vw,1.28rem)}
-  @media (max-width:900px){.featured-grid{grid-template-columns:1fr}}
-
-  /* Concept list: hairline rules only, no cards. The number/topic tag is muted; --accent is
-     reserved for the hover state, per the style guide's "one saturated color" rule.
-     The closing rule sits on the grid rather than on the last two cards, so a group with an odd
-     number of pages still closes cleanly; ::after then fills the empty final cell so the rule
-     above it runs the full width instead of stopping halfway across. */
-  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 clamp(28px,4vw,56px);border-bottom:1px solid var(--line)}
-  .grid:has(> .concept:last-child:nth-child(odd))::after{content:"";border-top:1px solid var(--line)}
-  .concept{display:block;color:inherit;text-decoration:none;padding:22px 0 30px;border-top:1px solid var(--line)}
-  .concept-icon{display:block;width:100%;height:76px;margin:0 0 18px;color:var(--fg);overflow:visible}
-  .concept-icon use{pointer-events:none}
+  /* grid-auto-rows:1fr keeps every tile in a grid the same height, so a two-line title and a
+     four-line one still read as one even field of tiles. */
+  .tile-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:1fr;gap:clamp(10px,1.3vw,16px)}
+  .tile{--accent:var(--cat);display:flex;flex-direction:column;gap:11px;padding:15px 14px 17px;border:1px solid color-mix(in srgb,var(--cat) 30%,transparent);border-radius:10px;background:color-mix(in srgb,var(--cat) 6%,transparent);color:inherit;text-decoration:none;transition:background .15s ease,border-color .15s ease}
+  .tile:hover{color:inherit;background:color-mix(in srgb,var(--cat) 13%,transparent);border-color:color-mix(in srgb,var(--cat) 60%,transparent)}
+  .tile:hover h3{color:var(--cat)}
+  .tile-icon{display:block;width:100%;height:64px;color:var(--fg);overflow:visible}
+  .tile-icon use{pointer-events:none}
   .icon-sprite{position:absolute;width:0;height:0;overflow:hidden}
-  .meta{display:block;font:11px ui-monospace,"Cascadia Code",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
-  .concept h3{margin:0 0 9px;font-size:clamp(1.12rem,1.7vw,1.36rem);font-weight:400;line-height:1.22;letter-spacing:-.01em}
-  .concept p{margin:0;font-size:.95rem;line-height:1.6;color:var(--muted2);text-wrap:pretty}
-  .concept:hover h3{color:var(--accent)}
-  .concept:hover .meta{color:var(--accent)}
+  .tile .meta{display:block;font:10.5px ui-monospace,"Cascadia Code",monospace;letter-spacing:.11em;text-transform:uppercase;color:var(--cat);margin:0}
+  .tile h3{margin:0;font-size:.98rem;font-weight:400;line-height:1.3;letter-spacing:-.01em;text-wrap:pretty}
+
+  /* Featured: the same tiles, one step larger, above the search and filter so a first-time
+     visitor lands on a hand-picked sample rather than whatever sorts first. */
+  .featured{margin:0 0 clamp(40px,5vw,64px)}
+  .featured .section-head{margin-bottom:16px}
+  .featured .tile{padding:19px 16px 21px}
+  .featured .tile-icon{height:84px}
+  .featured .tile h3{font-size:1.06rem}
+
+  /* Description tooltip. The blurbs no longer fit on a tile, so they surface on hover and on
+     keyboard focus from the same data-desc attribute the search reads. One shared element,
+     positioned per tile, rather than one node per card. Hairline border and an opaque --bg
+     panel — no drop shadow, per the design principles. */
+  .tile-tip{position:fixed;z-index:20;max-width:min(320px,80vw);padding:9px 12px;border:1px solid var(--line2);border-radius:8px;background:var(--bg);color:var(--muted2);font-size:.86rem;line-height:1.5;text-wrap:pretty;pointer-events:none;opacity:0;transform:translateY(3px);transition:opacity .13s ease,transform .13s ease}
+  .tile-tip.is-visible{opacity:1;transform:none}
+
+  .catalogue{margin-top:clamp(30px,4vw,44px)}
+
+  @media (max-width:1180px){.tile-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+  @media (max-width:920px){.tile-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media (max-width:640px){.tile-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
   /* Roadmap: same hairline list, with the equation in mono so it reads as data, not prose.
      Grouped by the same three categories as the built grid. */
@@ -121,10 +138,6 @@
     .brand-word{display:none}
   }
   @media (max-width:760px){
-    .grid{grid-template-columns:1fr}
-    /* One column: every card already sits on its own row, so the odd-cell filler would just
-       add an empty row with a stray rule above the grid's own bottom border. */
-    .grid::after{display:none}
     .roadmap li{flex-wrap:wrap;gap:6px 16px}
     .roadmap .eq{margin-left:0}
     .roadmap .status{min-width:0;text-align:left}
@@ -349,69 +362,59 @@
   </div>
 
   <section class="featured" aria-labelledby="cat-featured">
-    <div class="cat-head">
+    <div class="section-head">
       <h2 id="cat-featured">Featured</h2>
-      <span class="cat-count">Three to start with</span>
+      <span class="cat-count">Five to start with</span>
     </div>
-    <div class="featured-grid">
-      <a class="concept" href="visualizations/pizza-area.html"><span class="meta">Geometry</span><h3>One big pizza, or two smaller ones?</h3><p>Compare true pizza areas with circles and area-equivalent shapes &mdash; the diameter that sounds smaller often wins.</p></a>
-      <a class="concept" href="visualizations/potato-trajectory.html"><span class="meta">Motion</span><h3>Throwing a potato into a hole</h3><p>Set a release height, launch angle, and speed, and see whether a 200&nbsp;g potato lands in a hole 3&nbsp;m away &mdash; and how two very different arcs can land in the same spot.</p></a>
-      <a class="concept" href="visualizations/earth-moon-race.html"><span class="meta">Speed</span><h3>Earth to the Moon, at real speed</h3><p>Watch light cross the Earth&ndash;Moon gap, and magnify the tiny first part of the same journey for slower travellers.</p></a>
-    </div>
-  </section>
-
-  <div class="browse-tools" role="search" aria-label="Find a visualization">
-    <input id="vizSearch" type="search" placeholder="Search visualizations" aria-label="Search visualizations">
-    <select id="vizCategory" aria-label="Filter by category">
-      <option value="all">All categories</option>
-      <option value="Everyday maths">Everyday maths</option>
-      <option value="Discoveries">Discoveries</option>
-      <option value="Fun physics">Fun physics</option>
-    </select>
-    <span class="results-count" id="resultsCount" aria-live="polite">12 pages</span>
-  </div>
-
-  <section class="group" aria-labelledby="cat-everyday">
-    <div class="cat-head">
-      <h2 id="cat-everyday">Everyday maths</h2>
-      <span class="cat-count">Four pages</span>
-    </div>
-    <p class="cat-sub">Quantities from an ordinary day &mdash; a storm, a car, a bicycle, a bookshelf, a pizza order, a savings account &mdash; that you can check against your own life.</p>
-    <div class="grid">
-      <a class="concept" href="visualizations/horizon-distance.html"><span class="meta">01 / Geometry</span><h3>Why standing up lets you see farther</h3><p>Earth curves away beneath you &mdash; raise your eye height and watch the visible horizon push out from a few kilometres to thousands.</p></a>
-      <a class="concept" href="visualizations/braking-distance.html"><span class="meta">03 / Motion</span><h3>Why speed quadruples your stopping distance</h3><p>Drag the speed slider and watch braking distance grow with the square of speed &mdash; and see reaction distance stack on top.</p></a>
-      <a class="concept" href="visualizations/shelf-sag.html"><span class="meta">05 / Bending</span><h3>A shelf that sags</h3><p>Move a load along a beam, reshape its cross-section, and see where visible sag becomes excessive bending stress.</p></a>
-      <a class="concept" href="visualizations/pizza-area.html"><span class="meta">07 / Geometry</span><h3>One big pizza, or two smaller ones?</h3><p>Compare true pizza areas with circles and area-equivalent shapes &mdash; the diameter that sounds smaller often wins.</p></a>
+    <div class="tile-grid">
+      <a class="tile" data-cat="Everyday maths" data-desc="Compare true pizza areas with circles and area-equivalent shapes &mdash; the diameter that sounds smaller often wins." href="visualizations/pizza-area.html"><span class="meta">Everyday maths</span><h3>One big pizza, or two smaller ones?</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Watch light cross the Earth&ndash;Moon gap, and magnify the tiny first part of the same journey for slower travellers." href="visualizations/earth-moon-race.html"><span class="meta">Discoveries</span><h3>Earth to the Moon, at real speed</h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="See why a long drink straw becomes impossible to sip through while a much longer garden hose stays effortless." href="visualizations/straw-hose-flow.html"><span class="meta">Fun physics</span><h3>Why the straw gives up</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Drag the outside temperature down and watch a heat pump keep delivering more heat than the electricity it uses &mdash; then compare it against an electric heater and a gas furnace." href="visualizations/heat-pump-magic.html"><span class="meta">Discoveries</span><h3>Heat Pump <del>magic</del> <em>Science</em></h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="Set a release height, launch angle, and speed, and see whether a 200&nbsp;g potato lands in a hole 3&nbsp;m away &mdash; and how two very different arcs can land in the same spot." href="visualizations/potato-trajectory.html"><span class="meta">Fun physics</span><h3>Throwing a potato into a hole</h3></a>
     </div>
   </section>
 
-  <section class="group" aria-labelledby="cat-discoveries">
-    <div class="cat-head">
-      <h2 id="cat-discoveries">Discoveries</h2>
-      <span class="cat-count">Five pages</span>
+  <!-- Slot reserved for a "Most visited" row of five, deliberately not built yet: this repo
+       carries no analytics, so there is no honest source for the ranking. See HANDOVER.md. -->
+
+  <section class="catalogue" aria-labelledby="cat-all">
+    <div class="section-head">
+      <h2 id="cat-all">All pages</h2>
+      <span class="cat-count">Twelve pages</span>
     </div>
-    <p class="cat-sub">The equations that changed what we knew &mdash; each one reduced to the quantities you can move yourself.</p>
-    <div class="grid">
-      <a class="concept" href="visualizations/earth-moon-race.html"><span class="meta">13 / Speed</span><h3>Earth to the Moon, at real speed</h3><p>Watch light cross the Earth&ndash;Moon gap, and magnify the tiny first part of the same journey for slower travellers.</p></a>
-      <a class="concept" href="visualizations/mass-energy.html"><span class="meta">15 / Mass and energy</span><h3>How much energy is in matter?</h3><p>Turn an ordinary amount of mass into the energy hidden in E = mc<sup>2</sup>, then compare it against what real fuels &mdash; and everyday quantities like a Ford F-150 tank or a marathon &mdash; actually deliver.</p></a>
-      <a class="concept" href="visualizations/eratosthenes-shadow.html"><span class="meta">17 / Geometry</span><h3>Two sticks measure a planet</h3><p>Compare shadow angles at two cities a known distance apart, the way Eratosthenes sized up the Earth around 240 BC.</p></a>
-      <a class="concept" href="visualizations/time-dilation.html"><span class="meta">24 / Relativity</span><h3>Moving clocks run slow</h3><p>Drag a clock&rsquo;s speed toward light itself and watch two ticking dials &mdash; one stationary, one moving &mdash; pull apart.</p></a>
-      <a class="concept" href="visualizations/heat-pump-magic.html"><span class="meta">50 / Thermodynamics</span><h3>Heat Pump <del>magic</del> <em>Science</em></h3><p>Drag the outside temperature down and watch a heat pump keep delivering more heat than the electricity it uses &mdash; then compare it against an electric heater and a gas furnace.</p></a>
+    <p class="cat-sub">Everything built so far, coloured by category. Shuffle the order if you would rather stumble into something than go looking for it.</p>
+
+    <div class="browse-tools" role="search" aria-label="Find a visualization">
+      <input id="vizSearch" type="search" placeholder="Search visualizations" aria-label="Search visualizations">
+      <select id="vizCategory" aria-label="Filter by category">
+        <option value="all">All categories</option>
+        <option value="Everyday maths">Everyday maths</option>
+        <option value="Discoveries">Discoveries</option>
+        <option value="Fun physics">Fun physics</option>
+      </select>
+      <button class="text-btn" id="shuffleBtn" type="button">Shuffle</button>
+      <button class="text-btn" id="resetOrderBtn" type="button" hidden>Reset order</button>
+      <span class="results-count" id="resultsCount" aria-live="polite">12 pages</span>
+    </div>
+
+    <div class="tile-grid" id="catalogueGrid">
+      <a class="tile" data-cat="Everyday maths" data-desc="Earth curves away beneath you &mdash; raise your eye height and watch the visible horizon push out from a few kilometres to thousands." href="visualizations/horizon-distance.html"><span class="meta">Everyday maths</span><h3>Why standing up lets you see farther</h3></a>
+      <a class="tile" data-cat="Everyday maths" data-desc="Drag the speed slider and watch braking distance grow with the square of speed &mdash; and see reaction distance stack on top." href="visualizations/braking-distance.html"><span class="meta">Everyday maths</span><h3>Why speed quadruples your stopping distance</h3></a>
+      <a class="tile" data-cat="Everyday maths" data-desc="Move a load along a beam, reshape its cross-section, and see where visible sag becomes excessive bending stress." href="visualizations/shelf-sag.html"><span class="meta">Everyday maths</span><h3>A shelf that sags</h3></a>
+      <a class="tile" data-cat="Everyday maths" data-desc="Compare true pizza areas with circles and area-equivalent shapes &mdash; the diameter that sounds smaller often wins." href="visualizations/pizza-area.html"><span class="meta">Everyday maths</span><h3>One big pizza, or two smaller ones?</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Watch light cross the Earth&ndash;Moon gap, and magnify the tiny first part of the same journey for slower travellers." href="visualizations/earth-moon-race.html"><span class="meta">Discoveries</span><h3>Earth to the Moon, at real speed</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Turn an ordinary amount of mass into the energy hidden in E = mc2, then compare it against what real fuels &mdash; and everyday quantities like a Ford F-150 tank or a marathon &mdash; actually deliver." href="visualizations/mass-energy.html"><span class="meta">Discoveries</span><h3>How much energy is in matter?</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Compare shadow angles at two cities a known distance apart, the way Eratosthenes sized up the Earth around 240 BC." href="visualizations/eratosthenes-shadow.html"><span class="meta">Discoveries</span><h3>Two sticks measure a planet</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Drag a clock&rsquo;s speed toward light itself and watch two ticking dials &mdash; one stationary, one moving &mdash; pull apart." href="visualizations/time-dilation.html"><span class="meta">Discoveries</span><h3>Moving clocks run slow</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Drag the outside temperature down and watch a heat pump keep delivering more heat than the electricity it uses &mdash; then compare it against an electric heater and a gas furnace." href="visualizations/heat-pump-magic.html"><span class="meta">Discoveries</span><h3>Heat Pump <del>magic</del> <em>Science</em></h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="See why a long drink straw becomes impossible to sip through while a much longer garden hose stays effortless." href="visualizations/straw-hose-flow.html"><span class="meta">Fun physics</span><h3>Why the straw gives up</h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="Use melted spots and a microwave&rsquo;s frequency to estimate light speed, with compatible units and a standing-wave side view." href="visualizations/microwave-chocolate.html"><span class="meta">Fun physics</span><h3>Measuring light speed with chocolate</h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="Set a release height, launch angle, and speed, and see whether a 200&nbsp;g potato lands in a hole 3&nbsp;m away &mdash; and how two very different arcs can land in the same spot." href="visualizations/potato-trajectory.html"><span class="meta">Fun physics</span><h3>Throwing a potato into a hole</h3></a>
     </div>
   </section>
 
-  <section class="group" aria-labelledby="cat-fun">
-    <div class="cat-head">
-      <h2 id="cat-fun">Fun physics</h2>
-      <span class="cat-count">Three pages</span>
-    </div>
-    <p class="cat-sub">Oddities and quantities too big to picture, taken seriously enough to actually compute.</p>
-    <div class="grid">
-      <a class="concept" href="visualizations/straw-hose-flow.html"><span class="meta">30 / Fluid flow</span><h3>Why the straw gives up</h3><p>See why a long drink straw becomes impossible to sip through while a much longer garden hose stays effortless.</p></a>
-      <a class="concept" href="visualizations/microwave-chocolate.html"><span class="meta">38 / Waves</span><h3>Measuring light speed with chocolate</h3><p>Use melted spots and a microwave&rsquo;s frequency to estimate light speed, with compatible units and a standing-wave side view.</p></a>
-      <a class="concept" href="visualizations/potato-trajectory.html"><span class="meta">45 / Motion</span><h3>Throwing a potato into a hole</h3><p>Set a release height, launch angle, and speed, and see whether a 200&nbsp;g potato lands in a hole 3&nbsp;m away &mdash; and how two very different arcs can land in the same spot.</p></a>
-    </div>
-  </section>
+  <div class="tile-tip" id="tileTip" role="tooltip" hidden></div>
 
   <section class="roadmap" aria-label="Roadmap">
     <div class="kicker">What's next</div>
@@ -470,11 +473,11 @@
   // order independent from the artwork. They are decorative because the adjacent title
   // already names the concept.
   var SVG_NS = 'http://www.w3.org/2000/svg';
-  document.querySelectorAll('.concept[href^="visualizations/"]').forEach(function(card){
+  document.querySelectorAll('.tile[href^="visualizations/"]').forEach(function(card){
     var slug = card.getAttribute('href').split('/').pop().replace(/\.html$/, '');
     var icon = document.createElementNS(SVG_NS, 'svg');
     var use = document.createElementNS(SVG_NS, 'use');
-    icon.setAttribute('class', 'concept-icon');
+    icon.setAttribute('class', 'tile-icon');
     icon.setAttribute('viewBox', '0 0 120 64');
     icon.setAttribute('aria-hidden', 'true');
     icon.setAttribute('focusable', 'false');
@@ -486,21 +489,132 @@
   var search = document.getElementById('vizSearch');
   var category = document.getElementById('vizCategory');
   var count = document.getElementById('resultsCount');
-  var cards = Array.prototype.slice.call(document.querySelectorAll('.group .concept'));
+  var grid = document.getElementById('catalogueGrid');
+  var tiles = Array.prototype.slice.call(grid.querySelectorAll('.tile'));
+  // The authored order groups the catalogue by category; keep a copy so "Reset order" can
+  // put it back after a shuffle.
+  var defaultOrder = tiles.slice();
+
   function filterCards(){
     var q = search.value.trim().toLowerCase();
     var cat = category.value;
     var shown = 0;
-    cards.forEach(function(card){
-      var group = card.closest('.group');
-      var groupName = group.querySelector('h2').textContent.trim();
-      var matches = (!q || card.textContent.toLowerCase().indexOf(q) !== -1) && (cat === 'all' || cat === groupName);
+    tiles.forEach(function(card){
+      // Descriptions live in data-desc rather than on the tile, so search still matches the
+      // full blurb even though the tile itself shows only the icon, category and title.
+      var hay = (card.textContent + ' ' + (card.getAttribute('data-desc') || '')).toLowerCase();
+      var matches = (!q || hay.indexOf(q) !== -1) && (cat === 'all' || cat === card.getAttribute('data-cat'));
       card.classList.toggle('is-hidden', !matches);
       if(matches) shown++;
     });
     count.textContent = shown + (shown === 1 ? ' page' : ' pages');
+    hideTip();
   }
   search.addEventListener('input', filterCards);
   category.addEventListener('change', filterCards);
+
+  // Randomiser. Fisher-Yates over the tiles, then a FLIP pass so you actually watch the tiles
+  // travel to their new slots instead of the grid blinking into a new order: measure where
+  // every tile is, re-append in the new order (appending an element already in the grid moves
+  // it, so no removal pass is needed), then animate each one from its old position back to
+  // zero. The mid-keyframe lift and shrink give it the arc of a card being dealt.
+  var shuffleBtn = document.getElementById('shuffleBtn');
+  var resetBtn = document.getElementById('resetOrderBtn');
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function render(order){
+    hideTip();
+    var canAnimate = !!Element.prototype.animate && !(reduceMotion && reduceMotion.matches);
+    var first = canAnimate ? tiles.map(function(t){ return t.getBoundingClientRect(); }) : null;
+    order.forEach(function(tile){ grid.appendChild(tile); });
+    if(!canAnimate) return;
+    tiles.forEach(function(tile, i){
+      if(tile.classList.contains('is-hidden')) return;
+      tile.getAnimations().forEach(function(a){ a.cancel(); });
+      var a = first[i], b = tile.getBoundingClientRect();
+      var dx = a.left - b.left, dy = a.top - b.top;
+      if(!dx && !dy) return;
+      tile.animate([
+        {transform: 'translate(' + dx + 'px,' + dy + 'px) scale(1)'},
+        {transform: 'translate(' + (dx * 0.5) + 'px,' + (dy * 0.5 - 16) + 'px) scale(.93)', offset: 0.5},
+        {transform: 'none'}
+      ], {duration: 520, delay: Math.random() * 110, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'backwards'});
+    });
+  }
+
+  shuffleBtn.addEventListener('click', function(){
+    var order = tiles.slice();
+    for(var i = order.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = order[i]; order[i] = order[j]; order[j] = tmp;
+    }
+    render(order);
+    resetBtn.hidden = false;
+  });
+  resetBtn.addEventListener('click', function(){
+    render(defaultOrder);
+    resetBtn.hidden = true;
+  });
+
+  // Description tooltip. Tiles show only an icon, category and title, so the full blurb lives
+  // in data-desc and surfaces here — on hover and on keyboard focus, since hover-only content
+  // is unreachable by keyboard. It follows the tile it describes and flips above when there is
+  // no room below.
+  var tip = document.getElementById('tileTip');
+  var tipTarget = null, tipTimer = null;
+  var allTiles = Array.prototype.slice.call(document.querySelectorAll('.tile[data-desc]'));
+
+  function placeTip(tile){
+    var r = tile.getBoundingClientRect();
+    tip.hidden = false;
+    var t = tip.getBoundingClientRect();
+    var margin = 12;
+    var left = r.left + (r.width - t.width) / 2;
+    left = Math.max(margin, Math.min(left, window.innerWidth - t.width - margin));
+    var top = r.bottom + 8;
+    if(top + t.height > window.innerHeight - margin) top = Math.max(margin, r.top - t.height - 8);
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+  }
+  function showTip(tile){
+    if(tipTarget === tile) return;
+    hideTip();
+    tipTarget = tile;
+    tip.textContent = tile.getAttribute('data-desc') || '';
+    if(!tip.textContent) { tipTarget = null; return; }
+    placeTip(tile);
+    tile.setAttribute('aria-describedby', 'tileTip');
+    // Read a layout property to flush the just-unhidden element's base style before adding the
+    // class, so the fade actually transitions. rAF is the usual trick for this, but it never
+    // runs in a backgrounded document, which would leave the tooltip stuck at opacity 0.
+    void tip.offsetHeight;
+    tip.classList.add('is-visible');
+  }
+  function hideTip(){
+    if(tipTimer){ clearTimeout(tipTimer); tipTimer = null; }
+    if(tipTarget) tipTarget.removeAttribute('aria-describedby');
+    tipTarget = null;
+    tip.classList.remove('is-visible');
+    tip.hidden = true;
+  }
+  allTiles.forEach(function(tile){
+    tile.addEventListener('pointerenter', function(e){
+      if(e.pointerType === 'touch') return;   // no hover on touch; the tap opens the page
+      if(tipTimer) clearTimeout(tipTimer);
+      tipTimer = setTimeout(function(){ showTip(tile); }, 140);
+    });
+    tile.addEventListener('pointerleave', hideTip);
+    tile.addEventListener('focus', function(){ showTip(tile); });
+    tile.addEventListener('blur', hideTip);
+  });
+  // Tabbing to a tile scrolls it into view, so a scroll handler that only hides would kill the
+  // tooltip the instant a keyboard user reached it. Follow the tile while it holds focus;
+  // dismiss only a hover-opened one.
+  window.addEventListener('scroll', function(){
+    if(tipTarget && document.activeElement === tipTarget) placeTip(tipTarget);
+    else hideTip();
+  }, {passive: true});
+  window.addEventListener('resize', hideTip);
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') hideTip(); });
 })();
 </script>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Made Clear symbol, dark</title>
+  <rect width="512" height="512" rx="72" fill="#121A2C"/>
+  <text x="256" y="220" fill="#E9E6DB" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="156" font-style="italic">mc</text>
+  <path d="M72 310 C83 310 83 274 94 274 S105 344 116 344 S127 247 138 247 S149 326 160 326 S171 292 182 292 L440 292" fill="none" stroke="#6FA0F2" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

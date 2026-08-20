@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-labelledby="title">
+  <title id="title">Made Clear, dark</title>
+  <g transform="translate(34 34) scale(.45)">
+    <text x="256" y="220" fill="#E9E6DB" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="156" font-style="italic">mc</text>
+    <path d="M72 310 C83 310 83 274 94 274 S105 344 116 344 S127 247 138 247 S149 326 160 326 S171 292 182 292 L440 292" fill="none" stroke="#6FA0F2" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g fill="#E9E6DB" font-family="Georgia, 'Times New Roman', serif" font-style="italic">
+    <text x="300" y="164" font-size="138">m</text><text x="420" y="215" font-size="68">ade</text>
+    <text x="570" y="164" font-size="138">c</text><text x="665" y="215" font-size="68">lear</text>
+  </g>
+</svg>

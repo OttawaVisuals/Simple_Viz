@@ -233,6 +233,17 @@ inheriting that cap just leaves empty space beside the text for no reason. Overr
 explicitly: `.yoursection .sub{max-width:none}`, alongside the smaller top margin these
 sections already use.
 
+**On `index.html` and `about.html`, body text spans the full `.wrap` width — same edges as
+the tile grid — not a narrower reading-column measure.** These two pages are full-width
+layouts (no topgrid/equation column competing for space), so `.sub` and `.prose` should not
+carry a `max-width` in `ch`/`px` at all; let them stretch to match `.tile-grid`'s left/right
+edges exactly. A centered inner wrapper (e.g. a `.content{max-width:760px;margin:0 auto}`)
+was tried on `about.html` and rejected by the user twice — first because the outer `.wrap`
+itself was still capped at 760px instead of the site's 1320px, then because even after fixing
+that, the centered inner column left dead gutters on both sides that made the page look
+narrower than `index.html`'s edge-to-edge tile row. The fix both times was the same: drop the
+width cap and let the text block use the full `.wrap`, exactly like the tile grid does.
+
 **Presets row** — text-styled buttons (no border/background, just an underline), each
 setting the full interactive state to a named real-world example in one click.
 

@@ -247,6 +247,40 @@ width cap and let the text block use the full `.wrap`, exactly like the tile gri
 **Presets row** — text-styled buttons (no border/background, just an underline), each
 setting the full interactive state to a named real-world example in one click.
 
+**Collapsible "More details" disclosure** — a native `<details class="more">` /
+`<summary>` with a custom `+`/`&minus;` indicator (no marker triangle) and a `.more-body`
+grid of `.more-item` blocks (italic serif `<h3>`, mono `<p>`), first used in
+`heat-pump-magic.html` and reused for `thermal-comfort-pmv.html`'s full-methodology
+section. Use this instead of cramming a long, page-specific breakdown into the main `.note`
+paragraph — it keeps the page's default view uncluttered while still making the detail
+available to a reader who wants it.
+
+**A block equation inside a disclosure needs `min-width:0` on its grid-item ancestor, not
+just `overflow-x:auto` on the equation itself.** A dense equation set (`.eq{white-space:
+nowrap; overflow-x:auto}`) can be wide enough to need its own horizontal scrollbar — but if
+that `.eq` sits inside a CSS Grid (`.more-body{display:grid}`), the grid item wrapping it
+(`.more-item`) defaults to `min-width:auto`, which sizes the *track* to the equation's full
+unwrapped content width and pushes the whole page into horizontal overflow at narrow
+widths instead of scrolling internally. `overflow-x:auto` on the equation alone does
+nothing to stop this, since the ancestor never shrinks enough to trigger it. Fix both ends:
+`.more-body{grid-template-columns:minmax(0,1fr)}` and `.more-item{min-width:0}` (plus
+`max-width:100%;box-sizing:border-box` on the `.eq` itself, for safety). Caught on
+`thermal-comfort-pmv.html` at 375px — a real bug, not caught by a first pass that only
+checked `overflow-x:auto` was present on the equation and assumed that was sufficient.
+
+**`.more-body` must not carry its own `max-width` — it should render exactly as wide as
+the `.note` paragraph directly above it.** A first pass gave `.more-body` a `max-width:82ch`
+reading-width cap, on the assumption that dense equation-heavy prose wanted a narrower
+measure than normal — but `.note` itself carries no such cap (this site's body copy already
+spans the full `.wrap`/topgrid width by convention, same principle as the existing "second
+section's `<p class="sub">` should use the full column width" and "on `index.html` and
+`about.html`, body text spans the full `.wrap` width" entries above), so the capped
+disclosure rendered visibly narrower than the text just above it — roughly two-thirds of
+the page's actual content width — which reads as broken, not intentional. Give `.more-body`
+no `max-width` at all and let it inherit the same width `.note` gets. Verified by comparing
+`getBoundingClientRect()` on both elements directly (not just eyeballing): same `width` and
+same `left` to the pixel.
+
 **Private feedback** — every visualization ends with the same `data-feedback` section:
 `Yes` / `Almost` / `Not yet` clarity choices, followed by an optional private comment.
 Keep its CSS, HTML, and dependency-free JavaScript synchronized with

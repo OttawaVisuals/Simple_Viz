@@ -65,6 +65,7 @@
   .legend .name{font-size:12px;color:var(--muted2)}
   .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
 
+  .herocap{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
   .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
   .hero svg{width:100%;height:auto;display:block}
   .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.02em;color:var(--muted2);white-space:nowrap;transition:opacity .2s}
@@ -129,6 +130,25 @@
   .note a{color:var(--muted2);text-decoration-color:var(--line2)}
   .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
 
+  .more{margin-top:clamp(22px,2.4vw,30px)}
+  .more summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:7px;font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid transparent;padding-bottom:2px}
+  .more summary::-webkit-details-marker{display:none}
+  .more summary:hover{color:var(--accent);border-color:var(--accent)}
+  .more summary .ind{font:400 13px ui-monospace,monospace}
+  .more[open] summary .ind-open{display:none}
+  .more:not([open]) summary .ind-close{display:none}
+  .more-body{display:none;grid-template-columns:minmax(0,1fr);margin-top:18px;gap:26px}
+  .more[open] .more-body{display:grid}
+  .more-item{min-width:0}
+  .more-item h3{margin:0 0 6px;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif;font-weight:400;font-style:italic;font-size:16px;color:var(--fg)}
+  .more-item p{margin:0 0 8px;font-size:13.5px;line-height:1.7;color:var(--muted);font-family:ui-monospace,monospace}
+  .more-item p:last-child{margin-bottom:0}
+  .more-item p a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .more-item p a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  .more-item .eq{display:block;max-width:100%;box-sizing:border-box;margin:8px 0;padding:8px 12px;background:var(--line);border-radius:3px;color:var(--fg);font-size:13px;overflow-x:auto;white-space:nowrap}
+  .more-item ul{margin:8px 0;padding-left:1.3em;font-size:13.5px;line-height:1.7;color:var(--muted);font-family:ui-monospace,monospace}
+  .more-item li{margin-bottom:3px}
+
   .feedback{margin-top:clamp(40px,4.6vw,64px);padding-top:20px;border-top:1px solid var(--line)}
   .feedback-head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:20px}
   .feedback-kicker{margin:0 0 5px;font:10px/1.3 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
@@ -192,12 +212,16 @@
     </div>
   </div>
 
+  <div class="herocap" style="margin-top:clamp(20px,3vw,36px)">
+    <div class="ctrl-title" style="margin-bottom:0">10 m × 10 m room · 2.4 m ceiling height · north is up</div>
+    <button class="theme-toggle" id="viewToggle" type="button" aria-label="Toggle a comfort map overlay showing PPD contour lines"></button>
+  </div>
   <div class="hero" id="heroWrap">
-    <svg id="heroSvg" role="img" aria-label="A top-down floor plan with four walls, north at top; wall colors show their surface temperature, derived from indoor/outdoor temperature and insulation for any wall marked exterior, and lines from the draggable person show how strongly each surface radiates toward them."></svg>
+    <svg id="heroSvg" role="img"></svg>
   </div>
 
   <div class="wallsrow">
-    <div class="ctrl-title">Walls (top view — north is up)</div>
+    <div class="ctrl-title">Walls</div>
     <div class="wallgrid" id="wallGrid"></div>
   </div>
 
@@ -253,7 +277,128 @@
     <button class="preset" data-p="fan">summer heat with a fan on</button>
   </div>
 
-  <p class="note">The <a href="https://en.wikipedia.org/wiki/Thermal_comfort" target="_blank" rel="noopener">Fanger PMV/PPD model</a> (ISO 7730, adopted by <a href="https://en.wikipedia.org/wiki/ASHRAE_55" target="_blank" rel="noopener">ASHRAE 55</a>) puts a full body heat balance &mdash; metabolic heat in, against respiration, convection, radiation and sweat losses out &mdash; onto a &minus;3&hellip;+3 comfort scale, then converts that into PPD, the percentage of people predicted to be dissatisfied (PPD = 100 &minus; 95&middot;e<sup>&minus;0.03353&middot;PMV<sup>4</sup>&minus;0.2179&middot;PMV<sup>2</sup></sup>, never zero &mdash; nobody makes everyone happy). A room is compliant when &minus;0.5 &le; PMV &le; +0.5 and PPD &le; 10%, shown as the shaded band on the gauge above. <strong>Every exterior surface's temperature is calculated, not set directly.</strong> Steady-state conduction gives T<sub>surface</sub> = T<sub>in</sub> &minus; (T<sub>in</sub> &minus; T<sub>out</sub>)&middot;R<sub>si</sub>/R<sub>total</sub>, where R<sub>si</sub> = 0.12 m&sup2;&middot;K/W is the standard interior air-film resistance and R<sub>total</sub> adds that surface's own R-value (entered in the imperial units common on Canadian insulation batts, converted internally: 1 = 0.176 m&sup2;&middot;K/W) plus a 0.03 m&sup2;&middot;K/W exterior air film &mdash; the same formula for a wall marked "Exterior" and for a ceiling switched to "Roof", just with that surface's own R-value. Windows use their U-value directly, since a U-factor already is the whole-assembly figure: heat flux is U&middot;(T<sub>in</sub>&minus;T<sub>out</sub>), and the same R<sub>si</sub> fraction of that gives the glass temperature. <strong>Window size deliberately does not appear in either formula</strong> &mdash; a bigger pane isn't colder glass, it's just more of it. What size (and which walls are exterior at all) actually changes: how much of the room's radiant "view" is glazing versus opaque wall versus roof (feeding t<sub>r</sub> below), and what share of the whole envelope's heat loss the windows carry, both shown in the readout under the gauge. <strong>Mean radiant temperature</strong> (t<sub>r</sub>) is a weighted average of every wall, window, ceiling and floor temperature, weighted by how much of each you can actually "see" from where you're standing (angle factor) &mdash; this page uses a simplified, illustrative angle-factor model based only on distance to each of the four walls, not full solid-angle geometry, but the direction is honest: stand in a corner where two walls are both exterior and both pull t<sub>r</sub> down at once, which is exactly why corners of old houses feel colder than a single-exterior-wall room even at the same air temperature. Operative temperature is approximated as the simple average of air and radiant temperature, valid when air speed is low. Clothing (clo) and activity (met) values are standard reference figures from <a href="https://en.wikipedia.org/wiki/Clothing_insulation" target="_blank" rel="noopener">ASHRAE's clothing-insulation tables</a> and <a href="https://en.wikipedia.org/wiki/Metabolic_equivalent_of_task" target="_blank" rel="noopener">metabolic-rate tables</a>, not measurements of any specific outfit or person. The draft, floor-temperature and radiant-asymmetry flags below the gauge are simplified proxies for ASHRAE 55's separate local-discomfort limits (draft rate, floor 19&ndash;29&deg;C, radiant asymmetry &lt;5&deg;C for a cool surface) &mdash; real assessments measure them directly rather than approximating from the inputs here, and this page can flag more than one wall's asymmetry at once, which a single-number PMV never would.</p>
+  <p class="note">The <a href="https://en.wikipedia.org/wiki/Thermal_comfort" target="_blank" rel="noopener">Fanger PMV/PPD model</a> (ISO 7730, adopted by <a href="https://en.wikipedia.org/wiki/ASHRAE_55" target="_blank" rel="noopener">ASHRAE 55</a>) puts a full body heat balance &mdash; metabolic heat in, against respiration, convection, radiation and sweat losses out &mdash; onto a &minus;3&hellip;+3 comfort scale, then converts that into PPD, the percentage of people predicted to be dissatisfied (PPD = 100 &minus; 95&middot;e<sup>&minus;0.03353&middot;PMV<sup>4</sup>&minus;0.2179&middot;PMV<sup>2</sup></sup>, never zero &mdash; nobody makes everyone happy). A room is compliant when &minus;0.5 &le; PMV &le; +0.5 and PPD &le; 10%, shown as the shaded band on the gauge above. <strong>The room is a fixed 10&times;10 m floor plan with a 2.4 m ceiling</strong> &mdash; not adjustable, but concrete on purpose, so dragging the person means something (the readout under the gauge states it in metres) and the heat-loss figures below use each wall's real 10&times;2.4 m face area rather than an arbitrary placeholder. <strong>Every exterior surface's temperature is calculated, not set directly.</strong> Steady-state conduction gives T<sub>surface</sub> = T<sub>in</sub> &minus; (T<sub>in</sub> &minus; T<sub>out</sub>)&middot;R<sub>si</sub>/R<sub>total</sub>, where R<sub>total</sub> adds that surface's own R-value (entered in the imperial units common on Canadian insulation batts, converted internally: 1 = 0.176 m&sup2;&middot;K/W) plus a 0.03 m&sup2;&middot;K/W exterior air film &mdash; the same formula for a wall marked "Exterior" and for a ceiling switched to "Roof", just with that surface's own R-value. <strong>R<sub>si</sub>, the interior air-film resistance, depends on which way heat is actually flowing</strong> through that surface (ASHRAE Fundamentals Table 1, non-reflective surfaces): walls and windows use 1/8.29 m&sup2;&middot;K/W for horizontal flow, and the roof switches between 1/9.26 (indoor warmer than outdoor, heat escaping upward &mdash; the usual winter case) and 1/6.13 (outdoor warmer, heat arriving downward, e.g. summer sun on the roof) depending on the sign of T<sub>in</sub>&minus;T<sub>out</sub> at that moment &mdash; buoyancy assists an upward-flowing air film and resists a downward one, which is why the three differ. Windows use their U-value directly, since a U-factor already is the whole-assembly figure: heat flux is U&middot;(T<sub>in</sub>&minus;T<sub>out</sub>), and the same vertical-surface R<sub>si</sub> fraction of that gives the glass temperature. <strong>Window size deliberately does not appear in either formula</strong> &mdash; a bigger pane isn't colder glass, it's just more of it. What size (and which walls are exterior at all) actually changes: how much of the room's radiant "view" is glazing versus opaque wall versus roof (feeding t<sub>r</sub> below), and what share of the whole envelope's heat loss the windows carry, both shown in the readout under the gauge. <strong>Each window can also be dragged along its own wall</strong> &mdash; grab it directly in the diagram, or use its wall card's position slider &mdash; and position now genuinely matters: standing squarely in front of a window exposes you to (nearly) its full share of that wall's radiant view, while standing off to the side sees progressively more of the opaque wall instead, fading to purely-opaque by about 4 m of lateral offset &mdash; another simplified, illustrative falloff rather than a measured solid-angle calculation. <strong>Mean radiant temperature</strong> (t<sub>r</sub>) is a weighted average of every wall, window, ceiling and floor temperature, weighted by how much of each you can actually "see" from where you're standing (angle factor) &mdash; this page uses a simplified, illustrative angle-factor model based only on distance to each of the four walls, not full solid-angle geometry, but the direction is honest: stand in a corner where two walls are both exterior and both pull t<sub>r</sub> down at once, which is exactly why corners of old houses feel colder than a single-exterior-wall room even at the same air temperature. <strong>The "Show comfort map" toggle</strong> above the diagram draws PPD as a topographic map: it re-evaluates the whole PMV/PPD model at ~500 points across the floor, holding walls, air and clothing fixed and varying only position, then traces lines of equal PPD through that grid the same way a contour map traces equal elevation &mdash; tightly-packed rings mean comfort changes fast over a short distance (typically near a cold window or corner), and the dashed 10% line specifically marks the ASHRAE 55 compliance boundary. Operative temperature is approximated as the simple average of air and radiant temperature, valid when air speed is low. Clothing (clo) and activity (met) values are standard reference figures from <a href="https://en.wikipedia.org/wiki/Clothing_insulation" target="_blank" rel="noopener">ASHRAE's clothing-insulation tables</a> and <a href="https://en.wikipedia.org/wiki/Metabolic_equivalent_of_task" target="_blank" rel="noopener">metabolic-rate tables</a>, not measurements of any specific outfit or person. The draft, floor-temperature and radiant-asymmetry flags below the gauge are simplified proxies for ASHRAE 55's separate local-discomfort limits (draft rate, floor 19&ndash;29&deg;C, radiant asymmetry &lt;5&deg;C for a cool surface) &mdash; real assessments measure them directly rather than approximating from the inputs here, and this page can flag more than one wall's asymmetry at once, which a single-number PMV never would.</p>
+
+  <details class="more" id="methodologyDetails">
+    <summary><span class="ind ind-open">+</span><span class="ind ind-close">&minus;</span> Full methodology, equations and sources</summary>
+    <div class="more-body">
+
+      <div class="more-item">
+        <h3>Overview</h3>
+        <p>The page runs ten calculation steps every time a control changes: (1) each exterior wall's opaque surface temperature, (2) each window's surface temperature, (3) the ceiling or roof's surface temperature, (4) mean radiant temperature at the person's position, (5) operative temperature, (6&ndash;7) PMV and PPD from Fanger's model, (8) the envelope heat-loss share, (9) three local-discomfort flags, and (10), only when the comfort map is open, PPD re-evaluated on a grid and contoured. All ten are exact re-implementations of published formulas except where explicitly marked "illustrative" below &mdash; those are geometric simplifications this page makes so a 2D top-view diagram can respond to position at all, not shortcuts in the thermal physics itself.</p>
+      </div>
+
+      <div class="more-item">
+        <h3>Fixed assumptions</h3>
+        <p>Room: 10&times;10 m floor plan, 2.4 m ceiling height (typical residential), not adjustable &mdash; stated explicitly so "5 m from the west wall" means something concrete. Each wall's face area for the heat-loss-share calculation (step 8) is the real 10&times;2.4 m = 24 m&sup2;; the roof/ceiling's face is the full 10&times;10 m = 100 m&sup2; footprint. Person's radiant exposure is evaluated at floor level (z = 0); the model does not vary with standing/seated height. External work done by the body (W in the Fanger equation) is fixed at 0. Relative air speed is floored at 0.001 m/s in the PMV solver to avoid a divide-by-zero at the "0.00 m/s" slider position.</p>
+      </div>
+
+      <div class="more-item">
+        <h3>Step 1 &mdash; Opaque wall / roof surface temperature</h3>
+        <p>Steady-state 1D conduction, ISO 6946-style: heat flux through the assembly is driven by the total indoor&ndash;outdoor temperature difference across the total thermal resistance, and the surface temperature is what's left of that difference after only the interior air film's share is subtracted.</p>
+        <span class="eq">R_total = R_si + R_assembly + R_so&emsp;q = (T_in &minus; T_out) / R_total&emsp;T_surface = T_in &minus; q&middot;R_si</span>
+        <p>R_assembly is the user's R-value slider (entered in imperial ft&sup2;&middot;&deg;F&middot;h/Btu, since that's what's printed on Canadian insulation batts) converted with <strong>1 R-value unit = 0.176110 m&sup2;&middot;K/W</strong> (i.e. RSI = R<sub>imperial</sub> / 5.678263, the standard IP&rarr;SI factor). R_so = 0.03 m&sup2;&middot;K/W is the ASHRAE exterior surface resistance for a 24 km/h (15 mph) winter design wind, from the same table cited below. R_si is direction-dependent &mdash; see Step 3.</p>
+      </div>
+
+      <div class="more-item">
+        <h3>Step 2 &mdash; Window surface temperature</h3>
+        <p>A window's U-value is already the whole-assembly heat transfer coefficient (frame, spacer, gas fill and both surface films combined, per NFRC/ISO 15099 convention), so no separate resistance stack is built for it:</p>
+        <span class="eq">q = U&middot;(T_in &minus; T_out)&emsp;T_window = T_in &minus; q&middot;R_si,vertical</span>
+        <p>The same interior film resistance used for vertical walls (Step 3) is applied to back out just the interior glass-surface temperature from the total flux. This is an approximation &mdash; a real window's own interior-film fraction of its 1/U depends on its specific frame and edge-of-glass construction, which isn't knowable from a single U-value alone.</p>
+      </div>
+
+      <div class="more-item">
+        <h3>Step 3 &mdash; Interior air-film coefficients (R<sub>si</sub>)</h3>
+        <p>The interior surface resistance is not one number: air moving by natural convection behaves differently depending on whether it's flowing up, down, or sideways past the surface, so ASHRAE tabulates it by direction. This page selects the entry live, based on the sign of T<sub>in</sub>&minus;T<sub>out</sub> for the roof (since which way heat is flowing through it changes with the seasons), and uses the fixed vertical value for every wall and window regardless of season.</p>
+        <ul>
+          <li>Vertical surfaces (walls, windows), horizontal heat flow: h<sub>si</sub> = 8.29 W/(m&sup2;&middot;K) &rarr; R<sub>si</sub> = 0.1206 m&sup2;&middot;K/W</li>
+          <li>Horizontal surface, heat flowing <em>up</em> (roof/ceiling losing heat outward &mdash; indoor warmer, the usual winter case): h<sub>si</sub> = 9.26 W/(m&sup2;&middot;K) &rarr; R<sub>si</sub> = 0.1080 m&sup2;&middot;K/W</li>
+          <li>Horizontal surface, heat flowing <em>down</em> (roof/ceiling gaining heat inward &mdash; outdoor warmer, e.g. a hot sunlit roof in summer): h<sub>si</sub> = 6.13 W/(m&sup2;&middot;K) &rarr; R<sub>si</sub> = 0.1631 m&sup2;&middot;K/W</li>
+        </ul>
+        <p>Source: <em>ASHRAE Handbook &mdash; Fundamentals</em>, Table 1, "Surface Conductances and Resistances for Air," non-reflective surfaces (&epsilon; = 0.90), still air. These figures are unchanged across editions; see the <a href="https://sovathrothsama.files.wordpress.com/2016/03/ashrae-hvac-2001-fundamentals-handbook.pdf" target="_blank" rel="noopener">2001 ASHRAE Fundamentals Handbook, Ch. 25</a> or the <a href="https://www.tagengineering.ca/wp-content/uploads/2015/01/1997-Fundamentals_24-.pdf" target="_blank" rel="noopener">1997 edition, Ch. 24</a> (same table, both SI and IP units). The table also lists a sloped-45&deg; case (9.09 up / 7.50 down), not used here since every surface on this page is modeled as either flat-horizontal or vertical.</p>
+      </div>
+
+      <div class="more-item">
+        <h3>Step 4 &mdash; Mean radiant temperature (t<sub>r</sub>)</h3>
+        <p>The exact definition of t<sub>r</sub> is a solid-angle-weighted average of every surface a person can see, using true view/angle factors computed from room geometry. This page uses an <strong>illustrative substitute</strong>: each of the four walls gets a raw "closeness" weight from the person's fractional distance to it (0 = standing at the wall, 1 = standing at the opposite wall),</p>
+        <span class="eq">raw_wall = 0.06 + 0.16&middot;(1 &minus; distance_to_wall)</span>
+        <p>ceiling and floor each get a fixed weight of 0.12, and every weight is then divided by the sum of all six so they add to exactly 1. A wall's raw weight is split between its window and its opaque portion by glazing fraction <em>and</em> lateral alignment (Step 5) before that normalization. The weighted fourth-power average (the physically correct way to average radiant temperatures, since radiant exchange itself scales with T<sup>4</sup>) then gives:</p>
+        <span class="eq">t_r = [ &Sigma; F_i&middot;(T_i + 273)<sup>4</sup> ]<sup>0.25</sup> &minus; 273</span>
+        <p>summed over all six weighted surfaces (four walls' opaque+window portions, ceiling/roof, floor). This model captures the right <em>direction</em> of every effect this page demonstrates (closer to a cold surface pulls t<sub>r</sub> down; two exterior walls compound in a corner) but not true magnitudes &mdash; an exact calculation needs each surface's real solid angle from the occupant's actual eye/body position, not just a 1D distance-to-wall proxy.</p>
+      </div>
+
+      <div class="more-item">
+        <h3>Step 5 &mdash; Window alignment (lateral position along the wall)</h3>
+        <p>A window's share of its wall's raw weight also depends on how directly the person is standing in front of it, not just the room-wide glazing percentage:</p>
+        <span class="eq">alignment = clamp(1 &minus; |along &minus; window_pos| / 0.4, 0, 1)&emsp;window weight = raw_wall &times; glazing &times; alignment</span>
+        <p>where <em>along</em> is the person's fractional position along that wall's own axis and <em>window_pos</em> is the window's own fractional position (both 0&ndash;1, set by dragging the window in the diagram or its wall card's slider). Full exposure directly in front, fading linearly to zero (pure opaque wall) by 0.4 room-widths (4 m in this 10 m room) of lateral offset &mdash; a deliberately simple, illustrative falloff, not a measured solid-angle result.</p>
+      </div>
+
+      <div class="more-item">
+        <h3>Step 6 &mdash; Operative temperature</h3>
+        <span class="eq">t_o = (t_a + t_r) / 2</span>
+        <p>The exact definition weights air and radiant temperature by their respective heat transfer coefficients, t_o = (h_c&middot;t_a + h_r&middot;t_r)/(h_c+h_r); the simple average used here is the standard approximation valid when h_c &asymp; h_r, which holds at the low air speeds (&le;1 m/s) this page's slider range covers.</p>
+      </div>
+
+      <div class="more-item">
+        <h3>Step 7 &mdash; PMV (Fanger's model, ISO 7730 reference algorithm)</h3>
+        <p>This is the classic iterative computational form of Fanger's original 1970 heat-balance equation, as codified in <a href="https://www.iso.org/standard/39155.html" target="_blank" rel="noopener">ISO 7730</a> and reproduced in essentially every published PMV implementation (including the <a href="https://cbe-berkeley.gitbook.io/thermal-comfort-tool/documentation/pmv" target="_blank" rel="noopener">CBE Thermal Comfort Tool</a>'s reference documentation). Inputs: air temperature t<sub>a</sub>, mean radiant temperature t<sub>r</sub> (Step 4), relative air velocity v<sub>ar</sub>, relative humidity RH, metabolic rate M (met), clothing insulation I<sub>cl</sub> (clo), external work W (fixed at 0 here).</p>
+        <span class="eq">p_a = 10&middot;RH&middot;e<sup>16.6536 &minus; 4030.183/(t_a+235)</sup>&emsp;(water vapour pressure, Pa)</span>
+        <span class="eq">f_cl = 1+1.29&middot;I_cl if I_cl&le;0.078 m&sup2;K/W, else 1.05+0.645&middot;I_cl&emsp;(clothing area factor)</span>
+        <p>Clothing surface temperature t<sub>cl</sub> and the convective heat-transfer coefficient h<sub>c</sub> are mutually dependent, so they're solved together by fixed-point iteration (converges in a handful of steps, capped at 150, tolerance 0.00015):</p>
+        <span class="eq">t_cl = 35.7 &minus; 0.028&middot;(M&minus;W) &minus; I_cl&middot;[3.96&times;10<sup>&minus;8</sup>&middot;f_cl&middot;((t_cl+273)<sup>4</sup>&minus;(t_r+273)<sup>4</sup>) + f_cl&middot;h_c&middot;(t_cl&minus;t_a)]</span>
+        <span class="eq">h_c = max(12.1&radic;v_ar , 2.38&middot;|t_cl&minus;t_a|<sup>0.25</sup>)</span>
+        <p>Once converged, five heat-loss terms are evaluated (all in W/m&sup2;): latent respiration E<sub>res</sub> = 0.0000017&middot;M&middot;(5867&minus;p<sub>a</sub>); dry respiration C<sub>res</sub> = 0.0014&middot;M&middot;(34&minus;t<sub>a</sub>); skin diffusion E<sub>diff</sub> = 0.00305&middot;(5733&minus;6.99&middot;(M&minus;W)&minus;p<sub>a</sub>); regulatory sweating E<sub>rsw</sub> = 0.42&middot;(M&minus;W&minus;58.15) when M&minus;W&gt;58.15 else 0; radiative loss from clothing Q<sub>r</sub> = 3.96&middot;f<sub>cl</sub>&middot;((t<sub>cl</sub>+273)<sup>4</sup>&minus;(t<sub>r</sub>+273)<sup>4</sup>); convective loss Q<sub>c</sub> = f<sub>cl</sub>&middot;h<sub>c</sub>&middot;(t<sub>cl</sub>&minus;t<sub>a</sub>). Their sum is L (shown in the equation box and legend above), and:</p>
+        <span class="eq">PMV = [0.303&middot;e<sup>&minus;0.036M</sup> + 0.028]&middot;(M &minus; W &minus; L)</span>
+      </div>
+
+      <div class="more-item">
+        <h3>Step 8 &mdash; PPD</h3>
+        <span class="eq">PPD = 100 &minus; 95&middot;e<sup>&minus;0.03353&middot;PMV<sup>4</sup> &minus; 0.2179&middot;PMV<sup>2</sup></sup></span>
+        <p>A room is treated as ASHRAE 55 compliant when &minus;0.5 &le; PMV &le; +0.5 <em>and</em> PPD &le; 10% (the two conditions are almost, but not exactly, redundant near the boundary).</p>
+      </div>
+
+      <div class="more-item">
+        <h3>Step 9 &mdash; Envelope heat-loss share</h3>
+        <p>For every exterior wall, Watts through its window and opaque portions are q&times;area using each surface's own q from Steps 1&ndash;2 and the fixed 10&times;2.4 m wall face (splitting that area by the glazing fraction); if the ceiling is set to Roof, its q&times;100 m&sup2; footprint is added to the opaque total. The reported figure is windows' share of that grand total:</p>
+        <span class="eq">share_window = &Sigma;(q_window&middot;A_window) / [ &Sigma;(q_window&middot;A_window) + &Sigma;(q_opaque&middot;A_opaque) + q_roof&middot;A_roof ] &times; 100%</span>
+      </div>
+
+      <div class="more-item">
+        <h3>Step 10 &mdash; Local-discomfort flags</h3>
+        <p>Three simplified proxies for ASHRAE 55's separate local-discomfort limits, evaluated independently of the PMV/PPD headline number:</p>
+        <ul>
+          <li><strong>Draft risk</strong>: flagged when air speed &gt; 0.15 m/s <em>and</em> air temperature &lt; 22.5&deg;C &mdash; ASHRAE 55's own draft-risk threshold for HVAC-driven air movement below that temperature, not a full draft-rate (DR%) calculation.</li>
+          <li><strong>Floor temperature</strong>: flagged outside 19&ndash;29&deg;C, ASHRAE 55's recommended range for lightly-shod or bare feet.</li>
+          <li><strong>Radiant asymmetry</strong>, evaluated per exterior wall: effective asymmetry = (t<sub>a</sub> &minus; coldest_surface_on_that_wall) &times; (0.4 + 0.6&times;proximity), flagged when it exceeds 5&deg;C &mdash; ASHRAE 55's limit for a <em>cool</em> surface asymmetry (a warm-ceiling asymmetry limit of 14&deg;C also exists in the standard but isn't checked here, since none of this page's warm-surface scenarios approach it). This proxy can fire for more than one wall at once (see the corner preset), which a single PMV number never surfaces.</li>
+        </ul>
+      </div>
+
+      <div class="more-item">
+        <h3>Comfort map (PPD contour lines)</h3>
+        <p>With "Show comfort map" enabled, the full PMV/PPD calculation (Steps 4&ndash;8) is re-run at every point of a 23&times;23 grid across the floor, holding walls, ceiling, air and clothing/activity fixed and varying only (x, y). Contour levels are chosen automatically from the grid's actual min/max PPD, similar to how a topographic map's contour interval adapts to the terrain's elevation range: the range is divided into 5 steps, rounded to the nearest "nice" number (1, 2, 5, or 10 &times; a power of ten), and the ASHRAE 10% line is always added if it falls inside the range. Lines are traced through the grid with the standard <a href="https://en.wikipedia.org/wiki/Marching_squares" target="_blank" rel="noopener">marching squares</a> algorithm (linear interpolation along each grid cell's edges, one of the two ambiguous "saddle" cases resolved with a fixed diagonal convention). If PPD varies by less than 0.05 percentage points across the whole floor, no contours are drawn and the page states the range directly instead &mdash; a flat field is itself the finding, not a rendering failure.</p>
+      </div>
+
+      <div class="more-item">
+        <h3>Reference tables (clothing &amp; activity)</h3>
+        <p><strong>Clothing insulation (I<sub>cl</sub>, clo)</strong>: T-shirt &amp; shorts 0.3 &middot; Light summer wear 0.5 &middot; Shirt &amp; trousers 0.7 &middot; Business suit 1.0 &middot; Suit + sweater 1.3 &middot; Heavy winter clothing 1.7. Standard reference figures from <a href="https://en.wikipedia.org/wiki/Clothing_insulation" target="_blank" rel="noopener">ASHRAE's clothing-insulation tables</a>, not a measurement of any specific garment.</p>
+        <p><strong>Metabolic rate (M, met; 1 met = 58.15 W/m&sup2;)</strong>: Reclining 0.8 &middot; Seated, relaxed 1.0 &middot; Sedentary office work 1.1 &middot; Standing, light work 1.4 &middot; Walking ~1.1 m/s 2.0. From <a href="https://en.wikipedia.org/wiki/Metabolic_equivalent_of_task" target="_blank" rel="noopener">ASHRAE's metabolic-rate tables</a>.</p>
+      </div>
+
+      <div class="more-item">
+        <h3>Sources</h3>
+        <ul>
+          <li>Fanger, P.O. &mdash; original PMV/PPD heat-balance model, standardized as <a href="https://www.iso.org/standard/39155.html" target="_blank" rel="noopener">ISO 7730</a>, adopted by <a href="https://en.wikipedia.org/wiki/ASHRAE_55" target="_blank" rel="noopener">ASHRAE 55</a> and documented by the <a href="https://cbe-berkeley.gitbook.io/thermal-comfort-tool/documentation/pmv" target="_blank" rel="noopener">CBE Thermal Comfort Tool</a></li>
+          <li>ASHRAE Handbook &mdash; Fundamentals, Table 1, surface conductances/resistances: <a href="https://sovathrothsama.files.wordpress.com/2016/03/ashrae-hvac-2001-fundamentals-handbook.pdf" target="_blank" rel="noopener">2001 edition, Ch. 25</a>, <a href="https://www.tagengineering.ca/wp-content/uploads/2015/01/1997-Fundamentals_24-.pdf" target="_blank" rel="noopener">1997 edition, Ch. 24</a></li>
+          <li>Steady-state conduction through a multi-layer assembly: ISO 6946</li>
+          <li><a href="https://en.wikipedia.org/wiki/Clothing_insulation" target="_blank" rel="noopener">ASHRAE clothing-insulation tables</a> &middot; <a href="https://en.wikipedia.org/wiki/Metabolic_equivalent_of_task" target="_blank" rel="noopener">ASHRAE metabolic-rate tables</a></li>
+          <li><a href="https://en.wikipedia.org/wiki/Marching_squares" target="_blank" rel="noopener">Marching squares</a> (contour-tracing algorithm, comfort map only)</li>
+        </ul>
+        <p>Everything not sourced above &mdash; the angle-factor distance formula, the window-alignment falloff, the 10&times;10 m room and 2.4 m ceiling, the nominal wall areas &mdash; is this page's own simplified, illustrative modeling choice, flagged as such at first mention rather than presented as a cited figure.</p>
+      </div>
+
+    </div>
+  </details>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -320,18 +465,29 @@
     ceilType:'interior', tCeil:22, roofR:50,
     tFloor:21,
     walls:{
-      N:{ type:'exterior', temp:21, R:20, glazing:25 },
-      E:{ type:'interior', temp:21, R:20, glazing:0 },
-      S:{ type:'interior', temp:21, R:20, glazing:0 },
-      W:{ type:'interior', temp:21, R:20, glazing:0 }
+      N:{ type:'exterior', temp:21, R:20, glazing:25, pos:0.5 },
+      E:{ type:'interior', temp:21, R:20, glazing:0, pos:0.5 },
+      S:{ type:'interior', temp:21, R:20, glazing:0, pos:0.5 },
+      W:{ type:'interior', temp:21, R:20, glazing:0, pos:0.5 }
     },
     personX:0.5, personY:0.5,
     clo:3, met:2,
+    showContours:false,
     active:null
   };
-  var R_SI = 0.12, R_SO = 0.03; // ASHRAE interior/exterior air-film resistances, m²·K/W
+  // Interior surface conductances h_si (W/m²K), ASHRAE Fundamentals Table 1 (non-reflective,
+  // ε=0.90) — direction-dependent because buoyancy assists upward heat flow and opposes
+  // downward flow. Converted to resistance (R_si = 1/h_si) for use in the conduction formula.
+  var H_SI_VERTICAL = 8.29;    // walls & windows: horizontal heat flow
+  var H_SI_HORIZ_UP = 9.26;    // roof/ceiling losing heat outward (indoor warmer than outdoor)
+  var H_SI_HORIZ_DOWN = 6.13;  // roof/ceiling gaining heat inward (outdoor warmer than indoor)
+  var R_SI_VERTICAL = 1 / H_SI_VERTICAL;
+  var R_SI_HORIZ_UP = 1 / H_SI_HORIZ_UP;
+  var R_SI_HORIZ_DOWN = 1 / H_SI_HORIZ_DOWN;
+  var R_SO = 0.03; // ASHRAE exterior air-film resistance, m²·K/W (winter design wind)
   var IMPERIAL_R_TO_RSI = 5.678263;
-  var A_SEG = 7; // m², a representative surface segment, used only for the heat-loss-share readout
+  var ROOM_SIZE = 10;   // m — fixed square room, so dragging the person means something concrete
+  var WALL_HEIGHT = 2.4; // m — typical ceiling height, used only for wall/window areas below
 
   // ---- Fanger PMV/PPD (classic ISO 7730 iterative algorithm) ----
   function pmvPpd(ta, tr, vel, rh, met, clo, wme){
@@ -377,61 +533,76 @@
   }
 
   // ---- steady-state conduction: T_surf = T_in - (T_in-T_out)*R_si/R_total ----
-  function conductedSurface(rImperial){
+  function conductedSurface(rImperial, rSi){
     var rsi = rImperial / IMPERIAL_R_TO_RSI;
-    var rTotal = R_SI + rsi + R_SO;
+    var rTotal = rSi + rsi + R_SO;
     var q = (state.ta - state.tOut) / rTotal; // W/m²
-    return { temp: state.ta - q * R_SI, q: q };
+    return { temp: state.ta - q * rSi, q: q };
   }
   function windowSurface(){
-    var q = state.windowU * (state.ta - state.tOut); // W/m²
-    return { temp: state.ta - q * R_SI, q: q };
+    var q = state.windowU * (state.ta - state.tOut); // W/m² — U already bundles both films
+    return { temp: state.ta - q * R_SI_VERTICAL, q: q };
   }
   function ceilingSurface(){
     if (state.ceilType === 'interior') return { temp: state.tCeil, q: 0 };
-    return conductedSurface(state.roofR);
+    var rSi = state.ta >= state.tOut ? R_SI_HORIZ_UP : R_SI_HORIZ_DOWN;
+    return conductedSurface(state.roofR, rSi);
   }
   function wallSurfaces(){
     var out = {};
     WALL_ORDER.forEach(function(k){
       var w = state.walls[k];
       if (w.type === 'interior'){
-        out[k] = { opaqueTemp: w.temp, windowTemp: null, glazing: 0, opaqueQ: 0, windowQ: 0 };
+        out[k] = { opaqueTemp: w.temp, windowTemp: null, glazing: 0, pos: 0.5, opaqueQ: 0, windowQ: 0 };
       } else {
-        var wall = conductedSurface(w.R);
+        var wall = conductedSurface(w.R, R_SI_VERTICAL);
         var win = windowSurface();
         var g = clamp(w.glazing, 0, 100) / 100;
-        out[k] = { opaqueTemp: wall.temp, windowTemp: g > 0 ? win.temp : null, glazing: g, opaqueQ: wall.q, windowQ: win.q };
+        out[k] = { opaqueTemp: wall.temp, windowTemp: g > 0 ? win.temp : null, glazing: g, pos: clamp(w.pos, 0, 1), opaqueQ: wall.q, windowQ: win.q };
       }
     });
     return out;
   }
 
   // ---- aggregate heat-loss share: what fraction of total envelope loss is windows ----
+  // Uses the room's real dimensions: each wall's face is ROOM_SIZE × WALL_HEIGHT, the
+  // roof/ceiling's face is the ROOM_SIZE × ROOM_SIZE footprint.
   function heatLossShare(wallSurf, ceil){
+    var wallArea = ROOM_SIZE * WALL_HEIGHT;
     var totalWindow = 0, totalOpaque = 0, anyWindow = false;
     WALL_ORDER.forEach(function(k){
       var w = state.walls[k], s = wallSurf[k];
       if (w.type !== 'exterior') return;
-      var aWin = s.glazing * A_SEG, aOpq = A_SEG - aWin;
+      var aWin = s.glazing * wallArea, aOpq = wallArea - aWin;
       if (s.glazing > 0){ totalWindow += s.windowQ * aWin; anyWindow = true; }
       totalOpaque += s.opaqueQ * aOpq;
     });
-    if (state.ceilType === 'roof') totalOpaque += ceil.q * A_SEG;
+    if (state.ceilType === 'roof') totalOpaque += ceil.q * (ROOM_SIZE * ROOM_SIZE);
     var total = totalWindow + totalOpaque;
     return { shareWindow: total > 0 ? totalWindow / total * 100 : 0, anyWindow: anyWindow };
   }
 
   // ---- simplified angle-factor MRT: distance to each of 4 walls + ceiling + floor ----
+  // A window's share of its wall's angle factor also depends on lateral alignment: standing
+  // directly in front gets full exposure, standing off to the side sees mostly opaque wall
+  // instead — ALIGN_FALLOFF is how far off-center (as a fraction of the room's width) the
+  // window's influence has fully faded to just the opaque wall.
+  var ALIGN_FALLOFF = 0.4;
   function angleFactors(x, y, wallSurf){
     var dist = { N:y, S:1 - y, W:x, E:1 - x };
+    var along = { N:x, S:x, W:y, E:y }; // position along the wall, matching wallSurf[k].pos's axis
     var fCeil = 0.12, fFloor = 0.12;
     var wallF = {};
     var total = fCeil + fFloor;
     WALL_ORDER.forEach(function(k){
       var raw = 0.06 + 0.16 * (1 - dist[k]);
       var s = wallSurf[k];
-      var winF = s.glazing > 0 ? raw * s.glazing : 0;
+      var winF = 0;
+      if (s.glazing > 0){
+        var offset = Math.abs(along[k] - s.pos);
+        var alignment = clamp(1 - offset / ALIGN_FALLOFF, 0, 1);
+        winF = raw * s.glazing * alignment;
+      }
       var opqF = raw - winF;
       wallF[k] = { window: winF, opaque: opqF };
       total += winF + opqF;
@@ -439,8 +610,8 @@
     WALL_ORDER.forEach(function(k){ wallF[k].window /= total; wallF[k].opaque /= total; });
     return { wall: wallF, ceil: fCeil / total, floor: fFloor / total };
   }
-  function meanRadiantTemp(wallSurf, ceil){
-    var f = angleFactors(state.personX, state.personY, wallSurf);
+  function meanRadiantTemp(x, y, wallSurf, ceil){
+    var f = angleFactors(x, y, wallSurf);
     var sum = 0;
     WALL_ORDER.forEach(function(k){
       var s = wallSurf[k];
@@ -455,7 +626,7 @@
   function compute(){
     var wallSurf = wallSurfaces();
     var ceil = ceilingSurface();
-    var mrt = meanRadiantTemp(wallSurf, ceil);
+    var mrt = meanRadiantTemp(state.personX, state.personY, wallSurf, ceil);
     var clo = CLOTHING[state.clo].clo, met = ACTIVITY[state.met].met;
     var r = pmvPpd(state.ta, mrt.tr, Math.max(state.vel, 0.001), state.rh, met, clo, 0);
     var to = (state.ta + mrt.tr) / 2;
@@ -497,45 +668,54 @@
     if (k === 'W') return { x:h.left, y:h.roomTop, w:h.wallT, h:h.roomH };
     return { x:h.roomRight, y:h.roomTop, w:h.wallT, h:h.roomH }; // E
   }
-  function windowBandGeom(k, h, winLen){
-    if (k === 'N') return { x:h.roomLeft + (h.roomW - winLen) / 2, y:h.top, w:winLen, h:h.wallT };
-    if (k === 'S') return { x:h.roomLeft + (h.roomW - winLen) / 2, y:h.roomBot, w:winLen, h:h.wallT };
-    if (k === 'W') return { x:h.left, y:h.roomTop + (h.roomH - winLen) / 2, w:h.wallT, h:winLen };
-    return { x:h.roomRight, y:h.roomTop + (h.roomH - winLen) / 2, w:h.wallT, h:winLen }; // E
+  function windowBandGeom(k, h, winLen, pos){
+    var cN = clamp(pos * h.roomW, winLen / 2, h.roomW - winLen / 2);
+    var cE = clamp(pos * h.roomH, winLen / 2, h.roomH - winLen / 2);
+    if (k === 'N') return { x:h.roomLeft + cN - winLen / 2, y:h.top, w:winLen, h:h.wallT };
+    if (k === 'S') return { x:h.roomLeft + cN - winLen / 2, y:h.roomBot, w:winLen, h:h.wallT };
+    if (k === 'W') return { x:h.left, y:h.roomTop + cE - winLen / 2, w:h.wallT, h:winLen };
+    return { x:h.roomRight, y:h.roomTop + cE - winLen / 2, w:h.wallT, h:winLen }; // E
   }
-  function wallRayTargets(k, h){
-    if (k === 'N') return { opaque:{ x:h.roomLeft + h.roomW * 0.15, y:h.roomTop }, window:{ x:h.roomLeft + h.roomW * 0.5, y:h.roomTop } };
-    if (k === 'S') return { opaque:{ x:h.roomLeft + h.roomW * 0.15, y:h.roomBot }, window:{ x:h.roomLeft + h.roomW * 0.5, y:h.roomBot } };
-    if (k === 'W') return { opaque:{ x:h.roomLeft, y:h.roomTop + h.roomH * 0.15 }, window:{ x:h.roomLeft, y:h.roomTop + h.roomH * 0.5 } };
-    return { opaque:{ x:h.roomRight, y:h.roomTop + h.roomH * 0.15 }, window:{ x:h.roomRight, y:h.roomTop + h.roomH * 0.5 } }; // E
+  function wallRayTargets(k, h, pos){
+    var winN = h.roomLeft + clamp(pos, 0, 1) * h.roomW, winE = h.roomTop + clamp(pos, 0, 1) * h.roomH;
+    var opqN = h.roomLeft + (pos < 0.5 ? 0.85 : 0.15) * h.roomW, opqE = h.roomTop + (pos < 0.5 ? 0.85 : 0.15) * h.roomH;
+    if (k === 'N') return { opaque:{ x:opqN, y:h.roomTop }, window:{ x:winN, y:h.roomTop } };
+    if (k === 'S') return { opaque:{ x:opqN, y:h.roomBot }, window:{ x:winN, y:h.roomBot } };
+    if (k === 'W') return { opaque:{ x:h.roomLeft, y:opqE }, window:{ x:h.roomLeft, y:winE } };
+    return { opaque:{ x:h.roomRight, y:opqE }, window:{ x:h.roomRight, y:winE } }; // E
   }
 
   // build static SVG structure once
-  var roomBg = svgEl('rect', { fill:'var(--bg)' }); heroSvg.appendChild(roomBg);
+  var planG = svgEl('g', { id:'planG' }); heroSvg.appendChild(planG);
+
+  var roomBg = svgEl('rect', { fill:'var(--bg)' }); planG.appendChild(roomBg);
   var bandOpaque = {}, bandWindow = {}, rayOpaque = {}, rayWindow = {};
   WALL_ORDER.forEach(function(k){
-    bandOpaque[k] = svgEl('rect', { stroke:'var(--line2)', 'stroke-width':1 }); heroSvg.appendChild(bandOpaque[k]);
+    bandOpaque[k] = svgEl('rect', { stroke:'var(--line2)', 'stroke-width':1 }); planG.appendChild(bandOpaque[k]);
   });
   WALL_ORDER.forEach(function(k){
-    bandWindow[k] = svgEl('rect', { stroke:'var(--line2)', 'stroke-width':1 }); heroSvg.appendChild(bandWindow[k]);
+    var cursor = (k === 'N' || k === 'S') ? 'ew-resize' : 'ns-resize';
+    bandWindow[k] = svgEl('rect', { stroke:'var(--line2)', 'stroke-width':1, style:'cursor:' + cursor });
+    planG.appendChild(bandWindow[k]);
   });
-  var roomOutline = svgEl('rect', { fill:'none', stroke:'var(--line2)', 'stroke-width':1.25 }); heroSvg.appendChild(roomOutline);
+  var roomOutline = svgEl('rect', { fill:'none', stroke:'var(--line2)', 'stroke-width':1.25 }); planG.appendChild(roomOutline);
   WALL_ORDER.forEach(function(k){
-    rayOpaque[k] = svgEl('line', { 'stroke-linecap':'round' }); heroSvg.appendChild(rayOpaque[k]);
-    rayWindow[k] = svgEl('line', { 'stroke-linecap':'round' }); heroSvg.appendChild(rayWindow[k]);
+    rayOpaque[k] = svgEl('line', { 'stroke-linecap':'round' }); planG.appendChild(rayOpaque[k]);
+    rayWindow[k] = svgEl('line', { 'stroke-linecap':'round' }); planG.appendChild(rayWindow[k]);
   });
+  var contourG = svgEl('g', { id:'contourG' }); planG.appendChild(contourG); // comfort-map overlay, drawn under the person
   var personG = svgEl('g', { class:'roomdrag', tabindex:0, role:'slider',
-    'aria-label':'Person’s position in the room — drag, or use arrow keys' });
+    'aria-label':'Person’s position in the ' + ROOM_SIZE + '×' + ROOM_SIZE + ' m room — drag, or use arrow keys' });
   var personHead = svgEl('circle', { fill:'var(--fg)' });
   var personBody = svgEl('path', { fill:'var(--fg)' });
   var personHit = svgEl('circle', { fill:'transparent', r:18 });
   personG.appendChild(personHead); personG.appendChild(personBody); personG.appendChild(personHit);
-  heroSvg.appendChild(personG);
+  planG.appendChild(personG);
 
   // label overlays (HTML, percentage-positioned)
   function makeLbl(cls){ var d = document.createElement('div'); d.className = cls; heroWrap.appendChild(d); return d; }
   var lblWall = { N:makeLbl('lbl'), E:makeLbl('lbl'), S:makeLbl('lbl'), W:makeLbl('lbl') };
-  var lblInfo1 = makeLbl('infolbl'), lblInfo2 = makeLbl('infolbl');
+  var lblInfo1 = makeLbl('infolbl'), lblInfo2 = makeLbl('infolbl'), lblInfo3 = makeLbl('infolbl');
 
   function wallLabelText(k, s){
     var w = state.walls[k];
@@ -545,11 +725,21 @@
     return txt;
   }
 
-  function drawHero(r){
-    var w = heroW || heroWrap.clientWidth || 1100;
-    var h = geomPlan(w);
-    heroSvg.setAttribute('viewBox', '0 0 ' + w + ' ' + h.vbH);
-    heroSvg.setAttribute('preserveAspectRatio', 'none');
+  function updateInfoLabels(r, w, vbH, cx, topY){
+    var pctX = function(x){ return (x / w * 100) + '%'; };
+    var pctY = function(y){ return (y / vbH * 100) + '%'; };
+    lblInfo1.style.left = pctX(cx); lblInfo1.style.top = pctY(topY);
+    lblInfo1.style.transform = 'translateX(-50%)';
+    lblInfo1.textContent = (state.ceilType === 'roof' ? 'Roof ' : 'Ceiling ') + cFmt(r.ceil.temp) + ' · Floor ' + cFmt(state.tFloor);
+    lblInfo2.style.left = pctX(cx); lblInfo2.style.top = pctY(topY + 14);
+    lblInfo2.style.transform = 'translateX(-50%)';
+    lblInfo2.textContent = 'In ' + cFmt(state.ta) + ' · Out ' + cFmt(state.tOut) + ' · ' + Math.round(state.rh) + '% RH · ' + state.vel.toFixed(2) + ' m/s';
+    lblInfo3.style.left = pctX(cx); lblInfo3.style.top = pctY(topY + 28);
+    lblInfo3.style.transform = 'translateX(-50%)';
+    lblInfo3.textContent = (state.personX * ROOM_SIZE).toFixed(1) + ' m from W · ' + (state.personY * ROOM_SIZE).toFixed(1) + ' m from N';
+  }
+
+  function drawHeroPlan(r, h, w){
 
     roomBg.setAttribute('x', h.roomLeft); roomBg.setAttribute('y', h.roomTop);
     roomBg.setAttribute('width', h.roomW); roomBg.setAttribute('height', h.roomH);
@@ -563,13 +753,15 @@
 
       if (s.glazing > 0){
         var winLen = (k === 'N' || k === 'S') ? h.roomW * s.glazing : h.roomH * s.glazing;
-        var wg = windowBandGeom(k, h, winLen);
+        var wg = windowBandGeom(k, h, winLen, s.pos);
         bandWindow[k].setAttribute('x', wg.x); bandWindow[k].setAttribute('y', wg.y);
         bandWindow[k].setAttribute('width', wg.w); bandWindow[k].setAttribute('height', wg.h);
         bandWindow[k].setAttribute('fill', tempColorStyle(s.windowTemp));
         bandWindow[k].setAttribute('opacity', 1);
+        bandWindow[k].setAttribute('tabindex', 0);
       } else {
         bandWindow[k].setAttribute('opacity', 0);
+        bandWindow[k].setAttribute('tabindex', -1);
       }
     });
 
@@ -590,8 +782,8 @@
       line.setAttribute('opacity', visible ? 0.55 : 0);
     }
     WALL_ORDER.forEach(function(k){
-      var target = wallRayTargets(k, h);
       var s = r.wallSurf[k], f = r.factors.wall[k];
+      var target = wallRayTargets(k, h, s.pos);
       setRay(rayOpaque[k], target.opaque.x, target.opaque.y, f.opaque, s.opaqueTemp, true);
       setRay(rayWindow[k], target.window.x, target.window.y, f.window, s.windowTemp || state.ta, s.glazing > 0);
     });
@@ -611,60 +803,225 @@
     lblWall.E.style.transform = 'translate(-100%,-50%)';
     lblWall.E.textContent = wallLabelText('E', r.wallSurf.E);
 
-    lblInfo1.style.left = pctX((h.roomLeft + h.roomRight) / 2); lblInfo1.style.top = pctY(h.roomTop + 22);
-    lblInfo1.style.transform = 'translateX(-50%)';
-    lblInfo1.textContent = (state.ceilType === 'roof' ? 'Roof ' : 'Ceiling ') + cFmt(r.ceil.temp) + ' · Floor ' + cFmt(state.tFloor);
-    lblInfo2.style.left = pctX((h.roomLeft + h.roomRight) / 2); lblInfo2.style.top = pctY(h.roomTop + 36);
-    lblInfo2.style.transform = 'translateX(-50%)';
-    lblInfo2.textContent = 'In ' + cFmt(state.ta) + ' · Out ' + cFmt(state.tOut) + ' · ' + Math.round(state.rh) + '% RH · ' + state.vel.toFixed(2) + ' m/s';
+    updateInfoLabels(r, w, h.vbH, (h.roomLeft + h.roomRight) / 2, h.roomTop + 22);
   }
 
-  // ---- person drag (2D) ----
-  (function(){
+  // ---- comfort map: PPD contour lines, like elevation lines on a topographic map ----
+  // Evaluate PPD at every point on a grid (holding walls/air/clothing/activity fixed, varying
+  // only position), then trace lines of equal PPD through that grid with marching squares.
+  var CONTOUR_N = 22; // grid cells per axis (23×23 sample points) — fine enough to look smooth, cheap enough for every slider move
+  function ppdGrid(wallSurf, ceil, clo, met){
+    var rows = [];
+    for (var j = 0; j <= CONTOUR_N; j++){
+      var row = [];
+      for (var i = 0; i <= CONTOUR_N; i++){
+        var x = i / CONTOUR_N, y = j / CONTOUR_N;
+        var tr = meanRadiantTemp(x, y, wallSurf, ceil).tr;
+        row.push(pmvPpd(state.ta, tr, Math.max(state.vel, 0.001), state.rh, met, clo, 0).ppd);
+      }
+      rows.push(row);
+    }
+    return rows;
+  }
+  function niceStep(raw){
+    var pow = Math.pow(10, Math.floor(Math.log10(raw)));
+    var n = raw / pow;
+    return (n < 1.5 ? 1 : n < 3 ? 2 : n < 7 ? 5 : 10) * pow;
+  }
+  function contourLevels(minV, maxV){
+    var span = maxV - minV;
+    if (span < 0.05) return [];
+    var step = niceStep(span / 5);
+    var levels = [];
+    for (var v = Math.ceil(minV / step) * step; v < maxV; v += step) levels.push(Math.round(v * 100) / 100);
+    return levels;
+  }
+  // standard marching-squares edge table: which of the 4 cell edges a contour crosses, per case
+  var MS_CASES = {
+    1:[['left','bottom']], 2:[['bottom','right']], 3:[['left','right']],
+    4:[['top','right']], 5:[['top','left'],['bottom','right']], 6:[['top','bottom']], 7:[['top','left']],
+    8:[['top','left']], 9:[['top','bottom']], 10:[['top','right'],['bottom','left']], 11:[['top','right']],
+    12:[['left','right']], 13:[['bottom','right']], 14:[['left','bottom']]
+  };
+  function marchingSquares(grid, level){
+    var segs = [];
+    function lerp(v1, v2){ return Math.abs(v2 - v1) < 1e-9 ? 0.5 : (level - v1) / (v2 - v1); }
+    for (var j = 0; j < CONTOUR_N; j++){
+      for (var i = 0; i < CONTOUR_N; i++){
+        var tl = grid[j][i], tr = grid[j][i+1], br = grid[j+1][i+1], bl = grid[j+1][i];
+        var idx = (tl > level ? 8 : 0) | (tr > level ? 4 : 0) | (br > level ? 2 : 0) | (bl > level ? 1 : 0);
+        var pairs = MS_CASES[idx];
+        if (!pairs) continue;
+        var pts = {
+          top:[i + lerp(tl, tr), j], bottom:[i + lerp(bl, br), j + 1],
+          left:[i, j + lerp(tl, bl)], right:[i + 1, j + lerp(tr, br)]
+        };
+        pairs.forEach(function(pair){ segs.push([pts[pair[0]], pts[pair[1]]]); });
+      }
+    }
+    return segs;
+  }
+  function contourColor(level){
+    return Math.abs(level - 10) < 0.01 ? 'var(--bad)' : 'var(--muted2)';
+  }
+
+  var viewToggle = $('viewToggle');
+  function drawHero(r){
+    var w = heroW || heroWrap.clientWidth || 1100;
+    var h = geomPlan(w);
+    heroSvg.setAttribute('viewBox', '0 0 ' + w + ' ' + h.vbH);
+    heroSvg.setAttribute('preserveAspectRatio', 'none');
+    heroSvg.setAttribute('aria-label', 'A top-down floor plan of the ' + ROOM_SIZE + ' by ' + ROOM_SIZE + ' metre room with four walls, north at top; wall colors show their surface temperature, derived from indoor/outdoor temperature and insulation for any wall marked exterior, and lines from the draggable person show how strongly each surface radiates toward them.'
+      + (state.showContours ? ' A comfort map is overlaid, showing contour lines of equal predicted-dissatisfied percentage across the room, the way a topographic map shows elevation.' : ''));
+    viewToggle.textContent = state.showContours ? 'Hide comfort map' : 'Show comfort map';
+
+    drawHeroPlan(r, h, w);
+    drawContours(r, h, w);
+  }
+  viewToggle.addEventListener('click', function(){ state.showContours = !state.showContours; render(); });
+
+  function drawContours(r, h, w){
+    contourG.innerHTML = '';
+    if (!state.showContours) return;
+    var clo = CLOTHING[state.clo].clo, met = ACTIVITY[state.met].met;
+    var grid = ppdGrid(r.wallSurf, r.ceil, clo, met);
+    var minV = Infinity, maxV = -Infinity;
+    grid.forEach(function(row){ row.forEach(function(v){ if (v < minV) minV = v; if (v > maxV) maxV = v; }); });
+    var levels = contourLevels(minV, maxV);
+    if (minV < 10 && maxV > 10 && levels.indexOf(10) === -1) levels.push(10); // always show the ASHRAE 10% line if it falls within range
+    if (!levels.length){
+      var cx = h.roomLeft + h.roomW / 2, cy = h.roomTop + h.roomH / 2;
+      var note1 = svgEl('text', { x:cx, y:cy - 6, fill:'var(--muted)', 'font-size':11, 'font-family':'ui-monospace,monospace', 'text-anchor':'middle' });
+      note1.textContent = 'Too uniform to contour';
+      var note2 = svgEl('text', { x:cx, y:cy + 9, fill:'var(--muted)', 'font-size':11, 'font-family':'ui-monospace,monospace', 'text-anchor':'middle' });
+      note2.textContent = '(PPD ' + minV.toFixed(1) + '–' + maxV.toFixed(1) + '% everywhere)';
+      contourG.appendChild(note1); contourG.appendChild(note2);
+      return;
+    }
+    function toScreen(gx, gy){
+      return { x: h.roomLeft + (gx / CONTOUR_N) * h.roomW, y: h.roomTop + (gy / CONTOUR_N) * h.roomH };
+    }
+    levels.forEach(function(level){
+      var segs = marchingSquares(grid, level);
+      if (!segs.length) return;
+      var d = segs.map(function(seg){
+        var p0 = toScreen(seg[0][0], seg[0][1]), p1 = toScreen(seg[1][0], seg[1][1]);
+        return 'M' + p0.x.toFixed(1) + ',' + p0.y.toFixed(1) + 'L' + p1.x.toFixed(1) + ',' + p1.y.toFixed(1);
+      }).join(' ');
+      var isAshrae = Math.abs(level - 10) < 0.01;
+      var path = svgEl('path', { d:d, fill:'none', stroke:contourColor(level), 'stroke-width': isAshrae ? 1.75 : 1, 'stroke-dasharray': isAshrae ? 'none' : '3 2', opacity: isAshrae ? 0.85 : 0.55 });
+      contourG.appendChild(path);
+      var mid = toScreen(segs[Math.floor(segs.length / 2)][0][0], segs[Math.floor(segs.length / 2)][0][1]);
+      var label = svgEl('text', { x:mid.x, y:mid.y - 3, fill:contourColor(level), 'font-size':9, 'font-family':'ui-monospace,monospace', 'text-anchor':'middle' });
+      label.textContent = level + '%';
+      contourG.appendChild(label);
+    });
+  }
+
+  // ---- person drag: shared keyboard handling for both view modes ----
+  function personKeydown(e){
+    var step = e.shiftKey ? 0.1 : 0.02;
+    var vx = null, vy = null;
+    if (e.key === 'ArrowLeft') vx = state.personX - step;
+    else if (e.key === 'ArrowRight') vx = state.personX + step;
+    else if (e.key === 'ArrowUp') vy = state.personY - step;
+    else if (e.key === 'ArrowDown') vy = state.personY + step;
+    else if (e.key === 'Home'){ vx = 0.5; vy = 0.5; }
+    if (vx !== null || vy !== null){
+      e.preventDefault();
+      if (vx !== null) state.personX = clamp(Math.round(vx * 100) / 100, 0, 1);
+      if (vy !== null) state.personY = clamp(Math.round(vy * 100) / 100, 0, 1);
+      render();
+    }
+  }
+  function bindPointerDrag(el, setFromClient){
+    var dragging = false;
+    el.addEventListener('pointerdown', function(e){
+      dragging = true;
+      if (el.setPointerCapture) el.setPointerCapture(e.pointerId);
+      setFromClient(e.clientX, e.clientY);
+    });
+    el.addEventListener('pointermove', function(e){ if (dragging) setFromClient(e.clientX, e.clientY); });
+    function endDrag(){ dragging = false; }
+    el.addEventListener('pointerup', endDrag);
+    el.addEventListener('pointercancel', endDrag);
+    el.addEventListener('keydown', personKeydown);
+  }
+  // top-view drag: direct fraction of the room span
+  bindPointerDrag(personG, function(clientX, clientY){
+    var rect = heroSvg.getBoundingClientRect();
+    var w = heroW || heroWrap.clientWidth || 1100;
+    var h = geomPlan(w);
+    var scaleX = rect.width / w, scaleY = rect.height / h.vbH;
+    var localX = (clientX - rect.left) / scaleX, localY = (clientY - rect.top) / scaleY;
+    var fx = clamp((localX - h.spanX0) / (h.spanX1 - h.spanX0), 0, 1);
+    var fy = clamp((localY - h.spanY0) / (h.spanY1 - h.spanY0), 0, 1);
+    state.personX = Math.round(fx * 100) / 100;
+    state.personY = Math.round(fy * 100) / 100;
+    render();
+  });
+  function drawPersonAria(){
+    personG.setAttribute('aria-valuemin', 0);
+    personG.setAttribute('aria-valuemax', ROOM_SIZE);
+    personG.setAttribute('aria-valuenow', (state.personX * ROOM_SIZE).toFixed(1));
+    personG.setAttribute('aria-valuetext',
+      (state.personX * ROOM_SIZE).toFixed(1) + ' m from the west wall, ' + (state.personY * ROOM_SIZE).toFixed(1) + ' m from the north wall, in a ' + ROOM_SIZE + '×' + ROOM_SIZE + ' m room');
+  }
+
+  // ---- window drag: slide a wall's window along the wall, directly in the diagram ----
+  WALL_ORDER.forEach(function(k){
+    var el = bandWindow[k];
+    el.setAttribute('tabindex', 0);
+    el.setAttribute('role', 'slider');
+    el.setAttribute('aria-label', WALL_NAMES[k] + ' window position');
     var dragging = false;
     function setFromClient(clientX, clientY){
       var rect = heroSvg.getBoundingClientRect();
       var w = heroW || heroWrap.clientWidth || 1100;
       var h = geomPlan(w);
       var scaleX = rect.width / w, scaleY = rect.height / h.vbH;
-      var localX = (clientX - rect.left) / scaleX, localY = (clientY - rect.top) / scaleY;
-      var fx = clamp((localX - h.spanX0) / (h.spanX1 - h.spanX0), 0, 1);
-      var fy = clamp((localY - h.spanY0) / (h.spanY1 - h.spanY0), 0, 1);
-      state.personX = Math.round(fx * 100) / 100;
-      state.personY = Math.round(fy * 100) / 100;
+      var frac;
+      if (k === 'N' || k === 'S'){
+        var localX = (clientX - rect.left) / scaleX;
+        frac = (localX - h.roomLeft) / h.roomW;
+      } else {
+        var localY = (clientY - rect.top) / scaleY;
+        frac = (localY - h.roomTop) / h.roomH;
+      }
+      state.walls[k].pos = clamp(Math.round(frac * 50) / 50, 0, 1);
       render();
     }
-    personG.addEventListener('pointerdown', function(e){
+    el.addEventListener('pointerdown', function(e){
       dragging = true;
-      if (personG.setPointerCapture) personG.setPointerCapture(e.pointerId);
+      if (el.setPointerCapture) el.setPointerCapture(e.pointerId);
       setFromClient(e.clientX, e.clientY);
+      e.stopPropagation();
     });
-    personG.addEventListener('pointermove', function(e){ if (dragging) setFromClient(e.clientX, e.clientY); });
+    el.addEventListener('pointermove', function(e){ if (dragging) setFromClient(e.clientX, e.clientY); });
     function endDrag(){ dragging = false; }
-    personG.addEventListener('pointerup', endDrag);
-    personG.addEventListener('pointercancel', endDrag);
-    personG.addEventListener('keydown', function(e){
+    el.addEventListener('pointerup', endDrag);
+    el.addEventListener('pointercancel', endDrag);
+    el.addEventListener('keydown', function(e){
       var step = e.shiftKey ? 0.1 : 0.02;
-      var vx = null, vy = null;
-      if (e.key === 'ArrowLeft') vx = state.personX - step;
-      else if (e.key === 'ArrowRight') vx = state.personX + step;
-      else if (e.key === 'ArrowUp') vy = state.personY - step;
-      else if (e.key === 'ArrowDown') vy = state.personY + step;
-      else if (e.key === 'Home'){ vx = 0.5; vy = 0.5; }
-      if (vx !== null || vy !== null){
-        e.preventDefault();
-        if (vx !== null) state.personX = clamp(Math.round(vx * 100) / 100, 0, 1);
-        if (vy !== null) state.personY = clamp(Math.round(vy * 100) / 100, 0, 1);
-        render();
-      }
+      var forward = (k === 'N' || k === 'S') ? (e.key === 'ArrowRight') : (e.key === 'ArrowDown');
+      var backward = (k === 'N' || k === 'S') ? (e.key === 'ArrowLeft') : (e.key === 'ArrowUp');
+      if (!forward && !backward && e.key !== 'Home' && e.key !== 'End') return;
+      e.preventDefault();
+      e.stopPropagation();
+      var v = state.walls[k].pos;
+      if (forward) v += step; else if (backward) v -= step; else if (e.key === 'Home') v = 0; else v = 1;
+      state.walls[k].pos = clamp(Math.round(v * 50) / 50, 0, 1);
+      render();
     });
-  })();
-  function drawPersonAria(){
-    personG.setAttribute('aria-valuemin', 0);
-    personG.setAttribute('aria-valuemax', 100);
-    personG.setAttribute('aria-valuenow', Math.round(state.personX * 100));
-    personG.setAttribute('aria-valuetext',
-      Math.round(state.personX * 100) + '% from the west wall, ' + Math.round(state.personY * 100) + '% from the north wall');
+  });
+  function drawWindowAria(){
+    WALL_ORDER.forEach(function(k){
+      var el = bandWindow[k], pos = state.walls[k].pos;
+      el.setAttribute('aria-valuemin', 0);
+      el.setAttribute('aria-valuemax', 100);
+      el.setAttribute('aria-valuenow', Math.round(pos * 100));
+      el.setAttribute('aria-valuetext', Math.round(pos * 100) + '% along the wall from the ' + (k === 'N' || k === 'S' ? 'west' : 'north') + ' end');
+    });
   }
 
   // ---- generic mini slider (getter/setter based, so it can target nested wall state) ----
@@ -782,8 +1139,10 @@
       get:function(){ return state.walls[k].R; }, set:function(v){ state.walls[k].R = v; } });
     var glazSlider = makeMiniSlider(card, { label:WALL_NAMES[k] + ' window size', lo:0, hi:70, step:5, fmt:function(v){ return v === 0 ? 'no window' : Math.round(v) + '% of wall'; },
       get:function(){ return state.walls[k].glazing; }, set:function(v){ state.walls[k].glazing = v; } });
+    var posSlider = makeMiniSlider(card, { label:WALL_NAMES[k] + ' window position', lo:0, hi:100, step:2, fmt:function(v){ return Math.round(v) + '%'; },
+      get:function(){ return state.walls[k].pos * 100; }, set:function(v){ state.walls[k].pos = v / 100; } });
     wallGrid.appendChild(card);
-    wallCardRefs[k] = { typePicker:typePicker, tempSlider:tempSlider, rSlider:rSlider, glazSlider:glazSlider };
+    wallCardRefs[k] = { typePicker:typePicker, tempSlider:tempSlider, rSlider:rSlider, glazSlider:glazSlider, posSlider:posSlider };
   });
 
   // ---- clothing / activity pickers ----
@@ -939,7 +1298,7 @@
       var p = PRESETS[b.dataset.p];
       Object.keys(p).forEach(function(k){
         if (k === 'walls'){
-          WALL_ORDER.forEach(function(wk){ state.walls[wk] = { type:p.walls[wk].type, temp:p.walls[wk].temp, R:p.walls[wk].R, glazing:p.walls[wk].glazing }; });
+          WALL_ORDER.forEach(function(wk){ state.walls[wk] = { type:p.walls[wk].type, temp:p.walls[wk].temp, R:p.walls[wk].R, glazing:p.walls[wk].glazing, pos: p.walls[wk].pos !== undefined ? p.walls[wk].pos : 0.5 }; });
         } else {
           state[k] = p[k];
         }
@@ -976,6 +1335,7 @@
     var r = compute();
     drawHero(r);
     drawPersonAria();
+    drawWindowAria();
     drawEquationAndLegend(r);
 
     ceilTempSlider.wrap.style.display = state.ceilType === 'interior' ? '' : 'none';
@@ -985,6 +1345,7 @@
       ref.tempSlider.wrap.style.display = type === 'interior' ? '' : 'none';
       ref.rSlider.wrap.style.display = type === 'exterior' ? '' : 'none';
       ref.glazSlider.wrap.style.display = type === 'exterior' ? '' : 'none';
+      ref.posSlider.wrap.style.display = type === 'exterior' ? '' : 'none';
       ref.typePicker.draw();
     });
     ceilTypePicker.draw();

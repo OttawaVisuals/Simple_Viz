@@ -13,6 +13,62 @@ tool can pick up mid-stream without re-reading the whole chat history.
   filtering) with a "not a secure connection" warning — that's a corporate network/proxy
   issue on his end, not a site or Cloudflare cert problem; nothing to action here.
 
+## Fan laws page — new draft, 2026-08-20
+
+- **`visualizations/fan-laws.html`** ("A little slower saves a lot of fan power") is new
+  page 52 and is listed under Discoveries in `unreviewed.html` and `tracker.html`; it has
+  not been reviewed and should not move to `index.html` yet.
+- Scope is deliberately fixed-speed scaling for the same fan: one 30–120% speed control
+  drives airflow `Q ∝ N`, pressure `Δp ∝ N²`, and ideal shaft power `P ∝ N³`. The default
+  is the DOE's useful 80%-speed example (80% flow, 64% pressure, 51.2% power).
+- The hero pairs a speed-responsive fan/airflow animation with the three affinity curves;
+  the result column repeats the current values as three bars against the 100% reference.
+- Assumptions are explicit: fixed diameter, density and efficiency; shaft power rather than
+  exact electrical input; manufacturer curves remain authoritative for a real installation.
+- Sources are the DOE variable-speed-drive tip sheet and ANSI/AMCA 210. No absolute CFM,
+  pressure or motor-power baseline is invented; every output is relative to a known design
+  point.
+
+## Night-sky ice page — new draft, 2026-08-20
+
+- **`visualizations/night-sky-ice.html`** ("How a desert night can make ice") is new page
+  53 and is listed under Discoveries in `unreviewed.html` and `tracker.html`; it has not
+  been reviewed and should not move to `index.html` yet.
+- Historical attribution is deliberately Persian/Iranian, not Egyptian. The page links the
+  open UCL/Pochee et al. yakhchāl study and uses its 100 mm pond depth, 11-hour night and
+  0.7 sky-view factor as the model geometry.
+- Three controls drive constant night air temperature (0–12°C), relative humidity (10–90%)
+  and cloud cover (0–100%). Clear-sky emissivity is Brutsaert 1975,
+  `εsky = 1.24(ea/Ta)^(1/7)` with vapour pressure in hPa; cloud cover linearly interpolates
+  emissivity toward 1. Water temperature is integrated in 60-second steps, then latent heat
+  is accumulated at 0°C and converted to ice thickness using 333.7 kJ/kg and 917 kg/m³.
+- The default deliberately demonstrates the hook with above-freezing air: 4°C, 20% RH,
+  clear sky → effective sky about −29.7°C, freezing begins after about 6.2 hours, and the
+  simplified model produces about 3.6 mm of ice after 11 hours.
+- Scope is explicitly radiation-first: fixed sheltered convection `h = 4 W/m²K` is included;
+  evaporation and ground conduction are omitted. The page explains that the UCL detailed
+  model found radiation dominant, evaporation cooling significant, and ground conduction a
+  smaller heat gain, so this is not presented as a full historical reconstruction.
+
+## Reynolds number page — new draft, 2026-08-20
+
+- **`visualizations/reynolds-number.html`** ("When smooth flow breaks into turbulence") is
+  new page 54, listed under Fun physics in `unreviewed.html` and `tracker.html`; it has not
+  been reviewed and should not move to `index.html` yet.
+- It is the regime-map companion to the two straw pages. Controls use flow rate and diameter,
+  so the page evaluates `Re = 4ρQ/(πμD)` with the same representative water, air, milkshake
+  and honey properties used locally. Pipe-flow guideposts are laminar below 2,300,
+  transitional from 2,300–4,000, and turbulent above 4,000.
+- The main hook uses water at 5 mL/s: a 3.0 mm straw gives Re ≈ 2,122, while a 1.5 mm straw
+  gives Re ≈ 4,244. Halving diameter at fixed volumetric flow doubles Re because velocity
+  rises by four while the characteristic diameter halves.
+- The animated dye filament is deliberately qualitative, not CFD. Air presets use local
+  density and viscosity only; compressible pressure-driven airflow remains the scope of
+  `straw-hose-flow-darcy.html`.
+- Sources are Reynolds' 1883 dye-filament experiment and NASA's official Reynolds-number
+  explainer. States implying extreme mean speed are flagged rather than presented as normal
+  pipe-flow examples.
+
 ## Backlog — pitched ideas not yet built (added 2026-08-19)
 
 Four ideas Simon pitched for future pages; none started as of this entry except the heat
@@ -20,9 +76,7 @@ pump page, begun the same day (see the handoff entry below).
 
 **Six more pitched 2026-08-19** (a follow-up conversation with a colleague about the heat
 pump page), none started:
-- **Reynolds number.** Laminar vs. turbulent flow transition — natural companion to the
-  existing `straw-hose-flow.html`/`straw-hose-flow-darcy.html` pair and `pipe-flow-reference.
-  html`'s decision tree; could reuse those pages' flow-regime math rather than deriving fresh.
+- **Reynolds number.** Built as page 54 on 2026-08-20; see the handoff entry above.
 - **Piping visuals (flow, head).** Head loss / pump curves — likely overlaps mechanically
   with the Reynolds-number page and the existing Darcy–Weisbach work in
   `straw-hose-flow-darcy.html`; worth scoping together rather than as three separate pages.
@@ -194,6 +248,221 @@ pump page), none started:
   new page.
 
 ## Current handoff — 2026-08-20
+
+- **`visualizations/thermal-comfort-pmv.html` eighth follow-up pass: fixed the actual
+  complaint from the previous pass, which was not the overflow bug.** Simon's "fix the width
+  thing" after the overflow fix turned out to mean something entirely different: the
+  methodology disclosure's text was visibly narrower than the `.note` paragraph directly
+  above it (about two-thirds of the page's content width), not that it overflowed. Root
+  cause: `.more-body{max-width:82ch}`, added on the unstated assumption that dense
+  equation-heavy prose wanted a narrower reading measure — but `.note` itself carries no such
+  cap, since this site's body copy spans the full `.wrap` width by established convention
+  (same principle as the pre-existing "second section's `.sub` should use the full column
+  width" and "index/about body text spans the full `.wrap`" rules already in
+  [STYLE_GUIDE.md](STYLE_GUIDE.md#component-patterns)). Fixed by dropping the `max-width`
+  entirely; verified with `getBoundingClientRect()` on both elements rather than eyeballing —
+  `.more-body` now matches `.note`'s `width` and `left` to the pixel (869/38 at desktop),
+  still no horizontal overflow at either 375px or desktop width after removing the cap.
+  Documented in STYLE_GUIDE.md right alongside the overflow-gotcha entry from the previous
+  pass, so both real bugs from this one disclosure section are recorded together.
+  **Lesson for next time: when a user says "fix the width thing" right after a width fix
+  just shipped, don't assume it's the same bug re-surfacing — confirm what they're actually
+  looking at first.** This pass's fix required no back-and-forth only because the user's
+  second message was specific enough ("wrapping at around 2/3 of the content width... should
+  take the same width as the text above") to identify the real cause directly.
+
+- **`visualizations/thermal-comfort-pmv.html` seventh follow-up pass: fixed the mobile
+  overflow flagged (not yet confirmed) at the end of the previous pass — confirmed real,
+  root-caused, and fixed.** With the Browser pane compositing again, `document.documentElement.
+  scrollWidth` measured 754px in a 375px viewport with the methodology disclosure open. Root
+  cause: the block-equation spans (`.eq{white-space:nowrap;overflow-x:auto}`) sit inside
+  `.more-body{display:grid}`; a CSS Grid item defaults to `min-width:auto`, so the item
+  wrapping each equation (`.more-item`) was sizing its grid *track* to the equation's full
+  unwrapped content width instead of respecting the container — `overflow-x:auto` on the
+  equation itself never got a chance to trigger, because its ancestor never shrank down to the
+  viewport width in the first place. Fixed with `.more-body{grid-template-columns:minmax(0,
+  1fr)}` plus `.more-item{min-width:0}` (and `max-width:100%;box-sizing:border-box` on `.eq`
+  itself for good measure). Documented as a general gotcha in
+  [STYLE_GUIDE.md](STYLE_GUIDE.md#component-patterns) under the "Collapsible 'More details'
+  disclosure" entry, since any future page reusing this pattern with a dense equation block
+  would hit the identical bug. **Also hit and worked around a same-session tooling quirk while
+  verifying this**: `resize_window` without an explicit `tabId` silently no-ops on a
+  `navigate`-opened tab (confirmed via `window.innerWidth` staying at the old size after the
+  call reported success) — always pass `tabId` explicitly when more than one tab might exist.
+  Verified after the fix: `scrollWidth === clientWidth` (375 = 375) at mobile width and (946 =
+  946) at desktop with the disclosure open, the wide equations now scroll *inside* their own
+  343px-wide box instead of expanding the page (confirmed via each `.eq`'s own
+  `scrollWidth`/`clientWidth`), a real screenshot at 375px confirms the equation box visually
+  clips at the page edge with its content scrollable rather than overflowing, no console
+  errors, `pmvValue` still computes correctly (confirms the CSS-only fix didn't touch
+  anything script-facing).
+
+- **`visualizations/thermal-comfort-pmv.html` sixth follow-up pass: added a full
+  "Methodology, equations and sources" disclosure**, at Simon's request for a detailed
+  step-by-step writeup with every equation, assumption, source and numerical value used —
+  page-specific, not a new site-wide pattern. Reused the `<details class="more">` /
+  `.more-body` / `.more-item` disclosure CSS verbatim from `heat-pump-magic.html` (the
+  site's first use of this pattern), adding one new `.eq` block-equation style (monospace,
+  `var(--line)` background, horizontal-scrolling) since this page's formula set is far
+  denser than that page's three prose paragraphs.
+  - **15 items, written directly from the live source** (re-grepped every constant —
+    `H_SI_VERTICAL=8.29`, `H_SI_HORIZ_UP=9.26`, `H_SI_HORIZ_DOWN=6.13`, `R_SO=0.03`,
+    `IMPERIAL_R_TO_RSI=5.678263`, `ALIGN_FALLOFF=0.4`, `CONTOUR_N=22`, the full `pmvPpd()`
+    term-by-term — rather than reconstructing from memory of earlier passes) so the writeup
+    can't silently drift from what the code actually computes: overview, fixed assumptions,
+    then one step each for wall/roof conduction, window U-value, the three ASHRAE film
+    coefficients (with the direction each applies to), mean radiant temperature's
+    angle-factor formula, the window-alignment falloff, operative temperature, the full
+    Fanger/ISO 7730 PMV iteration (p_a, f_cl, the t_cl/h_c fixed-point loop, all five heat-loss
+    terms, the final PMV expression), PPD, heat-loss share, the three local-discomfort
+    thresholds, then separate items for the comfort-map/marching-squares methodology, the
+    clo/met reference tables, and a consolidated source list.
+  - **Sources cited by name with links**: ISO 7730/ASHRAE 55 for the PMV model itself (plus
+    the CBE Thermal Comfort Tool's public documentation of the same reference algorithm),
+    the two ASHRAE Fundamentals Handbook editions already sourced in an earlier pass for the
+    film-coefficient table, ISO 6946 for the conduction formula's shape, the existing
+    clothing/metabolic Wikipedia citations, and Wikipedia's marching-squares article for the
+    contour-tracing algorithm. A closing paragraph explicitly states what is *not* from a
+    cited source — the angle-factor distance formula, the window-alignment falloff, the
+    fixed 10×10 m room and nominal wall areas — rather than letting those blend in with the
+    cited figures.
+  - Verified: no console errors on load; `pmvValue` still computes correctly after the
+    insertion (confirms the new markup didn't break the script); exactly one `<details>`
+    element with all 15 `.more-item` children present with the intended headings, 13 `.eq`
+    blocks rendered, and the section confirmed positioned before the feedback section via
+    `compareDocumentPosition` — all DOM-structural checks, since the Browser pane's
+    compositing was unavailable for the entire second half of this session
+    (`window.innerWidth` itself returned 0 even after a fresh tab), so no pixel-level/visual
+    overflow check was possible this pass. **Flagged here explicitly so the next session
+    re-checks this section's layout (especially the `.eq` blocks' `overflow-x:auto` at
+    375px) visually once compositing is available again — not yet confirmed.**
+
+- **`visualizations/thermal-comfort-pmv.html` fifth follow-up pass: windows now have a
+  position along their wall, draggable directly in the diagram, and that position actually
+  changes the physics** — at Simon's observation that windows were "not really defined,"
+  always centered, with size but no location. Each `state.walls[k]` gained a `pos` field
+  (0–1 along the wall, default 0.5/centered).
+  - **Standing in front of a window now matters more than standing to its side.**
+    Previously a window's share of its wall's angle factor was `raw × glazing` regardless of
+    where the person stood along the wall — physically wrong, since a person off to one side
+    shouldn't get full window exposure. `angleFactors()` now multiplies that by an
+    `alignment` term (`ALIGN_FALLOFF = 0.4`): full exposure directly in front, fading
+    linearly to zero (pure opaque wall) by 4 m of lateral offset. Verified the direction is
+    right, not just present: with the window pinned to the east end of the north wall,
+    standing at that end read PMV −0.50 versus −0.36 at the same wall-distance but the far
+    (west) corner — colder when aligned with the window, as it should be.
+  - **The window rect in the diagram is directly draggable** (`bindPointerDrag`-style
+    pointerdown/move/up on `bandWindow[k]`, plus arrow-key support since it's a real
+    `role="slider"` element now) — grabbing it and sliding it along its wall updates
+    `state.walls[k].pos` live, same mechanism as the person control. Verified the pointer
+    math itself (not just that *something* moved) by dragging from the wall's east edge to
+    near its west edge and confirming `aria-valuetext` read exactly "100%" before and "0%"
+    after. A matching mini-slider ("… window position") was added to each wall card for
+    non-diagram control, shown/hidden alongside the R-value and window-size sliders whenever
+    that wall is Exterior.
+  - **Real bug caught during verification, not cosmetic: every preset click was silently
+    corrupting the whole page to PMV `NaN`.** The preset-click handler explicitly
+    reconstructs each wall's object from the preset data (`{type, temp, R, glazing}`) rather
+    than copying it wholesale — a pattern already in place before this pass, but it now
+    needed a 5th field and didn't get one, so every wall's `pos` became `undefined` the
+    instant any preset was clicked, which cascades through `angleFactors()`'s
+    `Math.abs(along−pos)` into `NaN` for every subsequent computation. Caught by checking the
+    live `pmvValue` text after a preset click rather than trusting the UI looked fine — the
+    wall temperature labels still rendered correct numbers (they don't depend on `pos`),
+    which would have made this easy to miss on a visual pass alone. Fixed by defaulting to
+    0.5 when a preset doesn't specify `pos` explicitly, and re-verified all five presets
+    (`cozy/window/attic/corner/fan`) return real numbers, not `NaN`.
+  - Verified in-browser: no horizontal overflow at 375px with the corner preset (both
+    exterior walls now showing four sliders each), no console errors on a genuinely fresh
+    tab (distinguished from the console tool's accumulated history across
+    navigations — confirmed via a fresh tab that early errors were test artifacts from a
+    transient viewport-compositing gap, not real page bugs), keyboard and pointer drag both
+    functional on the window control. **Not yet reviewed.**
+
+- **`visualizations/thermal-comfort-pmv.html` fourth follow-up pass, corrected mid-stream:
+  a PPD comfort-map overlay, not an isometric view.** Simon's request ("a toggle to change
+  from the person dragging to an isometric view") was first built literally as a 3D
+  cutaway room (see git history for that version) — he then clarified he'd actually meant
+  "lines of equal PPD value, like a topographic map." The isometric code (two SVG groups,
+  a dimetric projection, its own invertible drag math) was fully removed rather than kept
+  alongside the correct feature, since keeping a mode nobody asked for is exactly the kind
+  of scope creep this project's own conventions warn against. One piece survived the
+  rewrite: `meanRadiantTemp()` was refactored to take `(x, y, wallSurf, ceil)` instead of
+  reading `state.personX/Y` directly — needed for the contour grid below, and a strictly
+  cleaner signature regardless.
+  - **The comfort map re-evaluates the entire PMV/PPD model at 23×23 grid points** across
+    the room (`ppdGrid()`), holding every control fixed except position, then traces lines
+    of equal PPD through that scalar field with a standard **marching-squares** algorithm
+    (`marchingSquares()`, the full 16-case edge table, saddle cases 5/10 resolved with a
+    fixed diagonal — a known, accepted simplification of basic marching squares). ~530
+    PMV/PPD evaluations per redraw is trivial (each one converges in a handful of
+    iterations), so it recomputes live on every slider move with no perceptible lag.
+  - **Contour levels are auto-scaled to the room's actual PPD range** (`contourLevels()` /
+    `niceStep()`), the same "pick ~5 nice round numbers spanning the data" logic a real
+    topographic map's legend uses, rather than fixed 10%-apart bands that would either
+    clutter a small room or show nothing in a large-range one. The ASHRAE 55 10% line is
+    always added if it falls inside the range, drawn solid and bolder in `--bad` while
+    every other level is a thin dashed `--muted2` line — the one line the standard actually
+    cares about gets to look different from the rest.
+  - **A uniform room shows an explicit note instead of an empty diagram.** The first version
+    only drew contours when the grid's range exceeded a whole percentage point, so the
+    default "well-insulated office" preset — real PPD range 6.7–6.9% — showed nothing when
+    toggled on, which reads as broken rather than "this room is uniform." Fixed two ways:
+    lowered the no-draw threshold to 0.05 points (so `niceStep` finds fractional levels like
+    6.6/6.7/6.8/6.9% instead of bailing out), and added a fallback "Too uniform to contour
+    (PPD x–y% everywhere)" message for the rare case that's still too flat to show anything.
+  - Verified in-browser: the "cold corner office" preset draws five concentric rings
+    (7.5–9.5%) radiating from the cold corner exactly as expected — label screen positions
+    checked to confirm they step outward from the corner in order, not just that five paths
+    exist. The "desk pushed against the window" preset confirmed the ASHRAE 10% line renders
+    distinctly (solid, `stroke-width:1.75`, `--bad`) when the range actually spans it. No
+    horizontal overflow at 375px in the corner preset, no console errors, default preset no
+    longer shows a dead toggle. **Not yet reviewed.**
+
+- **`visualizations/thermal-comfort-pmv.html` third follow-up pass: real 10×10 m room
+  dimensions, and corrected direction-dependent interior film coefficients**, after Simon
+  asked two precise questions about the physics: whether the walls had real dimensions (they
+  didn't — dragging the person was purely a 0–1 fraction with no physical meaning), and what
+  coefficient converted U/ΔT into the interior window surface temperature.
+  - **Room is now a fixed 10×10 m footprint with a 2.4 m ceiling** (`ROOM_SIZE`,
+    `WALL_HEIGHT` constants, not exposed as sliders — kept fixed so dragging the person means
+    something concrete rather than adding a room-size control nobody asked for). The old
+    placeholder `A_SEG = 7 m²` heat-loss-share constant is gone; `heatLossShare()` now uses
+    each wall's real `ROOM_SIZE×WALL_HEIGHT` face area and the roof's real
+    `ROOM_SIZE×ROOM_SIZE` footprint. Added a third info line in the diagram and to the
+    person control's `aria-valuetext` reporting the person's distance from the west and
+    north walls in actual metres, plus a caption above the hero stating the room dimensions.
+  - **Interior film coefficients were wrong before this pass** — a single `R_SI = 0.12
+    m²·K/W` was applied to every surface (walls, windows, *and* the roof), flagged as a
+    known simplification in the previous entry below. Simon's colleague (from a Robert Bean
+    training) sent three h<sub>si</sub> values; cross-checked against the actual ASHRAE
+    Fundamentals Table 1 (2001 Handbook, non-reflective ε=0.90 surfaces) via web search
+    before trusting either source blind. Found the colleague's "Vertical" value (9.09
+    W/m²K) is actually ASHRAE's *45°-slope, upward* row — the standard's own vertical/
+    horizontal-flow value is 8.29 W/m²K, and 9.09/8.29 look shifted by one row relative to
+    the published 5-row table. Presented this discrepancy to Simon with sources rather than
+    silently picking one; he chose the standard ASHRAE table. Implemented as three
+    constants — `H_SI_VERTICAL=8.29` (walls, windows), `H_SI_HORIZ_UP=9.26` (roof/ceiling,
+    indoor warmer than outdoor — heat escaping upward, the normal winter case),
+    `H_SI_HORIZ_DOWN=6.13` (roof/ceiling, outdoor warmer — heat arriving downward, e.g. a
+    hot attic in summer) — with the roof calculation now picking between the last two based
+    on the live sign of `ta - tOut` each render, not a fixed assumption. `conductedSurface()`
+    gained an `rSi` parameter so the same function serves all three cases correctly instead
+    of hard-coding one resistance.
+    Sources: [ASHRAE HVAC 2001 Fundamentals, Ch. 25](https://sovathrothsama.files.wordpress.com/2016/03/ashrae-hvac-2001-fundamentals-handbook.pdf),
+    [1997 Fundamentals Ch. 24 (same table)](https://www.tagengineering.ca/wp-content/uploads/2015/01/1997-Fundamentals_24-.pdf).
+  - Verified in-browser: hand-recomputed the cozy preset with the new 8.29 coefficient
+    (R<sub>si</sub>=1/8.29=0.1206 vs. the old 0.12 — barely different, since the old
+    hand-picked value happened to be very close to the correct vertical-surface figure) —
+    page showed wall 20.9°C / window 15.1°C, matching by hand to the tenth of a degree.
+    Confirmed the person-position readout via a keyboard Home-key reset (deterministically
+    5.0 m / 5.0 m, the room's exact center) after an earlier reading showed a stray
+    non-default value that turned out to be a browser-automation artifact from a prior
+    test's leftover pointer state, not a code defect — traced by grepping every
+    `personX`/`personY` assignment in the file and confirming none fire outside actual
+    drag/keyboard/preset event handlers. Both themes, mobile (375px, including the
+    three-line info block and longer "ext ... · win ..." labels in the worst-case corner
+    preset — no overlaps, no horizontal overflow), no console errors. **Not yet reviewed.**
 
 - **`visualizations/thermal-comfort-pmv.html` second follow-up pass: rebuilt as a top-down
   floor plan with four independently-configurable walls, plus a roof option for the

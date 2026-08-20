@@ -258,7 +258,7 @@
     <h2>Where <em>&gamma;</em> actually comes from</h2>
     <p class="sub">Picture a &ldquo;light clock&rdquo;: two mirrors facing each other, with one photon bouncing between them &mdash; one round trip is one tick. Riding along with the clock, the photon just goes straight up and down. Watching it fly past at speed <em>v</em>, the photon has to cover that same up&ndash;down distance <em>plus</em> the sideways drift &mdash; a longer diagonal path, at the same fixed speed <em>c</em>. Same speed, longer path, more time per tick &mdash; that's the whole effect, geometrically.</p>
     <div class="hero lchero" id="lcWrap">
-      <svg id="lcSvg" role="img" aria-label="A light clock at rest, bouncing a photon straight up and down between two mirrors, beside the same clock moving sideways, where the photon traces a longer diagonal zigzag path between the same two mirrors."></svg>
+      <svg id="lcSvg" role="img" aria-label="A light clock at rest, bouncing a photon straight up and down between two mirrors, beside the same clock travelling left to right, its two mirrors sliding sideways as the photon bounces so that the photon traces a longer diagonal zigzag path."></svg>
     </div>
     <p class="lc-caption">Schematic, not to scale &mdash; the sideways drift is exaggerated so the diagonal stays visible at every speed; it tracks the <em>v</em> slider above.</p>
     <p class="lc-derive mono" id="lcDerive"></p>
@@ -538,7 +538,10 @@
     var gapBetween = narrow ? 30 : 50;
     var movX0 = statX0+statW+gapBetween;
     var movAvail = Math.max(w-movX0-10, 60);
-    return {w:w, vbH:vbH, L:L, cy:cy, statX0:statX0, statW:statW, movX0:movX0, movAvail:movAvail};
+    // The moving clock is the *same* clock, so its mirrors are the same width as the
+    // stationary pair — the sweep has to leave half a mirror of room at each end for the
+    // bars to stay inside the panel as the clock drifts across it.
+    return {w:w, vbH:vbH, L:L, cy:cy, statX0:statX0, statW:statW, movX0:movX0, movAvail:movAvail, mirrorW:statW};
   }
 
   function drawLightClock(){
@@ -564,18 +567,21 @@
 
     // moving panel: a zigzag path drifting right as the clock ticks, horizontal
     // step per half-tick scaled directly by v/c (0 at rest, fills the panel near c)
-    var leftPad=6, rightPad=6;
-    var maxHalf = (g.movAvail-leftPad-rightPad)/LC_SEGS;
+    var edgePad = g.mirrorW/2 + 6;
+    var maxHalf = Math.max((g.movAvail - g.mirrorW - 12)/LC_SEGS, 6);
     var halfStep = vc*maxHalf;
-    var x0 = g.movX0+leftPad;
+    var x0 = g.movX0+edgePad;
     var pts=[[x0,g.cy+g.L]];
     var up=true, cx=x0;
     for(var i=0;i<LC_SEGS;i++){ cx+=halfStep; pts.push([cx, up?g.cy-g.L:g.cy+g.L]); up=!up; }
     lcPts = pts;
-    var mx1=g.movX0, mx2=pts[pts.length-1][0]+rightPad;
-    lc.movTop.setAttribute('x1',mx1); lc.movTop.setAttribute('x2',mx2);
+    lc.mirrorW = g.mirrorW;
+    var mx1=g.movX0, mx2=pts[pts.length-1][0]+edgePad;
+    // Only the heights are fixed here. The mirrors are short bars that travel left to right
+    // with the photon, so their x positions are set every frame in updateLightClockDots() —
+    // that sideways drift is what the diagonal path is a consequence of, and drawing the
+    // mirrors as one static full-width rail hid it.
     lc.movTop.setAttribute('y1',g.cy-g.L); lc.movTop.setAttribute('y2',g.cy-g.L);
-    lc.movBot.setAttribute('x1',mx1); lc.movBot.setAttribute('x2',mx2);
     lc.movBot.setAttribute('y1',g.cy+g.L); lc.movBot.setAttribute('y2',g.cy+g.L);
     lc.movPath.setAttribute('points', pts.map(function(p){ return p[0].toFixed(1)+','+p[1].toFixed(1); }).join(' '));
     lc.movPath.setAttribute('stroke', accentOn?'var(--accent)':'var(--muted2)');
@@ -614,6 +620,7 @@
     updateLightClockDots();
   }
 
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var lcStatAccum=0, lcMovAccum=0;
   var LC_SPEED = 60; // shared px/s "photon speed" driving both dots — see note above
   function triWave(t){ return t<0.5 ? t*2 : (1-t)*2; }
@@ -627,16 +634,31 @@
     var sy=g.cy+g.L - triWave(phaseStat)*2*g.L;
     lc.statDot.setAttribute('cx',sx); lc.statDot.setAttribute('cy',sy);
 
-    var phaseMov = (lc.Dmov>0) ? (lcMovAccum/(2*lc.Dmov))%1 : 0;
-    var segF=triWave(phaseMov)*LC_SEGS;
+    // Forward-only, unlike the stationary panel: that photon really does reverse at each
+    // mirror, but the moving clock only ever travels one way. Playing its zigzag backwards
+    // would show the clock sliding back to the left, which is why the sweep restarts at the
+    // left edge instead — with a short fade at the seam so the jump reads as the next clock
+    // arriving rather than a glitch.
+    var phaseMov = (lc.Dmov>0) ? (lcMovAccum/lc.Dmov)%1 : 0;
+    var segF=phaseMov*LC_SEGS;
     var idx=Math.min(Math.floor(segF),LC_SEGS-1);
     var local=segF-idx;
     var p0=lcPts[idx], p1=lcPts[idx+1];
     var mx=p0[0]+(p1[0]-p0[0])*local, my=p0[1]+(p1[1]-p0[1])*local;
     lc.movDot.setAttribute('cx',mx); lc.movDot.setAttribute('cy',my);
+
+    var half=(lc.mirrorW||g.statW)/2;
+    lc.movTop.setAttribute('x1',mx-half); lc.movTop.setAttribute('x2',mx+half);
+    lc.movBot.setAttribute('x1',mx-half); lc.movBot.setAttribute('x2',mx+half);
+    // Fades out at the right-hand end of the sweep only. A symmetric fade would also start
+    // the clock invisible at phase 0, which is exactly the state the page renders in at
+    // rest, after a reset, and under reduced motion.
+    var fade = reduceMotion ? 1 : Math.min(1, (1-phaseMov)/0.08);
+    lc.movTop.setAttribute('opacity',fade);
+    lc.movBot.setAttribute('opacity',fade);
+    lc.movDot.setAttribute('opacity',fade);
   }
 
-  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var rafId=null, lastTs=null;
   function tick(ts){
     rafId = requestAnimationFrame(tick);

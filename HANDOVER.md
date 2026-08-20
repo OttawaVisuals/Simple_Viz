@@ -182,11 +182,11 @@ pump page), none started:
   hand-maintained list, or `localStorage` visit counts on the client), and how the existing
   three category groupings (Everyday maths / Discoveries / Fun physics) survive if colour is
   doing the categorising.
-- **`time-dilation.html` light clock — animate the moving clock's mirrors.** In the light-clock
+- **`time-dilation.html` light clock — animate the moving clock's mirrors — built 2026-08-20.** In the light-clock
   derivation diagram, the two horizontal bars (mirrors) of the *moving* clock should visibly
   travel left to right as the light bounces, so the diagonal path reads as a consequence of
   the clock's motion rather than a static drawing.
-- **`microwave-chocolate.html` — other frequencies.** Add non-microwave-oven frequencies
+- **`microwave-chocolate.html` — other frequencies — built 2026-08-20.** Add non-microwave-oven frequencies
   (Wi-Fi 2.4 GHz, and at least one other band) alongside the oven's 2.45 GHz, each with the
   caveat framing: *"if you could melt chocolate with your Wi-Fi, this would be the melt-spot
   spacing."* The half-wavelength melt-spot measurement is the same calculation; only the
@@ -194,6 +194,61 @@ pump page), none started:
   new page.
 
 ## Current handoff — 2026-08-20
+
+- **`time-dilation.html`: the moving light clock's mirrors now travel.** Previously the moving
+  panel drew its two mirrors as one static full-width rail spanning the whole zigzag, which hid
+  the very thing the diagram exists to show — the diagonal path is a *consequence* of the clock
+  sliding sideways. Now they are short bars that ride with the photon.
+  - The bars are drawn at exactly the stationary panel's mirror width (`mirrorW: statW`),
+    because it is meant to be the same clock. That forced the sweep geometry to reserve half a
+    mirror of padding at each end (`edgePad = mirrorW/2 + 6`) so the bars stay inside the panel
+    at full speed; the per-half-tick step is scaled down to match.
+  - **The moving photon is now forward-only.** It used to run on `triWave`, sweeping the zigzag
+    forward and then backward — which was invisible when the mirrors were a static rail, but
+    with visible mirrors would have shown the clock sliding back to the left. The stationary
+    panel keeps `triWave`, since that photon really does reverse at each mirror. The sweep
+    restarts at the left edge instead, with the mirrors and dot fading out over the last 8 % of
+    the cycle so the jump reads as the next clock arriving.
+  - **The fade is deliberately one-sided.** A symmetric fade also starts the clock invisible at
+    phase 0, which is exactly the state the page renders in at rest, after the reset button, and
+    under `prefers-reduced-motion` — so it fades out only. `reduceMotion`'s declaration moved
+    above `updateLightClockDots` for the same reason.
+  - Verified across the whole speed range (slider driven at 5 %, 50 %, 99 %, plus reset): the
+    moving mirror span is 112 px at every speed, exactly matching the stationary pair; the sweep
+    collapses to a vertical line at v≈0 and still fits inside the panel at v≈0.99c. The sweep
+    itself was verified by executing the shipped `updateLightClockDots` against stub elements at
+    21 phases — bars always centred on the photon, never reversing, always inside the panel,
+    photon alternating between the two mirror heights.
+
+- **`microwave-chocolate.html`: a second section for other radio bands.** New
+  `<section class="bands">` between the presets and the closing note — extending the page rather
+  than starting a new one, the pattern already used on `starlight-spectrum.html` and
+  `time-dilation.html`. The main measurement above it is untouched: it is keyed to the oven's
+  nameplate 2.45 GHz, and that is what the c = 2fΔx experiment actually uses.
+  - Six real band centres: 4G LTE band 3 (1.80 GHz), the oven (2.45), Wi-Fi 2.4 GHz channel 6
+    (2.437), 5G n78 (3.50), Wi-Fi 5 GHz channel 100 (5.50), Wi-Fi 6E (6.50). Every spacing is
+    **derived** from `c/2f` at draw time, never typed in, so the figures cannot drift from the
+    equation the page is about — they come out at 8.33 / 6.12 / 6.15 / 4.28 / 2.73 / 2.31 cm.
+  - The figure is six chocolate strips on one common 30 cm scale with a shared ruler, spots
+    drawn at that band's half-wavelength, plus a dashed vertical through the oven's second spot
+    so every other band can be read against it directly. The nicest thing it shows is that
+    Wi-Fi's 2.437 GHz sits in the same ISM band as the oven, so its spots would land 0.3 mm from
+    the oven's — the same fact that explains why a running microwave jams 2.4 GHz Wi-Fi.
+  - Band selection is pill buttons (STYLE_GUIDE.md's sanctioned discrete-option selector),
+    defaulting to Wi-Fi 2.4 GHz since that is the framing Simon asked for. A readout line under
+    the figure states the selected band's spacing against the oven's, switching between a
+    millimetre difference and a ratio depending on how far apart they are.
+  - **The power caveat is stated up front, not buried**: an oven puts ~1,000 W into a sealed
+    metal box, a router radiates ~0.1 W across a room — ten thousand times less, and untrapped.
+    The section says plainly that nothing here melts anything and that only the geometry carries
+    over.
+  - Narrow layout uses a per-band `short` label. The first attempt derived it by regex-stripping
+    the frequency off the pill text, which collapsed three different rows to just "Wi-Fi".
+  - Verified: drawn spot gaps converted back to cm match `c/2f` for all six bands exactly; one
+    pill pressed at a time; all six readout sentences correct; labels fit their gutter at 1440
+    and 375 px; no page overflow; both themes; no console errors.
+
+## Earlier on 2026-08-20
 
 - **`index.html` rebuilt as a tile grid.** The catalogue is now a single flat grid of tiles
   instead of three hairline-rule lists, per Simon's pitch (see the 2026-08-20 backlog entry

@@ -106,6 +106,21 @@
   .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
   .preset:hover{border-color:var(--accent);color:var(--accent)}
 
+  /* Second section: the same standing-wave geometry at other radio frequencies. Extends the
+     page skeleton rather than starting a new page, the pattern used on starlight-spectrum and
+     time-dilation. Pills are the sanctioned discrete-option selector from STYLE_GUIDE.md. */
+  .bands{margin-top:clamp(30px,3.4vw,46px);padding-top:clamp(20px,2.4vw,30px);border-top:1px solid var(--line)}
+  .bands h2{font-weight:300;font-size:clamp(1.3rem,2vw,1.7rem);letter-spacing:-.02em;margin:0}
+  .bands .sub{max-width:74ch}
+  .band-pills{display:flex;flex-wrap:wrap;gap:8px;margin:clamp(16px,2vw,22px) 0 0}
+  .band-pill{appearance:none;cursor:pointer;border:1px solid var(--line2);border-radius:999px;background:transparent;color:var(--muted2);padding:7px 13px;font:12px/1 ui-monospace,monospace}
+  .band-pill:hover,.band-pill:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
+  .band-pill[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--bg))}
+  .bandfig{position:relative;width:100%;margin-top:clamp(14px,2vw,20px)}
+  .bandfig svg{width:100%;height:auto;display:block}
+  .band-readout{margin:clamp(12px,1.6vw,18px) 0 0;font-size:14px;line-height:1.6;color:var(--muted2);max-width:74ch;text-wrap:pretty}
+  .band-readout b{font-weight:400;color:var(--fg)}
+
   .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
   .note a{color:var(--muted2);text-decoration-color:var(--line2)}
   .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
@@ -251,6 +266,16 @@
     <button class="preset" data-p="short">measured a bit short</button>
     <button class="preset" data-p="long">measured a bit long</button>
   </div>
+
+  <section class="bands" aria-labelledby="bandsHeading">
+    <h2 id="bandsHeading">What if it were your <em>Wi-Fi</em>?</h2>
+    <p class="sub">Nothing here will melt anything: an oven pours about 1,000&nbsp;W of microwave power into a sealed metal box, while a Wi-Fi router radiates roughly 0.1&nbsp;W across a whole room &mdash; ten thousand times less, and none of it trapped. The <em>geometry</em> is the part that carries over. Any of these frequencies, confined in a cavity, would put its hot spots exactly half a wavelength apart &mdash; so if you could melt chocolate with your Wi-Fi, this is the spacing you would measure.</p>
+    <div class="band-pills" id="bandPills" role="group" aria-label="Choose a radio band"></div>
+    <div class="bandfig" id="bandWrap">
+      <svg id="bandSvg" role="img" aria-label="Six strips of chocolate drawn to a common 30-centimetre scale, one per radio band, each with melt spots at that band's half-wavelength spacing — from 4G at the widest to the 6 gigahertz Wi-Fi band at the tightest."></svg>
+    </div>
+    <p class="band-readout" id="bandReadout"></p>
+  </section>
 
   <p class="note">Sometimes called the "chocolate speed of light experiment" (marshmallows and cheese work too). A spinning turntable smears the standing-wave pattern evenly across a whole rotation, which is exactly why ovens have one &mdash; to heat food evenly, the opposite of what this experiment wants &mdash; so the first step is always to remove it. With the turntable out, running the oven briefly on a flat tray melts the food in stripes at the wave's antinodes, spaced exactly half a wavelength (&lambda;/2) apart. A household microwave's magnetron runs at a fixed, nameplate-printed frequency of f&nbsp;=&nbsp;2.45&nbsp;GHz, so &lambda; = c/f &asymp; 12.24 cm and &lambda;/2 &asymp; 6.12 cm. The equation requires compatible SI units: frequency is converted to hertz and spacing to metres before multiplying. If GHz and cm are multiplied directly, 1&nbsp;GHz&middot;cm = 10<sup>7</sup>&nbsp;m/s. For example, 2&nbsp;&times;&nbsp;2.45&nbsp;&times;&nbsp;6.39 = 31.311 therefore means 31.311&nbsp;&times;&nbsp;10<sup>7</sup>&nbsp;m/s = 3.1311&nbsp;&times;&nbsp;10<sup>8</sup>&nbsp;m/s. A ruler reading off by a couple of millimetres, real magnetrons drifting from their nominal frequency, and blurred melted spots all add real error. Read more on <a href="https://en.wikipedia.org/wiki/Microwave_oven" target="_blank" rel="noopener">Wikipedia's microwave oven article</a>.</p>
 
@@ -594,6 +619,132 @@
   });
   applyTheme(currentTheme());
 
+  // ---- second figure: the same standing-wave geometry at other radio bands ----
+  // Every spacing here is derived from its frequency (lambda/2 = c/2f), never typed in, so the
+  // numbers cannot drift from the equation the page is about. Frequencies are real band centres.
+  var BANDS = [
+    {key:'lte',    pill:'4G LTE 1.8 GHz', short:'4G LTE',    name:'4G LTE (band 3)',      freq:1.80e9,
+     note:'Your phone’s downlink. The lowest frequency here, so the longest wave and the widest-spaced spots — a third further apart than the oven’s.'},
+    {key:'oven',   pill:'Microwave oven 2.45 GHz', short:'Oven', name:'Microwave oven',       freq:2.45e9,
+     note:'The nameplate frequency the experiment above actually uses, and the only one on this list with enough power behind it to melt anything.'},
+    {key:'wifi24', pill:'Wi-Fi 2.4 GHz', short:'Wi-Fi 2.4',  name:'Wi-Fi 2.4 GHz (ch 6)', freq:2.437e9,
+     note:'The same ISM band the oven runs in — which is exactly why a running microwave can jam 2.4 GHz Wi-Fi.'},
+    {key:'5g',     pill:'5G mid-band 3.5 GHz', short:'5G n78', name:'5G mid-band (n78)',    freq:3.50e9,
+     note:'The workhorse band for most 5G coverage, sitting between the two Wi-Fi bands.'},
+    {key:'wifi5',  pill:'Wi-Fi 5 GHz', short:'Wi-Fi 5',      name:'Wi-Fi 5 GHz (ch 100)', freq:5.50e9,
+     note:'Well over twice the oven’s frequency, so the spots crowd into well under half its spacing.'},
+    {key:'wifi6e', pill:'Wi-Fi 6 GHz', short:'Wi-Fi 6E',     name:'Wi-Fi 6 GHz (6E)',     freq:6.50e9,
+     note:'The band opened up for Wi-Fi 6E — the highest frequency here, and the tightest spot spacing.'}
+  ];
+  var BAND_SCALE_CM = 30;          // the strips are 30 cm of tray, drawn to one common scale
+  var bandSel = 'wifi24';          // the headline case: what your Wi-Fi would draw
+
+  var bandWrap=$('bandWrap'), bandSvg=$('bandSvg'), bandPills=$('bandPills'), bandReadout=$('bandReadout');
+  function halfLambdaCm(f){ return C/(2*f)*100; }
+  function bandGHz(b){ return (b.freq/1e9).toFixed(b.freq === 2.437e9 ? 3 : 2); }
+  function bel(tag, attrs){
+    var n = document.createElementNS(NS, tag);
+    for(var k in attrs) if(attrs.hasOwnProperty(k)) n.setAttribute(k, attrs[k]);
+    return n;
+  }
+
+  BANDS.forEach(function(b){
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'band-pill';
+    btn.textContent = b.pill;
+    btn.setAttribute('aria-pressed', String(b.key === bandSel));
+    btn.addEventListener('click', function(){ bandSel = b.key; drawBands(); });
+    bandPills.appendChild(btn);
+  });
+
+  function drawBands(){
+    var w = bandWrap.clientWidth || heroW || 1100;
+    var narrow = w < 620;
+    while(bandSvg.firstChild) bandSvg.removeChild(bandSvg.firstChild);
+
+    var gutter = narrow ? 76 : 168;   // measured: the widest narrow label ends at ~56
+    var valW = narrow ? 54 : 64;
+    var rowH = narrow ? 32 : 36;
+    var padTop = 24, rulerH = 34;
+    var stripX = gutter, stripW = Math.max(w - gutter - valW, 80);
+    var pxPerCm = stripW / BAND_SCALE_CM;
+    var vbH = padTop + BANDS.length*rowH + rulerH;
+    bandSvg.setAttribute('viewBox', '0 0 '+w+' '+vbH);
+
+    var ovenCm = halfLambdaCm(2.45e9);
+    var firstX = stripX + 8;
+
+    // A dashed vertical through the oven's second spot: every other band's second spot can be
+    // read against it directly, which is the whole comparison this figure exists to make.
+    var ovenX = firstX + ovenCm*pxPerCm;
+    bandSvg.appendChild(bel('line',{x1:ovenX,x2:ovenX,y1:padTop-8,y2:padTop+BANDS.length*rowH-6,
+      stroke:'var(--line2)','stroke-width':1,'stroke-dasharray':'3 4'}));
+    var ovenLbl = bel('text',{x:ovenX,y:padTop-13,fill:'var(--muted)','font-size':10,
+      'font-family':'ui-monospace,monospace','text-anchor':'middle'});
+    ovenLbl.textContent = narrow ? 'oven' : 'the oven’s spacing';
+    bandSvg.appendChild(ovenLbl);
+
+    BANDS.forEach(function(b, i){
+      var cm = halfLambdaCm(b.freq);
+      var on = b.key === bandSel;
+      var y = padTop + i*rowH + rowH/2;
+
+      var nm = bel('text',{x:0,y:y-2,fill:on?'var(--fg)':'var(--muted2)','font-size':11,
+        'font-family':'ui-monospace,monospace'});
+      nm.textContent = narrow ? b.short : b.name;
+      bandSvg.appendChild(nm);
+      var fq = bel('text',{x:0,y:y+11,fill:'var(--muted)','font-size':10,
+        'font-family':'ui-monospace,monospace'});
+      fq.textContent = bandGHz(b)+' GHz';
+      bandSvg.appendChild(fq);
+
+      // the chocolate strip itself, then its melt spots every half-wavelength
+      bandSvg.appendChild(bel('line',{x1:stripX,x2:stripX+stripW,y1:y,y2:y,
+        stroke:on?'var(--fg)':'var(--line)','stroke-width':on?3:2,'stroke-linecap':'round'}));
+      for(var x = firstX; x <= stripX+stripW-2; x += cm*pxPerCm){
+        bandSvg.appendChild(bel('circle',{cx:x.toFixed(2),cy:y,r:on?4:3,
+          fill:on?'var(--accent)':'var(--line2)',opacity:on?1:0.75}));
+      }
+
+      var val = bel('text',{x:w,y:y+3.5,fill:on?'var(--accent)':'var(--muted)','font-size':11,
+        'font-family':'ui-monospace,monospace','text-anchor':'end'});
+      val.textContent = cm.toFixed(2)+' cm';
+      bandSvg.appendChild(val);
+    });
+
+    // shared ruler, so the strips read as real distance rather than as a bar chart
+    var ry = padTop + BANDS.length*rowH + 10;
+    bandSvg.appendChild(bel('line',{x1:stripX,x2:stripX+stripW,y1:ry,y2:ry,
+      stroke:'var(--line2)','stroke-width':1}));
+    for(var c = 0; c <= BAND_SCALE_CM; c += 5){
+      var tx = stripX + c*pxPerCm;
+      bandSvg.appendChild(bel('line',{x1:tx,x2:tx,y1:ry,y2:ry+4,stroke:'var(--line2)','stroke-width':1}));
+      var tl = bel('text',{x:tx,y:ry+16,fill:'var(--muted)','font-size':10,
+        'font-family':'ui-monospace,monospace','text-anchor':'middle'});
+      tl.textContent = c === BAND_SCALE_CM ? c+' cm' : String(c);
+      bandSvg.appendChild(tl);
+    }
+
+    Array.prototype.forEach.call(bandPills.children, function(btn, i){
+      btn.setAttribute('aria-pressed', String(BANDS[i].key === bandSel));
+    });
+
+    var sel = BANDS.filter(function(x){ return x.key === bandSel; })[0];
+    var selCm = halfLambdaCm(sel.freq);
+    var diffMm = Math.abs(selCm - ovenCm)*10;
+    var lead;
+    if(sel.key === 'oven'){
+      lead = '<b>'+sel.name+', '+bandGHz(sel)+' GHz.</b> Hot spots '+selCm.toFixed(2)+' cm apart — the spacing the experiment above measures. ';
+    } else {
+      var rel = diffMm < 10
+        ? 'just '+diffMm.toFixed(1)+' mm '+(selCm > ovenCm ? 'wider' : 'tighter')+' than the oven’s '+ovenCm.toFixed(2)+' cm'
+        : (selCm/ovenCm).toFixed(2)+'× the oven’s '+ovenCm.toFixed(2)+' cm';
+      lead = '<b>'+sel.name+', '+bandGHz(sel)+' GHz.</b> If it could melt chocolate, the spots would land <b>'+selCm.toFixed(2)+' cm</b> apart — '+rel+'. ';
+    }
+    bandReadout.innerHTML = lead + sel.note;
+  }
+
   function measure(){
     var w = heroWrap.clientWidth;
     if(w && w !== heroW){ heroW = w; render(); }
@@ -605,6 +756,7 @@
     dxSlider.draw();
     $('dxReadout').textContent = state.spacing.toFixed(2)+' cm';
     drawResult();
+    drawBands();
   }
 
   new ResizeObserver(measure).observe(heroWrap);

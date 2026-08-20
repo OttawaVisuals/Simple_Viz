@@ -67,10 +67,15 @@
 
   .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
   .hero svg{width:100%;height:auto;display:block}
-  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.03em;color:var(--muted2);white-space:nowrap;transition:opacity .2s;text-align:center}
-  .hero .airlbl{position:absolute;font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.02em;color:var(--muted2);white-space:nowrap;transition:opacity .2s}
+  .hero .infolbl{position:absolute;font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
   .roomdrag{cursor:grab;touch-action:none}
   .roomdrag:active{cursor:grabbing}
+
+  .wallsrow{margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  .wallgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:clamp(18px,2.2vw,28px)}
+  @media (max-width:480px){.wallgrid{grid-template-columns:1fr}}
+  .wall-card .pill-buttons{margin-top:8px;margin-bottom:12px}
 
   .resultrow{display:grid;grid-template-columns:1.5fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
   @media (max-width:760px){.resultrow{grid-template-columns:1fr}}
@@ -170,7 +175,7 @@
   <div class="topgrid">
     <div class="headleft">
       <h1>The room feels <em>colder</em> than the thermostat says.</h1>
-      <p class="sub">Comfort isn't just air temperature &mdash; it's a heat balance with everything around you, including the cold glass of a window. Drag the person toward it and watch the number move, even with the air temperature untouched.</p>
+      <p class="sub">Comfort isn't just air temperature &mdash; it's a heat balance with everything around you: walls, windows, even the roof overhead. Drag the person around the floor plan below and watch the number move, even with the air temperature untouched.</p>
     </div>
 
     <div class="eqnbox">
@@ -188,42 +193,24 @@
   </div>
 
   <div class="hero" id="heroWrap">
-    <div class="lbl" id="lblCeil"></div>
-    <div class="lbl" id="lblFloor"></div>
-    <div class="lbl" id="lblExtWall"></div>
-    <div class="lbl" id="lblWindow"></div>
-    <div class="lbl" id="lblWall"></div>
-    <div class="airlbl" id="lblAir"></div>
-    <svg id="heroSvg" role="img" aria-label="A room cross-section with a draggable person; surface colors show ceiling, floor, exterior-wall, window and interior-wall temperature, the exterior wall and window temperatures derived from indoor/outdoor temperature and insulation, and lines from the person show how strongly each surface radiates toward them.">
-      <rect id="roomBg" fill="var(--bg)"></rect>
-      <rect id="bandWindow" stroke="var(--line2)" stroke-width="1"></rect>
-      <rect id="bandGlass" stroke="var(--line2)" stroke-width="1"></rect>
-      <rect id="bandWall" stroke="var(--line2)" stroke-width="1"></rect>
-      <rect id="bandCeil" stroke="var(--line2)" stroke-width="1"></rect>
-      <rect id="bandFloor" stroke="var(--line2)" stroke-width="1"></rect>
-      <rect id="roomOutline" fill="none" stroke="var(--line2)" stroke-width="1.25"></rect>
-      <line id="rayWindow" stroke-linecap="round"></line>
-      <line id="rayExtWall" stroke-linecap="round"></line>
-      <line id="rayWall" stroke-linecap="round"></line>
-      <line id="rayCeil" stroke-linecap="round"></line>
-      <line id="rayFloor" stroke-linecap="round"></line>
-      <g id="personG" class="roomdrag" tabindex="0" role="slider" aria-label="Person's position in the room, from the window to the far wall">
-        <circle id="personHead" fill="var(--fg)"></circle>
-        <path id="personBody" fill="var(--fg)"></path>
-        <circle id="personHit" fill="transparent" r="20"></circle>
-      </g>
-    </svg>
+    <svg id="heroSvg" role="img" aria-label="A top-down floor plan with four walls, north at top; wall colors show their surface temperature, derived from indoor/outdoor temperature and insulation for any wall marked exterior, and lines from the draggable person show how strongly each surface radiates toward them."></svg>
+  </div>
+
+  <div class="wallsrow">
+    <div class="ctrl-title">Walls (top view — north is up)</div>
+    <div class="wallgrid" id="wallGrid"></div>
   </div>
 
   <div class="resultrow">
     <div class="ctrlgroups">
       <div class="ctrl">
-        <div class="ctrl-title">Exterior wall &amp; window</div>
-        <div id="extSliders"></div>
-      </div>
-      <div class="ctrl">
-        <div class="ctrl-title">Other room surfaces</div>
-        <div id="surfSliders"></div>
+        <div class="ctrl-title">Outdoor &amp; envelope</div>
+        <div id="envSliders"></div>
+        <div class="pickgrp" style="margin-top:14px">
+          <div class="ctrl-title" style="margin-bottom:8px">Ceiling</div>
+          <div class="pill-buttons" id="ceilTypeButtons" role="group" aria-label="Ceiling type"></div>
+        </div>
+        <div id="ceilSliders"></div>
       </div>
       <div class="ctrl">
         <div class="ctrl-title">Air</div>
@@ -259,13 +246,14 @@
 
   <div class="presets">
     <span class="presets-title">Try</span>
-    <button class="preset" data-p="cozy">a well-balanced office</button>
+    <button class="preset" data-p="cozy">a well-insulated office</button>
     <button class="preset" data-p="window">a desk pushed against the window</button>
-    <button class="preset" data-p="hot">an overheated meeting room</button>
+    <button class="preset" data-p="attic">a top-floor bedroom under an old roof</button>
+    <button class="preset" data-p="corner">a cold corner office</button>
     <button class="preset" data-p="fan">summer heat with a fan on</button>
   </div>
 
-  <p class="note">The <a href="https://en.wikipedia.org/wiki/Thermal_comfort" target="_blank" rel="noopener">Fanger PMV/PPD model</a> (ISO 7730, adopted by <a href="https://en.wikipedia.org/wiki/ASHRAE_55" target="_blank" rel="noopener">ASHRAE 55</a>) puts a full body heat balance &mdash; metabolic heat in, against respiration, convection, radiation and sweat losses out &mdash; onto a &minus;3&hellip;+3 comfort scale, then converts that into PPD, the percentage of people predicted to be dissatisfied (PPD = 100 &minus; 95&middot;e<sup>&minus;0.03353&middot;PMV<sup>4</sup>&minus;0.2179&middot;PMV<sup>2</sup></sup>, never zero &mdash; nobody makes everyone happy). A room is compliant when &minus;0.5 &le; PMV &le; +0.5 and PPD &le; 10%, shown as the shaded band on the gauge above. <strong>The wall and window surface temperatures are calculated, not set directly.</strong> Steady-state conduction gives T<sub>surface</sub> = T<sub>in</sub> &minus; (T<sub>in</sub> &minus; T<sub>out</sub>)&middot;R<sub>si</sub>/R<sub>total</sub>, where R<sub>si</sub> = 0.12 m&sup2;&middot;K/W is the standard interior air-film resistance and R<sub>total</sub> adds the wall's own R-value (converted from the imperial units on the slider) plus a 0.03 m&sup2;&middot;K/W exterior air film. Windows are simpler, since a U-value already is the whole-assembly figure: heat flux is just U&middot;(T<sub>in</sub>&minus;T<sub>out</sub>), and the same R<sub>si</sub> fraction of that gives the interior glass temperature. <strong>Window size deliberately does not appear in either formula</strong> &mdash; a bigger pane isn't colder glass, it's just more of it. What size actually changes: how much of the room's radiant "view" is glazing versus opaque wall (feeding t<sub>r</sub> below), and what share of the wall assembly's total heat loss the window carries, both shown in the readout under the gauge. <strong>Mean radiant temperature</strong> (t<sub>r</sub>) is the piece that makes the room-box worth dragging a person around in: it's a weighted average of the ceiling, floor, window, exterior-wall and interior-wall temperatures, weighted by how much of each one you can actually "see" from where you're sitting (angle factor). This page uses a simplified, illustrative angle-factor model &mdash; a real one needs the exact geometry and distance to every surface &mdash; but the direction is honest: standing closer to a cold window increases its weight in t<sub>r</sub> and pulls your comfort down, even though the thermostat (air temperature) hasn't moved at all. Operative temperature is approximated as the simple average of air and radiant temperature, valid when air speed is low. Clothing (clo) and activity (met) values are standard reference figures from <a href="https://en.wikipedia.org/wiki/Clothing_insulation" target="_blank" rel="noopener">ASHRAE's clothing-insulation tables</a> and <a href="https://en.wikipedia.org/wiki/Metabolic_equivalent_of_task" target="_blank" rel="noopener">metabolic-rate tables</a>, not measurements of any specific outfit or person. The draft, floor-temperature and radiant-asymmetry flags below the gauge are simplified proxies for ASHRAE 55's separate local-discomfort limits (draft rate, floor 19&ndash;29&deg;C, radiant asymmetry &lt;5&deg;C for a cool surface) &mdash; real assessments measure them directly rather than approximating from the inputs here. R-values are entered in the imperial units (ft&sup2;&middot;&deg;F&middot;h/Btu) common on Canadian insulation batts and converted internally (1 = 0.176 m&sup2;&middot;K/W).</p>
+  <p class="note">The <a href="https://en.wikipedia.org/wiki/Thermal_comfort" target="_blank" rel="noopener">Fanger PMV/PPD model</a> (ISO 7730, adopted by <a href="https://en.wikipedia.org/wiki/ASHRAE_55" target="_blank" rel="noopener">ASHRAE 55</a>) puts a full body heat balance &mdash; metabolic heat in, against respiration, convection, radiation and sweat losses out &mdash; onto a &minus;3&hellip;+3 comfort scale, then converts that into PPD, the percentage of people predicted to be dissatisfied (PPD = 100 &minus; 95&middot;e<sup>&minus;0.03353&middot;PMV<sup>4</sup>&minus;0.2179&middot;PMV<sup>2</sup></sup>, never zero &mdash; nobody makes everyone happy). A room is compliant when &minus;0.5 &le; PMV &le; +0.5 and PPD &le; 10%, shown as the shaded band on the gauge above. <strong>Every exterior surface's temperature is calculated, not set directly.</strong> Steady-state conduction gives T<sub>surface</sub> = T<sub>in</sub> &minus; (T<sub>in</sub> &minus; T<sub>out</sub>)&middot;R<sub>si</sub>/R<sub>total</sub>, where R<sub>si</sub> = 0.12 m&sup2;&middot;K/W is the standard interior air-film resistance and R<sub>total</sub> adds that surface's own R-value (entered in the imperial units common on Canadian insulation batts, converted internally: 1 = 0.176 m&sup2;&middot;K/W) plus a 0.03 m&sup2;&middot;K/W exterior air film &mdash; the same formula for a wall marked "Exterior" and for a ceiling switched to "Roof", just with that surface's own R-value. Windows use their U-value directly, since a U-factor already is the whole-assembly figure: heat flux is U&middot;(T<sub>in</sub>&minus;T<sub>out</sub>), and the same R<sub>si</sub> fraction of that gives the glass temperature. <strong>Window size deliberately does not appear in either formula</strong> &mdash; a bigger pane isn't colder glass, it's just more of it. What size (and which walls are exterior at all) actually changes: how much of the room's radiant "view" is glazing versus opaque wall versus roof (feeding t<sub>r</sub> below), and what share of the whole envelope's heat loss the windows carry, both shown in the readout under the gauge. <strong>Mean radiant temperature</strong> (t<sub>r</sub>) is a weighted average of every wall, window, ceiling and floor temperature, weighted by how much of each you can actually "see" from where you're standing (angle factor) &mdash; this page uses a simplified, illustrative angle-factor model based only on distance to each of the four walls, not full solid-angle geometry, but the direction is honest: stand in a corner where two walls are both exterior and both pull t<sub>r</sub> down at once, which is exactly why corners of old houses feel colder than a single-exterior-wall room even at the same air temperature. Operative temperature is approximated as the simple average of air and radiant temperature, valid when air speed is low. Clothing (clo) and activity (met) values are standard reference figures from <a href="https://en.wikipedia.org/wiki/Clothing_insulation" target="_blank" rel="noopener">ASHRAE's clothing-insulation tables</a> and <a href="https://en.wikipedia.org/wiki/Metabolic_equivalent_of_task" target="_blank" rel="noopener">metabolic-rate tables</a>, not measurements of any specific outfit or person. The draft, floor-temperature and radiant-asymmetry flags below the gauge are simplified proxies for ASHRAE 55's separate local-discomfort limits (draft rate, floor 19&ndash;29&deg;C, radiant asymmetry &lt;5&deg;C for a cool surface) &mdash; real assessments measure them directly rather than approximating from the inputs here, and this page can flag more than one wall's asymmetry at once, which a single-number PMV never would.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -302,6 +290,9 @@
 (function(){
   function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
   function cFmt(v){ return v.toFixed(1)+'°C'; }
+  var $ = function(id){ return document.getElementById(id); };
+  var NS = 'http://www.w3.org/2000/svg';
+  function svgEl(tag, attrs){ var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); return e; }
 
   // ---- reference tables ----
   var CLOTHING = [
@@ -319,20 +310,28 @@
     {name:'Standing, light work', met:1.4},
     {name:'Walking ~1.1 m/s', met:2.0}
   ];
+  var WALL_ORDER = ['N','E','S','W'];
+  var WALL_NAMES = { N:'North wall', E:'East wall', S:'South wall', W:'West wall' };
 
   // ---- state ----
   var state = {
     ta:22, rh:40, vel:0.10,
-    tOut:-10, wallR:20, windowU:1.8, glazing:25,
-    tCeil:22, tFloor:21, tWall:21,
-    personX:0.5,
+    tOut:-10, windowU:1.8,
+    ceilType:'interior', tCeil:22, roofR:50,
+    tFloor:21,
+    walls:{
+      N:{ type:'exterior', temp:21, R:20, glazing:25 },
+      E:{ type:'interior', temp:21, R:20, glazing:0 },
+      S:{ type:'interior', temp:21, R:20, glazing:0 },
+      W:{ type:'interior', temp:21, R:20, glazing:0 }
+    },
+    personX:0.5, personY:0.5,
     clo:3, met:2,
-    active:null, drag:null
+    active:null
   };
   var R_SI = 0.12, R_SO = 0.03; // ASHRAE interior/exterior air-film resistances, m²·K/W
   var IMPERIAL_R_TO_RSI = 5.678263;
-
-  var $ = function(id){ return document.getElementById(id); };
+  var A_SEG = 7; // m², a representative surface segment, used only for the heat-loss-share readout
 
   // ---- Fanger PMV/PPD (classic ISO 7730 iterative algorithm) ----
   function pmvPpd(ta, tr, vel, rh, met, clo, wme){
@@ -377,54 +376,92 @@
     return { pmv: pmv, ppd: ppd, tcl: tcl, L: L, M: m };
   }
 
-  // ---- exterior wall & window surface temperature, from steady-state conduction ----
-  // T_surf = T_in - (T_in - T_out) * R_interior-film / R_total  (ISO 6946 / ASHRAE Fundamentals)
-  // Window size does NOT appear here: glass temperature only depends on U-value and the two
-  // air temperatures, not how big the window is. Size instead changes (a) how much of the
-  // room's radiant "view" is glazing vs opaque wall, via the angle factors below, and
-  // (b) what share of the wall assembly's total heat loss the window is responsible for.
-  function wallWindowSurfaceTemps(){
-    var rsiWall = state.wallR / IMPERIAL_R_TO_RSI;
-    var rTotalWall = R_SI + rsiWall + R_SO;
-    var qWall = (state.ta - state.tOut) / rTotalWall;           // W/m²
-    var tExtWall = state.ta - qWall * R_SI;
-
-    var qWindow = state.windowU * (state.ta - state.tOut);      // W/m²
-    var tWindow = state.ta - qWindow * R_SI;
-
-    var A_TOTAL = 7;                                            // m², a representative exterior-wall segment
-    var aWindow = (state.glazing / 100) * A_TOTAL, aWall = A_TOTAL - aWindow;
-    var qTotalWindow = qWindow * aWindow, qTotalWall = qWall * aWall;
-    var shareWindow = qTotalWindow / (qTotalWindow + qTotalWall) * 100;
-
-    return { tExtWall:tExtWall, tWindow:tWindow, qWall:qWall, qWindow:qWindow, shareWindow:shareWindow };
+  // ---- steady-state conduction: T_surf = T_in - (T_in-T_out)*R_si/R_total ----
+  function conductedSurface(rImperial){
+    var rsi = rImperial / IMPERIAL_R_TO_RSI;
+    var rTotal = R_SI + rsi + R_SO;
+    var q = (state.ta - state.tOut) / rTotal; // W/m²
+    return { temp: state.ta - q * R_SI, q: q };
+  }
+  function windowSurface(){
+    var q = state.windowU * (state.ta - state.tOut); // W/m²
+    return { temp: state.ta - q * R_SI, q: q };
+  }
+  function ceilingSurface(){
+    if (state.ceilType === 'interior') return { temp: state.tCeil, q: 0 };
+    return conductedSurface(state.roofR);
+  }
+  function wallSurfaces(){
+    var out = {};
+    WALL_ORDER.forEach(function(k){
+      var w = state.walls[k];
+      if (w.type === 'interior'){
+        out[k] = { opaqueTemp: w.temp, windowTemp: null, glazing: 0, opaqueQ: 0, windowQ: 0 };
+      } else {
+        var wall = conductedSurface(w.R);
+        var win = windowSurface();
+        var g = clamp(w.glazing, 0, 100) / 100;
+        out[k] = { opaqueTemp: wall.temp, windowTemp: g > 0 ? win.temp : null, glazing: g, opaqueQ: wall.q, windowQ: win.q };
+      }
+    });
+    return out;
   }
 
-  // ---- simplified angle-factor MRT from room surfaces + person position ----
-  function angleFactors(x, glazingFrac){
-    var fExtWallTotal = 0.06 + 0.16 * (1 - x);
+  // ---- aggregate heat-loss share: what fraction of total envelope loss is windows ----
+  function heatLossShare(wallSurf, ceil){
+    var totalWindow = 0, totalOpaque = 0, anyWindow = false;
+    WALL_ORDER.forEach(function(k){
+      var w = state.walls[k], s = wallSurf[k];
+      if (w.type !== 'exterior') return;
+      var aWin = s.glazing * A_SEG, aOpq = A_SEG - aWin;
+      if (s.glazing > 0){ totalWindow += s.windowQ * aWin; anyWindow = true; }
+      totalOpaque += s.opaqueQ * aOpq;
+    });
+    if (state.ceilType === 'roof') totalOpaque += ceil.q * A_SEG;
+    var total = totalWindow + totalOpaque;
+    return { shareWindow: total > 0 ? totalWindow / total * 100 : 0, anyWindow: anyWindow };
+  }
+
+  // ---- simplified angle-factor MRT: distance to each of 4 walls + ceiling + floor ----
+  function angleFactors(x, y, wallSurf){
+    var dist = { N:y, S:1 - y, W:x, E:1 - x };
     var fCeil = 0.12, fFloor = 0.12;
-    var fIntWall = 1 - fExtWallTotal - fCeil - fFloor;
-    var fWindow = fExtWallTotal * glazingFrac;
-    var fExtWallOpaque = fExtWallTotal - fWindow;
-    return { window: fWindow, extWall: fExtWallOpaque, ceil: fCeil, floor: fFloor, wall: fIntWall };
+    var wallF = {};
+    var total = fCeil + fFloor;
+    WALL_ORDER.forEach(function(k){
+      var raw = 0.06 + 0.16 * (1 - dist[k]);
+      var s = wallSurf[k];
+      var winF = s.glazing > 0 ? raw * s.glazing : 0;
+      var opqF = raw - winF;
+      wallF[k] = { window: winF, opaque: opqF };
+      total += winF + opqF;
+    });
+    WALL_ORDER.forEach(function(k){ wallF[k].window /= total; wallF[k].opaque /= total; });
+    return { wall: wallF, ceil: fCeil / total, floor: fFloor / total };
   }
-  function meanRadiantTemp(surf){
-    var f = angleFactors(state.personX, state.glazing / 100);
-    var sum = f.window * Math.pow(surf.tWindow + 273, 4)
-            + f.extWall * Math.pow(surf.tExtWall + 273, 4)
-            + f.ceil * Math.pow(state.tCeil + 273, 4)
-            + f.floor * Math.pow(state.tFloor + 273, 4)
-            + f.wall * Math.pow(state.tWall + 273, 4);
-    return Math.pow(sum, 0.25) - 273;
+  function meanRadiantTemp(wallSurf, ceil){
+    var f = angleFactors(state.personX, state.personY, wallSurf);
+    var sum = 0;
+    WALL_ORDER.forEach(function(k){
+      var s = wallSurf[k];
+      sum += f.wall[k].opaque * Math.pow(s.opaqueTemp + 273, 4);
+      if (s.windowTemp !== null) sum += f.wall[k].window * Math.pow(s.windowTemp + 273, 4);
+    });
+    sum += f.ceil * Math.pow(ceil.temp + 273, 4);
+    sum += f.floor * Math.pow(state.tFloor + 273, 4);
+    return { tr: Math.pow(sum, 0.25) - 273, factors: f };
   }
 
-  function compute(surf){
-    var tr = meanRadiantTemp(surf);
+  function compute(){
+    var wallSurf = wallSurfaces();
+    var ceil = ceilingSurface();
+    var mrt = meanRadiantTemp(wallSurf, ceil);
     var clo = CLOTHING[state.clo].clo, met = ACTIVITY[state.met].met;
-    var r = pmvPpd(state.ta, tr, Math.max(state.vel, 0.001), state.rh, met, clo, 0);
-    var to = (state.ta + tr) / 2;
-    return { tr: tr, to: to, pmv: r.pmv, ppd: r.ppd, L: r.L, M: r.M, clo: clo, met: met, surf: surf };
+    var r = pmvPpd(state.ta, mrt.tr, Math.max(state.vel, 0.001), state.rh, met, clo, 0);
+    var to = (state.ta + mrt.tr) / 2;
+    var loss = heatLossShare(wallSurf, ceil);
+    return { tr: mrt.tr, factors: mrt.factors, to: to, pmv: r.pmv, ppd: r.ppd, L: r.L, M: r.M, clo: clo, met: met,
+      wallSurf: wallSurf, ceil: ceil, loss: loss };
   }
 
   // ---- temperature -> theme-aware color ----
@@ -438,165 +475,208 @@
     return 'color-mix(in srgb, var(--bad) ' + pct2.toFixed(1) + '%, var(--line2))';
   }
 
-  // ---- hero room geometry ----
+  // ---- hero: top-down floor plan ----
   var heroWrap = $('heroWrap'), heroSvg = $('heroSvg');
-  var roomBg = $('roomBg'), bandWindow = $('bandWindow'), bandGlass = $('bandGlass'), bandWall = $('bandWall'), bandCeil = $('bandCeil'), bandFloor = $('bandFloor'), roomOutline = $('roomOutline');
-  var rayWindow = $('rayWindow'), rayExtWall = $('rayExtWall'), rayWall = $('rayWall'), rayCeil = $('rayCeil'), rayFloor = $('rayFloor');
-  var personG = $('personG'), personHead = $('personHead'), personBody = $('personBody'), personHit = $('personHit');
-  var lblCeil = $('lblCeil'), lblFloor = $('lblFloor'), lblExtWall = $('lblExtWall'), lblWindow = $('lblWindow'), lblWall = $('lblWall'), lblAir = $('lblAir');
   var heroW = 0;
 
-  function geomRoom(w){
-    var narrow = w < 620;
-    var vbH = narrow ? 190 : 230;
-    var top = 14, bottom = vbH - 14, left = 8, right = w - 8;
-    var ceilH = narrow ? 16 : 22, floorH = narrow ? 16 : 22;
-    var windowW = narrow ? 26 : 40, wallW = narrow ? 22 : 32;
-    var roomLeft = left + windowW, roomRight = right - wallW;
-    var roomTop = top + ceilH, roomBot = bottom - floorH;
-    var spanLeft = roomLeft + 16, spanRight = roomRight - 16;
-    var personY = roomBot - 2;
-    return { vbW:w, vbH:vbH, top:top, bottom:bottom, left:left, right:right, ceilH:ceilH, floorH:floorH,
-      windowW:windowW, wallW:wallW, roomLeft:roomLeft, roomRight:roomRight, roomTop:roomTop, roomBot:roomBot,
-      spanLeft:spanLeft, spanRight:spanRight, personY:personY };
+  function geomPlan(w){
+    var vbH = clamp(Math.round(w * 0.62), 210, 380);
+    var wallT = w < 620 ? 15 : 20;
+    var pad = 8;
+    var left = pad, right = w - pad, top = pad, bottom = vbH - pad;
+    var roomLeft = left + wallT, roomRight = right - wallT, roomTop = top + wallT, roomBot = bottom - wallT;
+    var roomW = roomRight - roomLeft, roomH = roomBot - roomTop;
+    var spanX0 = roomLeft + 16, spanX1 = roomRight - 16, spanY0 = roomTop + 16, spanY1 = roomBot - 16;
+    return { vbW:w, vbH:vbH, wallT:wallT, left:left, right:right, top:top, bottom:bottom,
+      roomLeft:roomLeft, roomRight:roomRight, roomTop:roomTop, roomBot:roomBot, roomW:roomW, roomH:roomH,
+      spanX0:spanX0, spanX1:spanX1, spanY0:spanY0, spanY1:spanY1 };
+  }
+  function wallBandGeom(k, h){
+    if (k === 'N') return { x:h.roomLeft, y:h.top, w:h.roomW, h:h.wallT };
+    if (k === 'S') return { x:h.roomLeft, y:h.roomBot, w:h.roomW, h:h.wallT };
+    if (k === 'W') return { x:h.left, y:h.roomTop, w:h.wallT, h:h.roomH };
+    return { x:h.roomRight, y:h.roomTop, w:h.wallT, h:h.roomH }; // E
+  }
+  function windowBandGeom(k, h, winLen){
+    if (k === 'N') return { x:h.roomLeft + (h.roomW - winLen) / 2, y:h.top, w:winLen, h:h.wallT };
+    if (k === 'S') return { x:h.roomLeft + (h.roomW - winLen) / 2, y:h.roomBot, w:winLen, h:h.wallT };
+    if (k === 'W') return { x:h.left, y:h.roomTop + (h.roomH - winLen) / 2, w:h.wallT, h:winLen };
+    return { x:h.roomRight, y:h.roomTop + (h.roomH - winLen) / 2, w:h.wallT, h:winLen }; // E
+  }
+  function wallRayTargets(k, h){
+    if (k === 'N') return { opaque:{ x:h.roomLeft + h.roomW * 0.15, y:h.roomTop }, window:{ x:h.roomLeft + h.roomW * 0.5, y:h.roomTop } };
+    if (k === 'S') return { opaque:{ x:h.roomLeft + h.roomW * 0.15, y:h.roomBot }, window:{ x:h.roomLeft + h.roomW * 0.5, y:h.roomBot } };
+    if (k === 'W') return { opaque:{ x:h.roomLeft, y:h.roomTop + h.roomH * 0.15 }, window:{ x:h.roomLeft, y:h.roomTop + h.roomH * 0.5 } };
+    return { opaque:{ x:h.roomRight, y:h.roomTop + h.roomH * 0.15 }, window:{ x:h.roomRight, y:h.roomTop + h.roomH * 0.5 } }; // E
   }
 
-  function drawHero(surf){
+  // build static SVG structure once
+  var roomBg = svgEl('rect', { fill:'var(--bg)' }); heroSvg.appendChild(roomBg);
+  var bandOpaque = {}, bandWindow = {}, rayOpaque = {}, rayWindow = {};
+  WALL_ORDER.forEach(function(k){
+    bandOpaque[k] = svgEl('rect', { stroke:'var(--line2)', 'stroke-width':1 }); heroSvg.appendChild(bandOpaque[k]);
+  });
+  WALL_ORDER.forEach(function(k){
+    bandWindow[k] = svgEl('rect', { stroke:'var(--line2)', 'stroke-width':1 }); heroSvg.appendChild(bandWindow[k]);
+  });
+  var roomOutline = svgEl('rect', { fill:'none', stroke:'var(--line2)', 'stroke-width':1.25 }); heroSvg.appendChild(roomOutline);
+  WALL_ORDER.forEach(function(k){
+    rayOpaque[k] = svgEl('line', { 'stroke-linecap':'round' }); heroSvg.appendChild(rayOpaque[k]);
+    rayWindow[k] = svgEl('line', { 'stroke-linecap':'round' }); heroSvg.appendChild(rayWindow[k]);
+  });
+  var personG = svgEl('g', { class:'roomdrag', tabindex:0, role:'slider',
+    'aria-label':'Person’s position in the room — drag, or use arrow keys' });
+  var personHead = svgEl('circle', { fill:'var(--fg)' });
+  var personBody = svgEl('path', { fill:'var(--fg)' });
+  var personHit = svgEl('circle', { fill:'transparent', r:18 });
+  personG.appendChild(personHead); personG.appendChild(personBody); personG.appendChild(personHit);
+  heroSvg.appendChild(personG);
+
+  // label overlays (HTML, percentage-positioned)
+  function makeLbl(cls){ var d = document.createElement('div'); d.className = cls; heroWrap.appendChild(d); return d; }
+  var lblWall = { N:makeLbl('lbl'), E:makeLbl('lbl'), S:makeLbl('lbl'), W:makeLbl('lbl') };
+  var lblInfo1 = makeLbl('infolbl'), lblInfo2 = makeLbl('infolbl');
+
+  function wallLabelText(k, s){
+    var w = state.walls[k];
+    if (w.type === 'interior') return k + ' int ' + cFmt(s.opaqueTemp);
+    var txt = k + ' ext ' + cFmt(s.opaqueTemp);
+    if (s.glazing > 0) txt += ' · win ' + cFmt(s.windowTemp);
+    return txt;
+  }
+
+  function drawHero(r){
     var w = heroW || heroWrap.clientWidth || 1100;
-    var h = geomRoom(w);
+    var h = geomPlan(w);
     heroSvg.setAttribute('viewBox', '0 0 ' + w + ' ' + h.vbH);
     heroSvg.setAttribute('preserveAspectRatio', 'none');
 
-    roomBg.setAttribute('x', h.left); roomBg.setAttribute('y', h.top);
-    roomBg.setAttribute('width', h.right - h.left); roomBg.setAttribute('height', h.bottom - h.top);
+    roomBg.setAttribute('x', h.roomLeft); roomBg.setAttribute('y', h.roomTop);
+    roomBg.setAttribute('width', h.roomW); roomBg.setAttribute('height', h.roomH);
 
-    var bandH = h.bottom - h.top;
-    var glazingFrac = clamp(state.glazing / 100, 0, 1);
-    var winH = bandH * glazingFrac;
-    var winY = h.top + (bandH - winH) / 2;
+    WALL_ORDER.forEach(function(k){
+      var geo = wallBandGeom(k, h);
+      var s = r.wallSurf[k];
+      bandOpaque[k].setAttribute('x', geo.x); bandOpaque[k].setAttribute('y', geo.y);
+      bandOpaque[k].setAttribute('width', geo.w); bandOpaque[k].setAttribute('height', geo.h);
+      bandOpaque[k].setAttribute('fill', tempColorStyle(s.opaqueTemp));
 
-    bandWindow.setAttribute('x', h.left); bandWindow.setAttribute('y', h.top);
-    bandWindow.setAttribute('width', h.windowW); bandWindow.setAttribute('height', bandH);
-    bandWindow.setAttribute('fill', tempColorStyle(surf.tExtWall));
+      if (s.glazing > 0){
+        var winLen = (k === 'N' || k === 'S') ? h.roomW * s.glazing : h.roomH * s.glazing;
+        var wg = windowBandGeom(k, h, winLen);
+        bandWindow[k].setAttribute('x', wg.x); bandWindow[k].setAttribute('y', wg.y);
+        bandWindow[k].setAttribute('width', wg.w); bandWindow[k].setAttribute('height', wg.h);
+        bandWindow[k].setAttribute('fill', tempColorStyle(s.windowTemp));
+        bandWindow[k].setAttribute('opacity', 1);
+      } else {
+        bandWindow[k].setAttribute('opacity', 0);
+      }
+    });
 
-    bandGlass.setAttribute('x', h.left); bandGlass.setAttribute('y', winY);
-    bandGlass.setAttribute('width', h.windowW); bandGlass.setAttribute('height', winH);
-    bandGlass.setAttribute('fill', tempColorStyle(surf.tWindow));
+    roomOutline.setAttribute('x', h.roomLeft); roomOutline.setAttribute('y', h.roomTop);
+    roomOutline.setAttribute('width', h.roomW); roomOutline.setAttribute('height', h.roomH);
 
-    bandWall.setAttribute('x', h.right - h.wallW); bandWall.setAttribute('y', h.top);
-    bandWall.setAttribute('width', h.wallW); bandWall.setAttribute('height', bandH);
-    bandWall.setAttribute('fill', tempColorStyle(state.tWall));
+    var px = h.spanX0 + state.personX * (h.spanX1 - h.spanX0);
+    var py = h.spanY0 + state.personY * (h.spanY1 - h.spanY0);
+    personHead.setAttribute('cx', px); personHead.setAttribute('cy', py - 9); personHead.setAttribute('r', 5.5);
+    personBody.setAttribute('d', 'M ' + (px-6) + ' ' + (py+9) + ' L ' + (px+6) + ' ' + (py+9) + ' L ' + (px+4) + ' ' + (py-3) + ' L ' + (px-4) + ' ' + (py-3) + ' Z');
+    personHit.setAttribute('cx', px); personHit.setAttribute('cy', py);
 
-    bandCeil.setAttribute('x', h.left); bandCeil.setAttribute('y', h.top);
-    bandCeil.setAttribute('width', h.right - h.left); bandCeil.setAttribute('height', h.ceilH);
-    bandCeil.setAttribute('fill', tempColorStyle(state.tCeil));
-
-    bandFloor.setAttribute('x', h.left); bandFloor.setAttribute('y', h.bottom - h.floorH);
-    bandFloor.setAttribute('width', h.right - h.left); bandFloor.setAttribute('height', h.floorH);
-    bandFloor.setAttribute('fill', tempColorStyle(state.tFloor));
-
-    roomOutline.setAttribute('x', h.left); roomOutline.setAttribute('y', h.top);
-    roomOutline.setAttribute('width', h.right - h.left); roomOutline.setAttribute('height', h.bottom - h.top);
-
-    var px = h.spanLeft + state.personX * (h.spanRight - h.spanLeft);
-    var py = h.personY;
-    personHead.setAttribute('cx', px); personHead.setAttribute('cy', py - 21); personHead.setAttribute('r', 5.5);
-    personBody.setAttribute('d', 'M ' + (px-6) + ' ' + py + ' L ' + (px+6) + ' ' + py + ' L ' + (px+4) + ' ' + (py-15) + ' L ' + (px-4) + ' ' + (py-15) + ' Z');
-    personHit.setAttribute('cx', px); personHit.setAttribute('cy', py - 10);
-
-    var f = angleFactors(state.personX, glazingFrac);
-    function ray(line, x2, y2, factor, temp){
-      line.setAttribute('x1', px); line.setAttribute('y1', py - 10);
+    function setRay(line, x2, y2, factor, temp, visible){
+      line.setAttribute('x1', px); line.setAttribute('y1', py);
       line.setAttribute('x2', x2); line.setAttribute('y2', y2);
       line.setAttribute('stroke-width', (2 + factor * 44).toFixed(1));
       line.setAttribute('stroke', tempColorStyle(temp));
-      line.setAttribute('opacity', 0.55);
+      line.setAttribute('opacity', visible ? 0.55 : 0);
     }
-    var wallStripY = h.top + (winY - h.top) / 2;
-    ray(rayWindow, h.roomLeft, winY + winH / 2, f.window, surf.tWindow);
-    ray(rayExtWall, h.roomLeft, wallStripY, f.extWall, surf.tExtWall);
-    ray(rayWall, h.roomRight, py - 10, f.wall, state.tWall);
-    ray(rayCeil, px, h.roomTop, f.ceil, state.tCeil);
-    ray(rayFloor, px, h.roomBot, f.floor, state.tFloor);
+    WALL_ORDER.forEach(function(k){
+      var target = wallRayTargets(k, h);
+      var s = r.wallSurf[k], f = r.factors.wall[k];
+      setRay(rayOpaque[k], target.opaque.x, target.opaque.y, f.opaque, s.opaqueTemp, true);
+      setRay(rayWindow[k], target.window.x, target.window.y, f.window, s.windowTemp || state.ta, s.glazing > 0);
+    });
 
     var pctX = function(x){ return (x / w * 100) + '%'; };
     var pctY = function(y){ return (y / h.vbH * 100) + '%'; };
-    lblCeil.style.left = pctX((h.roomLeft + h.roomRight) / 2); lblCeil.style.top = pctY(h.top + 3);
-    lblCeil.style.transform = 'translateX(-50%)';
-    lblCeil.textContent = 'Ceiling ' + cFmt(state.tCeil);
-    lblFloor.style.left = pctX((h.roomLeft + h.roomRight) / 2); lblFloor.style.top = pctY(h.bottom - h.floorH + 3);
-    lblFloor.style.transform = 'translateX(-50%)';
-    lblFloor.textContent = 'Floor ' + cFmt(state.tFloor);
-    lblExtWall.style.left = pctX(h.left + 3); lblExtWall.style.top = pctY(h.roomTop + 4);
-    lblExtWall.style.transform = 'translateX(0)';
-    lblExtWall.textContent = 'Wall ' + cFmt(surf.tExtWall);
-    lblWindow.style.left = pctX(h.left + 3); lblWindow.style.top = pctY(h.roomTop + 42);
-    lblWindow.style.transform = 'translateX(0)';
-    lblWindow.textContent = 'Window ' + cFmt(surf.tWindow);
-    lblWall.style.left = pctX(h.right - 3); lblWall.style.top = pctY(h.roomTop + 4);
-    lblWall.style.transform = 'translateX(-100%)';
-    lblWall.textContent = 'Interior wall ' + cFmt(state.tWall);
-    lblAir.style.left = pctX((h.roomLeft + h.roomRight) / 2); lblAir.style.top = pctY(h.roomTop + 26);
-    lblAir.style.transform = 'translateX(-50%)';
-    lblAir.textContent = 'In ' + cFmt(state.ta) + ' · Out ' + cFmt(state.tOut) + ' · ' + Math.round(state.rh) + '% RH · ' + state.vel.toFixed(2) + ' m/s';
+    lblWall.N.style.left = pctX((h.roomLeft + h.roomRight) / 2); lblWall.N.style.top = pctY(h.roomTop + 4);
+    lblWall.N.style.transform = 'translateX(-50%)';
+    lblWall.N.textContent = wallLabelText('N', r.wallSurf.N);
+    lblWall.S.style.left = pctX((h.roomLeft + h.roomRight) / 2); lblWall.S.style.top = pctY(h.roomBot - 4);
+    lblWall.S.style.transform = 'translate(-50%,-100%)';
+    lblWall.S.textContent = wallLabelText('S', r.wallSurf.S);
+    lblWall.W.style.left = pctX(h.roomLeft + 4); lblWall.W.style.top = pctY((h.roomTop + h.roomBot) / 2);
+    lblWall.W.style.transform = 'translateY(-50%)';
+    lblWall.W.textContent = wallLabelText('W', r.wallSurf.W);
+    lblWall.E.style.left = pctX(h.roomRight - 4); lblWall.E.style.top = pctY((h.roomTop + h.roomBot) / 2);
+    lblWall.E.style.transform = 'translate(-100%,-50%)';
+    lblWall.E.textContent = wallLabelText('E', r.wallSurf.E);
+
+    lblInfo1.style.left = pctX((h.roomLeft + h.roomRight) / 2); lblInfo1.style.top = pctY(h.roomTop + 22);
+    lblInfo1.style.transform = 'translateX(-50%)';
+    lblInfo1.textContent = (state.ceilType === 'roof' ? 'Roof ' : 'Ceiling ') + cFmt(r.ceil.temp) + ' · Floor ' + cFmt(state.tFloor);
+    lblInfo2.style.left = pctX((h.roomLeft + h.roomRight) / 2); lblInfo2.style.top = pctY(h.roomTop + 36);
+    lblInfo2.style.transform = 'translateX(-50%)';
+    lblInfo2.textContent = 'In ' + cFmt(state.ta) + ' · Out ' + cFmt(state.tOut) + ' · ' + Math.round(state.rh) + '% RH · ' + state.vel.toFixed(2) + ' m/s';
   }
 
-  // ---- person drag ----
+  // ---- person drag (2D) ----
   (function(){
     var dragging = false;
-    function setFromClientX(clientX){
-      var r = heroSvg.getBoundingClientRect();
+    function setFromClient(clientX, clientY){
+      var rect = heroSvg.getBoundingClientRect();
       var w = heroW || heroWrap.clientWidth || 1100;
-      var scaleX = r.width / w;
-      var h = geomRoom(w);
-      var localX = (clientX - r.left) / scaleX;
-      var f = clamp((localX - h.spanLeft) / (h.spanRight - h.spanLeft), 0, 1);
-      state.personX = Math.round(f * 100) / 100;
+      var h = geomPlan(w);
+      var scaleX = rect.width / w, scaleY = rect.height / h.vbH;
+      var localX = (clientX - rect.left) / scaleX, localY = (clientY - rect.top) / scaleY;
+      var fx = clamp((localX - h.spanX0) / (h.spanX1 - h.spanX0), 0, 1);
+      var fy = clamp((localY - h.spanY0) / (h.spanY1 - h.spanY0), 0, 1);
+      state.personX = Math.round(fx * 100) / 100;
+      state.personY = Math.round(fy * 100) / 100;
       render();
     }
     personG.addEventListener('pointerdown', function(e){
       dragging = true;
       if (personG.setPointerCapture) personG.setPointerCapture(e.pointerId);
-      setFromClientX(e.clientX);
+      setFromClient(e.clientX, e.clientY);
     });
-    personG.addEventListener('pointermove', function(e){ if (dragging) setFromClientX(e.clientX); });
+    personG.addEventListener('pointermove', function(e){ if (dragging) setFromClient(e.clientX, e.clientY); });
     function endDrag(){ dragging = false; }
     personG.addEventListener('pointerup', endDrag);
     personG.addEventListener('pointercancel', endDrag);
     personG.addEventListener('keydown', function(e){
       var step = e.shiftKey ? 0.1 : 0.02;
-      var v = null;
-      if (e.key === 'ArrowLeft') v = state.personX - step;
-      else if (e.key === 'ArrowRight') v = state.personX + step;
-      else if (e.key === 'Home') v = 0;
-      else if (e.key === 'End') v = 1;
-      if (v !== null){ e.preventDefault(); state.personX = clamp(Math.round(v*100)/100, 0, 1); render(); }
+      var vx = null, vy = null;
+      if (e.key === 'ArrowLeft') vx = state.personX - step;
+      else if (e.key === 'ArrowRight') vx = state.personX + step;
+      else if (e.key === 'ArrowUp') vy = state.personY - step;
+      else if (e.key === 'ArrowDown') vy = state.personY + step;
+      else if (e.key === 'Home'){ vx = 0.5; vy = 0.5; }
+      if (vx !== null || vy !== null){
+        e.preventDefault();
+        if (vx !== null) state.personX = clamp(Math.round(vx * 100) / 100, 0, 1);
+        if (vy !== null) state.personY = clamp(Math.round(vy * 100) / 100, 0, 1);
+        render();
+      }
     });
   })();
+  function drawPersonAria(){
+    personG.setAttribute('aria-valuemin', 0);
+    personG.setAttribute('aria-valuemax', 100);
+    personG.setAttribute('aria-valuenow', Math.round(state.personX * 100));
+    personG.setAttribute('aria-valuetext',
+      Math.round(state.personX * 100) + '% from the west wall, ' + Math.round(state.personY * 100) + '% from the north wall');
+  }
 
-  // ---- generic mini sliders ----
-  var SLIDER_DEFS = [
-    { key:'ta', parent:'airSliders', label:'Air temperature', lo:15, hi:30, step:0.5, fmt:cFmt, unitText:'degrees Celsius' },
-    { key:'rh', parent:'airSliders', label:'Relative humidity', lo:10, hi:80, step:1, fmt:function(v){ return Math.round(v)+'%'; }, unitText:'percent' },
-    { key:'vel', parent:'airSliders', label:'Air speed', lo:0, hi:1.0, step:0.05, fmt:function(v){ return v.toFixed(2)+' m/s'; }, unitText:'metres per second' },
-    { key:'tCeil', parent:'surfSliders', label:'Ceiling', lo:15, hi:30, step:0.5, fmt:cFmt, unitText:'degrees Celsius' },
-    { key:'tFloor', parent:'surfSliders', label:'Floor', lo:10, hi:30, step:0.5, fmt:cFmt, unitText:'degrees Celsius' },
-    { key:'tWall', parent:'surfSliders', label:'Interior walls', lo:10, hi:30, step:0.5, fmt:cFmt, unitText:'degrees Celsius' },
-    { key:'tOut', parent:'extSliders', label:'Outdoor temperature', lo:-30, hi:15, step:1, fmt:cFmt, unitText:'degrees Celsius' },
-    { key:'wallR', parent:'extSliders', label:'Wall insulation', lo:2, hi:50, step:1, fmt:function(v){ return 'R-'+Math.round(v); }, unitText:'imperial R-value' },
-    { key:'glazing', parent:'extSliders', label:'Window size', lo:5, hi:70, step:5, fmt:function(v){ return Math.round(v)+'% of wall'; }, unitText:'percent of the exterior wall' },
-    { key:'windowU', parent:'extSliders', label:'Window U-value', lo:0.6, hi:5.8, step:0.1, fmt:function(v){ return v.toFixed(1)+' W/m²K'; }, unitText:'watts per square metre-kelvin' }
-  ];
-  var sliderRefs = {};
-  SLIDER_DEFS.forEach(function(def){
-    var parent = $(def.parent);
+  // ---- generic mini slider (getter/setter based, so it can target nested wall state) ----
+  var sliders = [];
+  function makeMiniSlider(parent, opts){
     var wrap = document.createElement('div'); wrap.className = 'mini';
     var head = document.createElement('div'); head.className = 'mini-head';
-    var label = document.createElement('span'); label.className = 'mini-label'; label.textContent = def.label;
+    var label = document.createElement('span'); label.className = 'mini-label'; label.textContent = opts.label;
     var val = document.createElement('span'); val.className = 'mini-val mono';
     head.appendChild(label); head.appendChild(val);
     var track = document.createElement('div'); track.className = 'mtrack'; track.tabIndex = 0;
-    track.setAttribute('role', 'slider'); track.setAttribute('aria-label', def.label);
+    track.setAttribute('role', 'slider'); track.setAttribute('aria-label', opts.label);
     var rail = document.createElement('div'); rail.className = 'rail';
     var fill = document.createElement('div'); fill.className = 'fill';
     var thumb = document.createElement('div'); thumb.className = 'thumb';
@@ -605,11 +685,11 @@
     parent.appendChild(wrap);
 
     function setFromClientX(clientX){
-      var r = track.getBoundingClientRect();
-      var f = clamp((clientX - r.left) / r.width, 0, 1);
-      var v = def.lo + f * (def.hi - def.lo);
-      v = clamp(Math.round(v / def.step) * def.step, def.lo, def.hi);
-      state[def.key] = v; render();
+      var rect = track.getBoundingClientRect();
+      var f = clamp((clientX - rect.left) / rect.width, 0, 1);
+      var v = opts.lo + f * (opts.hi - opts.lo);
+      v = clamp(Math.round(v / opts.step) * opts.step, opts.lo, opts.hi);
+      opts.set(v); render();
     }
     var dragging = false;
     track.addEventListener('pointerdown', function(e){ dragging = true; if (track.setPointerCapture) track.setPointerCapture(e.pointerId); setFromClientX(e.clientX); });
@@ -617,47 +697,100 @@
     function end(){ dragging = false; }
     track.addEventListener('pointerup', end); track.addEventListener('pointercancel', end);
     track.addEventListener('keydown', function(e){
-      var step = e.shiftKey ? def.step * 5 : def.step;
-      var cur = state[def.key], v = null;
+      var step = e.shiftKey ? opts.step * 5 : opts.step;
+      var cur = opts.get(), v = null;
       if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') v = cur - step;
       else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') v = cur + step;
-      else if (e.key === 'Home') v = def.lo;
-      else if (e.key === 'End') v = def.hi;
-      if (v !== null){ e.preventDefault(); state[def.key] = clamp(Math.round(v/def.step)*def.step, def.lo, def.hi); render(); }
+      else if (e.key === 'Home') v = opts.lo;
+      else if (e.key === 'End') v = opts.hi;
+      if (v !== null){ e.preventDefault(); opts.set(clamp(Math.round(v / opts.step) * opts.step, opts.lo, opts.hi)); render(); }
     });
 
-    sliderRefs[def.key] = { track:track, fill:fill, thumb:thumb, val:val, def:def };
-  });
-
-  function drawSliders(){
-    Object.keys(sliderRefs).forEach(function(key){
-      var ref = sliderRefs[key], def = ref.def, cur = state[key];
-      var pct = ((cur - def.lo) / (def.hi - def.lo) * 100).toFixed(2) + '%';
-      ref.fill.style.width = pct; ref.thumb.style.left = pct;
-      ref.val.textContent = def.fmt(cur);
-      ref.track.setAttribute('aria-valuemin', def.lo);
-      ref.track.setAttribute('aria-valuemax', def.hi);
-      ref.track.setAttribute('aria-valuenow', cur);
-      ref.track.setAttribute('aria-valuetext', def.fmt(cur));
-    });
+    var slider = {
+      wrap: wrap,
+      draw: function(){
+        var cur = opts.get();
+        var pct = ((cur - opts.lo) / (opts.hi - opts.lo) * 100).toFixed(2) + '%';
+        fill.style.width = pct; thumb.style.left = pct;
+        val.textContent = opts.fmt(cur);
+        track.setAttribute('aria-valuemin', opts.lo);
+        track.setAttribute('aria-valuemax', opts.hi);
+        track.setAttribute('aria-valuenow', cur);
+        track.setAttribute('aria-valuetext', opts.fmt(cur));
+      }
+    };
+    sliders.push(slider);
+    return slider;
   }
+
+  function makePillPicker(parent, options, get, set){
+    var box = document.createElement('div'); box.className = 'pill-buttons';
+    parent.appendChild(box);
+    options.forEach(function(opt){
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = opt.label;
+      b.addEventListener('click', function(){ set(opt.value); render(); });
+      box.appendChild(b);
+    });
+    return {
+      draw: function(){
+        var cur = get();
+        Array.prototype.forEach.call(box.children, function(b, i){ b.setAttribute('aria-pressed', options[i].value === cur ? 'true' : 'false'); });
+      }
+    };
+  }
+
+  // ---- Outdoor & envelope sliders ----
+  var envParent = $('envSliders');
+  makeMiniSlider(envParent, { label:'Outdoor temperature', lo:-30, hi:15, step:1, fmt:cFmt,
+    get:function(){ return state.tOut; }, set:function(v){ state.tOut = v; } });
+  makeMiniSlider(envParent, { label:'Window U-value', lo:0.6, hi:5.8, step:0.1, fmt:function(v){ return v.toFixed(1) + ' W/m²K'; },
+    get:function(){ return state.windowU; }, set:function(v){ state.windowU = v; } });
+  makeMiniSlider(envParent, { label:'Floor temperature', lo:10, hi:30, step:0.5, fmt:cFmt,
+    get:function(){ return state.tFloor; }, set:function(v){ state.tFloor = v; } });
+
+  var ceilTypePicker = makePillPicker($('ceilTypeButtons'), [
+    { label:'Interior', value:'interior' }, { label:'Roof', value:'roof' }
+  ], function(){ return state.ceilType; }, function(v){ state.ceilType = v; });
+  var ceilParent = $('ceilSliders');
+  var ceilTempSlider = makeMiniSlider(ceilParent, { label:'Ceiling temperature', lo:15, hi:30, step:0.5, fmt:cFmt,
+    get:function(){ return state.tCeil; }, set:function(v){ state.tCeil = v; } });
+  var roofRSlider = makeMiniSlider(ceilParent, { label:'Roof insulation (R-value)', lo:10, hi:60, step:1, fmt:function(v){ return 'R-' + Math.round(v); },
+    get:function(){ return state.roofR; }, set:function(v){ state.roofR = v; } });
+
+  // ---- Air sliders ----
+  var airParent = $('airSliders');
+  makeMiniSlider(airParent, { label:'Air temperature', lo:15, hi:30, step:0.5, fmt:cFmt,
+    get:function(){ return state.ta; }, set:function(v){ state.ta = v; } });
+  makeMiniSlider(airParent, { label:'Relative humidity', lo:10, hi:80, step:1, fmt:function(v){ return Math.round(v) + '%'; },
+    get:function(){ return state.rh; }, set:function(v){ state.rh = v; } });
+  makeMiniSlider(airParent, { label:'Air speed', lo:0, hi:1.0, step:0.05, fmt:function(v){ return v.toFixed(2) + ' m/s'; },
+    get:function(){ return state.vel; }, set:function(v){ state.vel = v; } });
+
+  // ---- wall cards ----
+  var wallGrid = $('wallGrid');
+  var wallCardRefs = {};
+  WALL_ORDER.forEach(function(k){
+    var card = document.createElement('div'); card.className = 'wall-card';
+    var title = document.createElement('div'); title.className = 'ctrl-title'; title.textContent = WALL_NAMES[k];
+    card.appendChild(title);
+    var typePicker = makePillPicker(card, [
+      { label:'Interior', value:'interior' }, { label:'Exterior', value:'exterior' }
+    ], function(){ return state.walls[k].type; }, function(v){ state.walls[k].type = v; });
+    var tempSlider = makeMiniSlider(card, { label:WALL_NAMES[k] + ' temperature', lo:10, hi:30, step:0.5, fmt:cFmt,
+      get:function(){ return state.walls[k].temp; }, set:function(v){ state.walls[k].temp = v; } });
+    var rSlider = makeMiniSlider(card, { label:WALL_NAMES[k] + ' insulation (R-value)', lo:2, hi:50, step:1, fmt:function(v){ return 'R-' + Math.round(v); },
+      get:function(){ return state.walls[k].R; }, set:function(v){ state.walls[k].R = v; } });
+    var glazSlider = makeMiniSlider(card, { label:WALL_NAMES[k] + ' window size', lo:0, hi:70, step:5, fmt:function(v){ return v === 0 ? 'no window' : Math.round(v) + '% of wall'; },
+      get:function(){ return state.walls[k].glazing; }, set:function(v){ state.walls[k].glazing = v; } });
+    wallGrid.appendChild(card);
+    wallCardRefs[k] = { typePicker:typePicker, tempSlider:tempSlider, rSlider:rSlider, glazSlider:glazSlider };
+  });
 
   // ---- clothing / activity pickers ----
-  var cloButtons = $('cloButtons'), metButtons = $('metButtons');
-  CLOTHING.forEach(function(c, i){
-    var b = document.createElement('button'); b.type = 'button'; b.textContent = c.name;
-    b.addEventListener('click', function(){ state.clo = i; render(); });
-    cloButtons.appendChild(b);
-  });
-  ACTIVITY.forEach(function(a, i){
-    var b = document.createElement('button'); b.type = 'button'; b.textContent = a.name;
-    b.addEventListener('click', function(){ state.met = i; render(); });
-    metButtons.appendChild(b);
-  });
-  function drawPickers(){
-    Array.prototype.forEach.call(cloButtons.children, function(b, i){ b.setAttribute('aria-pressed', i === state.clo ? 'true' : 'false'); });
-    Array.prototype.forEach.call(metButtons.children, function(b, i){ b.setAttribute('aria-pressed', i === state.met ? 'true' : 'false'); });
-  }
+  var cloPicker = makePillPicker($('cloButtons'), CLOTHING.map(function(c, i){ return { label:c.name, value:i }; }),
+    function(){ return state.clo; }, function(v){ state.clo = v; });
+  var metPicker = makePillPicker($('metButtons'), ACTIVITY.map(function(a, i){ return { label:a.name, value:i }; }),
+    function(){ return state.met; }, function(v){ state.met = v; });
 
   // ---- equation + legend ----
   var Mterm1 = $('Mterm1'), Mterm2 = $('Mterm2'), Lterm = $('Lterm');
@@ -697,6 +830,17 @@
   function pmvLabelText(v){ for (var i=0;i<LEVELS.length;i++){ if (v <= LEVELS[i].max) return LEVELS[i].label; } return 'Hot'; }
   function pos(v){ return clamp((v - GMIN) / (GMAX - GMIN), 0, 1) * 100; }
 
+  function coldestSurface(r){
+    var candidates = [{ name:state.ceilType === 'roof' ? 'roof' : 'ceiling', temp:r.ceil.temp }, { name:'floor', temp:state.tFloor }];
+    WALL_ORDER.forEach(function(k){
+      var s = r.wallSurf[k];
+      candidates.push({ name:k + ' wall', temp:s.opaqueTemp });
+      if (s.glazing > 0) candidates.push({ name:k + ' window', temp:s.windowTemp });
+    });
+    candidates.sort(function(a, b){ return a.temp - b.temp; });
+    return candidates[0];
+  }
+
   function drawResult(r){
     var compliant = r.pmv >= -0.5 && r.pmv <= 0.5 && r.ppd <= 10;
     var resultColor = compliant ? 'var(--fg)' : 'var(--bad)';
@@ -734,35 +878,72 @@
       gBand.dataset.built = '1';
     }
 
-    auxLineEl.textContent = 'Mean radiant ' + r.tr.toFixed(1) + '°C · Operative ' + r.to.toFixed(1) + '°C · Wall surface ' + r.surf.tExtWall.toFixed(1) + '°C · Window surface ' + r.surf.tWindow.toFixed(1) + '°C';
-    auxLine2El.textContent = 'The window is ' + Math.round(state.glazing) + '% of that wall’s area, but carries ' + r.surf.shareWindow.toFixed(0) + '% of its heat loss.';
+    var cold = coldestSurface(r);
+    auxLineEl.textContent = 'Mean radiant ' + r.tr.toFixed(1) + '°C · Operative ' + r.to.toFixed(1) + '°C · Coldest surface: ' + cold.name + ' at ' + cFmt(cold.temp);
+    auxLine2El.textContent = r.loss.anyWindow
+      ? ('Windows carry ' + r.loss.shareWindow.toFixed(0) + '% of the whole envelope’s heat loss.')
+      : 'No exterior wall currently has a window.';
 
-    // local-discomfort flags (simplified proxies, see note)
+    // local-discomfort flags (simplified proxies, see note) — can fire for more than one wall
     var flags = [];
     if (state.vel > 0.15 && state.ta < 22.5) flags.push('Draft risk — air speed at this temperature may register as a chilling draft, not just cool air.');
     if (state.tFloor < 19 || state.tFloor > 29) flags.push('Floor temperature (' + cFmt(state.tFloor) + ') is outside ASHRAE 55’s comfortable 19–29°C range for bare or lightly-shod feet.');
-    var effAsym = (state.tWall - r.surf.tWindow) * (0.4 + 0.6 * (1 - state.personX));
-    if (r.surf.tWindow < state.tWall && effAsym > 5) flags.push('Cold-window asymmetry (≈' + effAsym.toFixed(1) + '°C) may feel uncomfortable here even though PMV alone looks fine.');
+    var dist = { N:state.personY, S:1 - state.personY, W:state.personX, E:1 - state.personX };
+    WALL_ORDER.forEach(function(k){
+      var w = state.walls[k], s = r.wallSurf[k];
+      if (w.type !== 'exterior') return;
+      var coldestHere = s.glazing > 0 ? Math.min(s.opaqueTemp, s.windowTemp) : s.opaqueTemp;
+      var proximity = 1 - dist[k];
+      var asym = (state.ta - coldestHere) * (0.4 + 0.6 * proximity);
+      if (asym > 5) flags.push(WALL_NAMES[k] + ' radiant asymmetry (≈' + asym.toFixed(1) + '°C) may feel uncomfortable here even though PMV alone looks fine.');
+    });
     flagsEl.innerHTML = '';
     if (flags.length === 0){
       var d = document.createElement('div'); d.className = 'flag ok'; d.textContent = 'No local-discomfort flags at this position.';
       flagsEl.appendChild(d);
     } else {
-      flags.forEach(function(f){ var d = document.createElement('div'); d.className = 'flag'; d.textContent = '⚠ ' + f; flagsEl.appendChild(d); });
+      flags.forEach(function(f){ var d2 = document.createElement('div'); d2.className = 'flag'; d2.textContent = '⚠ ' + f; flagsEl.appendChild(d2); });
     }
   }
 
   // ---- presets ----
   var PRESETS = {
-    cozy:   { ta:22, tOut:-10, wallR:20, windowU:1.8, glazing:25, tCeil:22, tFloor:21, tWall:21, rh:40, vel:0.10, personX:0.5, clo:3, met:2 },
-    window: { ta:22, tOut:-20, wallR:12, windowU:2.8, glazing:45, tCeil:22, tFloor:20, tWall:21, rh:40, vel:0.12, personX:0.08, clo:3, met:2 },
-    hot:    { ta:27, tOut:32,  wallR:20, windowU:1.8, glazing:25, tCeil:27, tFloor:26, tWall:26, rh:60, vel:0.05, personX:0.5, clo:2, met:2 },
-    fan:    { ta:29, tOut:34,  wallR:12, windowU:2.8, glazing:40, tCeil:28, tFloor:27, tWall:28, rh:55, vel:0.80, personX:0.5, clo:1, met:1 }
+    cozy: {
+      ta:22, tOut:-10, windowU:1.8, ceilType:'interior', tCeil:22, roofR:50, tFloor:21,
+      walls:{ N:{type:'exterior',temp:21,R:20,glazing:25}, E:{type:'interior',temp:21,R:20,glazing:0}, S:{type:'interior',temp:21,R:20,glazing:0}, W:{type:'interior',temp:21,R:20,glazing:0} },
+      personX:0.5, personY:0.5, rh:40, vel:0.10, clo:3, met:2
+    },
+    window: {
+      ta:22, tOut:-20, windowU:2.8, ceilType:'interior', tCeil:22, roofR:50, tFloor:20,
+      walls:{ N:{type:'exterior',temp:21,R:12,glazing:45}, E:{type:'interior',temp:21,R:20,glazing:0}, S:{type:'interior',temp:21,R:20,glazing:0}, W:{type:'interior',temp:21,R:20,glazing:0} },
+      personX:0.5, personY:0.08, rh:40, vel:0.12, clo:3, met:2
+    },
+    attic: {
+      ta:21, tOut:-15, windowU:1.8, ceilType:'roof', tCeil:22, roofR:20, tFloor:20,
+      walls:{ N:{type:'exterior',temp:21,R:20,glazing:20}, E:{type:'interior',temp:21,R:20,glazing:0}, S:{type:'interior',temp:21,R:20,glazing:0}, W:{type:'interior',temp:21,R:20,glazing:0} },
+      personX:0.5, personY:0.5, rh:40, vel:0.08, clo:3, met:0
+    },
+    corner: {
+      ta:22, tOut:-18, windowU:2.4, ceilType:'interior', tCeil:22, roofR:50, tFloor:20,
+      walls:{ N:{type:'exterior',temp:21,R:15,glazing:30}, E:{type:'interior',temp:21,R:20,glazing:0}, S:{type:'interior',temp:21,R:20,glazing:0}, W:{type:'exterior',temp:21,R:15,glazing:30} },
+      personX:0.12, personY:0.12, rh:40, vel:0.10, clo:3, met:2
+    },
+    fan: {
+      ta:29, tOut:34, windowU:2.8, ceilType:'interior', tCeil:28, roofR:50, tFloor:27,
+      walls:{ N:{type:'exterior',temp:28,R:12,glazing:40}, E:{type:'interior',temp:28,R:20,glazing:0}, S:{type:'interior',temp:28,R:20,glazing:0}, W:{type:'interior',temp:28,R:20,glazing:0} },
+      personX:0.5, personY:0.5, rh:55, vel:0.80, clo:1, met:1
+    }
   };
   document.querySelectorAll('.preset').forEach(function(b){
     b.addEventListener('click', function(){
       var p = PRESETS[b.dataset.p];
-      Object.keys(p).forEach(function(k){ state[k] = p[k]; });
+      Object.keys(p).forEach(function(k){
+        if (k === 'walls'){
+          WALL_ORDER.forEach(function(wk){ state.walls[wk] = { type:p.walls[wk].type, temp:p.walls[wk].temp, R:p.walls[wk].R, glazing:p.walls[wk].glazing }; });
+        } else {
+          state[k] = p[k];
+        }
+      });
       render();
     });
   });
@@ -792,12 +973,23 @@
     if (w && w !== heroW){ heroW = w; render(); }
   }
   function render(){
-    var surf = wallWindowSurfaceTemps();
-    var r = compute(surf);
-    drawHero(surf);
+    var r = compute();
+    drawHero(r);
+    drawPersonAria();
     drawEquationAndLegend(r);
-    drawSliders();
-    drawPickers();
+
+    ceilTempSlider.wrap.style.display = state.ceilType === 'interior' ? '' : 'none';
+    roofRSlider.wrap.style.display = state.ceilType === 'roof' ? '' : 'none';
+    WALL_ORDER.forEach(function(k){
+      var ref = wallCardRefs[k], type = state.walls[k].type;
+      ref.tempSlider.wrap.style.display = type === 'interior' ? '' : 'none';
+      ref.rSlider.wrap.style.display = type === 'exterior' ? '' : 'none';
+      ref.glazSlider.wrap.style.display = type === 'exterior' ? '' : 'none';
+      ref.typePicker.draw();
+    });
+    ceilTypePicker.draw();
+    sliders.forEach(function(s){ s.draw(); });
+    cloPicker.draw(); metPicker.draw();
     drawResult(r);
   }
 
@@ -879,4 +1071,5 @@
   });
 })();
 </script>
+</main>
 </html>

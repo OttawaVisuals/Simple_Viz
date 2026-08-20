@@ -195,7 +195,78 @@ pump page), none started:
 
 ## Current handoff — 2026-08-20
 
-- **`visualizations/thermal-comfort-pmv.html` follow-up pass: wall and window surface
+- **`visualizations/thermal-comfort-pmv.html` second follow-up pass: rebuilt as a top-down
+  floor plan with four independently-configurable walls, plus a roof option for the
+  ceiling**, at Simon's explicit request ("the ceiling could be the roof... a top view... 4
+  walls, that we could select interior or R value + window for"). This superseded the single
+  side-cross-section wall/window from the prior pass — see that entry immediately below for
+  the conduction formulas, which carried over unchanged, just applied per-surface now.
+  - **Room-box state reshaped**: `state.walls` is now `{N,E,S,W}`, each `{type:
+    'interior'|'exterior', temp, R, glazing}` — interior walls keep a direct temperature
+    slider (as the old single interior wall did); exterior walls get an R-value slider and
+    a window-size (glazing %) slider, sharing one global window U-value rather than a
+    per-wall one (kept to one shared slider deliberately, to avoid the control count
+    exploding to 4 walls × 3 window sliders). Ceiling gained the same `type` split
+    (`ceilType: 'interior'|'roof'`) — Roof mode reuses the identical
+    `conductedSurface()` steady-state formula the walls use, just with its own R-value
+    slider (10–60, vs walls' 2–50, since attics commonly run much higher R).
+  - **Angle-factor MRT model generalized to 4 walls**: `angleFactors(x,y,wallSurf)` computes
+    a raw view-factor per wall from the person's 2D position (`dist = {N:y, S:1-y, W:x,
+    E:1-x}`, same `0.06+0.16*(1-dist)` shape as the old 1D model), splits each exterior
+    wall's factor into window/opaque by its own glazing fraction, then normalizes the whole
+    set (4 walls × up to 2 each, plus ceiling, plus floor) to sum to 1 — replacing the old
+    single-window-wall-vs-interior-wall split. This is what makes a corner position with two
+    exterior walls pull t<sub>r</sub> down from two directions at once, verified live: the
+    new "cold corner office" preset (N and W both exterior, person at x=0.12,y=0.12) fires
+    **two simultaneous** radiant-asymmetry flags while PMV alone still reads "meets ASHRAE
+    55" (−0.47, 9.6% PPD) — exactly the gap between the single-number verdict and the
+    room-box's spatial detail that motivated building this as a diagram instead of a
+    calculator.
+  - **Heat-loss-share and coldest-surface readouts generalized to aggregate across every
+    exterior wall (and the roof, if active)**, not just one window wall: `heatLossShare()`
+    sums window vs. opaque flux across all exterior walls using the same illustrative 7 m²
+    per-surface assumption as the prior pass, and `coldestSurface()` scans all wall
+    opaque/window temps plus ceiling/roof and floor to report whichever is actually coldest
+    by name (verified: attic preset correctly reports "N window" as coldest even with a
+    poorly-insulated roof active, since the window still ran colder in that configuration).
+  - **Hero diagram rebuilt from a side elevation to a top-down plan**, north at top: room
+    interior plus four wall bands built as SVG rects via `wallBandGeom()`/`windowBandGeom()`
+    (window rect inset and centered along whichever wall has `glazing>0`, sized
+    proportionally to that wall's own length), 8 possible radiant-ray lines (opaque +
+    window per wall, hidden via `opacity:0` when a wall has no window) fanning from a
+    draggable person to per-wall target points via `wallRayTargets()`. All SVG elements are
+    built once via `createElementNS` in a setup pass (not static markup) since the
+    4-wall/8-ray/window-rect structure repeats too regularly to hand-write four times over.
+  - **Person drag is now 2D** (`personX`,`personY` both 0–1), using the SVG's
+    `getBoundingClientRect()` scaled by both viewBox axes independently (`preserveAspectRatio:
+    none` means x/y scale factors can differ) — arrow keys map naturally to
+    left/right/up/down instead of the old single-axis left/right only, `Home` recenters
+    both axes to 0.5 since a 2D control has no obvious single "home" edge.
+  - **Wall labels condensed to one line each** (`N ext 20.3°C · win 10.5°C` / `E int
+    21.0°C`) after deciding mid-build that stacking a separate wall-temp label and
+    window-temp label per wall (as the old page did for its one window wall) would risk
+    collision four times over instead of once — verified the single-line format never
+    overflows the viewport at 375px even in the corner preset (two walls, both with the
+    longest possible "ext ... · win ..." text), via `getBoundingClientRect()` checks on
+    every label.
+  - **New presets showcasing what a single exterior wall couldn't**: "a top-floor bedroom
+    under an old roof" (`ceilType:'roof'`, R-20 roof, reclining/low-met — verified PMV
+    reaches −1.97 "Cool", driven jointly by the roof and the low metabolic rate, a
+    deliberately atmospheric combination) and "a cold corner office" (described above).
+    Kept "a well-insulated office" and "a desk pushed against the window" from the prior
+    pass (re-expressed in the new per-wall state shape) and folded the old separate
+    "overheated meeting room" preset into "summer heat with a fan on" to hold the total at
+    five, matching the site's typical preset count.
+  - Verified in-browser: DOM/computed-value checks confirmed the physics before trusting
+    any visual (cozy preset: N wall 21.0°C / window 15.1°C matching hand calculation to the
+    tenth of a degree, same as the prior pass's side-view numbers, confirming the refactor
+    didn't change the underlying math for the single-exterior-wall case). Live (non-preset)
+    toggling of a wall's type and the ceiling's type both correctly show/hide their
+    conditional sliders without a page reload. Both themes, desktop (946px) and mobile
+    (375px, including the label-collision check above), no horizontal overflow at either
+    width, no console errors. **Not yet reviewed.**
+
+- **`visualizations/thermal-comfort-pmv.html` first follow-up pass: wall and window surface
   temperatures are now calculated, not set directly**, at Simon's explicit request ("with
   indoor temperature, outdoor temperature and R/U value, can we calculate the surface
   temperatures?"). Replaces the previous page's direct `tWindow` slider with four

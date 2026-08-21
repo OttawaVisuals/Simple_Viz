@@ -34,7 +34,27 @@ and user-agent strings are never stored.
 Under **Compute → Email Service → Email Routing**, add `hello@madeclear.ca` and forward it
 to the same verified destination currently used by `simon@madeclear.ca`.
 
-## 5. Deploy and test
+## 5. Alert email on new feedback (optional)
+
+Each submission can also send a short alert email, via a Cloudflare Email Workers "Send
+Email" binding riding on the Email Routing configured above — no third-party service.
+
+1. In the Pages project, go to **Settings → Functions** and find the **Email Bindings**
+   (a.k.a. "Send Email" binding) section — exact wording may vary by dashboard version.
+2. Add a binding named exactly `FEEDBACK_ALERT`, with its destination address set to the
+   same verified address `hello@madeclear.ca` forwards to.
+3. In **Settings → Variables and Secrets**, add a plain (non-secret) variable named exactly
+   `FEEDBACK_ALERT_TO` with that same destination address as its value.
+4. Redeploy. Both `FEEDBACK_ALERT` and `FEEDBACK_ALERT_TO` must be present for alerts to
+   send; if either is missing, feedback still saves to D1 as normal, just silently without
+   an email.
+
+The alert email comes from `alerts@madeclear.ca` (needs no real inbox — just a `From`
+address on a domain Cloudflare already manages for you) and contains the page, rating,
+comment, and page-state context for that submission. Sending failures are logged but never
+block the feedback write itself.
+
+## 6. Deploy and test
 
 Push the repository through the existing Pages deployment. On a visualization page:
 

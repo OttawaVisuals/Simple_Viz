@@ -25,6 +25,41 @@ function normalizeContext(value) {
     .filter(Boolean);
 }
 
+function buildRawEmail({ from, to, subject, text }) {
+  const headers = [
+    `From: ${from}`,
+    `To: ${to}`,
+    `Subject: ${subject}`,
+    "MIME-Version: 1.0",
+    'Content-Type: text/plain; charset="utf-8"',
+    "Content-Transfer-Encoding: 8bit",
+  ];
+  return `${headers.join("\r\n")}\r\n\r\n${text}`;
+}
+
+async function sendFeedbackAlert(env, { page, rating, comment, context }) {
+  if (!env.FEEDBACK_ALERT || !env.FEEDBACK_ALERT_TO) return;
+  try {
+    const { EmailMessage } = await import("cloudflare:email");
+    const lines = [
+      `Page: ${page}`,
+      `Rating: ${rating}`,
+      comment ? `Comment: ${comment}` : "Comment: (none)",
+      context.length ? `Context: ${context.join(" | ")}` : "",
+    ].filter(Boolean);
+    const raw = buildRawEmail({
+      from: "alerts@madeclear.ca",
+      to: env.FEEDBACK_ALERT_TO,
+      subject: `New feedback: ${page} (${rating})`,
+      text: lines.join("\n"),
+    });
+    await env.FEEDBACK_ALERT.send(new EmailMessage("alerts@madeclear.ca", env.FEEDBACK_ALERT_TO, raw));
+  } catch (err) {
+    // Alerting is best-effort only — never let a notification failure block a feedback submission.
+    console.error("feedback alert failed", err);
+  }
+}
+
 async function feedbackKey(request, secret, page) {
   const day = new Date().toISOString().slice(0, 10);
   const ip = request.headers.get("cf-connecting-ip") || "unknown";
@@ -101,6 +136,8 @@ async function handlePost({ request, env }) {
   )
     .bind(page, rating, comment, JSON.stringify(context), dedupeKey)
     .run();
+
+  await sendFeedbackAlert(env, { page, rating, comment, context });
 
   return json({ ok: true });
 }

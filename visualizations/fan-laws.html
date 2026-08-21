@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A little slower saves a lot of fan power</title>
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--track:#E2DDD2;
+    --flow:#377F82;--pressure:#8C6BB1;--power:#C2673D;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--track:#28304A;
+      --flow:#69B9B6;--pressure:#B79ADD;--power:#E49368;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--track:#28304A;
+    --flow:#69B9B6;--pressure:#B79ADD;--power:#E49368;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb,var(--accent) 20%,transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .brand{display:flex;align-items:center;gap:8px;color:var(--fg);text-transform:none;letter-spacing:0}
+  .brand:hover{color:var(--accent)}
+  .brand-icon{display:block;width:42px;height:20px;overflow:visible}
+  .brand-icon text{fill:currentColor;font:italic 16px Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  .brand-icon path{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .brand-word{display:flex;align-items:baseline;font:italic 18px/1 Georgia,"Iowan Old Style","Palatino Linotype",serif;white-space:nowrap}
+  .brand-word .sub{font-size:.54em;line-height:1;transform:translateY(.38em);margin-right:.18em;color:inherit}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  .topgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:54ch;margin:10px 0 0;text-wrap:pretty}
+  .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
+  .eqn{display:flex;align-items:center;gap:clamp(7px,1vw,12px);font-size:clamp(23px,3.2vw,38px);line-height:1;font-weight:300}
+  .eqn .eq{color:var(--muted)}
+  .eqn .frac{display:inline-flex;flex-direction:column;align-items:center}
+  .eqn .frac span{padding:.05em .22em}
+  .eqn .frac .bar{height:1.5px;background:var(--fg);width:100%;padding:0}
+  .eqn sup,.eqn sub{font-size:.55em}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:2.4em 1fr auto;gap:9px;align-items:baseline;background:var(--bg);padding:8px 2px}
+  .legend .sym{font-size:15px;font-weight:300}
+  .legend .name{font-size:12.5px;color:var(--muted2)}
+  .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{display:grid;grid-template-columns:minmax(240px,.72fr) minmax(0,1.55fr);gap:clamp(20px,3vw,46px);align-items:center;margin-top:clamp(24px,3.5vw,42px)}
+  @media (max-width:820px){.hero{grid-template-columns:1fr}.fan-figure{max-width:480px;margin:0 auto;width:100%}}
+  .fan-figure,.chart-figure{margin:0;min-width:0}
+  .figure-title{margin:0 0 8px;font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .fan-figure svg,.chart-figure svg{display:block;width:100%;height:auto}
+  .fan-shell{fill:none;stroke:var(--line2);stroke-width:2}
+  .fan-hub{fill:var(--bg);stroke:var(--fg);stroke-width:2}
+  .fan-blade{fill:color-mix(in srgb,var(--accent) 20%,var(--bg));stroke:var(--accent);stroke-width:1.5}
+  .airline{stroke:var(--flow);stroke-width:2;stroke-linecap:round;stroke-dasharray:10 14;opacity:.82}
+  .fan-label{fill:var(--muted);font:11px ui-monospace,monospace}
+  .chart-frame{fill:none;stroke:var(--line2);stroke-width:1}
+  .gridline{stroke:var(--line);stroke-width:1}
+  .axis-text{fill:var(--muted);font:11px ui-monospace,monospace}
+  .axis-title{fill:var(--muted2);font:11px ui-monospace,monospace}
+  .curve{fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+  .current-line{stroke:var(--fg);stroke-width:1;stroke-dasharray:3 5;opacity:.65}
+  .current-dot{stroke:var(--bg);stroke-width:2}
+  .curve-label{font:11px ui-monospace,monospace}
+  .chart-legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:8px;font:11px ui-monospace,monospace;color:var(--muted)}
+  .chart-legend span{display:inline-flex;align-items:center;gap:6px}
+  .chart-legend i{display:inline-block;width:18px;height:2px;background:currentColor}
+
+  .resultrow{display:grid;grid-template-columns:1.45fr .8fr;gap:clamp(24px,4vw,56px);align-items:start;margin-top:clamp(25px,3vw,38px);padding-top:clamp(20px,2.5vw,30px);border-top:1px solid var(--line)}
+  @media (max-width:760px){.resultrow{grid-template-columns:1fr}}
+  .ctrl{min-width:0}
+  .ctrl-head{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+  .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .ctrl-rel{font:11px ui-monospace,monospace;color:var(--muted)}
+  .readout{font-size:clamp(25px,3vw,36px);margin:9px 0 11px}
+  .track{position:relative;height:28px;cursor:ew-resize;touch-action:none;outline:none}
+  .track .rail{position:absolute;left:0;right:0;top:13px;height:2px;background:var(--track)}
+  .track .fill{position:absolute;left:0;top:13px;height:2px;background:var(--accent)}
+  .track .thumb{position:absolute;top:7px;width:14px;height:14px;border-radius:50%;background:var(--bg);border:2px solid var(--accent);transform:translateX(-50%)}
+  .track:focus-visible .thumb{outline:2px solid var(--accent);outline-offset:3px}
+  .track-range{display:flex;justify-content:space-between;gap:10px;font:10.5px ui-monospace,monospace;color:var(--muted)}
+  .track-range .mid{text-align:center}
+  .baseline{position:absolute;top:8px;width:1px;height:12px;background:var(--fg);opacity:.55}
+  .baseline-label{position:absolute;top:-9px;transform:translateX(-50%);font:9.5px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;margin-top:7px}
+  .result-value .num{font-size:clamp(34px,4.8vw,58px);line-height:1}
+  .result-value .unit{font-size:14px;color:var(--muted)}
+  .verdict{font-size:18px;font-style:italic}
+  .verdict-sub{font:12.5px/1.55 ui-monospace,monospace;color:var(--muted2);margin-top:7px}
+  .lawbars{display:grid;gap:12px;margin-top:22px}
+  .lawbar-head{display:flex;justify-content:space-between;gap:12px;align-items:baseline;font:11px ui-monospace,monospace}
+  .lawbar-head span:first-child{color:var(--muted2)}
+  .lawbar-track{position:relative;height:5px;background:var(--track)}
+  .lawbar-fill{position:absolute;inset:0 auto 0 0;max-width:100%}
+  .lawbar-ref{position:absolute;top:-3px;width:1px;height:11px;background:var(--fg);opacity:.6}
+  .bars-note{margin-top:10px;font:10.5px/1.5 ui-monospace,monospace;color:var(--muted)}
+
+  .presets{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-top:22px;font:11px ui-monospace,monospace;color:var(--muted)}
+  .presets-title{text-transform:uppercase;letter-spacing:.12em}
+  .preset{border:0;border-bottom:1px solid var(--line2);background:none;color:var(--muted2);padding:2px 0;font:inherit;cursor:pointer}
+  .preset:hover,.preset:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+  .note{margin:clamp(26px,3vw,40px) 0 0;padding-top:18px;border-top:1px solid var(--line);font:11.5px/1.75 ui-monospace,monospace;color:var(--muted);text-wrap:pretty}
+  .note strong{color:var(--muted2);font-weight:600}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+
+  .feedback{margin-top:clamp(40px,4.6vw,64px);padding-top:20px;border-top:1px solid var(--line)}
+  .feedback-head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:20px}
+  .feedback-kicker{margin:0 0 5px;font:10px/1.3 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .feedback h2{margin:0;font-size:clamp(21px,2.2vw,28px);font-weight:400;letter-spacing:-.02em}
+  .feedback-copy{margin:5px 0 0;font:12px/1.6 ui-monospace,monospace;color:var(--muted)}
+  .feedback-choices{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+  .feedback-choice{appearance:none;border:1px solid var(--line2);border-radius:999px;background:transparent;color:var(--muted2);padding:7px 12px;font:12px/1 ui-monospace,monospace;cursor:pointer}
+  .feedback-choice:hover,.feedback-choice:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
+  .feedback-choice[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--bg))}
+  .feedback-form{margin-top:18px;max-width:760px}
+  .feedback-form[hidden]{display:none}
+  .feedback-form label{display:block;margin-bottom:7px;font:12px/1.5 ui-monospace,monospace;color:var(--muted2)}
+  .feedback-form label span{color:var(--muted)}
+  .feedback-form textarea{width:100%;min-height:84px;resize:vertical;border:1px solid var(--line2);border-radius:3px;background:transparent;color:var(--fg);padding:10px 11px;font:14px/1.5 Georgia,serif}
+  .feedback-form textarea:focus{border-color:var(--accent);outline:1px solid var(--accent);outline-offset:2px}
+  .feedback-actions{display:flex;align-items:baseline;gap:14px;margin-top:9px}
+  .feedback-send{appearance:none;border:0;border-bottom:1px solid var(--line2);background:transparent;color:var(--muted2);padding:2px 0;font:12px/1.4 ui-monospace,monospace;cursor:pointer}
+  .feedback-send:hover,.feedback-send:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+  .feedback-send:disabled{cursor:wait;opacity:.55}
+  .feedback-status{font:11px/1.5 ui-monospace,monospace;color:var(--muted)}
+  .feedback-trap{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}
+  .footer{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,40px);font:11.5px/1.7 ui-monospace,monospace;color:var(--muted)}
+  .footer a{color:var(--muted2);text-decoration-color:var(--line2)}
+  @media (max-width:700px){.feedback-head{grid-template-columns:1fr}.feedback-choices{justify-content:flex-start}.footer{grid-template-columns:1fr;gap:10px}.ctrl-head{align-items:flex-start}.ctrl-rel{max-width:18ch;text-align:right}}
+</style>
+<main>
+<div class="wrap">
+  <div class="topbar">
+    <a class="brand" href="../index.html" aria-label="Made clear — home">
+      <svg class="brand-icon" viewBox="0 0 58 28" aria-hidden="true"><text x="22" y="16">mc</text><path d="M1 22 C3 22 3 16 5 16 S7 26 9 26 S11 13 13 13 S15 23 17 23 S19 18 21 18 L57 18"/></svg>
+      <span class="brand-word" aria-hidden="true"><span>m</span><span class="sub">ade</span><span>c</span><span class="sub">lear</span></span>
+    </a>
+    <div class="topbar-right"><span>Fan affinity laws</span><button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button></div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>A little slower saves <em>a lot</em> of fan power</h1>
+      <p class="sub">Slow a fan by 20% and airflow falls by 20% &mdash; but the ideal shaft power falls by almost half. The difference is the cube hiding in the fan laws.</p>
+    </div>
+    <div class="eqnbox">
+      <div class="eqn"><span class="frac"><span>P<sub>2</sub></span><span class="bar"></span><span>P<sub>1</sub></span></span><span class="eq">=</span><span class="frac"><span><em id="nTerm">N<sub>2</sub></em></span><span class="bar"></span><span>N<sub>1</sub></span></span><sup>3</sup></div>
+    </div>
+    <div class="legendbox"><div class="legend" id="legend"></div></div>
+  </div>
+
+  <div class="hero">
+    <figure class="fan-figure">
+      <p class="figure-title">Same fan, different speed</p>
+      <svg id="fanSvg" viewBox="0 0 420 300" role="img" aria-label="A variable-speed fan moving air through a short duct">
+        <rect x="24" y="46" width="372" height="208" rx="12" fill="none" stroke="var(--line)"/>
+        <g id="airLines">
+          <line class="airline" x1="202" y1="91" x2="380" y2="91"/><line class="airline" x1="202" y1="125" x2="380" y2="125"/>
+          <line class="airline" x1="202" y1="175" x2="380" y2="175"/><line class="airline" x1="202" y1="209" x2="380" y2="209"/>
+        </g>
+        <circle class="fan-shell" cx="132" cy="150" r="78"/>
+        <g id="fanRotor">
+          <path class="fan-blade" d="M132 140 C143 104 172 82 189 91 C198 114 177 139 145 151 Z"/>
+          <path class="fan-blade" d="M142 154 C178 165 200 194 191 211 C168 220 143 199 131 167 Z"/>
+          <path class="fan-blade" d="M127 164 C116 200 87 222 70 213 C61 190 82 165 114 153 Z"/>
+          <path class="fan-blade" d="M122 146 C86 135 64 106 73 89 C96 80 121 101 133 133 Z"/>
+        </g>
+        <circle class="fan-hub" cx="132" cy="150" r="13"/>
+        <text class="fan-label" id="fanSpeedLabel" x="132" y="281" text-anchor="middle"></text>
+      </svg>
+    </figure>
+    <figure class="chart-figure" id="chartWrap">
+      <p class="figure-title">What changes as speed changes</p>
+      <svg id="chartSvg" role="img" aria-label="Curves showing airflow proportional to fan speed, pressure proportional to speed squared, and power proportional to speed cubed"></svg>
+      <div class="chart-legend">
+        <span style="color:var(--flow)"><i></i>airflow Q &prop; N</span>
+        <span style="color:var(--pressure)"><i></i>pressure &Delta;p &prop; N&sup2;</span>
+        <span style="color:var(--power)"><i></i>power P &prop; N&sup3;</span>
+      </div>
+    </figure>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrl" id="speedCtrl">
+      <div class="ctrl-head"><span class="ctrl-title">Fan speed <em id="speedLabel">N<sub>2</sub></em></span><span class="ctrl-rel">relative to the 100% design point</span></div>
+      <div class="readout mono" id="speedReadout"></div>
+      <div class="track" id="speedTrack" tabindex="0" role="slider" aria-label="Fan speed relative to design speed">
+        <div class="rail"></div><div class="fill" id="speedFill"></div><div class="baseline" id="baseline"></div><div class="baseline-label" id="baselineLabel">design</div><div class="thumb" id="speedThumb"></div>
+      </div>
+      <div class="track-range"><span>30%</span><span class="mid">slower &larr; speed &rarr; faster</span><span>120%</span></div>
+    </div>
+    <div class="result">
+      <div class="result-label">Ideal shaft power</div>
+      <div class="result-value"><span class="num mono" id="savingValue"></span><span class="unit mono" id="savingUnit"></span><span class="verdict" id="verdict"></span></div>
+      <div class="verdict-sub" id="verdictSub"></div>
+      <div class="lawbars" id="lawbars"></div>
+      <div class="bars-note">The vertical mark is the original 100% design point. Bar scale runs to 180%.</div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-speed="100">design speed</button>
+    <button class="preset" data-speed="80">20% slower</button>
+    <button class="preset" data-speed="50">half speed</button>
+    <button class="preset" data-speed="120">20% faster</button>
+  </div>
+
+  <p class="note"><strong>These are the fan affinity laws for changing the speed of the same fan:</strong> Q<sub>2</sub>/Q<sub>1</sub>&nbsp;=&nbsp;N<sub>2</sub>/N<sub>1</sub>, &Delta;p<sub>2</sub>/&Delta;p<sub>1</sub>&nbsp;=&nbsp;(N<sub>2</sub>/N<sub>1</sub>)&sup2;, and P<sub>2</sub>/P<sub>1</sub>&nbsp;=&nbsp;(N<sub>2</sub>/N<sub>1</sub>)&sup3;. The page holds fan diameter, air density and efficiency constant and reports shaft power, not exact electrical input. Real motors, drives, filters, dampers and systems depart from the ideal &mdash; especially at very low speed &mdash; so measured manufacturer curves remain the authority. The cube-law result is still why variable-speed control can save so much energy: the <a href="https://www.energy.gov/sites/prod/files/2014/04/f15/motor_tip_sheet11.pdf" target="_blank" rel="noopener">U.S. Department of Energy</a> gives the same 20%-speed-reduction example, while <a href="https://www.amca.org/assets/resources/public/pdf/Education%20Modules/AMCA%20210-16.pdf" target="_blank" rel="noopener">ANSI/AMCA 210</a> defines the underlying similarity relationships.</p>
+
+  <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
+    <div class="feedback-head"><div><p class="feedback-kicker">Private feedback</p><h2 id="feedbackHeading">Was this clear?</h2><p class="feedback-copy">Your response is private and helps improve this page.</p></div>
+      <div class="feedback-choices" role="group" aria-label="Clarity rating"><button class="feedback-choice" type="button" data-rating="clear" aria-pressed="false">Yes</button><button class="feedback-choice" type="button" data-rating="almost" aria-pressed="false">Almost</button><button class="feedback-choice" type="button" data-rating="not-yet" aria-pressed="false">Not yet</button></div>
+    </div>
+    <form class="feedback-form" hidden><label for="feedbackComment">What could be clearer? <span>Optional, 1,200 characters maximum.</span></label><textarea id="feedbackComment" name="comment" maxlength="1200" placeholder="A confusing step, a possible mistake, or an idea..."></textarea><label class="feedback-trap" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label><div class="feedback-actions"><button class="feedback-send" type="submit">Send private feedback</button><span class="feedback-status" role="status" aria-live="polite"></span></div></form>
+  </section>
+  <div class="footer"><span>Designed and maintained by Simon using AI-assisted development. Sources and approximations are stated on each page.</span><span>Spot a mistake or have an idea? Write to <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.</span></div>
+</div>
+</main>
+<script>
+(function(){
+  var MIN=30, MAX=120, SCALE_MAX=180;
+  var state={speed:80,active:null};
+  var $=function(id){return document.getElementById(id);};
+  var speedTrack=$('speedTrack'), speedFill=$('speedFill'), speedThumb=$('speedThumb');
+  var chartWrap=$('chartWrap'), chartSvg=$('chartSvg'), chartW=0;
+  function clamp(v,a,b){return v<a?a:(v>b?b:v);}
+  function values(){var r=state.speed/100;return {flow:100*r,pressure:100*r*r,power:100*r*r*r};}
+  function fmt(v){return Math.abs(v-Math.round(v))<.05?Math.round(v).toString():v.toFixed(1);}
+  function colorFor(k){return k==='flow'?'var(--flow)':k==='pressure'?'var(--pressure)':'var(--power)';}
+
+  function drawLegend(){
+    var v=values(), rows=[
+      {sym:'N',name:'fan speed',val:state.speed+'%'},
+      {sym:'Q',name:'airflow',val:fmt(v.flow)+'%'},
+      {sym:'Δp',name:'pressure rise',val:fmt(v.pressure)+'%'},
+      {sym:'P',name:'shaft power',val:fmt(v.power)+'%'}
+    ];
+    $('legend').innerHTML=rows.map(function(r){return '<div class="row"><em class="sym">'+r.sym+'</em><span class="name">'+r.name+'</span><span class="val mono">'+r.val+'</span></div>';}).join('');
+  }
+
+  function drawSlider(){
+    var p=(state.speed-MIN)/(MAX-MIN)*100, base=(100-MIN)/(MAX-MIN)*100;
+    speedFill.style.width=p+'%';speedThumb.style.left=p+'%';$('baseline').style.left=base+'%';$('baselineLabel').style.left=base+'%';
+    $('speedReadout').textContent=state.speed+'% of design speed';
+    speedTrack.setAttribute('aria-valuemin',MIN);speedTrack.setAttribute('aria-valuemax',MAX);speedTrack.setAttribute('aria-valuenow',state.speed);speedTrack.setAttribute('aria-valuetext',state.speed+' percent of design speed');
+    $('nTerm').style.color=state.active==='speed'?'var(--accent)':'var(--fg)';$('speedLabel').style.color=state.active==='speed'?'var(--accent)':'var(--muted)';
+  }
+
+  function drawResult(){
+    var v=values(), delta=v.power-100;
+    if(delta<-.05){$('savingValue').textContent=fmt(-delta);$('savingUnit').textContent='%';$('verdict').textContent='less power.';}
+    else if(delta>.05){$('savingValue').textContent=fmt(delta);$('savingUnit').textContent='%';$('verdict').textContent='more power.';}
+    else{$('savingValue').textContent='100';$('savingUnit').textContent='%';$('verdict').textContent='of design power.';}
+    if(state.speed===100){$('verdictSub').textContent='All three quantities are at their original reference value.';}
+    else{$('verdictSub').textContent='At '+state.speed+'% speed: airflow '+fmt(v.flow)+'%, pressure '+fmt(v.pressure)+'%, power '+fmt(v.power)+'%.';}
+    var bars=[{k:'flow',name:'Airflow · N',v:v.flow},{k:'pressure',name:'Pressure · N²',v:v.pressure},{k:'power',name:'Power · N³',v:v.power}];
+    $('lawbars').innerHTML=bars.map(function(b){var width=clamp(b.v/SCALE_MAX*100,0,100),ref=100/SCALE_MAX*100;return '<div class="lawbar"><div class="lawbar-head"><span>'+b.name+'</span><strong class="mono">'+fmt(b.v)+'%</strong></div><div class="lawbar-track"><div class="lawbar-fill" style="width:'+width+'%;background:'+colorFor(b.k)+'"></div><div class="lawbar-ref" style="left:'+ref+'%"></div></div></div>';}).join('');
+  }
+
+  function svgEl(tag,attrs){var e=document.createElementNS('http://www.w3.org/2000/svg',tag);for(var k in attrs)e.setAttribute(k,attrs[k]);return e;}
+  function drawChart(){
+    var w=chartW||chartWrap.clientWidth||700,h=300,m={l:w<440?45:54,r:w<440?12:76,t:12,b:44},pw=w-m.l-m.r,ph=h-m.t-m.b;
+    chartSvg.setAttribute('viewBox','0 0 '+w+' '+h);chartSvg.innerHTML='';
+    function x(s){return m.l+(s/120)*pw;}function y(v){return m.t+ph-(v/180)*ph;}
+    [0,50,100,150].forEach(function(t){chartSvg.appendChild(svgEl('line',{x1:m.l,y1:y(t),x2:m.l+pw,y2:y(t),class:'gridline'}));var tx=svgEl('text',{x:m.l-8,y:y(t)+4,'text-anchor':'end',class:'axis-text'});tx.textContent=t+'%';chartSvg.appendChild(tx);});
+    [0,40,80,120].forEach(function(t){var tx=svgEl('text',{x:x(t),y:h-19,'text-anchor':t===0?'start':t===120?'end':'middle',class:'axis-text'});tx.textContent=t+'%';chartSvg.appendChild(tx);});
+    chartSvg.appendChild(svgEl('rect',{x:m.l,y:m.t,width:pw,height:ph,class:'chart-frame'}));
+    var xt=svgEl('text',{x:m.l+pw/2,y:h-2,'text-anchor':'middle',class:'axis-title'});xt.textContent='fan speed N';chartSvg.appendChild(xt);
+    var series=[{k:'flow',fn:function(r){return 100*r;}},{k:'pressure',fn:function(r){return 100*r*r;}},{k:'power',fn:function(r){return 100*r*r*r;}}];
+    series.forEach(function(s){var d='';for(var n=0;n<=120;n+=2){var yy=clamp(s.fn(n/100),0,180);d+=(n?'L':'M')+x(n).toFixed(1)+' '+y(yy).toFixed(1)+' ';}chartSvg.appendChild(svgEl('path',{d:d,class:'curve',stroke:colorFor(s.k)}));});
+    chartSvg.appendChild(svgEl('line',{x1:x(state.speed),y1:m.t,x2:x(state.speed),y2:m.t+ph,class:'current-line'}));
+    var v=values();series.forEach(function(s){chartSvg.appendChild(svgEl('circle',{cx:x(state.speed),cy:y(v[s.k]),r:5,fill:colorFor(s.k),class:'current-dot'}));});
+    var tag=svgEl('text',{x:clamp(x(state.speed),m.l+22,m.l+pw-22),y:m.t+14,'text-anchor':'middle',class:'axis-text'});tag.textContent=state.speed+'%';chartSvg.appendChild(tag);
+  }
+
+  var rotor=$('fanRotor'), airLines=$('airLines'), angle=0,offset=0,last=0,reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function animate(ts){var dt=last?Math.min((ts-last)/1000,.05):0;last=ts;angle=(angle+state.speed*1.25*dt)%360;offset=(offset-state.speed*.32*dt)%24;rotor.setAttribute('transform','rotate('+angle.toFixed(2)+' 132 150)');airLines.style.strokeDashoffset=offset.toFixed(2)+'px';requestAnimationFrame(animate);}
+  function drawFan(){$('fanSpeedLabel').textContent=state.speed+'% speed · '+fmt(values().flow)+'% airflow';}
+
+  function render(){drawLegend();drawSlider();drawResult();drawChart();drawFan();}
+  (function(){var dragging=false;function setX(clientX){var r=speedTrack.getBoundingClientRect(),f=clamp((clientX-r.left)/r.width,0,1);state.speed=clamp(Math.round(MIN+f*(MAX-MIN)),MIN,MAX);render();}
+    speedTrack.addEventListener('pointerdown',function(e){dragging=true;state.active='speed';if(speedTrack.setPointerCapture)speedTrack.setPointerCapture(e.pointerId);setX(e.clientX);});
+    speedTrack.addEventListener('pointermove',function(e){if(dragging)setX(e.clientX);});
+    function end(){dragging=false;state.active=null;render();}speedTrack.addEventListener('pointerup',end);speedTrack.addEventListener('pointercancel',end);
+    speedTrack.addEventListener('pointerenter',function(){state.active='speed';render();});$('speedCtrl').addEventListener('pointerleave',function(){if(!dragging){state.active=null;render();}});
+    speedTrack.addEventListener('keydown',function(e){var step=e.shiftKey?5:1,n=null;if(e.key==='ArrowLeft'||e.key==='ArrowDown')n=state.speed-step;else if(e.key==='ArrowRight'||e.key==='ArrowUp')n=state.speed+step;else if(e.key==='Home')n=MIN;else if(e.key==='End')n=MAX;if(n!==null){e.preventDefault();state.speed=clamp(n,MIN,MAX);state.active='speed';render();}});
+  })();
+  document.querySelectorAll('.preset').forEach(function(b){b.addEventListener('click',function(){state.speed=Number(b.dataset.speed);state.active=null;render();});});
+
+  var STORAGE_KEY='fan-laws-theme',themeToggle=$('themeToggle');
+  function systemPrefersDark(){return matchMedia('(prefers-color-scheme: dark)').matches;}
+  function currentTheme(){var applied=document.documentElement.getAttribute('data-theme');if(applied)return applied;var stored=null;try{stored=localStorage.getItem(STORAGE_KEY);}catch(e){}return stored||(systemPrefersDark()?'dark':'light');}
+  function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeToggle.textContent=t==='dark'?'Light mode':'Dark mode';try{localStorage.setItem(STORAGE_KEY,t);}catch(e){}}
+  themeToggle.addEventListener('click',function(){applyTheme(currentTheme()==='dark'?'light':'dark');});applyTheme(currentTheme());
+  new ResizeObserver(function(){var w=chartWrap.clientWidth;if(w&&Math.abs(w-chartW)>1){chartW=w;drawChart();}}).observe(chartWrap);
+  render();if(!reduceMotion)requestAnimationFrame(animate);
+})();
+</script>
+<script>
+(function(){
+  var root=document.querySelector('[data-feedback]');if(!root)return;
+  var form=root.querySelector('.feedback-form'),choices=Array.prototype.slice.call(root.querySelectorAll('.feedback-choice')),textarea=root.querySelector('textarea'),status=root.querySelector('.feedback-status'),send=root.querySelector('.feedback-send'),rating='';
+  choices.forEach(function(choice){choice.addEventListener('click',function(){rating=choice.dataset.rating;choices.forEach(function(item){item.setAttribute('aria-pressed',item===choice?'true':'false');});form.hidden=false;status.textContent='';});});
+  function pageSlug(){var file=location.pathname.split('/').pop()||'';return file.replace(/\.html?$/i,'').toLowerCase()||'visualization';}
+  function currentContext(){var values=[];Array.prototype.forEach.call(document.querySelectorAll('[role="slider"]'),function(slider){var label=slider.getAttribute('aria-label')||'Control',value=slider.getAttribute('aria-valuetext')||slider.getAttribute('aria-valuenow');if(value)values.push(label+': '+value);});return values.join(' · ').slice(0,500);}
+  form.addEventListener('submit',function(e){e.preventDefault();if(!rating)return;if(location.protocol==='file:'){status.textContent='Feedback submission is available on madeclear.ca.';return;}send.disabled=true;status.textContent='Sending…';var body={page:pageSlug(),rating:rating,comment:textarea.value.trim(),context:currentContext(),website:(form.elements.website&&form.elements.website.value)||''};fetch('/api/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(function(res){if(!res.ok)throw new Error('Request failed');status.textContent='Thank you — feedback sent.';textarea.value='';}).catch(function(){status.textContent='Could not send. Please try again.';}).then(function(){send.disabled=false;});});
+})();
+</script>
+</html>

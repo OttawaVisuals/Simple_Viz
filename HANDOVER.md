@@ -13,6 +13,26 @@ tool can pick up mid-stream without re-reading the whole chat history.
   filtering) with a "not a secure connection" warning — that's a corporate network/proxy
   issue on his end, not a site or Cloudflare cert problem; nothing to action here.
 
+## Materials arrangement page — draft handover, 2026-08-21
+
+- **`visualizations/materials-arrangement.html`** is a new, unreviewed teaching page about how
+  atomic arrangement differs across material families. It is not yet catalogued in
+  `unreviewed.html`, `index.html`, or `tracker.html`.
+- The selector currently covers pure metals (copper, aluminium, titanium), alloys (brass,
+  bronze, mild steel, cast iron, stainless steel, nichrome), a ceramic (alumina), a
+  semiconductor (silicon), polymers (polyethylene, nylon, rubber), and soda-lime glass.
+- The central display is intentionally schematic: it distinguishes representative atom types
+  and arrangement families, but does **not** claim to render a full unit cell, exact alloy
+  composition, polymer repeat unit, or glass chemistry. Every display now has a live colour
+  key. Polymer chains explicitly show carbon-backbone and hydrogen atoms; nylon also marks
+  nitrogen and oxygen; glass shows silicon and oxygen.
+- A lower “Atoms in this material” panel draws neutral-atom electron-shell diagrams and lists
+  atomic number plus shell populations for up to two representative elements. The page note
+  explicitly warns that these are neutral atoms, not the bonding/charge states in a solid.
+- JavaScript syntax checks passed after the last edit. Visual browser QA was not completed in
+  the prior session because the local browser-control bridge failed; manually review the page
+  at desktop and mobile widths before publishing.
+
 ## Basic functions page — reviewed and complete, 2026-08-21
 
 - **`visualizations/basic-functions.html`** ("The curves behind most graphs") is page
@@ -2473,6 +2493,38 @@ under **Fun physics**, right after `cosmic-scale.html`.
 - The `microwave-chocolate.html` homepage icon now uses the user-selected side-by-side
   concept: a microwave emits a blue wave toward a segmented chocolate bar with two warm
   melt spots and a measurement bracket.
+
+## Session handover — double slit and capillarity (2026-08-21)
+
+Two new self-contained draft pages were added. They are listed in `unreviewed.html`, not the
+homepage catalogue, pending the normal accuracy-and-polish review pass. The draft listing now
+shows 47 pages; its inline icon sprite includes matching `icon-double-slit` and
+`icon-capillary-rise` symbols.
+
+- **`visualizations/double-slit.html`** — "One particle, two slits." Covers Young's original
+  light experiment, the ideal far-field two-slit intensity pattern, discrete detection events,
+  and loss of interference when which-path information is available. Controls change slit
+  separation, wavelength, screen distance, and display mode. The home section is explicitly
+  limited to the classical optical interference experiment using a low-power laser and a
+  commercial double-slit slide; it does not claim a home single-photon experiment is practical.
+- **`visualizations/capillary-rise.html`** — "How water climbs." Uses an ideal clean,
+  vertical circular glass capillary: Jurin's law for equilibrium height and a
+  gravity-corrected Lucas–Washburn form for the rising speed. The liquid values are marked as
+  illustrative room-temperature estimates, especially for soap mixture and vegetable oil.
+  Its home experiment deliberately uses two flat glass pieces and uniform tape spacers, which
+  is more model-like than a paper towel. Paper/coffee-filter wicking is presented only as an
+  extension fitted to `x² = Ct`, not as a uniform capillary.
+- The capillarity liquid picker was initially implemented as a native `<select>`. Simon noticed
+  it departed from the approved style. It has been replaced with the style guide's approved
+  outlined, transparent discrete-option pills: Water, Soapy water, Vegetable oil. Their active
+  colors have light/dark theme tokens.
+- Script syntax checks passed for both new pages. A future review should still inspect the
+  pages at narrow viewport widths and check the numeric behaviour of every liquid/radius
+  preset in a browser before promotion to `index.html`.
+
+**New roadmap idea:** `index.html` and this handover list now include **Can you hear the size
+of a bottle?** — a Helmholtz-resonance page. Model: `f = c/(2π)√(A/(V L_eff))`; account for
+end correction in `L_eff` and present it as a household estimate.
 
 ## Roadmap
 

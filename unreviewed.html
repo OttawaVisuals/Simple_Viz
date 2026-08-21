@@ -4,23 +4,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Not yet reviewed — Physics You Can See</title>
 <style>
-  /* Tokens, type and topbar are the shared set from STYLE_GUIDE.md — kept byte-identical to
-     index.html so this reads as the same site. The grid/card/group rules below are copied
-     from index.html verbatim too, since this page is the same catalogue listing, just
-     filtered to the pages that haven't been through a review pass yet. */
+  /* Tokens, type, topbar and tile pattern are the shared set from STYLE_GUIDE.md — kept
+     byte-identical to index.html so this reads as the same site, just filtered to the pages
+     that haven't been through a review pass yet. */
   :root{
     --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
     --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+    --cat-everyday:#2F6BD8;--cat-discoveries:#8A5E0C;--cat-fun:#A83D2A;
   }
   @media (prefers-color-scheme:dark){
     :root:not([data-theme="light"]){
       --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
       --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+      --cat-everyday:#6FA0F2;--cat-discoveries:#E5B94B;--cat-fun:#E68075;
     }
   }
   :root[data-theme="dark"]{
     --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
     --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    --cat-everyday:#6FA0F2;--cat-discoveries:#E5B94B;--cat-fun:#E68075;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
@@ -57,39 +59,49 @@
   .browse-tools input{flex:1 1 260px;min-width:0}
   .browse-tools select{flex:0 1 190px}
   .results-count{font:11px ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-  .concept.is-hidden{display:none}
 
   .group{margin-top:clamp(46px,6vw,80px)}
   .group:first-of-type{margin-top:0}
   .cat-head{display:flex;justify-content:space-between;align-items:baseline;gap:20px}
   .cat-head h2{font-weight:300;font-size:clamp(1.25rem,2.2vw,1.55rem);letter-spacing:-.02em;margin:0}
   .cat-count{font:11px ui-monospace,"Cascadia Code",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
-  .cat-sub{margin:11px 0 20px;font-size:.95rem;line-height:1.6;color:var(--muted2);max-width:56ch;text-wrap:pretty}
 
-  .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 clamp(28px,4vw,56px);border-bottom:1px solid var(--line)}
-  .grid:has(> .concept:last-child:nth-child(odd))::after{content:"";border-top:1px solid var(--line)}
-  .concept{display:block;color:inherit;text-decoration:none;padding:22px 0 30px;border-top:1px solid var(--line)}
-  .concept-icon{display:block;width:100%;height:76px;margin:0 0 18px;color:var(--fg);overflow:visible}
-  .concept-icon use{pointer-events:none}
+  /* Tiles — the same colour-by-category pattern as index.html's catalogue grid. Colour is the
+     one deliberate departure from the "one saturated colour" rule (user request, 2026-08-20);
+     each tile rebinds --accent locally to its own category hue via --cat, so the accent
+     strokes inside the shared icon sprite recolour to match with no per-icon edits. */
+  .tile-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:1fr;gap:clamp(10px,1.3vw,16px);margin-top:20px}
+  .tile{--accent:var(--cat);display:flex;flex-direction:column;gap:11px;padding:15px 14px 17px;border:1px solid color-mix(in srgb,var(--cat) 30%,transparent);border-radius:10px;background:color-mix(in srgb,var(--cat) 6%,transparent);color:inherit;text-decoration:none;transition:background .15s ease,border-color .15s ease}
+  .tile:hover{color:inherit;background:color-mix(in srgb,var(--cat) 13%,transparent);border-color:color-mix(in srgb,var(--cat) 60%,transparent)}
+  .tile:hover h3{color:var(--cat)}
+  .tile-icon{display:block;width:100%;height:64px;color:var(--fg);overflow:visible}
+  .tile-icon use{pointer-events:none}
   .icon-sprite{position:absolute;width:0;height:0;overflow:hidden}
-  .meta{display:block;font:11px ui-monospace,"Cascadia Code",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
-  .concept h3{margin:0 0 9px;font-size:clamp(1.12rem,1.7vw,1.36rem);font-weight:400;line-height:1.22;letter-spacing:-.01em}
-  .concept p{margin:0;font-size:.95rem;line-height:1.6;color:var(--muted2);text-wrap:pretty}
-  .concept:hover h3{color:var(--accent)}
-  .concept:hover .meta{color:var(--accent)}
+  .tile .meta{display:block;font:10.5px ui-monospace,"Cascadia Code",monospace;letter-spacing:.11em;text-transform:uppercase;color:var(--cat);margin:0}
+  .tile h3{margin:0;font-size:.98rem;font-weight:400;line-height:1.3;letter-spacing:-.01em;text-wrap:pretty}
+  .tile.is-hidden{display:none}
+  .tile[data-cat="Everyday maths"]{--cat:var(--cat-everyday)}
+  .tile[data-cat="Discoveries"]{--cat:var(--cat-discoveries)}
+  .tile[data-cat="Fun physics"]{--cat:var(--cat-fun)}
+
+  /* Description tooltip — same pattern as index.html: tiles show only an icon, category and
+     title, so the full blurb surfaces on hover/focus from data-desc instead. */
+  .tile-tip{position:fixed;z-index:20;max-width:min(320px,80vw);padding:9px 12px;border:1px solid var(--line2);border-radius:8px;background:var(--bg);color:var(--muted2);font-size:.86rem;line-height:1.5;text-wrap:pretty;pointer-events:none;opacity:0;transform:translateY(3px);transition:opacity .13s ease,transform .13s ease}
+  .tile-tip.is-visible{opacity:1;transform:none}
 
   .note{margin:clamp(40px,5vw,64px) 0 0;max-width:88ch;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
   .site-footer{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,40px);font:11.5px/1.7 ui-monospace,monospace;color:var(--muted)}
   .site-footer a{color:var(--muted2);text-decoration-color:var(--line2)}
   .site-footer a:hover{color:var(--accent);text-decoration-color:var(--accent)}
 
+  @media (max-width:1180px){.tile-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+  @media (max-width:920px){.tile-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media (max-width:640px){.tile-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
   @media (max-width:480px){
     .topbar .count{display:none}
     .brand-word{display:none}
   }
   @media (max-width:760px){
-    .grid{grid-template-columns:1fr}
-    .grid::after{display:none}
     .site-footer{grid-template-columns:1fr;gap:10px}
   }
 </style>
@@ -98,6 +110,18 @@
 
   <svg class="icon-sprite" aria-hidden="true">
     <defs>
+      <symbol id="icon-materials-arrangement" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M60 5v54" stroke-dasharray="3 4"/>
+        <path d="M15 16L33 16M15 32L33 32M15 48L33 48M15 16L15 48M33 16L33 48" stroke="var(--accent)" stroke-width="1.4"/>
+        <g fill="currentColor" stroke="none"><circle cx="15" cy="16" r="3.2"/><circle cx="33" cy="16" r="3.2"/><circle cx="15" cy="32" r="3.2"/><circle cx="33" cy="32" r="3.2"/><circle cx="15" cy="48" r="3.2"/><circle cx="33" cy="48" r="3.2"/></g>
+        <path d="M78 14L93 22M93 22L86 36M70 30L86 36M86 36L100 44M74 50L100 44M78 14L106 16" stroke="var(--accent)" stroke-width="1.1"/>
+        <g fill="currentColor" stroke="none"><circle cx="78" cy="14" r="3.2"/><circle cx="93" cy="22" r="3.2"/><circle cx="70" cy="30" r="3.2"/><circle cx="86" cy="36" r="3.2"/><circle cx="100" cy="44" r="3.2"/><circle cx="74" cy="50" r="3.2"/><circle cx="106" cy="16" r="3.2"/></g>
+      </symbol>
+      <symbol id="icon-hot-car-flush" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 45h96M22 45V31l7-13h62l7 13v14"/><circle cx="32" cy="49" r="6"/><circle cx="88" cy="49" r="6"/>
+        <rect x="27" y="20" width="19" height="13" stroke="var(--accent)"/><rect x="74" y="20" width="19" height="13" stroke="var(--accent)"/>
+        <path d="M4 26h13M11 20l6 6-6 6" stroke="var(--accent)"/><path d="M103 26h13M109 20l6 6-6 6" stroke="var(--accent)"/>
+      </symbol>
       <symbol id="icon-double-slit" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="15" cy="32" r="4" fill="var(--accent)" stroke="var(--accent)"/><path d="M23 32h22" stroke="var(--accent)"/><path d="M48 10v19m0 6v19"/><path d="M54 22v8m0 4v8"/><path d="M64 13v38"/><path d="M76 14C92 14 92 50 110 50M76 50C92 50 92 14 110 14" stroke="var(--accent)" opacity=".7"/><path d="M112 8v48"/><path d="M112 14h4m-4 12h4m-4 12h4m-4 12h4"/>
       </symbol>
@@ -107,20 +131,11 @@
       <symbol id="icon-lightning-distance" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M18 30c-7-8 4-17 12-12 4-10 21-7 21 4 10-2 15 12 6 17H21"/><path d="M39 34l-7 12h7l-5 11 16-17h-8l5-6" fill="var(--accent)" stroke="var(--accent)"/><path d="M70 25q14 7 0 14M79 19q24 13 0 27M89 13q34 19 0 39"/>
       </symbol>
-      <symbol id="icon-braking-distance" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M15 42h56l-4-12-12-6H35l-9 6-11 3z"/><circle cx="29" cy="43" r="6"/><circle cx="59" cy="43" r="6"/><path d="M75 43h10M91 43h7M104 43h4" stroke="var(--accent)" stroke-width="3"/><path d="M77 25l8 8M86 22l6 7" stroke="var(--bad)"/>
-      </symbol>
       <symbol id="icon-bike-gears" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="35" cy="33" r="19"/><circle cx="35" cy="33" r="7"/><circle cx="89" cy="33" r="11"/><circle cx="89" cy="33" r="4"/><path d="M35 14L89 22M35 52l54-8" stroke="var(--accent)"/><path d="M35 9v5M35 52v5M11 33h5M54 33h5M89 18v4M89 44v4M74 33h4M100 33h4"/>
       </symbol>
-      <symbol id="icon-shelf-sag" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 21v35M108 21v35M12 24q48 30 96 0"/><path d="M51 8h18v18H51z" fill="var(--accent)" stroke="var(--accent)"/><path d="M60 27v14M55 36l5 5 5-5" stroke="var(--bad)"/>
-      </symbol>
       <symbol id="icon-compound-interest" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M13 53h96M17 53V41h13v12M39 53V34h13v19M61 53V24h13v29M83 53V10h13v43"/><path d="M20 38C42 37 54 30 67 22S87 9 103 8" stroke="var(--accent)" stroke-width="3"/><path d="M97 5l6 3-3 6" stroke="var(--accent)"/>
-      </symbol>
-      <symbol id="icon-pizza-area" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="35" cy="32" r="23"/><path d="M35 9v46M12 32h46"/><circle cx="84" cy="22" r="13"/><circle cx="96" cy="46" r="13"/><circle cx="29" cy="25" r="2" fill="var(--accent)" stroke="var(--accent)"/><circle cx="84" cy="22" r="3" fill="var(--accent)" stroke="var(--accent)"/><circle cx="96" cy="46" r="3" fill="var(--accent)" stroke="var(--accent)"/>
       </symbol>
       <symbol id="icon-mpg-trap" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M19 12h29v44H19zM25 18h17v12H25zM48 21h7l7 8v19c0 7 10 7 10 0V29"/><path d="M54 18l8 7"/><path d="M85 13c-7 11-13 18-13 27a13 13 0 0026 0c0-9-6-16-13-27z" fill="var(--accent)" stroke="var(--accent)"/><path d="M79 42h12" stroke="var(--bg)"/>
@@ -140,18 +155,8 @@
       <symbol id="icon-planet-light-delay" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="18" cy="32" r="8" fill="var(--accent)" stroke="var(--accent)"/><path d="M18 17v-6M18 53v-6M3 32h6M27 32h6M8 22l-4-4M28 42l4 4M8 42l-4 4M28 22l4-4" stroke="var(--accent)"/><path d="M34 32h42"/><circle cx="83" cy="32" r="7" stroke-dasharray="3 3"/><circle cx="103" cy="22" r="7"/><path d="M88 28l10-5M91 21l7 2-2 7" stroke="var(--accent)"/>
       </symbol>
-      <symbol id="icon-mass-energy" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M14 22l22-11 22 11v27L36 60 14 49zM14 22l22 11 22-11M36 33v27"/><circle cx="82" cy="32" r="8" fill="var(--accent)" stroke="var(--accent)"/><path d="M82 13V5M82 59v-8M63 32h-9M110 32h-9M69 19l-7-7M102 52l-7-7M69 45l-7 7M102 12l-7 7" stroke="var(--accent)"/>
-      </symbol>
       <symbol id="icon-gravity-lab" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="27" cy="32" r="17"/><circle cx="94" cy="32" r="10"/><path d="M49 32h30" stroke="var(--accent)"/><path d="M56 26l-7 6 7 6M72 26l7 6-7 6" stroke="var(--accent)"/><circle cx="27" cy="32" r="4" fill="var(--accent)" stroke="var(--accent)"/><circle cx="94" cy="32" r="3" fill="var(--accent)" stroke="var(--accent)"/>
-      </symbol>
-      <symbol id="icon-heat-pump-magic" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="14" cy="30" r="7"/><circle cx="22" cy="26" r="9"/><circle cx="30" cy="30" r="7"/><rect x="11" y="30" width="23" height="7" rx="3"/>
-        <path d="M38 33h12M46 28l4 5-4 5" stroke="var(--accent)"/>
-        <rect x="52" y="20" width="20" height="24" rx="3"/>
-        <path d="M76 33h12M84 28l4 5-4 5" stroke="var(--accent)"/>
-        <polygon points="90,24 104,12 118,24"/><rect x="94" y="24" width="20" height="20"/>
       </symbol>
       <symbol id="icon-thermal-comfort-pmv" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="4" y="8" width="112" height="48" rx="2"/><rect x="4" y="8" width="20" height="48" stroke="var(--accent)"/>
@@ -179,9 +184,6 @@
       <symbol id="icon-dew-point-window" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="26" y="6" width="68" height="52"/><path d="M60 6v52M26 32h68"/><path d="M42 17c5 6-4 10 1 16M75 17c5 6-4 10 1 16M44 39c5 6-4 10 1 15M76 39c5 6-4 10 1 15" stroke="var(--accent)"/>
       </symbol>
-      <symbol id="icon-eratosthenes-shadow" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 57Q60 8 108 57"/><path d="M35 32v20M81 31l8 18" stroke-width="3"/><path d="M23 6l18 26M38 6l18 22M53 6l18 20M68 6l18 22" stroke="var(--accent)"/><path d="M35 52h14M89 49l10-5"/>
-      </symbol>
       <symbol id="icon-snells-law" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M8 32h104"/><path d="M25 9l33 23 22 25" stroke="var(--accent)" stroke-width="3"/><path d="M58 9v46" stroke-dasharray="3 4"/><path d="M91 9l-17 23 27 18"/><path d="M80 27l-6 5 8 1"/>
       </symbol>
@@ -199,9 +201,6 @@
       </symbol>
       <symbol id="icon-earth-black-hole" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="28" cy="32" r="20"/><path d="M17 22l10 3 4-7 9 6-3 9 8 5M17 42l10-3 5 8"/><path d="M53 32h23M69 25l7 7-7 7" stroke="var(--accent)"/><circle cx="96" cy="32" r="10" fill="currentColor"/><ellipse cx="96" cy="32" rx="20" ry="5" stroke="var(--accent)"/>
-      </symbol>
-      <symbol id="icon-time-dilation" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="35" cy="32" r="22"/><path d="M35 16v16l9 6"/><circle cx="87" cy="32" r="17"/><path d="M87 20v12l4 3" stroke="var(--accent)"/><path d="M68 18h-9M65 28H53M67 41H56" stroke="var(--accent)"/><path d="M83 10l4-4 4 4"/>
       </symbol>
       <symbol id="icon-bayes-theorem" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <g fill="currentColor" stroke="none"><circle cx="18" cy="17" r="3"/><circle cx="32" cy="17" r="3"/><circle cx="46" cy="17" r="3"/><circle cx="60" cy="17" r="3"/><circle cx="74" cy="17" r="3"/><circle cx="88" cy="17" r="3"/><circle cx="102" cy="17" r="3"/><circle cx="18" cy="32" r="3"/><circle cx="32" cy="32" r="3"/><circle cx="46" cy="32" r="3"/><circle cx="60" cy="32" r="3"/><circle cx="74" cy="32" r="3"/><circle cx="88" cy="32" r="3"/><circle cx="102" cy="32" r="3"/><circle cx="18" cy="47" r="3"/><circle cx="32" cy="47" r="3"/><circle cx="46" cy="47" r="3"/><circle cx="60" cy="47" r="3"/><circle cx="74" cy="47" r="3"/><circle cx="88" cy="47" r="3"/><circle cx="102" cy="47" r="3"/></g><circle cx="18" cy="17" r="7" stroke="var(--accent)"/><circle cx="32" cy="17" r="7" stroke="var(--bad)"/>
@@ -238,9 +237,6 @@
       </symbol>
       <symbol id="icon-guitar-string" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M9 14h102M9 50h102M17 14v36M103 14v36"/><path d="M17 32c9-22 18 22 27 0s18 22 27 0 18 22 32 0" stroke="var(--accent)" stroke-width="3"/><path d="M26 10v8M50 10v8M74 10v8M96 10v8"/>
-      </symbol>
-      <symbol id="icon-microwave-chocolate" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="11" y="14" width="57" height="39" rx="3"/><rect x="18" y="21" width="34" height="25"/><circle cx="60" cy="25" r="3"/><path d="M58 36h5M58 42h5"/><path d="M77 43h35M80 43V28h29v15"/><circle cx="88" cy="36" r="4" fill="var(--accent)" stroke="var(--accent)"/><circle cx="102" cy="36" r="4" fill="var(--accent)" stroke="var(--accent)"/><path d="M88 24h14M88 20v8M102 20v8" stroke="var(--accent)"/>
       </symbol>
       <symbol id="icon-slinky-drop" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M28 8h64"/><path d="M60 8c-22 5-22 10 0 15s22 10 0 15-22 10 0 15 22 5 0 7" stroke="var(--accent)" stroke-width="3"/><path d="M34 17v32M28 43l6 6 6-6"/><path d="M86 17v15M80 26l6 6 6-6"/>
@@ -299,7 +295,7 @@
       <option value="Discoveries">Discoveries</option>
       <option value="Fun physics">Fun physics</option>
     </select>
-    <span class="results-count" id="resultsCount" aria-live="polite">47 pages</span>
+    <span class="results-count" id="resultsCount" aria-live="polite">48 pages</span>
   </div>
 
   <section class="group" aria-labelledby="cat-everyday">
@@ -307,46 +303,47 @@
       <h2 id="cat-everyday">Everyday maths</h2>
       <span class="cat-count">Eight pages</span>
     </div>
-    <div class="grid">
-      <a class="concept" href="visualizations/lightning-distance.html"><span class="meta">02 / Sound</span><h3>How far away was that lightning?</h3><p>Time the gap between the flash and the boom, multiply by the speed of sound, and measure a storm without any instrument.</p></a>
-      <a class="concept" href="visualizations/bike-gears.html"><span class="meta">04 / Gearing</span><h3>Same legs, different gear</h3><p>Pick a chainring and a sprocket, hold your cadence steady, and watch one pedal stroke buy either speed or a hill you can actually climb.</p></a>
-      <a class="concept" href="visualizations/compound-interest.html"><span class="meta">06 / Growth</span><h3>The last decade earns more</h3><p>Watch a fixed interest rate compound year after year, until the dollars added in the final decade outweigh the first three decades combined.</p></a>
-      <a class="concept" href="visualizations/mpg-trap.html"><span class="meta">08 / Rates</span><h3>Miles per gallon is a trap</h3><p>Drag two mpg values and see how much fuel each gain actually saves &mdash; the same 5&nbsp;mpg jump can save six times more gas depending on where you start.</p></a>
-      <a class="concept" href="visualizations/binary-hex.html"><span class="meta">09 / Number systems</span><h3>Why computers count in sixteens</h3><p>Flip eight bit switches and watch a decimal number, a two-digit hex code, and sometimes a letter appear together.</p></a>
-      <a class="concept" href="visualizations/birthday-paradox.html"><span class="meta">10 / Probability</span><h3>23 people, a coin flip</h3><p>Slide the size of a room and watch the odds that two people share a birthday cross fifty-fifty at just 23.</p></a>
-      <a class="concept" href="visualizations/roast-time.html"><span class="meta">11 / Scaling</span><h3>Why the big roast takes so long</h3><p>Resize a cube from a chicken breast to an elephant and watch the ratio of surface to volume decide both cooking time and body heat.</p></a>
-      <a class="concept" href="visualizations/decibels.html"><span class="meta">12 / Logarithms</span><h3>Decibels don't add up</h3><p>Drag the decibel slider and watch actual sound intensity and perceived loudness pull apart onto two very different curves.</p></a>
+    <div class="tile-grid">
+      <a class="tile" data-cat="Everyday maths" data-desc="Time the gap between the flash and the boom, multiply by the speed of sound, and measure a storm without any instrument." href="visualizations/lightning-distance.html"><span class="meta">Everyday maths</span><h3>How far away was that lightning?</h3></a>
+      <a class="tile" data-cat="Everyday maths" data-desc="Pick a chainring and a sprocket, hold your cadence steady, and watch one pedal stroke buy either speed or a hill you can actually climb." href="visualizations/bike-gears.html"><span class="meta">Everyday maths</span><h3>Same legs, different gear</h3></a>
+      <a class="tile" data-cat="Everyday maths" data-desc="Watch a fixed interest rate compound year after year, until the dollars added in the final decade outweigh the first three decades combined." href="visualizations/compound-interest.html"><span class="meta">Everyday maths</span><h3>The last decade earns more</h3></a>
+      <a class="tile" data-cat="Everyday maths" data-desc="Drag two mpg values and see how much fuel each gain actually saves &mdash; the same 5&nbsp;mpg jump can save six times more gas depending on where you start." href="visualizations/mpg-trap.html"><span class="meta">Everyday maths</span><h3>Miles per gallon is a trap</h3></a>
+      <a class="tile" data-cat="Everyday maths" data-desc="Flip eight bit switches and watch a decimal number, a two-digit hex code, and sometimes a letter appear together." href="visualizations/binary-hex.html"><span class="meta">Everyday maths</span><h3>Why computers count in sixteens</h3></a>
+      <a class="tile" data-cat="Everyday maths" data-desc="Slide the size of a room and watch the odds that two people share a birthday cross fifty-fifty at just 23." href="visualizations/birthday-paradox.html"><span class="meta">Everyday maths</span><h3>23 people, a coin flip</h3></a>
+      <a class="tile" data-cat="Everyday maths" data-desc="Resize a cube from a chicken breast to an elephant and watch the ratio of surface to volume decide both cooking time and body heat." href="visualizations/roast-time.html"><span class="meta">Everyday maths</span><h3>Why the big roast takes so long</h3></a>
+      <a class="tile" data-cat="Everyday maths" data-desc="Drag the decibel slider and watch actual sound intensity and perceived loudness pull apart onto two very different curves." href="visualizations/decibels.html"><span class="meta">Everyday maths</span><h3>Decibels don't add up</h3></a>
     </div>
   </section>
 
   <section class="group" aria-labelledby="cat-discoveries">
     <div class="cat-head">
       <h2 id="cat-discoveries">Discoveries</h2>
-      <span class="cat-count">Twenty-two pages</span>
+      <span class="cat-count">Twenty-three pages</span>
     </div>
-    <div class="grid">
-      <a class="concept" href="visualizations/double-slit.html"><span class="meta">58 / Quantum interference</span><h3>One particle, two slits</h3><p>Change a double-slit experiment and see wave fringes, individual detection events, and why making the path measurable removes the interference pattern.</p></a>
-      <a class="concept" href="visualizations/hot-car-flush.html"><span class="meta">57 / Air exchange</span><h3>Flush the hot air from a parked car</h3><p>Open one rear window and swing the opposite front door to see why a pressure pulse clears cabin air faster than one opening alone.</p></a>
-      <a class="concept" href="visualizations/dew-point-window.html"><span class="meta">56 / Humidity</span><h3>Why this window is fogging up</h3><p>Set room temperature, humidity and the glass surface temperature to see exactly when invisible vapour turns into droplets.</p></a>
-      <a class="concept" href="visualizations/night-sky-ice.html"><span class="meta">53 / Radiative cooling</span><h3>How a desert night can make ice</h3><p>Change air temperature, humidity and cloud cover to see a shallow pool radiate enough heat to freeze while the air stays above 0&deg;C.</p></a>
-      <a class="concept" href="visualizations/fan-laws.html"><span class="meta">52 / Fan affinity laws</span><h3>A little slower saves a lot of fan power</h3><p>Turn one speed control and watch airflow fall linearly, pressure by the square, and ideal shaft power by the cube.</p></a>
-      <a class="concept" href="visualizations/thermal-comfort-pmv.html"><span class="meta">51 / Thermal comfort</span><h3>The room feels colder than the thermostat says</h3><p>Drag a person around a room box and watch comfort shift with a cold window's radiant pull &mdash; even when the air temperature never moves.</p></a>
-      <a class="concept" href="visualizations/planet-light-delay.html"><span class="meta">14 / Light and distance</span><h3>You are seeing the past</h3><p>Choose a planet and compare where its light began with where that planet is now.</p></a>
-      <a class="concept" href="visualizations/gravity-lab.html"><span class="meta">16 / Gravity</span><h3>The pull between worlds</h3><p>Change mass and distance to feel Newton&rsquo;s inverse-square law take effect.</p></a>
-      <a class="concept" href="visualizations/snells-law.html"><span class="meta">18 / Optics</span><h3>Why the straw looks bent</h3><p>Bend a ray of light across the boundary into water or glass, then reverse it and watch the same equation cut the light off entirely.</p></a>
-      <a class="concept" href="visualizations/rocket-equation.html"><span class="meta">19 / Propulsion</span><h3>Why one more passenger costs so much fuel</h3><p>See why required propellant grows exponentially, not linearly, with the speed change a rocket needs.</p></a>
-      <a class="concept" href="visualizations/keplers-third-law.html"><span class="meta">20 / Orbits</span><h3>Why Mercury's year is 88 days</h3><p>Slide a planet's distance from the Sun outward and watch its orbital period grow even faster than its distance.</p></a>
-      <a class="concept" href="visualizations/grid-voltage.html"><span class="meta">21 / Circuits</span><h3>Why the grid runs at 400,000 volts</h3><p>Slide the transmission voltage up through real grid standards and watch resistive loss fall with the square of the increase.</p></a>
-      <a class="concept" href="visualizations/earth-temperature.html"><span class="meta">22 / Climate</span><h3>Sunlight in, heat out</h3><p>Tune Earth's reflectivity and watch the balance settle on a temperature &mdash; then see how far the real 33&deg; greenhouse gap sits above it.</p></a>
-      <a class="concept" href="visualizations/earth-black-hole.html"><span class="meta">23 / Relativity</span><h3>Squeeze the Earth into a black hole</h3><p>Pick a real mass, from a mountain to the Sun, and see how small you'd need to crush it before it became a black hole.</p></a>
-      <a class="concept" href="visualizations/bayes-theorem.html"><span class="meta">25 / Probability</span><h3>Why a 99%-accurate test can still be wrong</h3><p>Set a disease's rarity and a test's accuracy, then watch a grid of a hundred people show how many positive results are actually real.</p></a>
-      <a class="concept" href="visualizations/square-wave.html"><span class="meta">26 / Signals</span><h3>The overshoot that refuses to leave</h3><p>Add sine waves one harmonic at a time and watch a square wave emerge &mdash; with an overshoot that never quite goes away.</p></a>
-      <a class="concept" href="visualizations/escape-velocity.html"><span class="meta">27 / Gravity</span><h3>Why the Moon lost its atmosphere</h3><p>Launch something from a real world's surface and see whether your speed clears its escape velocity or falls back down.</p></a>
-      <a class="concept" href="visualizations/half-life.html"><span class="meta">28 / Nuclear physics</span><h3>Reading a bone's age off its isotopes</h3><p>Pick a real isotope and slide elapsed time in half-lives to see how carbon dating reads a bone's remaining atoms.</p></a>
-      <a class="concept" href="visualizations/doppler-shift.html"><span class="meta">29 / Waves</span><h3>Why a passing siren drops in pitch</h3><p>Steer a car's speed past a fixed listener and watch the pitch drop the instant it passes.</p></a>
-      <a class="concept" href="visualizations/starlight-spectrum.html"><span class="meta">46 / Spectroscopy</span><h3>Starlight has a barcode</h3><p>Drag a hydrogen electron's jump to emit one exact colour, then pick a real star and see which elements' dark lines show up in its light.</p></a>
-      <a class="concept" href="visualizations/newtons-cannonball.html"><span class="meta">47 / Orbital mechanics</span><h3>Orbit isn't up. It's sideways.</h3><p>Fire Newton's cannonball harder and harder from a mountain and watch it go from crashing, to orbiting, to leaving Earth for good.</p></a>
-      <a class="concept" href="visualizations/coriolis-effect.html"><span class="meta">48 / Rotating frames</span><h3>Straight lines that don't stay straight</h3><p>Watch a ball roll dead straight across a spinning disc and still look like it curves &mdash; then see why it's real for artillery but invisible in your bathtub.</p></a>
+    <div class="tile-grid">
+      <a class="tile" data-cat="Discoveries" data-desc="Copper, brass, steel, ceramic, plastic and glass may all look solid &mdash; but their atoms organise in fundamentally different ways." href="visualizations/materials-arrangement.html"><span class="meta">Discoveries</span><h3>Why materials are not all arranged alike</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Change a double-slit experiment and see wave fringes, individual detection events, and why making the path measurable removes the interference pattern." href="visualizations/double-slit.html"><span class="meta">Discoveries</span><h3>One particle, two slits</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Open one rear window and swing the opposite front door to see why a pressure pulse clears cabin air faster than one opening alone." href="visualizations/hot-car-flush.html"><span class="meta">Discoveries</span><h3>Flush the hot air from a parked car</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Set room temperature, humidity and the glass surface temperature to see exactly when invisible vapour turns into droplets." href="visualizations/dew-point-window.html"><span class="meta">Discoveries</span><h3>Why this window is fogging up</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Change air temperature, humidity and cloud cover to see a shallow pool radiate enough heat to freeze while the air stays above 0&deg;C." href="visualizations/night-sky-ice.html"><span class="meta">Discoveries</span><h3>How a desert night can make ice</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Turn one speed control and watch airflow fall linearly, pressure by the square, and ideal shaft power by the cube." href="visualizations/fan-laws.html"><span class="meta">Discoveries</span><h3>A little slower saves a lot of fan power</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Drag a person around a room box and watch comfort shift with a cold window's radiant pull &mdash; even when the air temperature never moves." href="visualizations/thermal-comfort-pmv.html"><span class="meta">Discoveries</span><h3>The room feels colder than the thermostat says</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Choose a planet and compare where its light began with where that planet is now." href="visualizations/planet-light-delay.html"><span class="meta">Discoveries</span><h3>You are seeing the past</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Change mass and distance to feel Newton&rsquo;s inverse-square law take effect." href="visualizations/gravity-lab.html"><span class="meta">Discoveries</span><h3>The pull between worlds</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Bend a ray of light across the boundary into water or glass, then reverse it and watch the same equation cut the light off entirely." href="visualizations/snells-law.html"><span class="meta">Discoveries</span><h3>Why the straw looks bent</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="See why required propellant grows exponentially, not linearly, with the speed change a rocket needs." href="visualizations/rocket-equation.html"><span class="meta">Discoveries</span><h3>Why one more passenger costs so much fuel</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Slide a planet's distance from the Sun outward and watch its orbital period grow even faster than its distance." href="visualizations/keplers-third-law.html"><span class="meta">Discoveries</span><h3>Why Mercury's year is 88 days</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Slide the transmission voltage up through real grid standards and watch resistive loss fall with the square of the increase." href="visualizations/grid-voltage.html"><span class="meta">Discoveries</span><h3>Why the grid runs at 400,000 volts</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Tune Earth's reflectivity and watch the balance settle on a temperature &mdash; then see how far the real 33&deg; greenhouse gap sits above it." href="visualizations/earth-temperature.html"><span class="meta">Discoveries</span><h3>Sunlight in, heat out</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Pick a real mass, from a mountain to the Sun, and see how small you'd need to crush it before it became a black hole." href="visualizations/earth-black-hole.html"><span class="meta">Discoveries</span><h3>Squeeze the Earth into a black hole</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Set a disease's rarity and a test's accuracy, then watch a grid of a hundred people show how many positive results are actually real." href="visualizations/bayes-theorem.html"><span class="meta">Discoveries</span><h3>Why a 99%-accurate test can still be wrong</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Add sine waves one harmonic at a time and watch a square wave emerge &mdash; with an overshoot that never quite goes away." href="visualizations/square-wave.html"><span class="meta">Discoveries</span><h3>The overshoot that refuses to leave</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Launch something from a real world's surface and see whether your speed clears its escape velocity or falls back down." href="visualizations/escape-velocity.html"><span class="meta">Discoveries</span><h3>Why the Moon lost its atmosphere</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Pick a real isotope and slide elapsed time in half-lives to see how carbon dating reads a bone's remaining atoms." href="visualizations/half-life.html"><span class="meta">Discoveries</span><h3>Reading a bone's age off its isotopes</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Steer a car's speed past a fixed listener and watch the pitch drop the instant it passes." href="visualizations/doppler-shift.html"><span class="meta">Discoveries</span><h3>Why a passing siren drops in pitch</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Drag a hydrogen electron's jump to emit one exact colour, then pick a real star and see which elements' dark lines show up in its light." href="visualizations/starlight-spectrum.html"><span class="meta">Discoveries</span><h3>Starlight has a barcode</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Fire Newton's cannonball harder and harder from a mountain and watch it go from crashing, to orbiting, to leaving Earth for good." href="visualizations/newtons-cannonball.html"><span class="meta">Discoveries</span><h3>Orbit isn't up. It's sideways.</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Watch a ball roll dead straight across a spinning disc and still look like it curves &mdash; then see why it's real for artillery but invisible in your bathtub." href="visualizations/coriolis-effect.html"><span class="meta">Discoveries</span><h3>Straight lines that don't stay straight</h3></a>
     </div>
   </section>
 
@@ -355,26 +352,28 @@
       <h2 id="cat-fun">Fun physics</h2>
       <span class="cat-count">Seventeen pages</span>
     </div>
-    <div class="grid">
-      <a class="concept" href="visualizations/capillary-rise.html"><span class="meta">59 / Capillarity</span><h3>How water climbs</h3><p>Change a liquid and an ideal glass-tube radius to see what sets capillary height and speed, then test the limits with a simple glass-gap experiment at home.</p></a>
-      <a class="concept" href="visualizations/well-depth.html"><span class="meta">55 / Motion and sound</span><h3>How deep is the well?</h3><p>Drop a stone, time the splash, and separate the stone&rsquo;s fall from the sound&rsquo;s return journey to estimate the depth.</p></a>
-      <a class="concept" href="visualizations/reynolds-number.html"><span class="meta">54 / Fluid flow</span><h3>When smooth flow breaks into turbulence</h3><p>Inject a dye stream into a pipe, then change the fluid, flow and diameter to watch orderly layers break into turbulent mixing.</p></a>
-      <a class="concept" href="visualizations/pendulum-period.html"><span class="meta">31 / Oscillation</span><h3>A swing keeps its own time</h3><p>Pull a pendulum back further and watch its rhythm barely change &mdash; until you push past the angle where that stops being true.</p></a>
-      <a class="concept" href="visualizations/terminal-velocity.html"><span class="meta">32 / Falling</span><h3>Falling as fast as the air allows</h3><p>Change body position and mass and watch a skydiver's fixed top speed shift &mdash; then open a canopy and watch the same equation slow it to a walk.</p></a>
-      <a class="concept" href="visualizations/ocean-salt.html"><span class="meta">33 / Scale</span><h3>All the salt in the sea</h3><p>Evaporate every ocean, spread the leftover salt over dry land, and see how deep the pile gets.</p></a>
-      <a class="concept" href="visualizations/ten-metre-ceiling.html"><span class="meta">34 / Fluid pressure</span><h3>The ten-metre ceiling</h3><p>However hard a pump pulls, no vacuum on Earth can lift water past one fixed, unbeatable height.</p></a>
-      <a class="concept" href="visualizations/coffee-cooling.html"><span class="meta">35 / Heat</span><h3>Milk now, or milk later?</h3><p>Add cold milk right away or wait until you're ready to drink &mdash; the same physics gives a different final temperature either way.</p></a>
-      <a class="concept" href="visualizations/resonance.html"><span class="meta">36 / Oscillation</span><h3>A small push, badly timed</h3><p>Sweep a driving frequency past a system's own, and watch a small push turn into a dangerously large swing.</p></a>
-      <a class="concept" href="visualizations/guitar-string.html"><span class="meta">37 / Sound</span><h3>A string you can actually hear</h3><p>Change a string's length, tension, and thickness, then press play and actually hear the pitch move.</p></a>
-      <a class="concept" href="visualizations/slinky-drop.html"><span class="meta">39 / Waves</span><h3>The bottom hasn't heard yet</h3><p>Let go of a stretched slinky's top and watch the bottom hang motionless until the news of the drop reaches it.</p></a>
-      <a class="concept" href="visualizations/sky-blue.html"><span class="meta">40 / Optics</span><h3>Why the sky is blue</h3><p>Slide through the visible spectrum and see why short wavelengths paint the sky blue and long ones paint sunsets red.</p></a>
-      <a class="concept" href="visualizations/ship-buoyancy.html"><span class="meta">41 / Fluids</span><h3>Why ships float</h3><p>Load cargo onto a steel hull and watch it settle lower in the water, until it finally floods and sinks.</p></a>
-      <a class="concept" href="visualizations/animal-biomass.html"><span class="meta">42 / Scale</span><h3>All animal life, by weight</h3><p>Stack humans, livestock, and every wild mammal on Earth by total weight, not headcount.</p></a>
-      <a class="concept" href="visualizations/cosmic-scale.html"><span class="meta">43 / Scale</span><h3>Closer to the smallest thing, or the biggest?</h3><p>Slide from the Planck length to the observable universe on one logarithmic ruler and see where anything &mdash; including you &mdash; actually falls.</p></a>
-      <a class="concept" href="visualizations/bounce-restitution.html"><span class="meta">44 / Collisions</span><h3>Count the bounces</h3><p>Drop a real ball onto a real surface and watch each rebound keep the same fraction of the last one's height &mdash; then turn on a balloon drum and keep counting after your eyes give up.</p></a>
-      <a class="concept" href="visualizations/straw-hose-flow-darcy.html"><span class="meta">49 / Fluid flow</span><h3>Why the straw gives up &mdash; airflow model</h3><p>Apply the same mouth pressure to a narrow straw and a wide hose, then compare the airflow each can actually deliver using compressible Darcy&ndash;Weisbach.</p></a>
+    <div class="tile-grid">
+      <a class="tile" data-cat="Fun physics" data-desc="Change a liquid and an ideal glass-tube radius to see what sets capillary height and speed, then test the limits with a simple glass-gap experiment at home." href="visualizations/capillary-rise.html"><span class="meta">Fun physics</span><h3>How water climbs</h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="Drop a stone, time the splash, and separate the stone&rsquo;s fall from the sound&rsquo;s return journey to estimate the depth." href="visualizations/well-depth.html"><span class="meta">Fun physics</span><h3>How deep is the well?</h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="Inject a dye stream into a pipe, then change the fluid, flow and diameter to watch orderly layers break into turbulent mixing." href="visualizations/reynolds-number.html"><span class="meta">Fun physics</span><h3>When smooth flow breaks into turbulence</h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="Pull a pendulum back further and watch its rhythm barely change &mdash; until you push past the angle where that stops being true." href="visualizations/pendulum-period.html"><span class="meta">Fun physics</span><h3>A swing keeps its own time</h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="Change body position and mass and watch a skydiver's fixed top speed shift &mdash; then open a canopy and watch the same equation slow it to a walk." href="visualizations/terminal-velocity.html"><span class="meta">Fun physics</span><h3>Falling as fast as the air allows</h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="Evaporate every ocean, spread the leftover salt over dry land, and see how deep the pile gets." href="visualizations/ocean-salt.html"><span class="meta">Fun physics</span><h3>All the salt in the sea</h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="However hard a pump pulls, no vacuum on Earth can lift water past one fixed, unbeatable height." href="visualizations/ten-metre-ceiling.html"><span class="meta">Fun physics</span><h3>The ten-metre ceiling</h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="Add cold milk right away or wait until you're ready to drink &mdash; the same physics gives a different final temperature either way." href="visualizations/coffee-cooling.html"><span class="meta">Fun physics</span><h3>Milk now, or milk later?</h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="Sweep a driving frequency past a system's own, and watch a small push turn into a dangerously large swing." href="visualizations/resonance.html"><span class="meta">Fun physics</span><h3>A small push, badly timed</h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="Change a string's length, tension, and thickness, then press play and actually hear the pitch move." href="visualizations/guitar-string.html"><span class="meta">Fun physics</span><h3>A string you can actually hear</h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="Let go of a stretched slinky's top and watch the bottom hang motionless until the news of the drop reaches it." href="visualizations/slinky-drop.html"><span class="meta">Fun physics</span><h3>The bottom hasn't heard yet</h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="Slide through the visible spectrum and see why short wavelengths paint the sky blue and long ones paint sunsets red." href="visualizations/sky-blue.html"><span class="meta">Fun physics</span><h3>Why the sky is blue</h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="Load cargo onto a steel hull and watch it settle lower in the water, until it finally floods and sinks." href="visualizations/ship-buoyancy.html"><span class="meta">Fun physics</span><h3>Why ships float</h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="Stack humans, livestock, and every wild mammal on Earth by total weight, not headcount." href="visualizations/animal-biomass.html"><span class="meta">Fun physics</span><h3>All animal life, by weight</h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="Slide from the Planck length to the observable universe on one logarithmic ruler and see where anything &mdash; including you &mdash; actually falls." href="visualizations/cosmic-scale.html"><span class="meta">Fun physics</span><h3>Closer to the smallest thing, or the biggest?</h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="Drop a real ball onto a real surface and watch each rebound keep the same fraction of the last one's height &mdash; then turn on a balloon drum and keep counting after your eyes give up." href="visualizations/bounce-restitution.html"><span class="meta">Fun physics</span><h3>Count the bounces</h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="Apply the same mouth pressure to a narrow straw and a wide hose, then compare the airflow each can actually deliver using compressible Darcy&ndash;Weisbach." href="visualizations/straw-hose-flow-darcy.html"><span class="meta">Fun physics</span><h3>Why the straw gives up &mdash; airflow model</h3></a>
     </div>
   </section>
+
+  <div class="tile-tip" id="tileTip" role="tooltip" hidden></div>
 
   <p class="note">These pages follow the same format as the rest of the site &mdash; one question, real numbers, a figure you move yourself &mdash; but haven't yet had the accuracy-and-polish review pass the homepage's pages have. Some may already be fine; treat all of them as provisional until they move to the homepage.</p>
 
@@ -408,12 +407,12 @@
   applyTheme(currentTheme());
 
   var SVG_NS = 'http://www.w3.org/2000/svg';
-  document.querySelectorAll('.concept[href^="visualizations/"]').forEach(function(card){
+  document.querySelectorAll('.tile[href^="visualizations/"]').forEach(function(card){
     var slug = card.getAttribute('href').split('/').pop().replace(/\.html$/, '');
     var iconSlug = slug === 'straw-hose-flow-darcy' ? 'straw-hose-flow' : slug;
     var icon = document.createElementNS(SVG_NS, 'svg');
     var use = document.createElementNS(SVG_NS, 'use');
-    icon.setAttribute('class', 'concept-icon');
+    icon.setAttribute('class', 'tile-icon');
     icon.setAttribute('viewBox', '0 0 120 64');
     icon.setAttribute('aria-hidden', 'true');
     icon.setAttribute('focusable', 'false');
@@ -425,21 +424,72 @@
   var search = document.getElementById('vizSearch');
   var category = document.getElementById('vizCategory');
   var count = document.getElementById('resultsCount');
-  var cards = Array.prototype.slice.call(document.querySelectorAll('.group .concept'));
+  var tiles = Array.prototype.slice.call(document.querySelectorAll('.group .tile'));
   function filterCards(){
     var q = search.value.trim().toLowerCase();
     var cat = category.value;
     var shown = 0;
-    cards.forEach(function(card){
-      var group = card.closest('.group');
-      var groupName = group.querySelector('h2').textContent.trim();
-      var matches = (!q || card.textContent.toLowerCase().indexOf(q) !== -1) && (cat === 'all' || cat === groupName);
+    tiles.forEach(function(card){
+      var hay = (card.textContent + ' ' + (card.getAttribute('data-desc') || '')).toLowerCase();
+      var matches = (!q || hay.indexOf(q) !== -1) && (cat === 'all' || cat === card.getAttribute('data-cat'));
       card.classList.toggle('is-hidden', !matches);
       if(matches) shown++;
     });
     count.textContent = shown + (shown === 1 ? ' page' : ' pages');
+    hideTip();
   }
   search.addEventListener('input', filterCards);
   category.addEventListener('change', filterCards);
+
+  // Description tooltip — same pattern as index.html.
+  var tip = document.getElementById('tileTip');
+  var tipTarget = null, tipTimer = null;
+  var allTiles = Array.prototype.slice.call(document.querySelectorAll('.tile[data-desc]'));
+
+  function placeTip(tile){
+    var r = tile.getBoundingClientRect();
+    tip.hidden = false;
+    var t = tip.getBoundingClientRect();
+    var margin = 12;
+    var left = r.left + (r.width - t.width) / 2;
+    left = Math.max(margin, Math.min(left, window.innerWidth - t.width - margin));
+    var top = r.bottom + 8;
+    if(top + t.height > window.innerHeight - margin) top = Math.max(margin, r.top - t.height - 8);
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+  }
+  function showTip(tile){
+    if(tipTarget === tile) return;
+    hideTip();
+    tipTarget = tile;
+    tip.textContent = tile.getAttribute('data-desc') || '';
+    if(!tip.textContent) { tipTarget = null; return; }
+    placeTip(tile);
+    tile.setAttribute('aria-describedby', 'tileTip');
+    void tip.offsetHeight;
+    tip.classList.add('is-visible');
+  }
+  function hideTip(){
+    if(tipTimer){ clearTimeout(tipTimer); tipTimer = null; }
+    if(tipTarget) tipTarget.removeAttribute('aria-describedby');
+    tipTarget = null;
+    tip.classList.remove('is-visible');
+    tip.hidden = true;
+  }
+  allTiles.forEach(function(tile){
+    tile.addEventListener('pointerenter', function(e){
+      if(e.pointerType === 'touch') return;
+      if(tipTimer) clearTimeout(tipTimer);
+      tipTimer = setTimeout(function(){ showTip(tile); }, 140);
+    });
+    tile.addEventListener('pointerleave', hideTip);
+    tile.addEventListener('focus', function(){ showTip(tile); });
+    tile.addEventListener('blur', hideTip);
+  });
+  window.addEventListener('scroll', function(){
+    if(tipTarget && document.activeElement === tipTarget) placeTip(tipTarget);
+    else hideTip();
+  }, {passive: true});
 })();
 </script>
+</html>

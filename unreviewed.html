@@ -409,8 +409,6 @@
 
   var SVG_NS = 'http://www.w3.org/2000/svg';
   document.querySelectorAll('.concept[href^="visualizations/"]').forEach(function(card){
-    card.target = '_blank';
-    card.rel = 'noopener';
     var slug = card.getAttribute('href').split('/').pop().replace(/\.html$/, '');
     var iconSlug = slug === 'straw-hose-flow-darcy' ? 'straw-hose-flow' : slug;
     var icon = document.createElementNS(SVG_NS, 'svg');

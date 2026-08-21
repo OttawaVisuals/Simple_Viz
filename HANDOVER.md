@@ -62,8 +62,9 @@ tool can pick up mid-stream without re-reading the whole chat history.
   `index.html`, using blue sine, gold linear and coral quadratic strokes. The four editable
   vector candidates remain in `Drafts/basic-functions-icon-options.svg`.
 - **2026-08-21 icon/link polish:** function strokes in the selected homepage icon were
-  reduced by 50%; its axes retain their original weight. Homepage and unreviewed catalogue
-  visualization tiles now open in new tabs; the convention is documented in `STYLE_GUIDE.md`.
+  reduced by 50%; its axes retain their original weight. Internal catalogue/page links stay
+  in the same tab; external source links open a new tab with `rel="noopener"`. The convention
+  is documented in `STYLE_GUIDE.md`.
 
 ## Fan laws page — new draft, 2026-08-20
 

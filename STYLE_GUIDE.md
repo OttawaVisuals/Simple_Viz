@@ -123,10 +123,10 @@ tighter section spacing and compact controls over hiding information. When contr
 results carry equal weight, use a 50/50 `.resultrow`; put each live number beside or at the
 end of the slider/gauge it explains rather than spending a separate vertical row on it.
 
-**Catalogue links.** Visualization tiles on `index.html` and `unreviewed.html` open their
-destination in a new tab (`target="_blank"` with `rel="noopener"`). The catalogue remains
-available while a reader explores a visualization. In-page navigation and contextual links
-stay in the same tab unless a page has a specific reason otherwise.
+**Link targets.** Internal links to pages on madeclear.ca (catalogue tiles, navigation and
+contextual cross-links) open in the same tab. External links to sources, papers and other
+websites open in a new tab (`target="_blank"` with `rel="noopener"`), so readers keep their
+place in the visualization. Apply this to every external `<a href="https://…">` source link.
 
 ## Component patterns
 

@@ -495,8 +495,6 @@
   // already names the concept.
   var SVG_NS = 'http://www.w3.org/2000/svg';
   document.querySelectorAll('.tile[href^="visualizations/"]').forEach(function(card){
-    card.target = '_blank';
-    card.rel = 'noopener';
     var slug = card.getAttribute('href').split('/').pop().replace(/\.html$/, '');
     var icon = document.createElementNS(SVG_NS, 'svg');
     var use = document.createElementNS(SVG_NS, 'use');

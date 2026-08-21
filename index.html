@@ -219,6 +219,9 @@
       <symbol id="icon-decibels" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M15 26h13l15-12v36L28 38H15z" fill="var(--accent)" stroke="var(--accent)"/><path d="M54 25q10 7 0 14M65 18q22 14 0 28M78 11q34 21 0 42"/><path d="M94 52V33h7v19M106 52V20h7v32" stroke="var(--accent)"/>
       </symbol>
+      <symbol id="icon-basic-functions" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 34h92M60 12v44"/><path d="M17 49L103 18" stroke="var(--cat-discoveries)" stroke-width="1.25"/><path d="M18 50Q60 8 102 50" stroke="var(--cat-fun)" stroke-width="1.25"/><path d="M16 45c12 0 12-22 24-22s12 22 24 22 12-22 24-22 12 22 20 22" stroke="var(--accent)" stroke-width="1.5"/>
+      </symbol>
       <symbol id="icon-earth-moon-race" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="15" cy="32" r="13" stroke-width="1.35"/>
         <path d="M5 27l9 2 4-6 6 4-2 7 4 3M9 39l8-3 3 6" stroke-width=".9"/>
@@ -411,7 +414,7 @@
       </select>
       <button class="text-btn" id="shuffleBtn" type="button">Shuffle</button>
       <button class="text-btn" id="resetOrderBtn" type="button" hidden>Reset order</button>
-      <span class="results-count" id="resultsCount" aria-live="polite">12 pages</span>
+      <span class="results-count" id="resultsCount" aria-live="polite">18 pages</span>
     </div>
 
     <div class="tile-grid" id="catalogueGrid">
@@ -419,6 +422,7 @@
       <a class="tile" data-cat="Everyday maths" data-desc="Drag the speed slider and watch braking distance grow with the square of speed &mdash; and see reaction distance stack on top." href="visualizations/braking-distance.html"><span class="meta">Everyday maths</span><h3>Why speed quadruples your stopping distance</h3></a>
       <a class="tile" data-cat="Everyday maths" data-desc="Move a load along a beam, reshape its cross-section, and see where visible sag becomes excessive bending stress." href="visualizations/shelf-sag.html"><span class="meta">Everyday maths</span><h3>A shelf that sags</h3></a>
       <a class="tile" data-cat="Everyday maths" data-desc="Compare true pizza areas with circles and area-equivalent shapes &mdash; the diameter that sounds smaller often wins." href="visualizations/pizza-area.html"><span class="meta">Everyday maths</span><h3>One big pizza, or two smaller ones?</h3></a>
+      <a class="tile" data-cat="Everyday maths" data-desc="Compare linear, quadratic, wave, exponential and logarithmic curves, then follow one moving input to see how the output changes." href="visualizations/basic-functions.html"><span class="meta">Everyday maths</span><h3>The curves behind most graphs</h3></a>
       <a class="tile" data-cat="Discoveries" data-desc="Watch light cross the Earth&ndash;Moon gap, and magnify the tiny first part of the same journey for slower travellers." href="visualizations/earth-moon-race.html"><span class="meta">Discoveries</span><h3>Earth to the Moon, at real speed</h3></a>
       <a class="tile" data-cat="Discoveries" data-desc="Turn an ordinary amount of mass into the energy hidden in E = mc2, then compare it against what real fuels &mdash; and everyday quantities like a Ford F-150 tank or a marathon &mdash; actually deliver." href="visualizations/mass-energy.html"><span class="meta">Discoveries</span><h3>How much energy is in matter?</h3></a>
       <a class="tile" data-cat="Discoveries" data-desc="Compare shadow angles at two cities a known distance apart, the way Eratosthenes sized up the Earth around 240 BC." href="visualizations/eratosthenes-shadow.html"><span class="meta">Discoveries</span><h3>Two sticks measure a planet</h3></a>
@@ -445,6 +449,7 @@
 
     <h3 class="rm-cat">Fun physics</h3>
     <ul>
+      <li><span><b>Can you hear the size of a bottle?</b> &mdash; change a bottle&rsquo;s air volume or neck opening and hear its Helmholtz resonance move in pitch</span><span class="eq">f = c/(2&pi;)&radic;(A/VL<sub>eff</sub>)</span><span class="status">idea</span></li>
       <li><span><b>Melting ice doesn't raise the glass</b> &mdash; float an ice cube in a full glass, mark the waterline, and watch it not move</span><span class="eq">&rho;<sub>ice</sub>V<sub>ice</sub> = &rho;<sub>water</sub>V<sub>disp</sub></span><span class="status">idea</span></li>
     </ul>
   </section>
@@ -490,6 +495,8 @@
   // already names the concept.
   var SVG_NS = 'http://www.w3.org/2000/svg';
   document.querySelectorAll('.tile[href^="visualizations/"]').forEach(function(card){
+    card.target = '_blank';
+    card.rel = 'noopener';
     var slug = card.getAttribute('href').split('/').pop().replace(/\.html$/, '');
     var icon = document.createElementNS(SVG_NS, 'svg');
     var use = document.createElementNS(SVG_NS, 'use');

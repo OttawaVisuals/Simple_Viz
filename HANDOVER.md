@@ -13,6 +13,58 @@ tool can pick up mid-stream without re-reading the whole chat history.
   filtering) with a "not a secure connection" warning — that's a corporate network/proxy
   issue on his end, not a site or Cloudflare cert problem; nothing to action here.
 
+## Basic functions page — reviewed and complete, 2026-08-21
+
+- **`visualizations/basic-functions.html`** ("The curves behind most graphs") is page
+  60, reviewed and listed under Everyday maths on `index.html` and in `tracker.html`. It was
+  removed from `unreviewed.html`.
+- One function is shown at a time: `sin(x)`, `cos(x)`, `tan(x)`, `e^x`, `ln(x)`, `log10(x)`,
+  `x`, `x²`, `|x|`, `1/x`, or `√x`. An automatically moving input dot can be paused or
+  dragged; the output readout, plot projections and gauge stay synchronized. Tangent and
+  reciprocal asymptotes plus positive-only log domains are explicitly drawn rather than
+  implying that the functions exist everywhere.
+- Angles are radians. Curves are educational standard real-valued forms, not measured data;
+  the output gauge is clipped to the visible plotting range for exponentials/tangent.
+- **2026-08-21 follow-up:** page can now overlay a gold comparison function over the blue
+  primary curve, using the same animated input. The primary function keeps the plot scale, so
+  a comparison outside it is clipped instead of silently changing the reference scale. A
+  visual log-scale section now contrasts the same four real sizes on linear and base-10-log
+  rulers: hair (0.07 mm), a person (1.7 m), CN Tower (553 m) and Earth's diameter
+  (12,742 km). The linear ruler visibly collapses the first three at the origin; the log
+  ruler allocates equal width to each tenfold jump. It also states that zero/negative values
+  cannot appear on a log axis.
+- **2026-08-21 refinement:** alternating pale blue bands now mark every power-of-ten interval
+  on the logarithmic ruler (`10^-1` through `10^10`), making the repeated scale jumps visible
+  as areas, not only as spacing.
+- **2026-08-21 layout:** the x input readout, animation control and slider now sit in the
+  right-hand result column above the y output. Function and comparison selectors remain left.
+- **2026-08-21 compact pass:** `basic-functions.html` now uses a 350px-high graph viewBox,
+  tighter top/hero/result spacing, and a 50/50 controls/results split. X's slider sits left
+  of its live number; the y headline is aligned opposite its label. Primary and comparison
+  selectors now share the same grouped pill layout and active-state geometry. The general
+  standard-laptop-height preference is recorded in `STYLE_GUIDE.md`.
+- **2026-08-21 log section:** always visible (no disclosure), with full-width explanatory
+  prose matching the page note. The prior narrow text came from this page's local
+  `.more p{max-width:78ch}` rule; that cap is overridden and the full-width rule is now also
+  explicit in `STYLE_GUIDE.md`.
+- **2026-08-21 CSS-order correction:** the legacy 78ch component rule was later in the
+  stylesheet than the first full-width override, so it won in the cascade. A final
+  `.more p{max-width:none}` is now placed after all component defaults, and `STYLE_GUIDE.md`
+  records the source-order requirement.
+- **2026-08-21 comparison repair:** choosing None now clears the gold path data and explicitly
+  hides both gold SVG elements. For sin/cos compared to tan/e^x, the graph and input range
+  expand to −10…10; the gold path is clipped to the plotting rectangle and samples outside
+  the primary y range are broken rather than drawn beyond the chart.
+- **2026-08-21 function expansion:** linear `x`, quadratic `x²`, absolute value `|x|`,
+  reciprocal `1/x` and square root `√x` were added. Reciprocal defaults to `x=1` to avoid an
+  undefined starting input; its vertical asymptote is shown by the curve break.
+- **Homepage icon:** Simon selected candidate 3 (three curve family). It is now active in
+  `index.html`, using blue sine, gold linear and coral quadratic strokes. The four editable
+  vector candidates remain in `Drafts/basic-functions-icon-options.svg`.
+- **2026-08-21 icon/link polish:** function strokes in the selected homepage icon were
+  reduced by 50%; its axes retain their original weight. Homepage and unreviewed catalogue
+  visualization tiles now open in new tabs; the convention is documented in `STYLE_GUIDE.md`.
+
 ## Fan laws page — new draft, 2026-08-20
 
 - **`visualizations/fan-laws.html`** ("A little slower saves a lot of fan power") is new
@@ -68,6 +120,33 @@ tool can pick up mid-stream without re-reading the whole chat history.
 - Sources are Reynolds' 1883 dye-filament experiment and NASA's official Reynolds-number
   explainer. States implying extreme mean speed are flagged rather than presented as normal
   pipe-flow examples.
+
+## Well-depth page — new draft, 2026-08-20
+
+- **`visualizations/well-depth.html`** ("How deep is the well?") is new page 55, listed
+  under Fun physics in `unreviewed.html` and `tracker.html`; it has not been reviewed.
+- It solves the stopwatch delay as two journeys: `t = √(2h/g) + h/c`, with total delay
+  and air temperature as controls. It uses `g = 9.81 m/s²` and
+  `c = 331.3 + 0.606T m/s`.
+- The default 4.0 s wait at 15°C gives about 70.6 m: 3.79 s falling and 0.21 s for sound
+  to return. Using all four seconds as fall time would give 78.5 m, 7.92 m too deep.
+- The hero animates the accelerating stone followed by the returning sound. A right-side
+  phase indicator highlights `√(2h/g)` during the fall, then `h/c` during the sound return;
+  the completed fall term stays visible but subdued. Sound is consistently gold in the
+  returning wave, `h/c` term and timeline segment. The lower section is an even 50/50 split:
+  two stacked sliders on the left, and results on the right; the result itself splits between
+  the current depth/timeline and the solved form
+  `h = (√(c² + 2gct) − c)²/(2g)`. The naive-result comparison remains exact.
+- Scope is explicit: vacuum free fall and constant gravity; stone drag, echoes, reaction
+  time, wind and humidity are omitted. Deep/light-stone cases can overestimate real depth.
+
+## Dew-point window page — new draft, 2026-08-20
+
+- **`visualizations/dew-point-window.html`** ("Why this window is fogging up") is page 56,
+  under Discoveries in `unreviewed.html` and `tracker.html`; it is unreviewed.
+- Uses the Magnus approximation over liquid water with indoor air temperature, relative
+  humidity and inside glass temperature. Condensation appears when the glass is at or below
+  the calculated dew point; fog/droplets are qualitative.
 
 ## Backlog — pitched ideas not yet built (added 2026-08-19)
 
@@ -2412,6 +2491,11 @@ fourth and has been built; see `index.html`'s `<section class="roadmap">` for th
   exactly its own weight in water, and ice melts into exactly that same volume of water — ties
   into the real climate-science point that floating sea ice melting doesn't raise sea level
   (only land ice does), worth stating directly in the note.
+- **Can you hear the size of a bottle?** (Fun physics; added 2026-08-21) — a household
+  Helmholtz-resonance experiment: change a bottle's air volume or neck opening and hear the
+  pitch move. The core model is f = c/(2π)√(A/(VL_eff)); it should explicitly state that the
+  effective neck length includes an end correction, so it is an estimate rather than a
+  precision measurement.
 
 ## Open questions / next steps
 

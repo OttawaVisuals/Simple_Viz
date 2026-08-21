@@ -116,6 +116,18 @@ Top to bottom, in this order:
 Stack to a single column below ~700–820px; see the `@media` queries in
 `straw-hose-flow.html` for the exact breakpoints per section.
 
+**Laptop-height default.** The title, equation, hero animation, controls and live results
+should fit within a standard laptop viewport where the concept permits (roughly 768 px tall,
+before the optional presets, methodology, note and feedback). Prefer a shorter SVG viewBox,
+tighter section spacing and compact controls over hiding information. When controls and live
+results carry equal weight, use a 50/50 `.resultrow`; put each live number beside or at the
+end of the slider/gauge it explains rather than spending a separate vertical row on it.
+
+**Catalogue links.** Visualization tiles on `index.html` and `unreviewed.html` open their
+destination in a new tab (`target="_blank"` with `rel="noopener"`). The catalogue remains
+available while a reader explores a visualization. In-page navigation and contextual links
+stay in the same tab unless a page has a specific reason otherwise.
+
 ## Component patterns
 
 **Theme toggle** — plain text button, not an icon or switch, matching the topbar's
@@ -232,6 +244,14 @@ added lower on the page (`starsection`, `lightclock`, or similar — see
 inheriting that cap just leaves empty space beside the text for no reason. Override it
 explicitly: `.yoursection .sub{max-width:none}`, alongside the smaller top margin these
 sections already use.
+
+The same rule applies to an always-visible explanatory section: its prose should span the
+same full content width as the `.note`, unless a deliberate side-by-side layout constrains it.
+Do not give it an arbitrary `ch` cap that makes it look narrower than the page below it.
+When overriding an earlier component rule, put the full-width override **after** that rule in
+the page stylesheet (or remove the old cap): equal-specificity CSS resolves in favour of the
+later declaration. This exact source-order mistake caused the basic-functions log section to
+remain constrained despite an earlier `max-width:none` override.
 
 **On `index.html` and `about.html`, body text spans the full `.wrap` width — same edges as
 the tile grid — not a narrower reading-column measure.** These two pages are full-width

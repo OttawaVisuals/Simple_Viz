@@ -65,6 +65,11 @@ tool can pick up mid-stream without re-reading the whole chat history.
   reduced by 50%; its axes retain their original weight. Internal catalogue/page links stay
   in the same tab; external source links open a new tab with `rel="noopener"`. The convention
   is documented in `STYLE_GUIDE.md`.
+- **Session closed, 2026-08-21:** basic-functions work is complete and reviewed. Commit
+  `ac259b5` added the page, its reviewed catalogue/tracker status, icon options and style
+  guidance; commit `50b318c` corrected link targets globally for the current HTML source
+  links. Both are pushed to `main`. The next optional enhancement is adding more advanced
+  functions (for example logistic, general power or step), but no follow-up work is pending.
 
 ## Fan laws page — new draft, 2026-08-20
 

@@ -74,6 +74,11 @@ conform, per Simon's explicit call.
   the prior session because the local browser-control bridge failed; manually review the page
   at desktop and mobile widths before publishing.
 
+## Cosmic scale page — reviewed and complete, 2026-08-22
+
+- **`visualizations/cosmic-scale.html`** (“Closer to the smallest thing, or the biggest?”) is reviewed and complete. It now has selectable smallest/biggest endpoints, a log-scale position result, and a separate multiplicative scale-factor result.
+- Moved from `unreviewed.html` to the reviewed-only catalogue in `index.html` under Fun physics. Reviewed count is now 15; unreviewed count is now 46.
+
 ## Basic functions page — reviewed and complete, 2026-08-21
 
 - **`visualizations/basic-functions.html`** ("The curves behind most graphs") is page
@@ -188,10 +193,11 @@ conform, per Simon's explicit call.
   explainer. States implying extreme mean speed are flagged rather than presented as normal
   pipe-flow examples.
 
-## Well-depth page — new draft, 2026-08-20
+## Well-depth page — reviewed and complete, 2026-08-22
 
-- **`visualizations/well-depth.html`** ("How deep is the well?") is new page 55, listed
-  under Fun physics in `unreviewed.html` and `tracker.html`; it has not been reviewed.
+- **`visualizations/well-depth.html`** ("How deep is the well?") is page 55, reviewed and
+  listed under Fun physics on `index.html` and in `tracker.html`; it was removed from
+  `unreviewed.html`.
 - It solves the stopwatch delay as two journeys: `t = √(2h/g) + h/c`, with total delay
   and air temperature as controls. It uses `g = 9.81 m/s²` and
   `c = 331.3 + 0.606T m/s`.

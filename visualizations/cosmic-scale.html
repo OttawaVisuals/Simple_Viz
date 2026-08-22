@@ -7,16 +7,19 @@
   :root{
     --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
     --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+    --small:var(--accent);--large:#D9A41F;--marker:#3E8E6E;
   }
   @media (prefers-color-scheme:dark){
     :root:not([data-theme="light"]){
       --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
       --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+      --small:var(--accent);--large:#F0C766;--marker:#6FBFA0;
     }
   }
   :root[data-theme="dark"]{
     --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
     --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    --small:var(--accent);--large:#F0C766;--marker:#6FBFA0;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
@@ -48,7 +51,7 @@
   .headleft{min-width:0}
   h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
   h1 em{font-style:italic;font-weight:300}
-  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:54ch;margin:10px 0 0;text-wrap:pretty}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
 
   .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
   .eqn{display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);font-size:clamp(22px,2.6vw,32px);line-height:1;font-weight:300}
@@ -67,13 +70,22 @@
   .legend .name{font-size:12.5px;color:var(--muted2)}
   .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
 
+  .endpoints{display:flex;flex-wrap:wrap;gap:14px 28px;padding-top:16px;border-top:1px solid var(--line)}
+  .endpoint-choice{display:flex;align-items:baseline;flex-wrap:wrap;gap:7px 10px}
+  .endpoint-label{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .endpoint-pills{display:flex;flex-wrap:wrap;gap:5px}
+  .endpoint-pill{appearance:none;cursor:pointer;border:1px solid var(--line2);border-radius:999px;background:transparent;padding:5px 9px;color:var(--muted2);font:12px/1 ui-monospace,monospace}
+  .endpoint-pill:hover,.endpoint-pill:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
+  .endpoint-pill[aria-pressed="true"]{border-color:var(--fg);background:var(--fg);color:var(--bg)}
+
   .hero{position:relative;width:100%;margin:clamp(28px,4vw,44px) 0 0}
   .hero svg{width:100%;height:auto;display:block}
-  .hero .lbl{position:absolute;font:500 10.5px ui-monospace,monospace;letter-spacing:.03em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
+  .hero .lbl{position:absolute;display:flex;align-items:center;gap:4px;font:500 10.5px ui-monospace,monospace;letter-spacing:.03em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
+  .hero .item-icon{width:13px;height:13px;flex:none;overflow:visible}
   .hero .lbl.you{color:var(--fg);font-weight:700}
   .hero .lbl.cur{color:var(--accent);font-weight:600}
 
-  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  .resultrow{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
   @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
 
   .ctrls{display:flex;flex-direction:column;gap:clamp(18px,2.2vw,28px)}
@@ -89,13 +101,19 @@
   .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
   .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
 
-  .result{text-align:left}
+  .result{display:grid;grid-template-columns:1fr 1fr;gap:clamp(18px,2.5vw,36px);text-align:left}
+  .result-panel+.result-panel{border-left:1px solid var(--line);padding-left:clamp(18px,2.5vw,36px)}
   .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
   .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
   .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
   .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
   .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px}
   .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
+  .distance-kpi{margin-top:10px;font:500 13px/1.4 ui-monospace,monospace;color:var(--muted2)}
+  .distance-kpi strong{color:var(--fg);font-size:15px}.distance-kpi span{color:var(--muted)}
+  .linear-value{margin-top:8px;font:500 clamp(20px,2.2vw,29px)/1 ui-monospace,monospace;letter-spacing:-.03em;color:var(--fg)}
+  .linear-copy{margin-top:7px;font-size:13px;line-height:1.45;color:var(--muted2)}
+  .linear-verdict{font-size:clamp(16px,1.7vw,19px);font-weight:600;line-height:1.25}
   .gauge{position:relative;height:56px;margin-top:16px;max-width:420px}
   .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
   .gauge .ticklabel{position:absolute;top:26px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
@@ -112,6 +130,8 @@
   .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
   .note a{color:var(--muted2);text-decoration-color:var(--line2)}
   .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  .record-notes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,2vw,28px);margin-top:18px;padding-top:16px;border-top:1px solid var(--line);font:11px/1.6 ui-monospace,monospace;color:var(--muted)}
+  .record-notes p{margin:0}.record-notes strong{display:block;margin-bottom:3px;color:var(--muted2);font-weight:600}.record-notes a{color:var(--muted2);text-decoration-color:var(--line2)}
 
   .feedback{margin-top:clamp(40px,4.6vw,64px);padding-top:20px;border-top:1px solid var(--line)}
   .feedback-head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:20px}
@@ -137,7 +157,7 @@
   .footer{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,40px);font:11.5px/1.7 ui-monospace,monospace;color:var(--muted)}
   .footer a{color:var(--muted2);text-decoration-color:var(--line2)}
   .footer a:hover{color:var(--accent);text-decoration-color:var(--accent)}
-  @media (max-width:700px){.feedback-head{grid-template-columns:1fr}.feedback-choices{justify-content:flex-start}.footer{grid-template-columns:1fr;gap:10px}}
+  @media (max-width:700px){.result{grid-template-columns:1fr}.result-panel+.result-panel{border-left:0;border-top:1px solid var(--line);padding:18px 0 0}.record-notes{grid-template-columns:1fr}.feedback-head{grid-template-columns:1fr}.feedback-choices{justify-content:flex-start}.footer{grid-template-columns:1fr;gap:10px}}
 </style>
 <main>
 <div class="wrap">
@@ -159,7 +179,7 @@
   <div class="topgrid">
     <div class="headleft">
       <h1>Closer to the smallest thing &mdash; <em>or the biggest?</em></h1>
-      <p class="sub">Line up everything from the Planck length (1.6 × 10⁻³⁵ m, the smallest meaningful distance) to the observable universe (8.8 × 10²⁶ m) on one logarithmic ruler. A human turns out to sit past the midpoint &mdash; closer to the biggest end than the smallest.</p>
+      <p class="sub">Choose the ends, then line up the objects between them on one logarithmic ruler. Equal steps are equal multiples, not equal distances.</p>
     </div>
 
     <div class="eqnbox">
@@ -180,7 +200,9 @@
   </div>
 
   <div class="hero" id="heroWrap">
-    <svg id="heroSvg" role="img" aria-label="A logarithmic ruler from the Planck length to the observable universe, with reference objects marked and a slider showing where the selected size falls.">
+    <svg id="heroSvg" role="img" aria-label="A logarithmic ruler with reference objects marked and a slider showing where the selected size falls.">
+      <g id="orderBandsG"></g>
+      <g id="orderLabelsG"></g>
       <line id="axis" stroke="var(--line2)" stroke-width="1.25"></line>
       <g id="ticksG"></g>
       <line id="youTick" stroke="var(--fg)" stroke-width="1.5"></line>
@@ -195,45 +217,81 @@
       <div class="ctrl" id="sizeCtrl">
         <div class="ctrl-head">
           <span class="ctrl-title">Size <em id="sLabel">s</em></span>
-          <span class="ctrl-rel">drag across ~62 orders of magnitude</span>
+          <span class="ctrl-rel" id="scaleSpan"></span>
         </div>
         <div class="readout mono" id="sizeReadout"></div>
-        <div class="track" id="sizeTrack" tabindex="0" role="slider" aria-label="Size, from the Planck length to the observable universe">
+        <div class="track" id="sizeTrack" tabindex="0" role="slider">
           <div class="rail"></div>
           <div class="fill" id="sizeFill"></div>
           <div class="thumb" id="sizeThumb"></div>
         </div>
-        <div class="track-range"><span>&#8467;<sub>P</sub></span><span class="mid">drag to any size, or try a preset below</span><span>U</span></div>
+        <div class="track-range"><span id="minRange">Planck</span><span class="mid">drag to any size, or try a preset below</span><span id="maxRange">Universe</span></div>
+      </div>
+      <div class="endpoints" aria-label="Choose the ends of the scale">
+        <div class="endpoint-choice" role="group" aria-label="Smallest end">
+          <span class="endpoint-label">Smallest</span>
+          <div class="endpoint-pills">
+            <button class="endpoint-pill" type="button" data-end="min" data-key="planck" aria-pressed="true">Planck</button>
+            <button class="endpoint-pill" type="button" data-end="min" data-key="quark" aria-pressed="false">Quark</button>
+            <button class="endpoint-pill" type="button" data-end="min" data-key="proton" aria-pressed="false">Proton</button>
+          </div>
+        </div>
+        <div class="endpoint-choice" role="group" aria-label="Biggest end">
+          <span class="endpoint-label">Biggest</span>
+          <div class="endpoint-pills">
+            <button class="endpoint-pill" type="button" data-end="max" data-key="universe" aria-pressed="true">Universe</button>
+            <button class="endpoint-pill" type="button" data-end="max" data-key="milkyway" aria-pressed="false">Milky Way</button>
+            <button class="endpoint-pill" type="button" data-end="max" data-key="sun" aria-pressed="false">Sun</button>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="result">
-      <div class="result-label">Position on the scale</div>
-      <div class="result-value"><span class="num mono" id="fValue"></span><span class="unit mono">%</span><span class="v" id="verdict"></span></div>
-      <div class="verdict-sub" id="verdictSub"></div>
-      <div class="gauge" id="gauge">
-        <div class="track"></div>
-        <div class="you" id="gYou"></div>
-        <div class="youlabel" id="gYouLabel">you</div>
-        <div class="mark" id="gMark"></div>
-        <div class="marklabel mono" id="gMarkLabel"></div>
-        <div id="gTicks"></div>
-        <div id="gLabels"></div>
+      <div class="result-panel">
+        <div class="result-label">Log scale</div>
+        <div class="result-value"><span class="num mono" id="fValue"></span><span class="unit mono">%</span><span class="v" id="verdict"></span></div>
+        <div class="verdict-sub" id="verdictSub"></div>
+        <div class="distance-kpi" id="distanceKpi"></div>
+        <div class="gauge" id="gauge">
+          <div class="track"></div>
+          <div class="you" id="gYou"></div>
+          <div class="youlabel" id="gYouLabel">you</div>
+          <div class="mark" id="gMark"></div>
+          <div class="marklabel mono" id="gMarkLabel"></div>
+          <div id="gTicks"></div>
+          <div id="gLabels"></div>
+        </div>
+      </div>
+      <div class="result-panel">
+        <div class="result-label">Scale factor</div>
+        <div class="linear-value" id="linearValue"></div>
+        <div class="linear-copy linear-verdict" id="linearVerdict"></div>
+        <div class="linear-copy" id="linearFormula"></div>
       </div>
     </div>
   </div>
 
   <div class="presets">
     <span class="presets-title">Try</span>
+    <button class="preset" data-p="quark">a quark (upper limit)</button>
+    <button class="preset" data-p="weak">the weak force&rsquo;s reach</button>
     <button class="preset" data-p="proton">a proton</button>
     <button class="preset" data-p="virus">a virus</button>
     <button class="preset" data-p="rice">a grain of rice</button>
+    <button class="preset" data-p="everest">Mount Everest</button>
+    <button class="preset" data-p="moon">the Moon</button>
     <button class="preset" data-p="whale">a blue whale</button>
     <button class="preset" data-p="earth">Earth</button>
+    <button class="preset" data-p="planet">largest exoplanet</button>
+    <button class="preset" data-p="star">largest star</button>
+    <button class="preset" data-p="blackhole">largest black hole</button>
+    <button class="preset" data-p="oort">the Oort Cloud</button>
     <button class="preset" data-p="universe">the observable universe</button>
   </div>
 
-  <p class="note">The <a href="https://en.wikipedia.org/wiki/Planck_length" target="_blank" rel="noopener">Planck length</a> isn't the size of a real object &mdash; it's the theoretical scale at which our current physics stops making sense, used here only because it's the smallest distance anyone can meaningfully talk about. The <a href="https://en.wikipedia.org/wiki/Observable_universe" target="_blank" rel="noopener">observable universe</a>'s diameter (&asymp;93 billion light-years) is the other fixed end. Both extremes and every object in between are placed by their order of magnitude, i.e. their base&#8209;10 logarithm &mdash; equal steps on this ruler are equal multiples, not equal distances, which is what makes the whole range fit on one page. See also the classic <a href="https://en.wikipedia.org/wiki/Orders_of_magnitude_(length)" target="_blank" rel="noopener">orders of magnitude (length)</a> table this page draws its reference sizes from. One honest wrinkle: the gap from the Planck length up to a single proton is already about 20 orders of magnitude &mdash; roughly a third of the entire ruler &mdash; almost all of it in a subatomic realm with nothing built at intermediate scales, so the "midpoint" this page measures against is shaped by that empty stretch as much as by anything at the large end.</p>
+  <p class="note">The <a href="https://en.wikipedia.org/wiki/Planck_length" target="_blank" rel="noopener">Planck length</a> isn't the size of a real object &mdash; it's the theoretical scale at which our current physics stops making sense, used here only as one possible small-end reference. The <a href="https://en.wikipedia.org/wiki/Observable_universe" target="_blank" rel="noopener">observable universe</a>'s diameter is about 93 billion light-years. Every point is placed by its order of magnitude, i.e. its base&#8209;10 logarithm: equal steps are equal multiples, not equal distances. The quark mark is an <strong>upper limit</strong>, not a measured diameter: CMS has probed for quark substructure down to 10<sup>&minus;20</sup>&nbsp;m without finding it. The weak force&rsquo;s reach is about 10<sup>&minus;18</sup>&nbsp;m. The Oort Cloud is a hypothesized shell around the Sun; its outer edge may reach 1.6 light-years away, so this ruler uses a rough 3.2-light-year diameter. See CERN&rsquo;s explanations of <a href="https://home.cern/cms-looks-deep-inside-quarks/" target="_blank" rel="noopener">the quark limit</a> and <a href="https://home.cern/science/physics/z-boson/" target="_blank" rel="noopener">the weak force&rsquo;s range</a>, NASA&rsquo;s <a href="https://science.nasa.gov/solar-system/oort-cloud/facts/" target="_blank" rel="noopener">Oort Cloud summary</a>, plus the classic <a href="https://en.wikipedia.org/wiki/Orders_of_magnitude_(length)" target="_blank" rel="noopener">orders of magnitude (length)</a> table.</p>
+  <div class="record-notes" aria-label="Record-scale notes"><p><strong>Largest exoplanet</strong>NASA&rsquo;s catalogue lists V2376 Ori b at 87.21 Earth radii: about 1.11 million km across. Its estimated mass is 20 Jupiters, so the classification sits near the planet/brown-dwarf boundary. <a href="https://exoplanetarchive.ipac.caltech.edu/overview/V2376%20Ori" target="_blank" rel="noopener">NASA Exoplanet Archive</a></p><p><strong>Largest star</strong>Stephenson 2-18 is often cited at about 2,150 solar radii, or roughly 3.0 billion km across. That extreme estimate depends on an uncertain distance, so treat it as provisional. <a href="https://en.wikipedia.org/wiki/Stephenson_2_DFK_1" target="_blank" rel="noopener">Estimate and uncertainty</a></p><p><strong>Largest black hole</strong>TON 618 is the most massive observed black hole in this comparison: its estimated event-horizon diameter is about 390 billion km. <a href="https://www.guinnessworldrecords.com/world-records/76251-heaviest-black-hole" target="_blank" rel="noopener">Current record summary</a></p></div>
 
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
@@ -271,34 +329,52 @@
 (function(){
   var PLANCK = 1.616255e-35;   // m — theoretical smallest meaningful length
   var UNIVERSE = 8.8e26;       // m — observable universe diameter (~93 billion ly)
-  var LOGMIN = Math.log10(PLANCK);
-  var LOGMAX = Math.log10(UNIVERSE);
+  var ENDS = {
+    planck:{name:'Planck length', symbol:'ℓP', size:PLANCK},
+    quark:{name:'Quark', symbol:'quark', size:1e-20},
+    proton:{name:'Proton', symbol:'proton', size:1.7e-15},
+    sun:{name:'Sun', symbol:'Sun', size:1.3914e9},
+    milkyway:{name:'Milky Way', symbol:'Milky Way', size:9.4607e20},
+    universe:{name:'Observable universe', symbol:'U', size:UNIVERSE}
+  };
+  var minKey = 'planck', maxKey = 'universe';
+  var LOGMIN = Math.log10(ENDS[minKey].size);
+  var LOGMAX = Math.log10(ENDS[maxKey].size);
   var SPAN = LOGMAX - LOGMIN;
 
   var OBJS = [
     {key:'planck',  name:'Planck length', size:PLANCK},
+    {key:'quark',   name:'Quark <10⁻²⁰ m', size:1e-20},
+    {key:'weak',    name:'Weak force reach', size:1e-18},
     {key:'proton',  name:'Proton',        size:1.7e-15},
     {key:'atom',    name:'Atom',          size:1.06e-10},
     {key:'virus',   name:'Virus',         size:1e-7},
     {key:'rice',    name:'Rice grain',    size:7e-3},
     {key:'human',   name:'You',           size:1.7, you:true},
     {key:'whale',   name:'Blue whale',    size:25},
+    {key:'everest', name:'Mount Everest', size:8848.86, lane:{tick:-64,label:-88}},
+    {key:'moon',    name:'Moon',          size:3.474e6},
     {key:'earth',   name:'Earth',         size:1.2742e7},
-    {key:'sun',     name:'The Sun',       size:1.3914e9},
+    {key:'planet',  name:'Largest exoplanet', size:1.11123e9},
+    {key:'sun',     name:'The Sun',       size:1.3914e9, lane:{tick:-42,label:-58}},
+    {key:'star',    name:'Largest star',  size:2.99151e12},
+    {key:'blackhole',name:'Largest black hole', size:3.9e14},
+    {key:'oort',    name:'Oort Cloud',    size:3.0e16},
     {key:'milkyway',name:'Milky Way',     size:9.4607e20},
     {key:'universe',name:'Universe',      size:UNIVERSE}
   ];
+  var MOBILE_KEYS = ['planck','quark','atom','rice','human','earth','sun','milkyway','universe'];
   // 4 vertical lanes, cycled by index, so items that sit close together on the
   // (very unevenly populated) log axis still land on visually separate rows —
   // e.g. the rice/human/whale/earth cluster above each get a distinct lane.
   var LANES = [
-    {tick:-40, label:-56},
-    {tick: 22, label: 34},
-    {tick:-22, label:-34},
-    {tick: 40, label: 54}
+    {tick:-64, label:-88},
+    {tick: 50, label: 76},
+    {tick:-42, label:-58},
+    {tick: 34, label: 52}
   ];
   var PRESETS = {
-    proton:1.7e-15, virus:1e-7, rice:7e-3, whale:25, earth:1.2742e7, universe:UNIVERSE
+    quark:1e-20, weak:1e-18, proton:1.7e-15, virus:1e-7, rice:7e-3, everest:8848.86, moon:3.474e6, whale:25, earth:1.2742e7, planet:1.11123e9, star:2.99151e12, blackhole:3.9e14, oort:3.0e16, universe:UNIVERSE
   };
   var SUP='⁰¹²³⁴⁵⁶⁷⁸⁹';
   function sup(n){ return String(n).split('').map(function(c){ return c==='-'?'⁻':(c==='+'?'':SUP[+c]); }).join(''); }
@@ -331,19 +407,49 @@
   function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
   function logOf(m){ return Math.log10(m); }
   function fOf(m){ return clamp((logOf(m)-LOGMIN)/SPAN, 0, 1); }
+  function minEnd(){ return ENDS[minKey]; }
+  function maxEnd(){ return ENDS[maxKey]; }
+  function setEndpoints(){
+    LOGMIN = logOf(minEnd().size); LOGMAX = logOf(maxEnd().size); SPAN = LOGMAX - LOGMIN;
+    state.logS = clamp(state.logS, LOGMIN, LOGMAX);
+  }
 
   var HUMAN = 1.7;
-  var fHuman = fOf(HUMAN);
+  function fHuman(){ return fOf(HUMAN); }
+  function selectionColour(m){ return fOf(m)>=.5 ? 'var(--large)' : 'var(--small)'; }
 
   var $ = function(id){ return document.getElementById(id); };
-  var state = { logS: logOf(HUMAN) };
-  var heroW = 0;
+  var state = { logS: logOf(HUMAN), active:null };
+  var heroW = 0, itemLabelY=[];
 
-  var heroWrap=$('heroWrap'), heroSvg=$('heroSvg'), axis=$('axis'), ticksG=$('ticksG');
+  var heroWrap=$('heroWrap'), heroSvg=$('heroSvg'), orderBandsG=$('orderBandsG'), orderLabelsG=$('orderLabelsG'), axis=$('axis'), ticksG=$('ticksG');
   var youTick=$('youTick'), youDot=$('youDot'), curDrop=$('curDrop'), curMark=$('curMark');
 
   var NS='http://www.w3.org/2000/svg';
   function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+  function itemIcon(key){
+    var icon=el('svg',{class:'item-icon',viewBox:'0 0 16 16',fill:'none',stroke:'currentColor','stroke-width':'1.4','stroke-linecap':'round','stroke-linejoin':'round'});
+    function add(tag,attrs){ icon.appendChild(el(tag,attrs)); }
+    if(key==='planck'){ add('path',{d:'M8 2v12M2 8h12'}); }
+    else if(key==='quark'){ add('circle',{cx:8,cy:8,r:2,fill:'currentColor'});add('circle',{cx:3,cy:4,r:.8,fill:'currentColor'});add('circle',{cx:13,cy:12,r:.8,fill:'currentColor'}); }
+    else if(key==='weak'){ add('path',{d:'M1 8c2-6 4 6 7 0s4 6 7 0'}); }
+    else if(key==='proton'){ add('circle',{cx:8,cy:8,r:4});add('path',{d:'M8 5v6M5 8h6'}); }
+    else if(key==='atom'){ add('ellipse',{cx:8,cy:8,rx:6,ry:2.5});add('ellipse',{cx:8,cy:8,rx:2.5,ry:6,transform:'rotate(45 8 8)'});add('circle',{cx:8,cy:8,r:1,fill:'currentColor'}); }
+    else if(key==='virus'){ add('circle',{cx:8,cy:8,r:3.5});add('path',{d:'M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.5 1.5M11.5 11.5L13 13M13 3l-1.5 1.5M4.5 11.5L3 13'}); }
+    else if(key==='rice'){ add('ellipse',{cx:8,cy:8,rx:6,ry:2.4,transform:'rotate(-25 8 8)'}); }
+    else if(key==='human'){ add('circle',{cx:8,cy:3.5,r:1.8});add('path',{d:'M8 5.5v5M4.5 7.5L8 8.5l3.5-1M8 10.5l-3 4M8 10.5l3 4'}); }
+    else if(key==='whale'){ add('path',{d:'M1 9c3-5 9-5 12-1l2-2v5l-2-1c-4 4-9 3-12-1z'});add('path',{d:'M7 5l1-2 1 2'}); }
+    else if(key==='everest'){ add('path',{d:'M1 14L7 4l2 3 2-2 4 9z'}); }
+    else if(key==='moon'){ add('circle',{cx:8,cy:8,r:6});add('circle',{cx:5,cy:6,r:1});add('circle',{cx:10.5,cy:10,r:1.4}); }
+    else if(key==='earth'){ add('circle',{cx:8,cy:8,r:6});add('path',{d:'M2 8h12M8 2c3 3 3 9 0 12M8 2c-3 3-3 9 0 12'}); }
+    else if(key==='planet'){ add('circle',{cx:8,cy:8,r:5});add('path',{d:'M3 8h10'}); }
+    else if(key==='sun'||key==='star'){ add('circle',{cx:8,cy:8,r:3.5});add('path',{d:'M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.5 1.5M11.5 11.5L13 13M13 3l-1.5 1.5M4.5 11.5L3 13'}); }
+    else if(key==='blackhole'){ add('circle',{cx:8,cy:8,r:5});add('circle',{cx:8,cy:8,r:2.5,fill:'currentColor'});add('path',{d:'M2 5c4-4 9-3 12 1'}); }
+    else if(key==='oort'){ add('circle',{cx:8,cy:8,r:6,'stroke-dasharray':'1 2'});add('circle',{cx:8,cy:8,r:1,fill:'currentColor'}); }
+    else if(key==='milkyway'){ add('path',{d:'M3 11c7 3 11-7 4-8-6-1-6 7 0 8 5 1 7-5 3-7'}); }
+    else { add('circle',{cx:8,cy:8,r:6});add('circle',{cx:5,cy:6,r:.8,fill:'currentColor'});add('circle',{cx:11,cy:5,r:.8,fill:'currentColor'});add('circle',{cx:10,cy:11,r:.8,fill:'currentColor'}); }
+    return icon;
+  }
 
   var tickEls = OBJS.map(function(){
     var line = el('line', {'stroke':'var(--line2)','stroke-width':1});
@@ -353,7 +459,8 @@
   });
   var lblEls = OBJS.map(function(o,i){
     var lbl = document.createElement('div'); lbl.className='lbl'+(o.you?' you':'');
-    lbl.textContent = o.name;
+    var name = document.createElement('span'); name.textContent = o.name;
+    lbl.appendChild(itemIcon(o.key)); lbl.appendChild(name);
     lbl.style.transform = i===0 ? 'translateX(0)' : (i===OBJS.length-1 ? 'translateX(-100%)' : 'translateX(-50%)');
     heroWrap.appendChild(lbl);
     return {lbl:lbl};
@@ -363,12 +470,29 @@
   heroWrap.appendChild(curLbl);
 
   function geom(w){
-    var axisY = 90;
+    var axisY = 135;
     var pad = 6;
-    return { w:w, axisY:axisY, vbH: axisY+64, pad:pad };
+    return { w:w, axisY:axisY, vbH: axisY+96, pad:pad };
   }
 
   function xFor(w,pad,size){ return pad + (w-2*pad)*fOf(size); }
+  function boxesOverlap(a,b){ return a.left<b.right && a.right>b.left && a.top<b.bottom && a.bottom>b.top; }
+  function resolveItemLabels(g,py){
+    var placed=Array.prototype.slice.call(orderLabelsG.querySelectorAll('text')).map(function(label){ return label.getBoundingClientRect(); }),shifts=[0,-24,24,-48,48,-72,72];
+    OBJS.forEach(function(o,i){
+      var label=lblEls[i].lbl,base=itemLabelY[i],chosen=base;
+      for(var s=0;s<shifts.length;s++){
+        var candidate=base+shifts[s];
+        if(candidate<5 || candidate>g.vbH-16) continue;
+        label.style.top=py(candidate);
+        var box=label.getBoundingClientRect(),blocked=placed.some(function(other){ return boxesOverlap(box,other); });
+        if(!blocked){ chosen=candidate; break; }
+      }
+      label.style.top=py(chosen); itemLabelY[i]=chosen;
+      tickEls[i].line.setAttribute('y2',chosen<g.axisY?chosen+13:chosen-3);
+      placed.push(label.getBoundingClientRect());
+    });
+  }
 
   function drawHero(){
     var w = heroW || heroWrap.clientWidth || 1100;
@@ -379,36 +503,76 @@
     axis.setAttribute('x1', g.pad); axis.setAttribute('x2', w-g.pad);
     axis.setAttribute('y1', g.axisY); axis.setAttribute('y2', g.axisY);
 
+    orderBandsG.innerHTML = '';
+    orderLabelsG.innerHTML = '';
+    for(var e=Math.floor(LOGMIN);e<Math.ceil(LOGMAX);e++){
+      var lo=Math.max(e,LOGMIN), hi=Math.min(e+1,LOGMAX);
+      var x1=g.pad+(w-2*g.pad)*(lo-LOGMIN)/SPAN, x2=g.pad+(w-2*g.pad)*(hi-LOGMIN)/SPAN;
+      var bandIndex=e-Math.floor(LOGMIN),tinted=bandIndex%2===0;
+      orderBandsG.appendChild(el('rect',{x:x1,y:0,width:x2-x1,height:g.vbH,fill:tinted?'var(--small)':'transparent',opacity:'.075'}));
+      if(tinted && (w>=620 || bandIndex%6===0)){
+        var label=el('text',{x:(x1+x2)/2,y:bandIndex%4===0?13:g.vbH-8,fill:'var(--muted)','font-family':'ui-monospace, monospace','font-size':'10','text-anchor':'middle'});
+        label.textContent='10'+sup(e)+' m'; orderLabelsG.appendChild(label);
+      }
+    }
+
     var px = function(x){ return (x/w*100)+'%'; };
     var py = function(y){ return (y/g.vbH*100)+'%'; };
+    itemLabelY=[];
 
     OBJS.forEach(function(o,i){
       var x = xFor(w,g.pad,o.size);
-      var lane = LANES[i%4];
+      var lane = o.lane || LANES[i%4];
       var t = tickEls[i];
+      var inRange=o.size>=minEnd().size && o.size<=maxEnd().size;
+      var visible=inRange && (w>=620 || MOBILE_KEYS.indexOf(o.key)!==-1);
+      t.line.style.display=visible?'':'none'; t.dot.style.display=visible?'':'none';
+      lblEls[i].lbl.style.display=visible?'':'none';
+      if(!visible) return;
+      lblEls[i].lbl.style.transform=o.key===minKey ? 'translateX(0)' : (o.key===maxKey ? 'translateX(-100%)' : 'translateX(-50%)');
       t.line.setAttribute('x1',x); t.line.setAttribute('x2',x);
       t.line.setAttribute('y1', g.axisY); t.line.setAttribute('y2', g.axisY+lane.tick);
-      t.line.setAttribute('stroke', o.you ? 'var(--fg)' : 'var(--line2)');
+      var colour = selectionColour(o.size);
+      t.line.setAttribute('stroke', colour);
       t.dot.setAttribute('cx',x); t.dot.setAttribute('cy',g.axisY);
-      t.dot.setAttribute('fill', o.you ? 'var(--fg)' : 'var(--line2)');
+      t.dot.setAttribute('fill', colour);
       t.dot.setAttribute('r', o.you ? 3.5 : 2.5);
 
       var le = lblEls[i];
       le.lbl.style.left = px(x); le.lbl.style.top = py(g.axisY+lane.label);
+      le.lbl.style.color = colour;
+      itemLabelY[i]=g.axisY+lane.label;
     });
+    if(w>=620) resolveItemLabels(g,py);
 
     if(youTick){
+      var youColour = selectionColour(HUMAN);
       youTick.setAttribute('x1', xFor(w,g.pad,HUMAN)); youTick.setAttribute('x2', xFor(w,g.pad,HUMAN));
       youTick.setAttribute('y1', g.axisY-10); youTick.setAttribute('y2', g.axisY+10);
+      youTick.setAttribute('stroke',youColour);
       youDot.setAttribute('cx', xFor(w,g.pad,HUMAN)); youDot.setAttribute('cy', g.axisY);
+      youDot.setAttribute('fill',youColour);
     }
 
     var curSize = Math.pow(10, state.logS);
     var cx = xFor(w,g.pad,curSize);
+    var aboveScore=0,belowScore=0;
+    OBJS.forEach(function(o,i){
+      if(itemLabelY[i]===undefined) return;
+      var ox=xFor(w,g.pad,o.size), proximity=Math.max(0,110-Math.abs(cx-ox));
+      var labelOffset=itemLabelY[i]-g.axisY;
+      if(Math.abs(-34-labelOffset)<24) aboveScore+=proximity;
+      if(Math.abs(27-labelOffset)<24) belowScore+=proximity;
+    });
+    var markerAbove=aboveScore<=belowScore, markBase=markerAbove?g.axisY-20:g.axisY+20, markTip=markerAbove?g.axisY-12:g.axisY+12;
+    var curColour = 'var(--marker)';
     curDrop.setAttribute('x1',cx); curDrop.setAttribute('x2',cx);
-    curDrop.setAttribute('y1', g.axisY-22); curDrop.setAttribute('y2', g.axisY);
-    curMark.setAttribute('points', (cx-5)+','+(g.axisY-22)+' '+(cx+5)+','+(g.axisY-22)+' '+cx+','+(g.axisY-13));
-    curLbl.style.left = px(cx); curLbl.style.top = py(g.axisY-40);
+    curDrop.setAttribute('y1',markBase); curDrop.setAttribute('y2',g.axisY);
+    curDrop.setAttribute('stroke',curColour);
+    curMark.setAttribute('points',(cx-5)+','+markBase+' '+(cx+5)+','+markBase+' '+cx+','+markTip);
+    curMark.setAttribute('fill',curColour);
+    curLbl.style.left = px(cx); curLbl.style.top = py(markerAbove?g.axisY-34:g.axisY+27);
+    curLbl.style.color = curColour;
     curLbl.textContent = fmtLen(curSize);
   }
 
@@ -417,20 +581,27 @@
   function drawLegend(){
     var f = fOf(Math.pow(10,state.logS));
     var rows = [
-      {sym:'s', name:'selected size', val: fmtLen(Math.pow(10,state.logS))},
-      {sym:'ℓP', name:'Planck length (fixed)', val: fmtLen(PLANCK)},
-      {sym:'U', name:'observable universe (fixed)', val: fmtLen(UNIVERSE)},
+      {sym:'s', name:'selected size', val: fmtLen(Math.pow(10,state.logS)), key:'size'},
+      {sym:minEnd().symbol, name:'smallest end', val: fmtLen(minEnd().size)},
+      {sym:maxEnd().symbol, name:'biggest end', val: fmtLen(maxEnd().size)},
       {sym:'f', name:'fraction along the scale', val: (f*100).toFixed(1)+'%'}
     ];
     legendEl.innerHTML = '';
     rows.forEach(function(row){
       var div = document.createElement('div'); div.className='row';
       var sym = document.createElement('em'); sym.className='sym'; sym.textContent = row.sym;
+      sym.style.color = state.active===row.key ? selectionColour(Math.pow(10,state.logS)) : 'var(--fg)';
       var name = document.createElement('span'); name.className='name'; name.textContent = row.name;
       var val = document.createElement('span'); val.className='val mono'; val.textContent = row.val;
       div.appendChild(sym); div.appendChild(name); div.appendChild(val);
       legendEl.appendChild(div);
     });
+    var active = state.active==='size' ? selectionColour(Math.pow(10,state.logS)) : 'var(--fg)';
+    $('sTerm1').style.color = active;
+    $('sLabel').style.color = active;
+    $('lpTerm1').textContent = minEnd().symbol;
+    $('lpTerm2').textContent = minEnd().symbol;
+    $('uTerm').textContent = maxEnd().symbol;
   }
 
   // ---- slider ----
@@ -442,11 +613,15 @@
     render();
   }
   var dragging=false;
-  track.addEventListener('pointerdown', function(e){ dragging=true; if(track.setPointerCapture) track.setPointerCapture(e.pointerId); setFromClientX(e.clientX); });
+  track.addEventListener('pointerdown', function(e){ dragging=true; state.active='size'; if(track.setPointerCapture) track.setPointerCapture(e.pointerId); setFromClientX(e.clientX); });
   track.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
-  function endDrag(){ dragging=false; }
+  function endDrag(){ dragging=false; state.active=null; render(); }
   track.addEventListener('pointerup', endDrag);
   track.addEventListener('pointercancel', endDrag);
+  track.addEventListener('pointerenter', function(){ state.active='size'; render(); });
+  track.addEventListener('pointerleave', function(){ if(!dragging){ state.active=null; render(); } });
+  track.addEventListener('focus', function(){ state.active='size'; render(); });
+  track.addEventListener('blur', function(){ if(!dragging){ state.active=null; render(); } });
   track.addEventListener('keydown', function(e){
     var step = SPAN/200 * (e.shiftKey ? 10 : 1);
     var v = null;
@@ -454,43 +629,82 @@
     else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = state.logS+step;
     else if(e.key==='Home') v = LOGMIN;
     else if(e.key==='End') v = LOGMAX;
-    if(v!==null){ e.preventDefault(); state.logS = clamp(v, LOGMIN, LOGMAX); render(); }
+    if(v!==null){ e.preventDefault(); state.logS = clamp(v, LOGMIN, LOGMAX); state.active='size'; render(); }
   });
   function drawSlider(){
     var pct = ((state.logS-LOGMIN)/SPAN*100).toFixed(3)+'%';
+    var colour = selectionColour(Math.pow(10,state.logS));
     fill.style.width = pct; thumb.style.left = pct;
+    fill.style.background = colour; thumb.style.borderColor = colour;
+    track.setAttribute('aria-label', 'Size, from '+minEnd().name+' to '+maxEnd().name);
     track.setAttribute('aria-valuemin', LOGMIN.toFixed(2));
     track.setAttribute('aria-valuemax', LOGMAX.toFixed(2));
     track.setAttribute('aria-valuenow', state.logS.toFixed(2));
     track.setAttribute('aria-valuetext', fmtLen(Math.pow(10,state.logS)));
     $('sizeReadout').textContent = fmtLen(Math.pow(10,state.logS));
+    $('sizeReadout').style.color = colour;
+    $('scaleSpan').textContent = 'drag across ~'+SPAN.toFixed(0)+' orders of magnitude';
+    $('minRange').textContent = minEnd().name;
+    $('maxRange').textContent = maxEnd().name;
   }
 
   // ---- result + gauge ----
-  var fValueEl=$('fValue'), verdictEl=$('verdict'), verdictSubEl=$('verdictSub');
+  var fValueEl=$('fValue'), verdictEl=$('verdict'), verdictSubEl=$('verdictSub'), distanceKpiEl=$('distanceKpi');
+  var linearValueEl=$('linearValue'), linearVerdictEl=$('linearVerdict'), linearFormulaEl=$('linearFormula');
   var gMark=$('gMark'), gMarkLabel=$('gMarkLabel'), gYou=$('gYou'), gYouLabel=$('gYouLabel');
   var gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
 
   function drawResult(){
-    var f = fOf(Math.pow(10,state.logS));
+    var size = Math.pow(10,state.logS), f = fOf(size), colour = selectionColour(size);
+    var humanF = fHuman();
     fValueEl.textContent = (f*100).toFixed(1);
     var closerBig = f >= 0.5;
     verdictEl.textContent = closerBig ? 'Nearer the biggest.' : 'Nearer the smallest.';
-    verdictEl.style.color = 'var(--accent)';
+    fValueEl.style.color = colour;
+    verdictEl.style.color = colour;
 
-    var diff = Math.abs(f - fHuman)*100;
-    var rel = f > fHuman ? 'bigger, on this scale, than a human' : (f < fHuman ? 'smaller, on this scale, than a human' : 'exactly where a human sits');
-    verdictSubEl.textContent = 'A human sits at '+(fHuman*100).toFixed(1)+'% — this is '+diff.toFixed(1)+' points '+rel+'.';
+    var diff = Math.abs(f - humanF)*100;
+    var rel = f > humanF ? 'bigger, on this scale, than a human' : (f < humanF ? 'smaller, on this scale, than a human' : 'exactly where a human sits');
+    verdictSubEl.textContent = 'A human sits at '+(humanF*100).toFixed(1)+'% — this is '+diff.toFixed(1)+' points '+rel+'.';
+    var logSize=logOf(size), smallGap=Math.abs(logSize-LOGMIN), bigGap=Math.abs(LOGMAX-logSize);
+    var orderDifference=Math.abs(smallGap-bigGap);
+    if(smallGap<1e-8) distanceKpiEl.textContent='At the smallest end.';
+    else if(bigGap<1e-8) distanceKpiEl.textContent='At the biggest end.';
+    else if(orderDifference<0.0005) distanceKpiEl.textContent='Equally close to both ends.';
+    else distanceKpiEl.innerHTML='<strong>'+orderDifference.toFixed(1)+'</strong> orders closer to the '+(smallGap<bigGap?'smallest':'biggest')+' <span>on the log scale</span>';
+
+    var fromSmall=size/minEnd().size, toBig=maxEnd().size/size;
+    var scaleRatio=fromSmall/toBig;
+    function factorText(value){ return value>=100 ? sci(value) : value.toFixed(value>=10?0:1); }
+    if(!isFinite(scaleRatio)){
+      linearValueEl.textContent='At smallest end';
+      linearVerdictEl.textContent='The biggest end is closer in multiplicative size.';
+      linearFormulaEl.textContent='Scale-factor comparison.';
+    }else if(scaleRatio===0){
+      linearValueEl.textContent='At biggest end';
+      linearVerdictEl.textContent='The smallest end is closer in multiplicative size.';
+      linearFormulaEl.textContent='Scale-factor comparison.';
+    }else{
+      var scaleNear=scaleRatio>=1?'biggest':'smallest';
+      var scaleFactor=scaleRatio>=1?scaleRatio:1/scaleRatio;
+      linearValueEl.textContent=factorText(scaleFactor)+'×';
+      linearVerdictEl.textContent='closer in size to the '+scaleNear+' end.';
+      linearFormulaEl.textContent='(selected ÷ smallest) ÷ (biggest ÷ selected) = '+factorText(scaleRatio);
+    }
+    linearValueEl.style.color=colour;
+    linearVerdictEl.style.color=colour;
 
     var pct = (f*100).toFixed(2)+'%';
     gMark.style.left = pct;
+    gMark.style.background = colour;
     gMarkLabel.style.left = pct;
+    gMarkLabel.style.color = colour;
     gMarkLabel.style.transform = f>0.82 ? 'translateX(-100%)' : f<0.1 ? 'translateX(0)' : 'translateX(-50%)';
     gMarkLabel.textContent = (f*100).toFixed(1)+'%';
 
-    var yPct = (fHuman*100).toFixed(2)+'%';
+    var yPct = (humanF*100).toFixed(2)+'%';
     gYou.style.left = yPct;
-    gYouLabel.style.left = clamp(fHuman*100,6,90).toFixed(2)+'%';
+    gYouLabel.style.left = clamp(humanF*100,6,90).toFixed(2)+'%';
 
     if(!gTicksEl.dataset.built){
       var ticksHtml='', labelsHtml='';
@@ -506,7 +720,19 @@
   // ---- presets ----
   document.querySelectorAll('.preset').forEach(function(b){
     b.addEventListener('click', function(){
-      state.logS = logOf(PRESETS[b.dataset.p]);
+      state.logS = clamp(logOf(PRESETS[b.dataset.p]), LOGMIN, LOGMAX);
+      render();
+    });
+  });
+
+  document.querySelectorAll('.endpoint-pill').forEach(function(button){
+    button.addEventListener('click', function(){
+      if(button.dataset.end==='min') minKey=button.dataset.key;
+      else maxKey=button.dataset.key;
+      setEndpoints();
+      document.querySelectorAll('.endpoint-pill[data-end="'+button.dataset.end+'"]').forEach(function(pill){
+        pill.setAttribute('aria-pressed', pill===button ? 'true' : 'false');
+      });
       render();
     });
   });
@@ -538,6 +764,7 @@
   }
 
   function render(){
+    state.logS=clamp(state.logS,LOGMIN,LOGMAX);
     drawHero();
     drawLegend();
     drawSlider();

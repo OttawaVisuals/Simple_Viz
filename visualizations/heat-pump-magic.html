@@ -176,8 +176,9 @@
   .more summary .ind{font:400 13px ui-monospace,monospace}
   .more[open] summary .ind-open{display:none}
   .more:not([open]) summary .ind-close{display:none}
-  .more-body{display:none;margin-top:18px;gap:22px;max-width:78ch}
+  .more-body{display:none;margin-top:18px;gap:22px;grid-template-columns:minmax(0,1fr)}
   .more[open] .more-body{display:grid}
+  .more-item{min-width:0}
   .more-item h3{margin:0 0 6px;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif;font-weight:400;font-style:italic;font-size:16px;color:var(--fg)}
   .more-item p{margin:0;font-size:13.5px;line-height:1.7;color:var(--muted);font-family:ui-monospace,monospace}
   .more-item p a{color:var(--muted2);text-decoration-color:var(--line2)}

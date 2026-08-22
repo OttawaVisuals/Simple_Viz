@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design specimen — settling the guide</title>
+<meta name="description" content="Side-by-side options for icons, palette, type and tone, to settle the Made clear design guide.">
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+    --cat-everyday:#2F6BD8;--cat-discoveries:#8A5E0C;--cat-fun:#A83D2A;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+      --cat-everyday:#6FA0F2;--cat-discoveries:#E5B94B;--cat-fun:#E68075;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    --cat-everyday:#6FA0F2;--cat-discoveries:#E5B94B;--cat-fun:#E68075;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 90px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .brand{display:flex;align-items:center;gap:8px;color:var(--fg);text-transform:none;letter-spacing:0}
+  .brand:hover{color:var(--accent)}
+  .brand-icon{display:block;width:42px;height:20px;overflow:visible}
+  .brand-icon text{fill:currentColor;font:italic 16px Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  .brand-icon path{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .brand-word{display:flex;align-items:baseline;font:italic 18px/1 Georgia,"Iowan Old Style","Palatino Linotype",serif;white-space:nowrap}
+  .brand-word .sm{font-size:.54em;line-height:1;transform:translateY(.38em);margin-right:.18em;color:inherit}
+  .topbar-right{display:flex;align-items:center;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:clamp(10px,1.6vw,20px) 0 0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);margin:10px 0 0;text-wrap:pretty}
+
+  section{margin-top:clamp(38px,4.5vw,64px)}
+  .rule{border:0;border-top:1px solid var(--line);margin:0 0 18px}
+  h2{font-weight:300;font-size:clamp(1.25rem,2vw,1.6rem);line-height:1.1;letter-spacing:-.01em;margin:0}
+  h2 .n{font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-right:12px;vertical-align:.28em}
+  .ask{font-size:.94rem;line-height:1.5;color:var(--muted2);margin:8px 0 0;max-width:82ch}
+  h3{font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:400;margin:30px 0 0}
+
+  .code{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-size:11px;letter-spacing:.08em;color:var(--accent)}
+  .cap{font:11px/1.5 ui-monospace,monospace;color:var(--muted);margin:8px 0 0}
+
+  /* ---- icon grids ---- */
+  .icgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px 26px;margin-top:16px}
+  @media (max-width:820px){.icgrid{grid-template-columns:1fr}}
+  .cell{min-width:0;border-top:1px solid var(--line);padding-top:10px}
+  .cell .hd{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .cell .nm{font:11px/1 ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .ic{display:block;width:100%;height:64px;color:var(--fg);overflow:visible;margin-top:10px}
+  .ic.big{height:128px}
+
+  /* tile preview, matching index.html chrome */
+  .tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:16px}
+  @media (max-width:820px){.tiles{grid-template-columns:1fr}}
+  .tile{--accent:var(--cat);display:flex;flex-direction:column;gap:11px;padding:15px 14px 17px;border:1px solid color-mix(in srgb,var(--cat) 30%,transparent);border-radius:10px;background:color-mix(in srgb,var(--cat) 6%,transparent);color:inherit;text-decoration:none}
+  .tile[data-cat="everyday"]{--cat:var(--cat-everyday)}
+  .tile[data-cat="discoveries"]{--cat:var(--cat-discoveries)}
+  .tile[data-cat="fun"]{--cat:var(--cat-fun)}
+  .tile h4{font-weight:300;font-size:1.06rem;line-height:1.15;margin:0}
+  .tile .meta{display:block;font:10.5px ui-monospace,"Cascadia Code",monospace;letter-spacing:.11em;text-transform:uppercase;color:var(--cat);margin:0}
+
+  /* ---- palette ---- */
+  .pals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px;margin-top:16px}
+  @media (max-width:900px){.pals{grid-template-columns:1fr}}
+  .swatches{display:flex;gap:0;margin-top:10px;border-radius:5px;overflow:hidden}
+  .sw{height:34px;flex:1}
+  .hexes{display:flex;gap:0;margin-top:5px}
+  .hexes span{flex:1;font:9.5px/1.3 ui-monospace,monospace;color:var(--muted);text-align:center;letter-spacing:-.01em}
+  .demo{display:block;width:100%;height:96px;margin-top:12px;overflow:visible}
+  .demo .ax{stroke:var(--line2);stroke-width:1;fill:none}
+  .demo path.s{fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+  /* ---- type ---- */
+  .measures{display:grid;gap:22px;margin-top:16px}
+  .m52 p{max-width:52ch}.m60 p{max-width:60ch}.m74 p{max-width:74ch}
+  .readout{display:flex;align-items:baseline;gap:10px;margin-top:12px;flex-wrap:wrap}
+  .readout .big{font:300 clamp(30px,4vw,44px)/1 ui-monospace,"Cascadia Code",monospace;font-variant-numeric:tabular-nums}
+  .readout .unit{font:13px ui-monospace,monospace;color:var(--muted)}
+  .legend{display:grid;grid-template-columns:1.6em 1fr auto;gap:4px 8px;margin-top:14px;align-items:baseline;max-width:420px}
+  .legend .sym{font-style:italic;color:var(--accent)}
+  .legend .nm2{font-size:.9rem;color:var(--muted2)}
+  .legend .val{font:11px ui-monospace,monospace;color:var(--muted)}
+  .note{font:12px/1.6 ui-monospace,"Cascadia Code",monospace;color:var(--muted);margin-top:14px}
+
+  /* ---- tone ---- */
+  .opts{display:grid;gap:26px;margin-top:16px}
+  .opt{border-top:1px solid var(--line);padding-top:12px}
+  .opt .h{font-weight:300;font-size:clamp(1.5rem,2.8vw,2.1rem);line-height:1.05;letter-spacing:-.02em;margin:8px 0 0}
+  .opt .h em{font-style:italic}
+  .opt p{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:70ch;margin:9px 0 0;text-wrap:pretty}
+  .wc{font:10.5px ui-monospace,monospace;color:var(--muted);letter-spacing:.08em}
+
+  .ballot{margin-top:clamp(38px,4.5vw,64px);border-top:1px solid var(--line2);padding-top:16px}
+  .ballot ul{margin:10px 0 0;padding-left:18px;font:12.5px/1.9 ui-monospace,"Cascadia Code",monospace;color:var(--muted2)}
+</style>
+
+<main><div class="wrap">
+
+<div class="topbar">
+  <a class="brand" href="index.html" aria-label="Made clear — home">
+    <svg class="brand-icon" viewBox="0 0 58 28" aria-hidden="true">
+      <text x="22" y="16">mc</text>
+      <path d="M1 22 C3 22 3 16 5 16 S7 26 9 26 S11 13 13 13 S15 23 17 23 S19 18 21 18 L57 18"/>
+    </svg>
+    <span class="brand-word" aria-hidden="true"><span>m</span><span class="sm">ade</span><span>c</span><span class="sm">lear</span></span>
+  </a>
+  <div class="topbar-right">
+    <span>Design specimen</span>
+    <button class="theme-toggle" id="themeToggle" type="button">Dark mode</button>
+  </div>
+</div>
+
+<h1>Pick the ones you like.</h1>
+<p class="sub" style="max-width:78ch">Every option below carries a code in <span class="code">this colour</span>. Reply with the codes you want &mdash; e.g. <span class="code">I-R2, I-W2, I-A1, P-A, T-M52, X-2, S-40</span> &mdash; and I&rsquo;ll write them into STYLE_GUIDE.md as rules. Check both themes with the toggle above; the icon choices in particular read differently in dark mode.</p>
+
+<!-- ============ ICONS ============ -->
+<section>
+  <hr class="rule">
+  <h2><span class="n">01</span>Icons &mdash; register</h2>
+  <p class="ask">The same three concepts, drawn three ways. <strong>R1</strong> draws the real object. <strong>R2</strong> draws the relationship as a diagram. <strong>R3</strong> puts a small real object into the diagram. Today the catalogue mixes all three, which is why the front page looks slightly unruly at a glance. Pick one as the default.</p>
+
+  <h3>Coffee cooling</h3>
+  <div class="icgrid">
+    <div class="cell"><div class="hd"><span class="nm">R1 &middot; object</span><span class="code">I-R1</span></div>
+      <svg class="ic" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M42 26h28v16a8 8 0 0 1-8 8H50a8 8 0 0 1-8-8z"/>
+        <path d="M70 30h5a6 6 0 0 1 0 12h-5"/>
+        <path d="M34 54h44"/>
+        <path d="M50 20c-3-5 3-7 0-12M62 20c-3-5 3-7 0-12" stroke="var(--accent)" stroke-width="1.8"/>
+      </svg></div>
+    <div class="cell"><div class="hd"><span class="nm">R2 &middot; diagram</span><span class="code">I-R2</span></div>
+      <svg class="ic" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M18 8v46h86"/>
+        <path d="M18 12C44 46 62 48 104 48" stroke="var(--accent)"/>
+        <path d="M18 48h86" stroke-width="1.3" stroke-dasharray="4 4"/>
+      </svg></div>
+    <div class="cell"><div class="hd"><span class="nm">R3 &middot; object in diagram</span><span class="code">I-R3</span></div>
+      <svg class="ic" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M16 10h14v10a5 5 0 0 1-5 5h-4a5 5 0 0 1-5-5z"/>
+        <path d="M30 13h3a4 4 0 0 1 0 8h-3"/>
+        <path d="M34 18C58 44 70 48 106 48" stroke="var(--accent)"/>
+        <path d="M14 48h92" stroke-width="1.3" stroke-dasharray="4 4"/>
+      </svg></div>
+  </div>
+
+  <h3>Pendulum period</h3>
+  <div class="icgrid">
+    <div class="cell">
+      <svg class="ic" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M40 8h40"/>
+        <path d="M60 8L44 42"/><circle cx="44" cy="42" r="6"/>
+        <path d="M60 8L76 42" stroke-width="1.2"/><circle cx="76" cy="42" r="6" stroke-width="1.2"/>
+        <path d="M44 52q16 8 32 0" stroke="var(--accent)" stroke-width="1.8"/>
+      </svg></div>
+    <div class="cell">
+      <svg class="ic" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M60 8v42" stroke-width="1.3" stroke-dasharray="4 4"/>
+        <path d="M60 8L86 42"/><circle cx="86" cy="42" r="5"/>
+        <path d="M60 30a24 24 0 0 0 15 12" stroke="var(--accent)" stroke-width="1.8"/>
+        <path d="M30 8v42M26 8h8M26 50h8" stroke-width="1.3"/>
+      </svg></div>
+    <div class="cell">
+      <svg class="ic" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M42 8h36"/>
+        <path d="M60 8L46 40"/><circle cx="46" cy="40" r="5"/>
+        <path d="M60 8L74 40" stroke-width="1.2"/><circle cx="74" cy="40" r="5" stroke-width="1.2"/>
+        <path d="M42 54h36M42 50v8M78 50v8" stroke="var(--accent)" stroke-width="1.8"/>
+      </svg></div>
+  </div>
+
+  <h3>Half-life</h3>
+  <div class="icgrid">
+    <div class="cell">
+      <svg class="ic" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <g fill="currentColor" stroke="none"><circle cx="20" cy="20" r="4"/><circle cx="34" cy="20" r="4"/><circle cx="48" cy="20" r="4"/><circle cx="20" cy="36" r="4"/><circle cx="34" cy="36" r="4"/><circle cx="48" cy="36" r="4"/></g>
+        <g stroke-width="1.6"><circle cx="72" cy="20" r="4"/><circle cx="86" cy="20" r="4"/><circle cx="100" cy="20" r="4"/><circle cx="72" cy="36" r="4"/></g>
+        <g fill="currentColor" stroke="none"><circle cx="86" cy="36" r="4"/><circle cx="100" cy="36" r="4"/></g>
+        <path d="M60 8v40" stroke="var(--accent)" stroke-width="1.8" stroke-dasharray="4 4"/>
+      </svg></div>
+    <div class="cell">
+      <svg class="ic" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M16 8v46h90"/>
+        <path d="M16 10C34 10 34 50 104 52" stroke="var(--accent)"/>
+        <path d="M16 31h30M46 31v23" stroke-width="1.3" stroke-dasharray="4 4"/>
+        <path d="M16 42h60M76 42v12" stroke-width="1.3" stroke-dasharray="4 4"/>
+      </svg></div>
+    <div class="cell">
+      <svg class="ic" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M14 10C34 10 32 40 104 42" stroke="var(--accent)"/>
+        <g fill="currentColor" stroke="none"><circle cx="20" cy="54" r="3"/><circle cx="30" cy="54" r="3"/><circle cx="40" cy="54" r="3"/><circle cx="50" cy="54" r="3"/><circle cx="62" cy="54" r="3"/><circle cx="76" cy="54" r="3"/><circle cx="98" cy="54" r="3"/></g>
+      </svg></div>
+  </div>
+
+  <p class="cap">Codes: <span class="code">I-R1</span> object &middot; <span class="code">I-R2</span> diagram &middot; <span class="code">I-R3</span> object in diagram</p>
+</section>
+
+<section>
+  <hr class="rule">
+  <h2><span class="n">02</span>Icons &mdash; line weight</h2>
+  <p class="ask">Today 43 elements use 2.2&nbsp;px, but the inner strokes across the sprite range from 0.55 to 4, and four symbols declare no default weight at all. Same icon, three weight policies, shown at the real 64&nbsp;px tile height and again at double size.</p>
+  <div class="icgrid">
+    <div class="cell"><div class="hd"><span class="nm">W1 &middot; one weight, 2.2 flat</span><span class="code">I-W1</span></div>
+      <svg class="ic" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M16 10h14v10a5 5 0 0 1-5 5h-4a5 5 0 0 1-5-5z"/><path d="M30 13h3a4 4 0 0 1 0 8h-3"/>
+        <path d="M34 18C58 44 70 48 106 48" stroke="var(--accent)"/><path d="M14 48h92"/><path d="M14 8v40"/>
+      </svg>
+      <svg class="ic big" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M16 10h14v10a5 5 0 0 1-5 5h-4a5 5 0 0 1-5-5z"/><path d="M30 13h3a4 4 0 0 1 0 8h-3"/>
+        <path d="M34 18C58 44 70 48 106 48" stroke="var(--accent)"/><path d="M14 48h92"/><path d="M14 8v40"/>
+      </svg>
+      <p class="cap">Simplest rule. Everything reads at equal importance; the accent colour does all the ranking.</p></div>
+
+    <div class="cell"><div class="hd"><span class="nm">W2 &middot; two-step ladder, 2.2 / 1.3</span><span class="code">I-W2</span></div>
+      <svg class="ic" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M16 10h14v10a5 5 0 0 1-5 5h-4a5 5 0 0 1-5-5z"/><path d="M30 13h3a4 4 0 0 1 0 8h-3"/>
+        <path d="M34 18C58 44 70 48 106 48" stroke="var(--accent)"/><path d="M14 48h92" stroke-width="1.3" stroke-dasharray="4 4"/><path d="M14 8v40" stroke-width="1.3"/>
+      </svg>
+      <svg class="ic big" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M16 10h14v10a5 5 0 0 1-5 5h-4a5 5 0 0 1-5-5z"/><path d="M30 13h3a4 4 0 0 1 0 8h-3"/>
+        <path d="M34 18C58 44 70 48 106 48" stroke="var(--accent)"/><path d="M14 48h92" stroke-width="1.3" stroke-dasharray="4 4"/><path d="M14 8v40" stroke-width="1.3"/>
+      </svg>
+      <p class="cap">Subject at 2.2, context and reference lines at 1.3. Two values only, no third.</p></div>
+
+    <div class="cell"><div class="hd"><span class="nm">W3 &middot; freehand (today)</span><span class="code">I-W3</span></div>
+      <svg class="ic" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M16 10h14v10a5 5 0 0 1-5 5h-4a5 5 0 0 1-5-5z" stroke-width="1.8"/><path d="M30 13h3a4 4 0 0 1 0 8h-3" stroke-width="1.35"/>
+        <path d="M34 18C58 44 70 48 106 48" stroke="var(--accent)" stroke-width="3"/><path d="M14 48h92" stroke-width=".9" stroke-dasharray="4 4"/><path d="M14 8v40" stroke-width="1.15"/>
+      </svg>
+      <svg class="ic big" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M16 10h14v10a5 5 0 0 1-5 5h-4a5 5 0 0 1-5-5z" stroke-width="1.8"/><path d="M30 13h3a4 4 0 0 1 0 8h-3" stroke-width="1.35"/>
+        <path d="M34 18C58 44 70 48 106 48" stroke="var(--accent)" stroke-width="3"/><path d="M14 48h92" stroke-width=".9" stroke-dasharray="4 4"/><path d="M14 8v40" stroke-width="1.15"/>
+      </svg>
+      <p class="cap">What the sprite does now. More expressive per icon, less consistent across 47 of them.</p></div>
+  </div>
+</section>
+
+<section>
+  <hr class="rule">
+  <h2><span class="n">03</span>Icons &mdash; how much accent colour</h2>
+  <p class="ask">The accent recolours per category on the front page, so it is the loudest thing in each tile. Right now some icons have none and some have five accented elements plus a filled accent shape.</p>
+  <div class="icgrid">
+    <div class="cell"><div class="hd"><span class="nm">A1 &middot; one accented element</span><span class="code">I-A1</span></div>
+      <svg class="ic" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M14 8v46h92" stroke-width="1.3"/>
+        <path d="M22 44h12v10H22zM40 36h12v18H40zM58 26h12v28H58zM76 14h12v40H76z" stroke-width="1.3"/>
+        <path d="M20 50C44 46 62 30 100 10" stroke="var(--accent)"/>
+      </svg>
+      <p class="cap">Accent marks the one thing the page is about; everything else is neutral.</p></div>
+    <div class="cell"><div class="hd"><span class="nm">A2 &middot; accent + one filled mark</span><span class="code">I-A2</span></div>
+      <svg class="ic" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M14 8v46h92" stroke-width="1.3"/>
+        <path d="M22 44h12v10H22zM40 36h12v18H40zM58 26h12v28H58zM76 14h12v40H76z" stroke-width="1.3"/>
+        <path d="M20 50C44 46 62 30 100 10" stroke="var(--accent)"/>
+        <circle cx="100" cy="10" r="4" fill="var(--accent)" stroke="none"/>
+      </svg>
+      <p class="cap">Adds a single solid accent mark for the endpoint or result. No other fills.</p></div>
+    <div class="cell"><div class="hd"><span class="nm">A3 &middot; accent throughout (today)</span><span class="code">I-A3</span></div>
+      <svg class="ic" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M14 8v46h92" stroke="var(--accent)" stroke-width="1.3"/>
+        <path d="M22 44h12v10H22zM40 36h12v18H40z" stroke-width="1.3"/>
+        <path d="M58 26h12v28H58zM76 14h12v40H76z" stroke="var(--accent)" stroke-width="1.3" fill="color-mix(in srgb,var(--accent) 25%,transparent)"/>
+        <path d="M20 50C44 46 62 30 100 10" stroke="var(--accent)"/>
+        <circle cx="100" cy="10" r="4" fill="var(--accent)" stroke="none"/>
+      </svg>
+      <p class="cap">Several icons in the sprite are near this. Loud once the category hue is applied.</p></div>
+  </div>
+
+  <h3>In situ &mdash; the same three, in real tile chrome</h3>
+  <div class="tiles">
+    <a class="tile" data-cat="everyday" href="#" onclick="return false">
+      <svg class="ic" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M14 8v46h92" stroke-width="1.3"/><path d="M22 44h12v10H22zM40 36h12v18H40zM58 26h12v28H58zM76 14h12v40H76z" stroke-width="1.3"/><path d="M20 50C44 46 62 30 100 10" stroke="var(--accent)"/>
+      </svg>
+      <span class="meta">Everyday maths &middot; I-A1</span><h4>Compound interest</h4></a>
+    <a class="tile" data-cat="discoveries" href="#" onclick="return false">
+      <svg class="ic" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M14 8v46h92" stroke-width="1.3"/><path d="M22 44h12v10H22zM40 36h12v18H40zM58 26h12v28H58zM76 14h12v40H76z" stroke-width="1.3"/><path d="M20 50C44 46 62 30 100 10" stroke="var(--accent)"/><circle cx="100" cy="10" r="4" fill="var(--accent)" stroke="none"/>
+      </svg>
+      <span class="meta">Discoveries &middot; I-A2</span><h4>Compound interest</h4></a>
+    <a class="tile" data-cat="fun" href="#" onclick="return false">
+      <svg class="ic" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M14 8v46h92" stroke="var(--accent)" stroke-width="1.3"/><path d="M22 44h12v10H22zM40 36h12v18H40z" stroke-width="1.3"/><path d="M58 26h12v28H58zM76 14h12v40H76z" stroke="var(--accent)" stroke-width="1.3" fill="color-mix(in srgb,var(--accent) 25%,transparent)"/><path d="M20 50C44 46 62 30 100 10" stroke="var(--accent)"/><circle cx="100" cy="10" r="4" fill="var(--accent)" stroke="none"/>
+      </svg>
+      <span class="meta">Fun physics &middot; I-A3</span><h4>Compound interest</h4></a>
+  </div>
+</section>
+
+<!-- ============ PALETTE ============ -->
+<section>
+  <hr class="rule">
+  <h2><span class="n">04</span>Page palette &mdash; series colours</h2>
+  <p class="ask">The token set defines one accent and one &ldquo;bad&rdquo; red, and says per-concept colours sit outside it. So every page with three or four fluids, planets or materials invents its own hexes and its own dark-mode variants. This is the largest real gap in the guide. Pick a standing set of five series colours, defined once for both themes; a page then takes them in order instead of choosing.</p>
+  <div class="pals">
+    <div class="cell"><div class="hd"><span class="nm">P-A &middot; earth</span><span class="code">P-A</span></div>
+      <div class="swatches"><span class="sw" style="background:#4E7FC4"></span><span class="sw" style="background:#C4703F"></span><span class="sw" style="background:#C89A3F"></span><span class="sw" style="background:#8FA13E"></span><span class="sw" style="background:#C48AA8"></span></div>
+      <div class="hexes"><span>4E7FC4</span><span>C4703F</span><span>C89A3F</span><span>8FA13E</span><span>C48AA8</span></div>
+      <svg class="demo" viewBox="0 0 300 96" preserveAspectRatio="none" aria-hidden="true">
+        <path class="ax" d="M6 4v86h288" vector-effect="non-scaling-stroke"/>
+        <path class="s" vector-effect="non-scaling-stroke" stroke="#4E7FC4" d="M8 84C60 80 120 40 292 8"/>
+        <path class="s" vector-effect="non-scaling-stroke" stroke="#C4703F" d="M8 84C70 84 140 60 292 30"/>
+        <path class="s" vector-effect="non-scaling-stroke" stroke="#C89A3F" d="M8 84C80 86 160 74 292 52"/>
+        <path class="s" vector-effect="non-scaling-stroke" stroke="#8FA13E" d="M8 84C90 88 180 82 292 70"/>
+      </svg>
+      <p class="cap">Formalises what the site already does: these are the most-used non-token hexes across the 63 pages.</p></div>
+
+    <div class="cell"><div class="hd"><span class="nm">P-B &middot; ink &amp; ochre</span><span class="code">P-B</span></div>
+      <div class="swatches"><span class="sw" style="background:#5B7A99"></span><span class="sw" style="background:#B08430"></span><span class="sw" style="background:#A85F45"></span><span class="sw" style="background:#6E8B72"></span><span class="sw" style="background:#8A7E93"></span></div>
+      <div class="hexes"><span>5B7A99</span><span>B08430</span><span>A85F45</span><span>6E8B72</span><span>8A7E93</span></div>
+      <svg class="demo" viewBox="0 0 300 96" preserveAspectRatio="none" aria-hidden="true">
+        <path class="ax" d="M6 4v86h288" vector-effect="non-scaling-stroke"/>
+        <path class="s" vector-effect="non-scaling-stroke" stroke="#5B7A99" d="M8 84C60 80 120 40 292 8"/>
+        <path class="s" vector-effect="non-scaling-stroke" stroke="#B08430" d="M8 84C70 84 140 60 292 30"/>
+        <path class="s" vector-effect="non-scaling-stroke" stroke="#A85F45" d="M8 84C80 86 160 74 292 52"/>
+        <path class="s" vector-effect="non-scaling-stroke" stroke="#6E8B72" d="M8 84C90 88 180 82 292 70"/>
+      </svg>
+      <p class="cap">Quieter, closer to the paper. Series recede and the accent stays the loudest thing on the page.</p></div>
+
+    <div class="cell"><div class="hd"><span class="nm">P-C &middot; high separation</span><span class="code">P-C</span></div>
+      <div class="swatches"><span class="sw" style="background:#2F6BD8"></span><span class="sw" style="background:#C4522B"></span><span class="sw" style="background:#D9A41F"></span><span class="sw" style="background:#3E8E6E"></span><span class="sw" style="background:#8A5AA8"></span></div>
+      <div class="hexes"><span>2F6BD8</span><span>C4522B</span><span>D9A41F</span><span>3E8E6E</span><span>8A5AA8</span></div>
+      <svg class="demo" viewBox="0 0 300 96" preserveAspectRatio="none" aria-hidden="true">
+        <path class="ax" d="M6 4v86h288" vector-effect="non-scaling-stroke"/>
+        <path class="s" vector-effect="non-scaling-stroke" stroke="#2F6BD8" d="M8 84C60 80 120 40 292 8"/>
+        <path class="s" vector-effect="non-scaling-stroke" stroke="#C4522B" d="M8 84C70 84 140 60 292 30"/>
+        <path class="s" vector-effect="non-scaling-stroke" stroke="#D9A41F" d="M8 84C80 86 160 74 292 52"/>
+        <path class="s" vector-effect="non-scaling-stroke" stroke="#3E8E6E" d="M8 84C90 88 180 82 292 70"/>
+      </svg>
+      <p class="cap">Easiest to tell apart at a glance, and the pairs stay distinct for red&ndash;green colour blindness. Competes with the accent.</p></div>
+  </div>
+  <p class="cap" style="margin-top:14px">Second question, independent of the set you pick: should the same five hexes serve both themes (simple, but they sit dark against the navy), or should each get a lightened dark-mode variant the way the tokens do? &nbsp;<span class="code">P-SHARED</span> or <span class="code">P-PAIRED</span>. The swatches above are the light-mode values in both themes, so the toggle shows you exactly what P-SHARED costs.</p>
+</section>
+
+<!-- ============ TYPE ============ -->
+<section>
+  <hr class="rule">
+  <h2><span class="n">05</span>Type &mdash; the scale, live</h2>
+  <p class="ask">This part is nearly settled already: 57 of 63 pages agree on these values. Shown here to confirm rather than choose.</p>
+
+  <div style="margin-top:18px">
+    <h1 style="margin:0">Two sticks measure a <em>planet</em></h1>
+    <p class="sub" style="max-width:60ch">Subtitle &mdash; Georgia, clamp(.94rem, 1.1vw, 1.04rem), line-height 1.55, in <span class="code">--muted2</span>.</p>
+    <div class="readout"><span class="big">12&#8239;742</span><span class="unit">km</span><span style="color:var(--muted2)">&mdash; within 2% of the real figure.</span></div>
+    <div class="legend">
+      <span class="sym">&theta;</span><span class="nm2">shadow angle at Alexandria</span><span class="val">7.2&deg;</span>
+      <span class="sym">d</span><span class="nm2">distance to Syene</span><span class="val">843 km</span>
+    </div>
+    <p class="note">Note text &mdash; 12px mono, <span class="code">--muted</span>. Carries the source link, the approximations made, and the anecdote.</p>
+  </div>
+
+  <h3>Reading measure &mdash; the one thing that drifts</h3>
+  <p class="ask"><span class="mono">.sub</span> is capped at 52, 54, 55, 56, 57 and 74&nbsp;ch across the site. Same paragraph at three widths:</p>
+  <div class="measures">
+    <div class="m52"><span class="code">T-M52</span><p class="sub">Drop a stone down a well and start a timer. The splash you hear has made two journeys: the stone fell down under gravity, then its sound climbed back up at a fixed speed.</p></div>
+    <div class="m60"><span class="code">T-M60</span><p class="sub">Drop a stone down a well and start a timer. The splash you hear has made two journeys: the stone fell down under gravity, then its sound climbed back up at a fixed speed.</p></div>
+    <div class="m74"><span class="code">T-M74</span><p class="sub">Drop a stone down a well and start a timer. The splash you hear has made two journeys: the stone fell down under gravity, then its sound climbed back up at a fixed speed.</p></div>
+  </div>
+  <p class="cap">52ch is the current default, chosen because the subtitle sits beside the equation column. 60 suits pages where that column is narrow or absent.</p>
+</section>
+
+<!-- ============ TONE ============ -->
+<section>
+  <hr class="rule">
+  <h2><span class="n">06</span>Text &mdash; title formula</h2>
+  <p class="ask">The catalogue currently mixes all three of these. Same page, three headline registers.</p>
+  <div class="opts">
+    <div class="opt"><span class="code">X-1 &middot; question</span>
+      <div class="h">How deep is the well?</div>
+      <p>Names the thing the reader wants to know. Reads as a puzzle; the page is the answer.</p></div>
+    <div class="opt"><span class="code">X-2 &middot; the surprise, stated</span>
+      <div class="h">The splash makes <em>two</em> journeys</div>
+      <p>Leads with the counter-intuitive fact itself. Tells the reader what they are about to learn rather than what they are about to be asked.</p></div>
+    <div class="opt"><span class="code">X-3 &middot; wry</span>
+      <div class="h">Why the stone lies about the depth</div>
+      <p>Gives the physics a character. Warmer, and closest to <em>Why the straw gives up</em> &mdash; but it can drift into cute if all 63 pages do it.</p></div>
+  </div>
+</section>
+
+<section>
+  <hr class="rule">
+  <h2><span class="n">07</span>Text &mdash; subtitle length</h2>
+  <p class="ask">There is no cap today, and it shows: subtitles run from 22 words to over 60. Same page, three lengths.</p>
+  <div class="opts">
+    <div class="opt"><span class="code">S-25</span> <span class="wc">&middot; 25 words, one sentence</span>
+      <p class="sub" style="max-width:60ch">Drop a stone and start a timer. The splash you hear has made two journeys: the stone fell down, then its sound climbed back up.</p></div>
+    <div class="opt"><span class="code">S-40</span> <span class="wc">&middot; 40 words, two sentences, carries a real number</span>
+      <p class="sub" style="max-width:60ch">Drop a stone and start a timer. The splash has made two journeys &mdash; the stone falling under gravity, then its sound climbing back at 343&nbsp;m/s &mdash; and ignoring the second one makes a 60&nbsp;m well look like 78&nbsp;m.</p></div>
+    <div class="opt"><span class="code">S-60</span> <span class="wc">&middot; 60+ words, the current long end</span>
+      <p class="sub" style="max-width:60ch">Drop a stone down a well and start a timer. The splash you hear has made two journeys: first the stone falls under gravity, accelerating the whole way, and then the sound of the impact climbs back up the shaft at a constant 343&nbsp;m/s. Most people time the whole thing and treat it as pure free fall, which is why a 60&nbsp;m well gets reported as 78&nbsp;m.</p></div>
+  </div>
+  <p class="cap">CLAUDE.md already asks for one subtitle paragraph that states the real numbers and the concept in one breath &mdash; S-40 is the closest reading of that. A word cap is what makes it enforceable.</p>
+</section>
+
+<section>
+  <hr class="rule">
+  <h2><span class="n">08</span>Text &mdash; voice</h2>
+  <p class="ask">Three smaller calls that need a ruling rather than a specimen. Answer inline and I will write them in.</p>
+  <div class="opts">
+    <div class="opt"><span class="code">V-PERSON</span>
+      <p>Second person and imperative (&ldquo;Drop a stone and start a timer&rdquo;) versus neutral (&ldquo;A stone is dropped&rdquo;). The site currently leans second-person throughout &mdash; confirm that as the rule?</p></div>
+    <div class="opt"><span class="code">V-UNITS</span>
+      <p>Metric first with imperial in brackets where a reader would think in imperial &mdash; 60&nbsp;m (200&nbsp;ft) &mdash; or metric only? Note that <em>pizza-area</em> is inches-native because that is how pizza is sold, so the rule needs an &ldquo;unless the object is sold in imperial&rdquo; clause either way.</p></div>
+    <div class="opt"><span class="code">V-JARGON</span>
+      <p>May a title use the technical name unglossed (<em>Reynolds number</em>, <em>Snell&rsquo;s law</em>), or must the title be plain language, with the technical name appearing only in the topbar tag and the closing note?</p></div>
+  </div>
+  <p class="cap">Spelling is already settled: Canadian &mdash; metre, colour, centre, neighbour.</p>
+</section>
+
+<div class="ballot">
+  <p class="sub" style="margin:0">Reply with your picks. A complete ballot looks like:</p>
+  <ul>
+    <li>icons &nbsp; I-R2 &nbsp; I-W2 &nbsp; I-A1</li>
+    <li>palette &nbsp; P-A &nbsp; P-PAIRED</li>
+    <li>type &nbsp; T-M52</li>
+    <li>text &nbsp; X-2 &nbsp; S-40 &nbsp; plus a line each on V-PERSON, V-UNITS, V-JARGON</li>
+  </ul>
+</div>
+
+</div></main>
+
+<script>
+(function(){
+  var STORAGE_KEY = 'design-specimen-theme';
+  var themeToggle = document.getElementById('themeToggle');
+  function systemPrefersDark(){ return matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    var applied = document.documentElement.getAttribute('data-theme');
+    if(applied) return applied;
+    var stored = null; try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){ applyTheme(currentTheme()==='dark'?'light':'dark'); });
+  applyTheme(currentTheme());
+})();
+</script>

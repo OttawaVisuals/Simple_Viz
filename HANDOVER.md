@@ -13,6 +13,47 @@ tool can pick up mid-stream without re-reading the whole chat history.
   filtering) with a "not a secure connection" warning — that's a corporate network/proxy
   issue on his end, not a site or Cloudflare cert problem; nothing to action here.
 
+## Design guide settled: icons, palette, type and tone — 2026-08-22
+
+Several open questions flagged in STYLE_GUIDE.md (icon weight/register/accent-usage, the
+missing series-color palette, subtitle length, title formula, voice) were unresolved because
+they're taste calls, not derivable from the code. Built
+[`design-specimen.html`](design-specimen.html) — a single page in the site's own style
+showing competing options side by side, coded (`I-R2`, `P-A`, `S-40`, etc.) so Simon could
+reply with a short ballot instead of writing prose rulings. All decisions below are now in
+**STYLE_GUIDE.md** and are **forward-only** — none of the 63 existing pages were swept to
+conform, per Simon's explicit call.
+
+- **Icons:** default register is object-in-diagram (a small drawn object sitting on the
+  diagram it explains), line weight is a two-step ladder (2.2px subject / 1.3px context, no
+  third value), accent color is used throughout the icon rather than reserved for one
+  element. These are defaults to reach for per new icon, not a hard rule — deviate where a
+  concept is cleanly a pure object or pure abstract diagram.
+- **Most new icons will be produced with Codex going forward**, not Claude — if you're Claude
+  picking this project back up, check whether the sprite in `index.html` already has an icon
+  for a page before drawing one; don't duplicate work across tools.
+- **Series palette (new):** a standing five-color set for pages with multiple
+  fluids/planets/materials to distinguish, replacing "invent hexes per page." `--s1` is just
+  `var(--accent)` — a single-series page needs no new color at all. `--s2`–`--s5` are defined
+  with paired light/dark hexes the same way `--accent`/`--bad` are. See the "Series palette"
+  entry under Design tokens in STYLE_GUIDE.md for the exact values.
+- **Title/voice:** question-form titles by default (wry titles like "Why the straw gives up"
+  are an allowed exception, not the default register); phenomenon names (Reynolds number,
+  Snell's law) are fine in a title if the subtitle glosses them in plain terms; subtitle
+  target is ~40 words / two sentences carrying a real number; voice is second-person
+  imperative ("Drop a stone and start a timer"); units are metric-first with imperial in
+  brackets, except objects natively sold/specified in imperial (pizza diameters in inches).
+- **Spelling: Canadian**, formalized (metre, colour, centre, neighbour) — matches the `.ca`
+  domain and most existing prose.
+- **Bug caught and fixed while doing this:** `heat-pump-magic.html`'s `.more-body` still
+  carried the exact `max-width:78ch` cap that an earlier STYLE_GUIDE entry already documented
+  as wrong (the disclosure rendering visibly narrower than `.note` above it). Fixed the same
+  way as that entry (`grid-template-columns:minmax(0,1fr)` + `.more-item{min-width:0}`, no
+  cap) and verified with `getBoundingClientRect()` that `.note` and `.more-body` now match
+  exactly. `basic-functions.html` and `thermal-comfort-pmv.html` were already correct — this
+  is a recurring failure mode worth checking by measurement, not eyeballing, whenever a
+  disclosure section is touched.
+
 ## Materials arrangement page — draft handover, 2026-08-21
 
 - **`visualizations/materials-arrangement.html`** is a new, unreviewed teaching page about how

@@ -72,15 +72,62 @@ in-page toggle, see below) must work:
   and its linked equation term. `--bad` (a muted red/coral) is reserved for "impossible" /
   over-limit states. Everything else is drawn from the neutral `--fg`/`--muted`/`--muted2`/
   `--line` scale.
-- Per-concept accent colors (e.g. the four fluid colors in straw-hose-flow) sit outside this
-  token set as their own hex constants, since they carry semantic meaning (identifying a
-  specific fluid/object) rather than being theme chrome.
+- **Series palette (decided 2026-08-22).** A page with multiple fluids/planets/objects to
+  tell apart draws from this standing five-color set, in order, instead of inventing hexes
+  per page:
+
+  ```css
+  --s1:var(--accent);      /* same token as the page accent — don't hardcode it separately */
+  --s2:#D9A41F;--s2-dark:#F0C766;
+  --s3:#C4522B;--s3-dark:#E08A6A;
+  --s4:#3E8E6E;--s4-dark:#6FBFA0;
+  --s5:#8A5AA8;--s5-dark:#B98FD4;
+  ```
+
+  `--s1` is deliberately just `var(--accent)` (`#2F6BD8` / `#6FA0F2`) — a single-series page
+  should use the accent directly rather than re-declaring it. `--s2`&ndash;`--s5` need their
+  own `-dark` variant declared under the same `prefers-color-scheme`/`data-theme` blocks as
+  the rest of the tokens, the `-dark` hexes lightened by the same eye as the existing
+  `--accent`/`--bad`/`--cat-*` pairs (not just used as-is against navy). This set was chosen
+  for maximum separation between series, including under red&ndash;green color blindness —
+  it will therefore usually read as more saturated than the rest of the page, which is
+  correct: series color is meant to compete for attention the way `--accent` does, not recede
+  like `--muted`. A page needing more than five series is rare enough not to plan for; extend
+  by eye rather than pre-defining `--s6`.
+- Per-concept accent colors that don't fit the series set above (e.g. a single non-accent
+  prop color) still sit outside the token set as their own hex constant, since they carry
+  specific semantic meaning rather than being theme chrome.
 - **`index.html` only:** the homepage tile grid colors each tile by category
   (`--cat-everyday` / `--cat-discoveries` / `--cat-fun`, added 2026-08-20 at the user's
   request). Each tile rebinds `--accent` locally to its category hue, which also recolors the
   accent strokes inside the shared icon sprite. This is a cover-page device for telling twelve
   tiles apart at a glance — **do not carry category colors into a visualization page**, where
   the single-`--accent` rule above still holds.
+
+## Homepage icons (decided 2026-08-22)
+
+Each catalogue tile in `index.html` gets a distinct symbol from the shared `icon-sprite`
+(`0 0 120 64` viewBox, `currentColor` + `var(--accent)`, ID = the visualization's filename
+slug — see the JS architecture note in HANDOVER.md for how the mapping works). Default
+treatment for a new icon:
+
+- **Register: object-in-diagram as the default**, e.g. a small drawn coffee cup sitting on
+  the cooling-curve diagram it explains, rather than either a pure object sketch or a pure
+  abstract diagram alone. This isn't a hard rule — deviate where a concept is cleanly one or
+  the other (a pure curve for something with no physical object, a pure object for something
+  with no useful diagram) — but reach for the combination first.
+- **Line weight: a two-step ladder, 2.2px / 1.3px.** The subject of the icon (the thing named
+  in the title) draws at 2.2px; supporting/context lines (axes, reference marks, dashed
+  extension lines) draw at 1.3px. Don't introduce a third weight — the existing sprite's
+  freehand range (0.55&ndash;4px across symbols, and four symbols with no declared default)
+  is exactly what this replaces.
+- **Accent: used throughout the icon**, not reserved for a single element — strokes, fills,
+  and the occasional filled accent mark (an endpoint, a highlighted region) can all carry
+  `var(--accent)` where it helps the icon read at 64px. Since `--accent` is rebound per
+  category on the homepage, this also means an icon can look meaningfully different, not just
+  recolored, across its three category tints — that's fine.
+- These are defaults to reach for, not a retrofit mandate — see "Current state" in CLAUDE.md;
+  don't resweep the existing 47-symbol sprite to conform.
 
 ## Typography
 
@@ -92,6 +139,33 @@ in-page toggle, see below) must work:
   `ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace`, with
   `font-variant-numeric: tabular-nums`.
 - That serif/mono contrast is the *only* typographic system — don't add a third typeface.
+- **Spelling: Canadian** (decided 2026-08-22) — *metre*, *colour*, *centre*, *neighbour*, not
+  the US forms. Matches the `.ca` domain and most existing prose; a handful of stray US
+  spellings (`neighbor` ×6) predate this ruling and get fixed opportunistically, not swept.
+
+### Title, subtitle and voice (decided 2026-08-22)
+
+- **Title formula: question by default** ("How deep is the well?"), naming the thing the
+  reader wants to know so the page reads as the answer. A wry/character title ("Why the
+  straw gives up") is allowed as a deliberate exception for a page where the concept has an
+  obvious hook — don't reach for it as the default register.
+- **Technical names are allowed in a title** when it's the established name of the phenomenon
+  itself (*Reynolds number*, *Snell's law*) — not gatekept to the topbar tag — provided the
+  subtitle explains what it means in plain terms immediately under it. The bar is "a
+  non-specialist reader isn't left needing to look the term up before the subtitle finishes."
+- **Subtitle: one paragraph, about 40 words, two sentences.** Long enough to carry a real
+  number and the concept, short enough to read in one breath — this is the concrete target
+  for CLAUDE.md's existing "states the real numbers and the concept in one breath" rule.
+  Below ~25 words it tends to lose the number; above ~60 it stops being a subtitle. Keep the
+  existing `.sub{max-width:52ch}` measure — that's already the majority convention and pairs
+  correctly with the topgrid's equation/legend columns.
+- **Voice: second person, imperative.** "Drop a stone and start a timer," not "A stone is
+  dropped." Applies to the subtitle and any instructional copy; the note/methodology sections
+  can stay descriptive.
+- **Units: metric first, imperial in brackets** where a reader would actually think in
+  imperial — `60 m (200 ft)` — not metric-only. Exception: when the object itself is sold or
+  specified in imperial (pizza diameters in inches, etc.), lead with that native unit instead
+  and don't force a metric-first rewrite.
 
 ## Page skeleton
 
@@ -252,6 +326,17 @@ When overriding an earlier component rule, put the full-width override **after**
 the page stylesheet (or remove the old cap): equal-specificity CSS resolves in favour of the
 later declaration. This exact source-order mistake caused the basic-functions log section to
 remain constrained despite an earlier `max-width:none` override.
+
+**This is a recurring bug, not a one-off — audit `.more`/`.more-body`/second-section width
+against `.note` whenever you touch either.** Caught again on 2026-08-22 in
+[`heat-pump-magic.html`](visualizations/heat-pump-magic.html): its `.more-body` still carried
+`max-width:78ch` while `.note` above it ran full width, so the disclosure read at roughly
+two-thirds the width of the rest of the page. Fixed the same way as the general rule above
+(`.more-body{grid-template-columns:minmax(0,1fr)}` + `.more-item{min-width:0}`, `max-width`
+dropped entirely). `basic-functions.html` and `thermal-comfort-pmv.html` were already correct.
+When adding a new disclosure, verify with `getBoundingClientRect()` on `.note` and
+`.more-body` directly rather than eyeballing — the gap is easy to miss at a glance since both
+still look "roughly full width" until measured.
 
 **On `index.html` and `about.html`, body text spans the full `.wrap` width — same edges as
 the tile grid — not a narrower reading-column measure.** These two pages are full-width

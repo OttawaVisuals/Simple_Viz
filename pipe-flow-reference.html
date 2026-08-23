@@ -170,8 +170,8 @@
       <h3>Isothermal compressible pipe flow &mdash; gases, meaningful &Delta;P</h3>
       <div class="formula-box">
         <span class="eq">p&#8321;&sup2; &minus; p&#8322;&sup2; = f(L/D)(&#7745;/A)&sup2;RT</span>
-        <div class="meta">Combines the Darcy&ndash;Weisbach friction relation with the ideal gas law and continuity, integrated along the pipe assuming constant temperature (reasonable at the speeds involved here, since the tube has time to exchange heat with its surroundings). Needed once a gas's pressure drop stops being a small fraction of absolute pressure &mdash; which happens fast for anything straw-scale, since narrow tubes need real pressure to push meaningful airflow through them. This is what <code>straw-hose-flow-darcy.html</code> implements for air.
-          <div class="callout"><b>Known limit, not yet enforced in code:</b> isothermal pipe flow chokes at <span class="eq">Ma = 1/&radic;&gamma; &asymp; 0.845</span> for air (&gamma;=1.4) &mdash; not at Ma=1 like the more familiar adiabatic case. Past that point no isothermal solution exists for the given boundary pressures, and the equation above will still happily return a number (checked 2026-08-18: short length + wide diameter + max pressure on <code>straw-hose-flow-darcy.html</code> returns <b>Mach 1.49</b>, which is not a physically possible isothermal-flow result). The page currently only flags "Mach&nbsp;&ge;0.3 &mdash; use full Fanno flow," which undersells this: past 0.845 the number isn't just imprecise, it doesn't correspond to any real flow. <b>Open fix, pinned:</b> detect and flag choking at Ma&nbsp;&asymp;&nbsp;0.845 explicitly, rather than reporting a number past it.</div>
+        <div class="meta">Combines the Darcy&ndash;Weisbach friction relation with the ideal gas law and continuity, integrated along the pipe assuming constant temperature (reasonable at the speeds involved here, since the tube has time to exchange heat with its surroundings). Needed once a gas's pressure drop stops being a small fraction of absolute pressure &mdash; which happens fast for anything straw-scale, since narrow tubes need real pressure to push meaningful airflow through them. <code>straw-hose-flow-darcy.html</code> (retired 2026-08-23) prototyped this; <code>straw-hose-flow.html</code> now implements the full version for air directly, including the acceleration term this simplified form omits &mdash; see below.
+          <div class="callout"><b>Historical, from the retired prototype (2026-08-18):</b> isothermal pipe flow chokes at <span class="eq">Ma = 1/&radic;&gamma; &asymp; 0.845</span> for air (&gamma;=1.4) &mdash; not at Ma=1 like the more familiar adiabatic case. The old <code>straw-hose-flow-darcy.html</code> fixed mouth pressure and solved for flow, which let short length + wide diameter + max pressure return <b>Mach 1.49</b>, a result with no valid isothermal solution, flagged only as "use full Fanno flow" rather than as invalid. <b>Fixed by construction, not by adding a guard:</b> <code>straw-hose-flow.html</code> instead fixes flow rate <code>Q</code> and solves for the required mouth pressure, which bounds Mach to &asymp;0.5 at the narrowest slider setting regardless of pressure &mdash; the choking regime is structurally unreachable, see the comment above <code>machFor()</code> in that file.</div>
         </div>
       </div>
 
@@ -205,14 +205,8 @@
           <tr>
             <td><a href="visualizations/straw-hose-flow.html">straw-hose-flow.html</a></td>
             <td>Air</td>
-            <td class="mono">Hagen&ndash;Poiseuille</td>
-            <td><span class="status warn">known limitation</span> &mdash; incompressible model applied to a compressible gas; out of scope for that page by design, see the Darcy variant below</td>
-          </tr>
-          <tr>
-            <td><a href="visualizations/straw-hose-flow-darcy.html">straw-hose-flow-darcy.html</a></td>
-            <td>Air</td>
-            <td class="mono">Isothermal compressible</td>
-            <td><span class="status warn">open bug</span> &mdash; friction-factor blending is correct, but reports results past the Ma&asymp;0.845 isothermal choking limit without flagging it; experimental, not on the public homepage</td>
+            <td class="mono">Isothermal compressible, incl. acceleration term</td>
+            <td><span class="status ok">fixed 2026-08-23</span> &mdash; was plain Hagen&ndash;Poiseuille regardless of speed; now solves p&#8321;&sup2;&minus;p&#8322;&sup2;&minus;2G&sup2;RT&nbsp;ln(p&#8321;/p&#8322;)=G&sup2;fLRT/D by bisection for the mouth pressure at a fixed target flow, which also makes the Ma&asymp;0.845 choking case below structurally unreachable (see the row above)</td>
           </tr>
         </tbody>
       </table>

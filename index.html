@@ -296,6 +296,11 @@
       <symbol id="icon-doppler-shift" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M43 39h33l-4-10-9-4H51l-6 5-8 2z"/><circle cx="49" cy="40" r="5"/><circle cx="68" cy="40" r="5"/><path d="M35 27q-7 6 0 12M28 21q-15 12 0 24M20 15q-23 18 0 36"/><path d="M80 29q7 5 0 10M87 24q13 10 0 20M95 18q21 16 0 32" stroke="var(--accent)"/>
       </symbol>
+      <symbol id="icon-reynolds-number" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 13h110v38H5z"/><path d="M5 21h110M5 43h110" opacity=".45"/>
+        <path d="M8 32C30 32 43 32 58 32" stroke="var(--accent)" stroke-width="3"/><path d="M58 32c8-16 13 16 21 0s13 16 21 0 10 10 15 1" stroke="var(--accent)" stroke-width="3"/>
+        <circle cx="31" cy="26" r="1.5" fill="currentColor"/><circle cx="39" cy="39" r="1.5" fill="currentColor"/><circle cx="89" cy="23" r="1.5" fill="currentColor"/><circle cx="103" cy="41" r="1.5" fill="currentColor"/>
+      </symbol>
       <symbol id="icon-straw-hose-flow" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="18" cy="27" r="10"/><path d="M8 25c1-9 7-13 14-10 6 2 8 8 6 13M16 37v11M7 58v-9c0-7 5-11 11-11s11 4 11 11v9M27 29l7 1"/><path d="M29 30c18 0 8 18 25 18 19 0 6-34 25-34 17 0 4 32 21 32h7" stroke="var(--accent)"/><path d="M107 39v16h9V39M105 39h13"/><path d="M111 38c-4-5-2-9 0-12 3 4 5 8 0 12z" fill="var(--accent)" stroke="var(--accent)"/>
       </symbol>
@@ -370,7 +375,7 @@
       <span class="brand-word" aria-hidden="true"><span>m</span><span class="sub">ade</span><span>c</span><span class="sub">lear</span></span>
     </a>
     <div class="topbar-right">
-      <span class="count">Sixteen equations</span>
+      <span class="count">Seventeen equations</span>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
     </div>
   </div>
@@ -400,7 +405,7 @@
   <section class="catalogue" aria-labelledby="cat-all">
     <div class="section-head">
       <h2 id="cat-all">All pages</h2>
-      <span class="cat-count">Sixteen pages</span>
+      <span class="cat-count">Seventeen pages</span>
     </div>
     <p class="cat-sub">Everything built so far, coloured by category. Shuffle the order if you would rather stumble into something than go looking for it.</p>
 
@@ -414,7 +419,7 @@
       </select>
       <button class="text-btn" id="shuffleBtn" type="button">Shuffle</button>
       <button class="text-btn" id="resetOrderBtn" type="button" hidden>Reset order</button>
-      <span class="results-count" id="resultsCount" aria-live="polite">16 pages</span>
+      <span class="results-count" id="resultsCount" aria-live="polite">17 pages</span>
     </div>
 
     <div class="tile-grid" id="catalogueGrid">
@@ -431,6 +436,7 @@
       <a class="tile" data-cat="Discoveries" data-desc="Hold a rocket at 1 g, 2 g or more and see the onboard time, Earth time and distance needed to approach &mdash; never reach &mdash; light speed." href="visualizations/constant-acceleration.html"><span class="meta">Discoveries</span><h3>How long to almost reach light speed?</h3></a>
       <a class="tile" data-cat="Discoveries" data-desc="Drag the outside temperature down and watch a heat pump keep delivering more heat than the electricity it uses &mdash; then compare it against an electric heater and a gas furnace." href="visualizations/heat-pump-magic.html"><span class="meta">Discoveries</span><h3>Heat Pump <del>magic</del> <em>Science</em></h3></a>
       <a class="tile" data-cat="Fun physics" data-desc="See why a long drink straw becomes impossible to sip through while a much longer garden hose stays effortless." href="visualizations/straw-hose-flow.html"><span class="meta">Fun physics</span><h3>Why the straw gives up</h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="Inject a dye stream into a pipe, then change the fluid, flow and diameter to watch orderly layers break into turbulent mixing." href="visualizations/reynolds-number.html"><span class="meta">Fun physics</span><h3>When smooth flow breaks into turbulence</h3></a>
       <a class="tile" data-cat="Fun physics" data-desc="Use melted spots and a microwave&rsquo;s frequency to estimate light speed, with compatible units and a standing-wave side view." href="visualizations/microwave-chocolate.html"><span class="meta">Fun physics</span><h3>Measuring light speed with chocolate</h3></a>
       <a class="tile" data-cat="Fun physics" data-desc="Choose the smallest and biggest endpoints, slide across a logarithmic ruler, and compare both log-scale position and multiplicative size." href="visualizations/cosmic-scale.html"><span class="meta">Fun physics</span><h3>Closer to the smallest thing, or the biggest?</h3></a>
       <a class="tile" data-cat="Fun physics" data-desc="Set a release height, launch angle, and speed, and see whether a 200&nbsp;g potato lands in a hole 3&nbsp;m away &mdash; and how two very different arcs can land in the same spot." href="visualizations/potato-trajectory.html"><span class="meta">Fun physics</span><h3>Throwing a potato into a hole</h3></a>

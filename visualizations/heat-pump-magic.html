@@ -92,6 +92,11 @@
   .hero svg{width:100%;height:auto;display:block}
   .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
   .hero .lbl.big{font-size:12px}
+  .hero-playbar{display:flex;align-items:baseline;gap:12px;margin-top:8px;min-height:20px}
+  .hero-play{cursor:pointer;border:0;border-bottom:1px solid var(--line2);background:none;color:var(--fg);padding:0 0 2px;font:italic 14px/1.25 Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  .hero-play:hover,.hero-play:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+  .hero-status{font:10.5px/1.45 ui-monospace,monospace;color:var(--muted);text-wrap:pretty}
+  @media (max-width:520px){.hero-playbar{display:block}.hero-status{display:block;margin-top:5px}}
 
   .hero-chart{width:100%}
   .chart-heading{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
@@ -152,18 +157,6 @@
   .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
   .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
   .preset:hover{border-color:var(--accent);color:var(--accent)}
-
-  .refrig{margin-top:clamp(30px,3.4vw,46px);padding-top:clamp(20px,2.4vw,30px);border-top:1px solid var(--line)}
-  .refrig h2{font-weight:300;font-size:clamp(1.3rem,2vw,1.7rem);letter-spacing:-.02em;margin:0}
-  .refrig .sub{margin:8px 0 0;max-width:none}
-  .refrig-wrap{position:relative;width:100%;margin:clamp(18px,2.2vw,28px) 0 0}
-  .refrig-wrap svg{width:100%;height:auto;display:block}
-  .refrig-wrap .lbl{position:absolute;text-align:center;white-space:normal;line-height:1.35;font:400 10.5px ui-monospace,monospace;color:var(--muted2)}
-  .refrig-wrap .lbl b{display:block;font:600 12px ui-monospace,monospace;color:var(--fg);margin-bottom:2px}
-  .refrig-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:14px;font:400 11px ui-monospace,monospace;color:var(--muted)}
-  .refrig-legend span{display:inline-flex;align-items:center;gap:6px}
-  .refrig-legend i{width:14px;height:0;border-top:2px solid;display:inline-block}
-  .refrig-legend i.dashed{border-top-style:dashed}
 
   .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
   .note a{color:var(--muted2);text-decoration-color:var(--line2)}
@@ -259,17 +252,25 @@
       <div class="lbl big" id="lblLoss"></div>
       <div class="lbl" id="lblOutside">outside air</div>
       <div class="lbl" id="lblInside">indoor, 21&deg;C</div>
-      <svg id="heroSvg" role="img" aria-label="Energy flow diagram: fuel or electricity, and for a heat pump ambient outdoor heat too, flow into the unit, which delivers heat indoors — with a loss arrow for any device whose coefficient of performance is below 1.">
+      <svg id="heroSvg" role="img" aria-label="Combined energy and refrigeration-cycle diagram: outside heat enters the evaporator, electricity powers the compressor, refrigerant carries the combined energy to the indoor condenser, and an expansion valve returns it to low pressure.">
+        <g id="weatherDetails"></g>
         <g id="cloudIcon"></g>
         <g id="houseIcon"></g>
         <g id="plugIcon"></g>
         <rect id="unitRect" rx="8" fill="var(--bg)" stroke="var(--line2)" stroke-width="1.25"></rect>
-        <text id="unitLabel" text-anchor="middle" fill="var(--muted2)" font-family="ui-monospace,monospace"></text>
         <line id="qcLine" stroke-linecap="round"></line>
         <line id="qhLine" stroke-linecap="round"></line>
         <line id="wLine" stroke-linecap="round"></line>
         <line id="lossLine" stroke-linecap="round"></line>
+        <g id="unitDetails"></g>
+        <g id="heroRefrigerant" aria-hidden="true"></g>
+        <text id="unitLabel" text-anchor="middle" fill="var(--muted2)" font-family="ui-monospace,monospace"></text>
+        <g id="energyParticles" aria-hidden="true"></g>
       </svg>
+      <div class="hero-playbar">
+        <button class="hero-play" id="energyPlay" type="button">Play the full cycle</button>
+        <span class="hero-status" id="energyStatus" aria-live="polite"></span>
+      </div>
     </div>
 
     <div class="hero-chart" id="chartWrap">
@@ -341,33 +342,6 @@
     <button class="preset" data-p="freeze">deep freeze</button>
     <button class="preset" data-p="electric">compare: electric heater</button>
     <button class="preset" data-p="gas">compare: natural gas</button>
-  </div>
-
-  <div class="refrig">
-    <h2>Inside the heat pump: the refrigeration cycle</h2>
-    <p class="sub">A heat pump doesn&rsquo;t just blow warm air &mdash; a sealed loop of refrigerant does four things, in order, over and over: it <b>evaporates</b> outdoors, picking up Q<sub>C</sub> from the outside air; gets <b>compressed</b>, which raises both its pressure and temperature using the electrical work W; <b>condenses</b> indoors, releasing Q<sub>H</sub> into the house; then drops back to low pressure through an <b>expansion valve</b>, ready to evaporate again. The electric heater and gas furnace above skip this loop entirely &mdash; which is exactly why neither can move extra heat for free.</p>
-    <div class="refrig-wrap" id="refrigWrap">
-      <div class="lbl" id="rlComp"></div>
-      <div class="lbl" id="rlCond"></div>
-      <div class="lbl" id="rlEvap"></div>
-      <div class="lbl" id="rlValve"></div>
-      <svg id="refrigSvg" role="img" aria-label="Refrigeration cycle diagram: refrigerant evaporates outdoors absorbing heat, is compressed using electrical work, condenses indoors releasing heat, then expands back to low pressure through a valve, repeating continuously.">
-        <rect id="rCompRect" rx="8" fill="var(--bg)" stroke="var(--line2)" stroke-width="1.25"></rect>
-        <rect id="rCondRect" rx="8" fill="var(--bg)" stroke="var(--line2)" stroke-width="1.25"></rect>
-        <rect id="rEvapRect" rx="8" fill="var(--bg)" stroke="var(--line2)" stroke-width="1.25"></rect>
-        <rect id="rValveRect" rx="8" fill="var(--bg)" stroke="var(--line2)" stroke-width="1.25"></rect>
-        <line id="rSuctionLine" stroke-linecap="round"></line>
-        <line id="rDischargeLine" stroke-linecap="round"></line>
-        <line id="rLiquidLine" stroke-linecap="round"></line>
-        <line id="rExpandLine" stroke-linecap="round"></line>
-      </svg>
-    </div>
-    <div class="refrig-legend">
-      <span><i class="dashed" style="border-color:#5B8FBF"></i>low pressure &middot; vapor (suction)</span>
-      <span><i class="dashed" style="border-color:#C4703F"></i>high pressure &middot; hot vapor (discharge)</span>
-      <span><i style="border-color:#C4703F"></i>high pressure &middot; warm liquid</span>
-      <span><i style="border-color:#5B8FBF"></i>low pressure &middot; cold liquid/vapor mix</span>
-    </div>
   </div>
 
   <p class="note"><strong>Coefficient of performance</strong> (COP) is heat delivered divided by electrical work: COP&nbsp;=&nbsp;Q<sub>H</sub>/W, which can honestly exceed 1 because Q<sub>H</sub>&nbsp;=&nbsp;W&nbsp;+&nbsp;Q<sub>C</sub> &mdash; the extra comes from outside air, not from breaking energy conservation. The dashed line above is the <a href="https://en.wikipedia.org/wiki/Carnot_cycle" target="_blank" rel="noopener">Carnot</a> ceiling, T<sub>H</sub>/(T<sub>H</sub>&minus;T<sub>C</sub>) in kelvin &mdash; the best any heat pump could do, climbing without bound as outdoor and indoor temperature converge (hence the arrow where it runs off the top of the chart). The solid curve is a real machine, read off <a href="https://daikinquebec.net/en/heat-pump/cop/" target="_blank" rel="noopener">Daikin Quebec's published COP table</a> (one product line, not a universal curve; the &minus;20&deg;C and +20&deg;C ends extrapolate its nearest slope). Gas furnaces don't move ambient heat, so they sit flat near 90% &mdash; the rest is lost up the flue, shown above as the loss arrow when that device is selected. Electric resistance heaters are flatter still, pinned at exactly COP&nbsp;1. Try all three from the toggle above. Indoor target fixed at 21&deg;C throughout.</p>
@@ -486,20 +460,19 @@
   function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
 
   var state = { device:'hp', Tc:5, active:null };
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var energy = {playing:false, start:0, progress:0, geom:null, raf:null};
   var heroW = 0, chartW = 0;
 
   var $ = function(id){ return document.getElementById(id); };
   var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
   var cloudIcon=$('cloudIcon'), houseIcon=$('houseIcon'), plugIcon=$('plugIcon');
+  var weatherDetails=$('weatherDetails'), unitDetails=$('unitDetails'), heroRefrigerant=$('heroRefrigerant'), energyParticles=$('energyParticles');
   var unitRect=$('unitRect'), unitLabel=$('unitLabel');
   var qcLine=$('qcLine'), qhLine=$('qhLine'), wLine=$('wLine'), lossLine=$('lossLine');
   var lblW=$('lblW'), lblQc=$('lblQc'), lblQh=$('lblQh'), lblLoss=$('lblLoss'), lblOutside=$('lblOutside'), lblInside=$('lblInside');
+  var energyPlay=$('energyPlay'), energyStatus=$('energyStatus');
   var chartWrap=$('chartWrap'), chartSvg=$('chartSvg'), chartCurrent=$('chartCurrent');
-  var refrigWrap=$('refrigWrap'), refrigSvg=$('refrigSvg');
-  var rCompRect=$('rCompRect'), rCondRect=$('rCondRect'), rEvapRect=$('rEvapRect'), rValveRect=$('rValveRect');
-  var rSuctionLine=$('rSuctionLine'), rDischargeLine=$('rDischargeLine'), rLiquidLine=$('rLiquidLine'), rExpandLine=$('rExpandLine');
-  var rlComp=$('rlComp'), rlCond=$('rlCond'), rlEvap=$('rlEvap'), rlValve=$('rlValve');
-  var refrigW = 0;
 
   function dev(){
     for(var i=0;i<DEVICES.length;i++){ if(DEVICES[i].key===state.device) return DEVICES[i]; }
@@ -512,12 +485,13 @@
     // cy/vbH carry a little extra top padding (vs. the space cy+30 needs at the bottom) to
     // leave room for the loss arrow, which exits the unit box upward and only shows for a
     // device with COP<1 (gas) — reserved unconditionally so switching devices doesn't reflow.
-    var cy = narrow?78:88;
-    var vbH = narrow?160:180;
-    var unitW = narrow?76:96, unitH = narrow?52:62;
+    var isHp=state.device==='hp';
+    var cy = narrow?108:112;
+    var vbH = narrow?238:242;
+    var unitW = isHp?(narrow?138:220):(narrow?98:126), unitH = isHp?(narrow?104:112):(narrow?70:78);
     var ux = w/2 - unitW/2, uy = cy - unitH/2;
-    var cloudX = narrow?36:56, houseX = w - (narrow?36:56);
-    var plugY = uy + unitH + (narrow?46:56);
+    var cloudX = narrow?38:58, houseX = w - (narrow?42:62);
+    var plugY = uy + unitH + (narrow?48:54);
     var lossLen = narrow?22:28;
     var SCALE = narrow?3.4:4.4;
     var wW = clamp(SCALE*1, 2, 30);
@@ -528,11 +502,11 @@
       w:w, vbH:vbH, cy:cy,
       unitX:ux, unitY:uy, unitW:unitW, unitH:unitH, unitCx: ux+unitW/2, unitCy: uy+unitH/2,
       cloudX:cloudX, houseX:houseX, plugX: ux+unitW/2, plugY:plugY,
-      qcX1: cloudX+18, qcX2: ux-4, qcW:qcW,
-      qhX1: ux+unitW+4, qhX2: houseX-18, qhW:qhW,
-      wY1: plugY-14, wY2: uy+unitH+2, wW:wW,
+      qcX1: cloudX+18, qcX2:isHp?ux+unitW*.18:ux-4, qcW:qcW,
+      qhX1:isHp?ux+unitW*.82:ux+unitW+4, qhX2: houseX-18, qhW:qhW,
+      wY1: plugY-14, wY2:isHp?uy+unitH*.74+9:uy+unitH+2, wW:wW,
       lossX: ux+unitW/2, lossY1: uy-3, lossY2: uy-3-lossLen, lossW:lossW,
-      labelY_qc: cy-16, labelY_qh: cy-16, labelY_w: plugY-2, labelY_loss: uy-3-lossLen
+      labelY_qc: cy-18, labelY_qh: cy-18, labelY_w: plugY-2, labelY_loss: uy-3-lossLen
     };
   }
 
@@ -544,6 +518,133 @@
     s += 'a '+r2+' '+r2+' 0 1 1 '+(2*r2*0.9)+' '+(2*scale)+' ';
     s += 'a '+r3+' '+r3+' 0 1 1 '+(0.2*r3)+' 0 Z';
     return s;
+  }
+
+  function addLine(group,x1,y1,x2,y2,stroke,width,opacity){
+    group.appendChild(el('line',{x1:x1,y1:y1,x2:x2,y2:y2,stroke:stroke,'stroke-width':width||1.25,opacity:opacity===undefined?1:opacity,'stroke-linecap':'round'}));
+  }
+
+  function drawWeather(h,isHp){
+    weatherDetails.innerHTML='';
+    if(!isHp) return;
+    // Air currents make the cloud read as a moving heat source, not a decorative weather icon.
+    for(var i=0;i<3;i++){
+      var ay=h.cy-13+i*13;
+      weatherDetails.appendChild(el('path',{d:'M'+(h.cloudX-27)+' '+ay+' C'+(h.cloudX-16)+' '+(ay-5)+' '+(h.cloudX-8)+' '+(ay+5)+' '+(h.cloudX+1)+' '+ay,fill:'none',stroke:'var(--line2)','stroke-width':1,opacity:.65,'stroke-linecap':'round'}));
+    }
+    if(state.Tc<=0){
+      [[-18,-28],[4,-31],[19,-18]].forEach(function(p){
+        var x=h.cloudX+p[0],y=h.cy+p[1];
+        addLine(weatherDetails,x-3,y,x+3,y,'#5B8FBF',1,.75);
+        addLine(weatherDetails,x,y-3,x,y+3,'#5B8FBF',1,.75);
+      });
+    }else if(state.Tc>=9){
+      var sx=h.cloudX-13,sy=h.cy-30;
+      weatherDetails.appendChild(el('circle',{cx:sx,cy:sy,r:5,fill:'none',stroke:'#C9A227','stroke-width':1.2,opacity:.8}));
+      for(var a=0;a<8;a++){
+        var ang=a*Math.PI/4;
+        addLine(weatherDetails,sx+Math.cos(ang)*8,sy+Math.sin(ang)*8,sx+Math.cos(ang)*11,sy+Math.sin(ang)*11,'#C9A227',1,.7);
+      }
+    }
+  }
+
+  function drawUnitDetail(h,d){
+    unitDetails.innerHTML='';
+    var x=h.unitX,y=h.unitY,w=h.unitW,hh=h.unitH,cx=h.unitCx,cy=h.unitCy;
+    if(d.key==='hp'){
+      // One sealed loop now carries both stories: the refrigerant state changes and the
+      // outside/electrical energy that ultimately leaves through the indoor condenser.
+      var evap={x:x+w*.18,y:cy},comp={x:cx,y:y+hh*.74},cond={x:x+w*.82,y:cy},valve={x:cx,y:y+hh*.25};
+      h.cycle={evap:evap,comp:comp,cond:cond,valve:valve};
+      unitDetails.appendChild(el('path',{d:'M'+evap.x+' '+evap.y+' L'+comp.x+' '+comp.y,fill:'none',stroke:'#5B8FBF','stroke-width':2.2,'stroke-dasharray':'5 4','stroke-linecap':'round'}));
+      unitDetails.appendChild(el('path',{d:'M'+comp.x+' '+comp.y+' L'+cond.x+' '+cond.y,fill:'none',stroke:'#C4703F','stroke-width':2.8,'stroke-dasharray':'6 4','stroke-linecap':'round'}));
+      unitDetails.appendChild(el('path',{d:'M'+cond.x+' '+cond.y+' L'+valve.x+' '+valve.y,fill:'none',stroke:'#C4703F','stroke-width':2,'stroke-dasharray':'3 3','stroke-linecap':'round'}));
+      unitDetails.appendChild(el('path',{d:'M'+valve.x+' '+valve.y+' L'+evap.x+' '+evap.y,fill:'none',stroke:'#5B8FBF','stroke-width':2,'stroke-dasharray':'3 3','stroke-linecap':'round'}));
+
+      // Evaporator and condenser coils.
+      [evap,cond].forEach(function(node,index){
+        var col=index===0?'#5B8FBF':'#C4703F',coil='M'+(node.x-8)+' '+(node.y-11);
+        for(var row=0;row<4;row++) coil+=' L'+(node.x+(row%2? -8:8))+' '+(node.y-11+(row+1)*5.5);
+        unitDetails.appendChild(el('path',{d:coil,fill:'none',stroke:col,'stroke-width':2,'stroke-linecap':'round','stroke-linejoin':'round'}));
+      });
+      unitDetails.appendChild(el('circle',{cx:comp.x,cy:comp.y,r:9,fill:'var(--bg)',stroke:'#C9A227','stroke-width':1.8}));
+      unitDetails.appendChild(el('path',{d:'M'+(comp.x-4)+' '+comp.y+' q4 -5 8 0 q-4 5 -8 0',fill:'none',stroke:'#C9A227','stroke-width':1.3}));
+      unitDetails.appendChild(el('path',{d:'M'+(valve.x-8)+' '+(valve.y-5)+' L'+valve.x+' '+valve.y+' L'+(valve.x-8)+' '+(valve.y+5)+' M'+(valve.x+8)+' '+(valve.y-5)+' L'+valve.x+' '+valve.y+' L'+(valve.x+8)+' '+(valve.y+5),fill:'none',stroke:'var(--muted2)','stroke-width':1.4,'stroke-linejoin':'round'}));
+
+      var labelSize=w<170?8.8:9.4;
+      unitDetails.appendChild(el('text',{x:evap.x,y:evap.y-16,'text-anchor':'middle',fill:'var(--muted2)','font-size':labelSize,'font-family':'ui-monospace,monospace'},'evaporator'));
+      unitDetails.appendChild(el('text',{x:cond.x,y:cond.y-16,'text-anchor':'middle',fill:'var(--muted2)','font-size':labelSize,'font-family':'ui-monospace,monospace'},'condenser'));
+      unitDetails.appendChild(el('text',{x:comp.x,y:comp.y+19,'text-anchor':'middle',fill:'var(--muted2)','font-size':labelSize,'font-family':'ui-monospace,monospace'},'compressor'));
+      unitDetails.appendChild(el('text',{x:valve.x,y:valve.y-9,'text-anchor':'middle',fill:'var(--muted2)','font-size':labelSize,'font-family':'ui-monospace,monospace'},'expansion'));
+    }else if(d.key==='electric'){
+      var left=x+w*.18,right=x+w*.82,top=y+hh*.27,step=(right-left)/8,path='M'+left+' '+top;
+      for(var e=1;e<=8;e++) path+=' L'+(left+e*step)+' '+(top+(e%2?14:-2));
+      unitDetails.appendChild(el('path',{d:path,fill:'none',stroke:'#C4703F','stroke-width':2.4,'stroke-linecap':'round','stroke-linejoin':'round'}));
+      for(var er=0;er<3;er++) unitDetails.appendChild(el('path',{d:'M'+(left+10+er*20)+' '+(y+hh*.68)+' q7 -7 14 0',fill:'none',stroke:'#C4703F','stroke-width':1.2,opacity:.7}));
+    }else{
+      var fx=cx,fy=y+hh*.55;
+      unitDetails.appendChild(el('path',{d:'M'+fx+' '+(fy-22)+' C'+(fx+12)+' '+(fy-10)+' '+(fx+9)+' '+(fy+4)+' '+fx+' '+(fy+8)+' C'+(fx-10)+' '+(fy+4)+' '+(fx-12)+' '+(fy-10)+' '+fx+' '+(fy-22)+' Z',fill:'color-mix(in srgb,var(--bad) 12%,var(--bg))',stroke:'var(--bad)','stroke-width':1.5,'stroke-linejoin':'round'}));
+      for(var gx=0;gx<4;gx++) addLine(unitDetails,x+w*.17+gx*w*.18,y+hh*.20,x+w*.17+gx*w*.18,y+hh*.40,'var(--line2)',2,.9);
+      unitDetails.appendChild(el('path',{d:'M'+cx+' '+y+' V'+(y-16)+' h'+(w*.15),fill:'none',stroke:'var(--line2)','stroke-width':3,'stroke-linejoin':'round'}));
+    }
+  }
+
+  function buildEnergyParticles(h,d,c){
+    energyParticles.innerHTML='';
+    heroRefrigerant.innerHTML='';
+    energy.geom=h;
+    var streams=[{key:'w',count:4,color:'#C9A227',r:2.6},{key:'qh',count:Math.min(9,Math.max(4,Math.round(c*1.6))),color:'#C4703F',r:3.1}];
+    if(d.key==='hp') streams.push({key:'qc',count:Math.min(8,Math.max(3,Math.round((c-1)*1.8))),color:'#5B8FBF',r:3});
+    if(d.key==='gas') streams.push({key:'loss',count:2,color:'var(--bad)',r:2.8});
+    streams.forEach(function(stream){
+      for(var i=0;i<stream.count;i++){
+        energyParticles.appendChild(el('circle',{r:stream.r,fill:stream.color,opacity:0,'data-stream':stream.key,'data-index':i}));
+      }
+    });
+    if(d.key==='hp'&&h.cycle){
+      for(var rp=0;rp<7;rp++) heroRefrigerant.appendChild(el('circle',{r:2.5,fill:'#5B8FBF',opacity:0,'data-cycle-index':rp}));
+    }
+    updateEnergyParticles();
+  }
+
+  function streamPhase(stream,p){
+    if(stream==='w') return clamp(p/.38,0,1);
+    if(stream==='qc') return clamp((p-.10)/.48,0,1);
+    if(stream==='qh') return clamp((p-.50)/.44,0,1);
+    return clamp((p-.48)/.38,0,1);
+  }
+
+  function updateEnergyParticles(){
+    var h=energy.geom;
+    if(!h) return;
+    Array.prototype.forEach.call(energyParticles.children,function(dot){
+      var stream=dot.getAttribute('data-stream'),i=Number(dot.getAttribute('data-index'));
+      var q=streamPhase(stream,energy.progress),f=q*1.55-i*.14;
+      var visible=energy.playing&&f>=0&&f<=1;
+      dot.setAttribute('opacity',visible ? .95 : 0);
+      if(!visible) return;
+      var x,y;
+      if(stream==='w'){x=h.plugX;y=h.wY1+(h.wY2-h.wY1)*f;}
+      else if(stream==='qc'){x=h.qcX1+(h.qcX2-h.qcX1)*f;y=h.cy;}
+      else if(stream==='qh'){x=h.qhX1+(h.qhX2-h.qhX1)*f;y=h.cy;}
+      else{x=h.lossX;y=h.lossY1+(h.lossY2-h.lossY1)*f;}
+      dot.setAttribute('cx',x);dot.setAttribute('cy',y);
+    });
+    if(h.cycle){
+      var pts=[h.cycle.evap,h.cycle.comp,h.cycle.cond,h.cycle.valve,h.cycle.evap];
+      Array.prototype.forEach.call(heroRefrigerant.children,function(dot){
+        var i=Number(dot.getAttribute('data-cycle-index')),f=(energy.progress*2.2-i*.115)%1;
+        if(f<0) f+=1;
+        var seg=Math.min(3,Math.floor(f*4)),q=f*4-seg,a=pts[seg],b=pts[seg+1];
+        dot.setAttribute('cx',a.x+(b.x-a.x)*q);dot.setAttribute('cy',a.y+(b.y-a.y)*q);
+        dot.setAttribute('fill',seg===0||seg===3?'#5B8FBF':'#C4703F');
+        dot.setAttribute('opacity',energy.playing ? .95 : 0);
+      });
+    }
+  }
+
+  function setEnergyStatus(text){
+    if(energyStatus.textContent!==text) energyStatus.textContent=text;
   }
 
   function drawHero(){
@@ -560,9 +661,11 @@
     // unit box
     unitRect.setAttribute('x', h.unitX); unitRect.setAttribute('y', h.unitY);
     unitRect.setAttribute('width', h.unitW); unitRect.setAttribute('height', h.unitH);
-    unitLabel.setAttribute('x', h.unitCx); unitLabel.setAttribute('y', h.unitCy+4);
-    unitLabel.setAttribute('font-size', 10.5);
-    unitLabel.textContent = isHp ? 'heat pump' : (isGas ? 'furnace' : 'heater');
+    unitLabel.setAttribute('x', h.unitCx); unitLabel.setAttribute('y', h.unitY+h.unitH-6);
+    unitLabel.setAttribute('font-size', 9.5);
+    unitLabel.textContent = isHp ? '' : (isGas ? 'furnace' : 'heater');
+    drawUnitDetail(h,d);
+    drawWeather(h,isHp);
 
     // cloud (outside air source)
     cloudIcon.innerHTML = '';
@@ -572,11 +675,13 @@
 
     // house (indoor)
     houseIcon.innerHTML='';
-    var hx=h.houseX, hy=h.cy, hw=30, hh=24;
+    var hx=h.houseX, hy=h.cy, hw=36, hh=30;
     var roof = el('polygon', {points: (hx-hw/2-3)+','+(hy-hh/2)+' '+hx+','+(hy-hh/2-14)+' '+(hx+hw/2+3)+','+(hy-hh/2), fill:'var(--bg)', stroke:'var(--line2)', 'stroke-width':1.25});
     var body = el('rect', {x:hx-hw/2, y:hy-hh/2, width:hw, height:hh, fill:'var(--bg)', stroke:'var(--line2)', 'stroke-width':1.25});
     var door = el('rect', {x:hx-4, y:hy+hh/2-12, width:8, height:12, fill:'none', stroke:'var(--line2)', 'stroke-width':1});
-    houseIcon.appendChild(roof); houseIcon.appendChild(body); houseIcon.appendChild(door);
+    var windowPane = el('rect', {x:hx-12, y:hy-5, width:7, height:7, fill:'color-mix(in srgb,#C4703F 12%,var(--bg))', stroke:'var(--line2)', 'stroke-width':.8});
+    houseIcon.appendChild(roof); houseIcon.appendChild(body); houseIcon.appendChild(door); houseIcon.appendChild(windowPane);
+    for(var wave=0;wave<3;wave++) houseIcon.appendChild(el('path',{d:'M'+(hx-11+wave*8)+' '+(hy+8)+' q4 -5 8 0',fill:'none',stroke:'#C4703F','stroke-width':1,opacity:.7,'stroke-linecap':'round'}));
 
     // input icon: plug for electricity, flame for gas
     plugIcon.innerHTML='';
@@ -654,7 +759,57 @@
 
     lblInside.style.left = px2(h.houseX); lblInside.style.top = py2(h.cy+30);
     lblInside.style.transform = 'translateX(-50%)';
+    buildEnergyParticles(h,d,c);
+    if(!energy.playing) setEnergyStatus(energySummary());
   }
+
+  function energySummary(){
+    var c=cop(),d=dev();
+    if(d.key==='hp') return '1.00 kWh electricity + '+Math.max(0,c-1).toFixed(2)+' kWh outside heat = '+c.toFixed(2)+' kWh indoors.';
+    if(d.key==='electric') return '1.00 kWh electricity = 1.00 kWh indoors.';
+    return '1.00 kWh-equivalent fuel = '+c.toFixed(2)+' kWh indoors + '+Math.max(0,1-c).toFixed(2)+' kWh lost.';
+  }
+
+  function energyStage(){
+    var p=energy.progress,d=dev();
+    if(d.key==='hp'){
+      if(p<.22) return 'Compressor: electricity adds work W and raises the refrigerant pressure.';
+      if(p<.50) return 'Evaporator: cold refrigerant absorbs Qc from the outside air.';
+      if(p<.82) return 'Condenser: W + Qc leave together as indoor heat Qh.';
+      return 'Expansion valve: pressure drops and the sealed loop starts again.';
+    }
+    if(d.key==='electric') return p<.50 ? 'Electricity meets the resistance element.' : 'The same amount of energy leaves as heat.';
+    return p<.45 ? 'Fuel burns inside the heat exchanger.' : 'Most heat goes indoors; a smaller share leaves through the flue.';
+  }
+
+  function stopEnergy(){
+    if(energy.raf) cancelAnimationFrame(energy.raf);
+    energy.raf=null;
+    energy.playing=false; energy.start=0; energy.progress=0;
+    qcLine.style.strokeDashoffset='0px';qhLine.style.strokeDashoffset='0px';wLine.style.strokeDashoffset='0px';
+    energyPlay.textContent='Play the full cycle';
+    updateEnergyParticles();
+  }
+
+  function playEnergy(){
+    if(energy.raf) cancelAnimationFrame(energy.raf);
+    energy.raf=null;
+    energy.start=0; energy.progress=0;
+    if(reduceMotion){
+      energy.playing=false; energy.progress=1;
+      setEnergyStatus(energySummary());
+      energyPlay.textContent='Replay the full cycle';
+      updateEnergyParticles();
+      return;
+    }
+    energy.playing=true;
+    energyPlay.textContent='Playing…';
+    setEnergyStatus(energyStage());
+    updateEnergyParticles();
+    energy.raf=requestAnimationFrame(tick);
+  }
+
+  energyPlay.addEventListener('click',playEnergy);
 
   // ---- equation colouring ----
   var accent = 'var(--accent)';
@@ -693,7 +848,7 @@
     var b = document.createElement('button');
     b.type = 'button';
     b.textContent = d.name;
-    b.addEventListener('click', function(){ state.device=d.key; render(); });
+    b.addEventListener('click', function(){ stopEnergy(); state.device=d.key; render(); playEnergy(); });
     deviceButtons.appendChild(b);
   });
   function drawDeviceButtons(){
@@ -836,8 +991,10 @@
     };
     b.addEventListener('click', function(){
       var p = presets[b.dataset.p];
+      stopEnergy();
       state.device=p.device; state.Tc=p.tc;
       render();
+      playEnergy();
     });
   });
 
@@ -932,78 +1089,6 @@
       '<span class="dot" style="background:#C4703F"></span>gas furnace <b>'+GAS_COP.toFixed(2)+'&times;</b>';
   }
 
-  // ---- refrigeration-cycle diagram: same measured-width/viewBox convention as the hero,
-  // laid out as a clockwise loop (evaporator -> compressor -> condenser -> expansion valve).
-  // Always shows the heat pump's own cycle, independent of the device picker above (the
-  // point of this section is what electric/gas heating skip entirely).
-  function geomRefrig(w){
-    var vbH = 230;
-    var boxW = clamp(w*0.30, 96, 168), boxH = 56;
-    var marginX = clamp(w*0.05, 12, 48);
-    var topY = 24, botY = vbH - 24 - boxH;
-    var leftX = marginX, rightX = w - marginX - boxW;
-    return {
-      w:w, vbH:vbH, boxW:boxW, boxH:boxH, leftX:leftX, rightX:rightX, topY:topY, botY:botY,
-      lcx: leftX+boxW/2, rcx: rightX+boxW/2,
-      topMidY: topY+boxH/2, botMidY: botY+boxH/2
-    };
-  }
-
-  function drawRefrig(){
-    var w = refrigW || refrigWrap.clientWidth || 640;
-    var g = geomRefrig(w);
-    refrigSvg.setAttribute('viewBox','0 0 '+w+' '+g.vbH);
-    refrigSvg.setAttribute('preserveAspectRatio','none');
-
-    rCompRect.setAttribute('x',g.leftX); rCompRect.setAttribute('y',g.topY); rCompRect.setAttribute('width',g.boxW); rCompRect.setAttribute('height',g.boxH);
-    rCondRect.setAttribute('x',g.rightX); rCondRect.setAttribute('y',g.topY); rCondRect.setAttribute('width',g.boxW); rCondRect.setAttribute('height',g.boxH);
-    rEvapRect.setAttribute('x',g.leftX); rEvapRect.setAttribute('y',g.botY); rEvapRect.setAttribute('width',g.boxW); rEvapRect.setAttribute('height',g.boxH);
-    rValveRect.setAttribute('x',g.rightX); rValveRect.setAttribute('y',g.botY); rValveRect.setAttribute('width',g.boxW); rValveRect.setAttribute('height',g.boxH);
-
-    // suction: evaporator -> compressor (low pressure vapor, cool side)
-    rSuctionLine.setAttribute('x1',g.lcx); rSuctionLine.setAttribute('x2',g.lcx);
-    rSuctionLine.setAttribute('y1',g.botY); rSuctionLine.setAttribute('y2',g.topY+g.boxH);
-    rSuctionLine.setAttribute('stroke','#5B8FBF'); rSuctionLine.setAttribute('stroke-width',3);
-    rSuctionLine.setAttribute('stroke-dasharray','9 8'); rSuctionLine.setAttribute('opacity',0.85);
-
-    // discharge: compressor -> condenser (high pressure hot vapor)
-    rDischargeLine.setAttribute('y1',g.topMidY); rDischargeLine.setAttribute('y2',g.topMidY);
-    rDischargeLine.setAttribute('x1',g.leftX+g.boxW); rDischargeLine.setAttribute('x2',g.rightX);
-    rDischargeLine.setAttribute('stroke','#C4703F'); rDischargeLine.setAttribute('stroke-width',3);
-    rDischargeLine.setAttribute('stroke-dasharray','9 8'); rDischargeLine.setAttribute('opacity',0.9);
-
-    // liquid line: condenser -> expansion valve (high pressure warm liquid)
-    rLiquidLine.setAttribute('x1',g.rcx); rLiquidLine.setAttribute('x2',g.rcx);
-    rLiquidLine.setAttribute('y1',g.topY+g.boxH); rLiquidLine.setAttribute('y2',g.botY);
-    rLiquidLine.setAttribute('stroke','#C4703F'); rLiquidLine.setAttribute('stroke-width',3);
-    rLiquidLine.setAttribute('stroke-dasharray','3 4'); rLiquidLine.setAttribute('opacity',0.9);
-
-    // expansion: valve -> evaporator (low pressure cold liquid/vapor mix)
-    rExpandLine.setAttribute('y1',g.botMidY); rExpandLine.setAttribute('y2',g.botMidY);
-    rExpandLine.setAttribute('x1',g.rightX); rExpandLine.setAttribute('x2',g.leftX+g.boxW);
-    rExpandLine.setAttribute('stroke','#5B8FBF'); rExpandLine.setAttribute('stroke-width',3);
-    rExpandLine.setAttribute('stroke-dasharray','3 4'); rExpandLine.setAttribute('opacity',0.85);
-
-    var px2=function(x){ return (x/w*100)+'%'; }, py2=function(y){ return (y/g.vbH*100)+'%'; };
-    var labelW = (g.boxW-14)+'px';
-
-    rlComp.style.left=px2(g.leftX+g.boxW/2); rlComp.style.top=py2(g.topMidY);
-    rlComp.style.transform='translate(-50%,-50%)'; rlComp.style.width=labelW;
-    rlComp.innerHTML='<b>Compressor</b>squeezes the vapor, using W';
-
-    rlCond.style.left=px2(g.rightX+g.boxW/2); rlCond.style.top=py2(g.topMidY);
-    rlCond.style.transform='translate(-50%,-50%)'; rlCond.style.width=labelW;
-    rlCond.innerHTML='<b>Condenser</b>21&deg;C indoor &middot; releases heat';
-
-    rlEvap.style.left=px2(g.leftX+g.boxW/2); rlEvap.style.top=py2(g.botMidY);
-    rlEvap.style.transform='translate(-50%,-50%)'; rlEvap.style.width=labelW;
-    rlEvap.innerHTML='<b>Evaporator</b>'+state.Tc.toFixed(0)+'&deg;C outside &middot; absorbs heat';
-
-    rlValve.style.left=px2(g.rightX+g.boxW/2); rlValve.style.top=py2(g.botMidY);
-    rlValve.style.transform='translate(-50%,-50%)'; rlValve.style.width=labelW;
-    rlValve.innerHTML='<b>Expansion valve</b>pressure drops back down';
-  }
-
   // ---- "more details" live figure: sensible heat available in the outside air, cross-checked
   // against this page's own COP-derived Qc at the current temperature ----
   var R_SPECIFIC_AIR = 287.05, P_ATM = 101325, CP_AIR = 1005; // dry-air constants
@@ -1038,11 +1123,6 @@
     var w = chartWrap.clientWidth;
     if(w && w !== chartW){ chartW = w; drawChart(); }
   }
-  function measureRefrig(){
-    var w = refrigWrap.clientWidth;
-    if(w && w !== refrigW){ refrigW = w; drawRefrig(); }
-  }
-
   function render(){
     drawHero();
     drawEquationAndLegend();
@@ -1051,36 +1131,41 @@
     $('tcReadout').textContent = state.Tc.toFixed(0)+'°C';
     drawResult();
     drawChart();
-    drawRefrig();
     drawMoreDetails();
   }
 
   new ResizeObserver(measure).observe(heroWrap);
   new ResizeObserver(measureChart).observe(chartWrap);
-  new ResizeObserver(measureRefrig).observe(refrigWrap);
-  window.addEventListener('resize', function(){ measure(); measureChart(); measureRefrig(); });
-  [60,250,900].forEach(function(t){ setTimeout(function(){ measure(); measureChart(); measureRefrig(); }, t); });
-  if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ measure(); measureChart(); measureRefrig(); });
+  window.addEventListener('resize', function(){ measure(); measureChart(); });
+  [60,250,900].forEach(function(t){ setTimeout(function(){ measure(); measureChart(); }, t); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ measure(); measureChart(); });
 
   render();
 
-  // Flow-dash animation: the site's continuous decorative loop pattern, no user pause control,
-  // so it must respect prefers-reduced-motion.
-  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var dashOff = 0, rafId = null;
-  function tick(){
-    rafId = requestAnimationFrame(tick);
-    dashOff -= 0.7;
+  // One bounded loop now drives both the kWh streams and the refrigerant moving through the
+  // evaporator, compressor, condenser and expansion valve.
+  function tick(ts){
+    if(!energy.playing){energy.raf=null;return;}
+    if(!energy.start) energy.start=ts;
+    energy.progress=clamp((ts-energy.start)/3900,0,1);
+    var dashOff=-energy.progress*150;
     var v = dashOff.toFixed(2)+'px';
-    qcLine.style.strokeDashoffset = v;
-    qhLine.style.strokeDashoffset = v;
-    wLine.style.strokeDashoffset = (dashOff*1.1).toFixed(2)+'px';
-    rSuctionLine.style.strokeDashoffset = v;
-    rDischargeLine.style.strokeDashoffset = v;
-    rLiquidLine.style.strokeDashoffset = (dashOff*0.6).toFixed(2)+'px';
-    rExpandLine.style.strokeDashoffset = (dashOff*0.6).toFixed(2)+'px';
+    qcLine.style.strokeDashoffset=v;
+    qhLine.style.strokeDashoffset=v;
+    wLine.style.strokeDashoffset=(dashOff*1.1).toFixed(2)+'px';
+    setEnergyStatus(energyStage());
+    updateEnergyParticles();
+    if(energy.progress>=1){
+      energy.playing=false;
+      energy.start=0;
+      energy.raf=null;
+      setEnergyStatus(energySummary());
+      energyPlay.textContent='Replay the full cycle';
+      updateEnergyParticles();
+      return;
+    }
+    energy.raf=requestAnimationFrame(tick);
   }
-  if(!reduceMotion) rafId = requestAnimationFrame(tick);
 })();
 </script>
 <script>

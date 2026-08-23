@@ -383,18 +383,45 @@
     return 'M'+pts.join(' L');
   }
 
-  var groundLine, trajPath, holeOuter, holeInner, h0Line, h0Dot, landTick, potato;
+  function pathForTo(f,g,tEnd){
+    var N=32,pts=[],end=clamp(tEnd,0,f.tLand);
+    for(var i=0;i<=N;i++){
+      var p=posAt(f,end*i/N);
+      pts.push(g.px(p.x).toFixed(1)+','+g.py(p.y).toFixed(1));
+    }
+    return 'M'+pts.join(' L');
+  }
+
+  function arrowPath(x1,y1,x2,y2){
+    var dx=x2-x1,dy=y2-y1,len=Math.sqrt(dx*dx+dy*dy)||1,ux=dx/len,uy=dy/len;
+    var ax1=x2-ux*7+uy*3.5,ay1=y2-uy*7-ux*3.5;
+    var ax2=x2-ux*7-uy*3.5,ay2=y2-uy*7+ux*3.5;
+    return 'M'+x1+' '+y1+' L'+x2+' '+y2+' M'+ax1+' '+ay1+' L'+x2+' '+y2+' L'+ax2+' '+ay2;
+  }
+
+  var groundLine, trajPath, trailPath, holeOuter, holeInner, targetRing, h0Line, h0Dot, landTick;
+  var launchVector, velocityVector, gravityVector, vectorLabels, impactGroup, potato;
   function buildSvg(){
     heroSvg.innerHTML = '';
     groundLine = el('line',{stroke:'var(--diagram)','stroke-width':1.5});
     trajPath = el('path',{fill:'none',stroke:'var(--diagram)','stroke-width':2,'stroke-dasharray':'2 5'});
+    trailPath = el('path',{fill:'none',stroke:'var(--accent)','stroke-width':2.5,'stroke-linecap':'round','stroke-linejoin':'round'});
     holeOuter = el('ellipse',{fill:'var(--bg)',stroke:'var(--diagram)','stroke-width':1.5});
     holeInner = el('ellipse',{fill:'color-mix(in srgb, var(--fg) 18%, var(--bg))'});
+    targetRing = el('ellipse',{fill:'none',stroke:'var(--accent)','stroke-width':1,'stroke-dasharray':'3 3',opacity:.55});
     h0Line = el('line',{stroke:'var(--diagram)','stroke-width':1.5,'stroke-dasharray':'3 3'});
     h0Dot = el('circle',{r:3.5,fill:'var(--muted2)'});
     landTick = el('line',{stroke:'var(--bad)','stroke-width':2});
-    potato = el('ellipse',{rx:7,ry:5.4,fill:'#B9834B',stroke:'var(--bg)','stroke-width':1.5});
-    [groundLine,trajPath,holeOuter,holeInner,h0Line,h0Dot,landTick,potato].forEach(function(e){ heroSvg.appendChild(e); });
+    launchVector = el('path',{fill:'none',stroke:'var(--accent)','stroke-width':1.6,'stroke-linecap':'round','stroke-linejoin':'round'});
+    velocityVector = el('path',{fill:'none',stroke:'var(--accent)','stroke-width':1.6,'stroke-linecap':'round','stroke-linejoin':'round'});
+    gravityVector = el('path',{fill:'none',stroke:'var(--bad)','stroke-width':1.4,'stroke-linecap':'round','stroke-linejoin':'round'});
+    vectorLabels = el('g',{});
+    impactGroup = el('g',{});
+    potato = el('g',{});
+    potato.appendChild(el('ellipse',{rx:8,ry:5.8,fill:'#B9834B',stroke:'var(--bg)','stroke-width':1.5}));
+    potato.appendChild(el('circle',{cx:-3,cy:-1.5,r:1,fill:'#8D5F34',opacity:.8}));
+    potato.appendChild(el('circle',{cx:2.8,cy:1.4,r:.8,fill:'#8D5F34',opacity:.75}));
+    [groundLine,targetRing,holeOuter,holeInner,trajPath,trailPath,h0Line,h0Dot,landTick,launchVector,velocityVector,gravityVector,vectorLabels,impactGroup,potato].forEach(function(e){ heroSvg.appendChild(e); });
   }
   buildSvg();
 
@@ -410,6 +437,8 @@
 
     trajPath.setAttribute('d', pathFor(f, g));
     trajPath.setAttribute('stroke', state.active==='angle'||state.active==='v0' ? 'var(--accent)' : 'var(--diagram)');
+    trailPath.setAttribute('d', anim.playing||anim.thrown ? pathForTo(f,g,anim.t) : '');
+    trailPath.setAttribute('opacity',anim.playing||anim.thrown ? 1 : 0);
 
     var holeRpx = Math.max(4, HOLE_R*g.scale);
     var holeX = g.px(HOLE_D);
@@ -417,6 +446,8 @@
     holeOuter.setAttribute('rx', holeRpx); holeOuter.setAttribute('ry', Math.min(7, holeRpx*0.55));
     holeInner.setAttribute('cx', holeX); holeInner.setAttribute('cy', g.groundY+1.5);
     holeInner.setAttribute('rx', holeRpx*0.72); holeInner.setAttribute('ry', Math.min(5, holeRpx*0.4));
+    targetRing.setAttribute('cx',holeX);targetRing.setAttribute('cy',g.groundY);
+    targetRing.setAttribute('rx',Math.max(11,holeRpx*1.45));targetRing.setAttribute('ry',Math.max(5,Math.min(10,holeRpx*.8)));
 
     h0Line.setAttribute('x1', g.px(0)); h0Line.setAttribute('x2', g.px(0));
     h0Line.setAttribute('y1', g.groundY); h0Line.setAttribute('y2', g.py(state.h0));
@@ -431,8 +462,42 @@
     landTick.setAttribute('stroke', landColor);
 
     var p = anim.playing ? posAt(f, anim.t) : (anim.thrown ? {x:f.xLand,y:0} : {x:0,y:state.h0});
-    potato.setAttribute('cx', g.px(p.x)); potato.setAttribute('cy', g.py(p.y));
+    var potatoX=g.px(p.x),potatoY=g.py(p.y),spin=(anim.playing||anim.thrown?anim.t:0)*520;
+    potato.setAttribute('transform','translate('+potatoX+' '+potatoY+') rotate('+spin.toFixed(1)+')');
     potato.style.opacity = 1;
+
+    // Launch vector stays visible before release; the live tangent vector replaces it in flight.
+    var vectorScale=Math.min(36,Math.max(24,g.scale*.42));
+    var speedNow=Math.sqrt(f.vx*f.vx+Math.pow(f.vy0-G*anim.t,2));
+    var vxN=f.vx/Math.max(speedNow,.001),vyN=(f.vy0-G*anim.t)/Math.max(speedNow,.001);
+    var launchEndX=g.px(0)+Math.cos(state.angle*Math.PI/180)*vectorScale;
+    var launchEndY=g.py(state.h0)-Math.sin(state.angle*Math.PI/180)*vectorScale;
+    launchVector.setAttribute('d',arrowPath(g.px(0),g.py(state.h0),launchEndX,launchEndY));
+    launchVector.setAttribute('opacity',anim.playing||anim.thrown?0:1);
+    var velEndX=potatoX+vxN*vectorScale,velEndY=potatoY-vyN*vectorScale;
+    velocityVector.setAttribute('d',arrowPath(potatoX,potatoY,velEndX,velEndY));
+    velocityVector.setAttribute('opacity',anim.playing?1:0);
+    var gravX=clamp(potatoX+18,18,w-12),gravY=Math.max(12,potatoY-34);
+    gravityVector.setAttribute('d',arrowPath(gravX,gravY,gravX,gravY+24));
+    gravityVector.setAttribute('opacity',anim.playing?1:0);
+
+    vectorLabels.innerHTML='';
+    if(!anim.playing&&!anim.thrown){
+      vectorLabels.appendChild(el('text',{x:launchEndX+5,y:launchEndY-4,fill:'var(--accent)','font-size':10,'font-family':'ui-monospace,monospace'},'v₀ · '+state.v0.toFixed(1)+' m/s'));
+    }else if(anim.playing){
+      vectorLabels.appendChild(el('text',{x:velEndX+5,y:velEndY-4,fill:'var(--accent)','font-size':10,'font-family':'ui-monospace,monospace'},speedNow.toFixed(1)+' m/s'));
+      vectorLabels.appendChild(el('text',{x:gravX+6,y:gravY+18,fill:'var(--bad)','font-size':10,'font-family':'ui-monospace,monospace'},'g'));
+    }
+
+    impactGroup.innerHTML='';
+    if(anim.thrown){
+      var hit=Math.abs(f.xLand-HOLE_D)<=HOLE_R,ix=g.px(f.xLand),iy=g.groundY,color=hit?'var(--accent)':'var(--bad)';
+      impactGroup.appendChild(el('ellipse',{cx:ix,cy:iy,rx:hit?Math.max(9,holeRpx):8,ry:hit?Math.max(4,holeRpx*.5):3,fill:'none',stroke:color,'stroke-width':2,opacity:.9}));
+      for(var ray=0;ray<5;ray++){
+        var ang=Math.PI+(ray/4)*Math.PI,x1=ix+Math.cos(ang)*7,y1=iy+Math.sin(ang)*4,x2=ix+Math.cos(ang)*14,y2=iy+Math.sin(ang)*10;
+        impactGroup.appendChild(el('line',{x1:x1,y1:y1,x2:x2,y2:y2,stroke:color,'stroke-width':1.2,'stroke-linecap':'round'}));
+      }
+    }
 
     var px = function(x){ return (x/w*100)+'%'; };
     var py = function(y){ return (y/g.vbH*100)+'%'; };
@@ -673,7 +738,8 @@
       flightTxt.textContent = 't = '+Math.min(anim.t,f.tLand).toFixed(2)+' / '+f.tLand.toFixed(2)+' s';
     } else if(anim.thrown){
       var f2 = flight();
-      flightTxt.textContent = 'landed at t = '+f2.tLand.toFixed(2)+' s';
+      var hit2=Math.abs(f2.xLand-HOLE_D)<=HOLE_R;
+      flightTxt.textContent = (hit2?'in the hole':'missed by '+Math.abs(f2.xLand-HOLE_D).toFixed(2)+' m')+' · t = '+f2.tLand.toFixed(2)+' s';
     }
   }
 

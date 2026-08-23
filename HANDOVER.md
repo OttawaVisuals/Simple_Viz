@@ -1,5 +1,19 @@
 # Handover
 
+## Live animation detail pass — potato and braking, 2026-08-23
+
+- **`visualizations/potato-trajectory.html`** keeps the same projectile equations, controls and playback timing. The hero now shows a launch-velocity arrow before release, a live tangent velocity vector and gravity arrow during flight, an accent trail along the portion already travelled, potato spin/details, a clearer target ring, and hit/miss impact marks. The playback caption now reports the miss distance when applicable.
+- **`visualizations/braking-distance.html`** keeps the same reaction/braking physics, controls, chart and 1.4-second tween. The hero now separates the two phases with quiet background bands, changes road texture with the selected surface, uses a more detailed car with rotating wheels, and adds live speed and rearward braking-force arrows. A heat-coloured trail and particles show where kinetic energy is dissipated, while a moving label reports phase, speed and percentage of energy dissipated from the same deceleration state.
+- Both files pass JavaScript syntax, duplicate-ID, missing-element-reference and diff-whitespace checks. Automated browser QA remains unavailable because the in-app browser bridge still rejects its trusted dependency; inspect both once at desktop and mobile widths before publishing this pass.
+
+## Heat-pump hero animation — visual upgrade, 2026-08-23
+
+- **`visualizations/heat-pump-magic.html`** keeps its existing COP model, device comparison and chart. The formerly separate kWh-flow hero and lower refrigeration-cycle animation are now one combined hero; the lower diagram and its continuous animation were removed.
+- In heat-pump mode the central device is a labelled sealed loop: evaporator → compressor → condenser → expansion valve. Blue/orange refrigerant particles circulate through those four states while the same playback brings Qc from outside air, W into the compressor, and Qh out of the condenser into the house. The stage caption explains each component in sequence.
+- Electric-resistance and gas-furnace modes still replace the loop with their own machinery. Temperature-dependent snow/sun detail, indoor heat waves and the gas-flue loss remain.
+- A text-styled **“Play the full cycle”** control runs the single bounded 3.9-second sequence. Device buttons and comparison presets replay it automatically. The displayed particle count is illustrative; arrow widths and exact kWh labels remain the quantitative encoding. `prefers-reduced-motion` skips to the final energy-balance sentence.
+- JavaScript syntax, duplicate-ID, missing-static-element-reference and diff-whitespace checks pass. Browser playback QA remains open because the in-app browser bridge rejected its trusted dependency during this session; review the hero once at desktop and mobile widths before the next publish.
+
 ## Constant-acceleration page — new draft, 2026-08-22
 
 - **`visualizations/constant-acceleration.html`** is a new, unreviewed special-relativity page. It is listed in `unreviewed.html` under Discoveries and in `tracker.html`.

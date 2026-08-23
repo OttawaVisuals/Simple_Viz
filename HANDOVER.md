@@ -1,5 +1,22 @@
 # Handover
 
+## Constant-acceleration page — new draft, 2026-08-22
+
+- **`visualizations/constant-acceleration.html`** is a new, unreviewed special-relativity page. It is listed in `unreviewed.html` under Discoveries and in `tracker.html`.
+- It uses constant **proper** acceleration (what passengers feel). The speed control is rapidity `η = ατ/c`, which maps to `v/c = tanh η` and gives useful resolution near light speed without ever selecting `c`.
+- Current default: 1 g for `η = 1` gives 76.16% c after about 0.97 onboard years, 1.14 Earth years, and 0.53 light-years. The displayed distance, Earth time and onboard time assume one acceleration leg; stopping takes an equal deceleration leg.
+- It does not model propellant, energy, radiation, collisions, gravity or engineering feasibility. Review source-link wording and visual layout at desktop/mobile before moving it to the reviewed catalogue.
+
+### Follow-up — distance and energy, 2026-08-22
+
+- A second logarithmic distance ruler now marks where the selected target speed is reached against the Moon, 1 AU, heliopause, outer Oort cloud, Alpha Centauri and Galactic-centre distances. The distances are reference markers, not targets or route plans.
+- A 1 kg–100 tonne mass slider now reports `Eₖ = (γ − 1)mc²`, the Earth-frame kinetic energy of the selected dry/payload mass. It is deliberately presented as an absolute minimum: it excludes fuel mass, exhaust kinetic energy, inefficiency and deceleration.
+- **2026-08-22 rebuild:** the page was rewritten from the accumulated four-script prototype into one state object, one renderer and one animation loop. Its compact topgrid, 238px desktop hero, three side-by-side controls and two-column results are intended to keep title/equation/animation/sliders/results within a 768px laptop viewport.
+- The main hero is now a top-down radial view. “Zoom out” animates the view radius logarithmically from 40 AU through the heliopause, Oort Cloud and nearby-star scale while the target-speed position stays marked. Planetary orbits, heliopause and the Oort annulus use radial distances to scale; nearby-star directions are explicitly schematic. `prefers-reduced-motion` jumps to the final scale.
+- **Animation direction revised:** the hero is now a wide, left-anchored flight view. It begins with the Sun at far left and Earth–Neptune spread schematically across the width with dotted orbit arcs. The rocket launches from Earth and passes the planets; after reaching roughly three-quarters width it stays fixed while the Sun remains anchored and the horizontal distance scale expands logarithmically to the selected endpoint. Heliopause (~120 AU), Voyager 1 (~173 AU in 2026), the Oort Cloud and nearby stars appear when their scale is reached.
+- **Animation polish:** the opening frame contains only Sun, Earth and Mars, with Mars at three-quarters width. The rocket travels from Earth to Mars; zooming begins there, holding the rocket/Mars screen position while Jupiter through Neptune enter naturally from the right as the distance scale expands. The run time is 15 seconds. Planet orbits and bodies, heliopause, Voyager and the Oort Cloud use the approved `--s1`–`--s5` series palette. This animation is documented in `STYLE_GUIDE.md` as the preferred wide, anchored scale-reveal pattern.
+- **Session closed:** the draft is functionally complete and passes JavaScript syntax, duplicate-ID, missing-element-reference and diff-whitespace checks. Automated browser QA was unavailable because the local browser-control bridge failed; refresh and review the 15-second animation at desktop and mobile widths before promoting the page from the unreviewed catalogue.
+
 Working log for switching between Claude and Codex on this project. Update this file
 whenever a design direction is decided, reversed, or left open — the goal is that either
 tool can pick up mid-stream without re-reading the whole chat history.

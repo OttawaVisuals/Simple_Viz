@@ -197,6 +197,17 @@ tighter section spacing and compact controls over hiding information. When contr
 results carry equal weight, use a 50/50 `.resultrow`; put each live number beside or at the
 end of the slider/gauge it explains rather than spending a separate vertical row on it.
 
+**Preferred animated scale reveal.** [`constant-acceleration.html`](visualizations/constant-acceleration.html)
+is the reference for the kind of explanatory animation Simon likes. Begin at a familiar,
+readable scale with only the objects needed for that opening beat; reveal later objects as
+the story reaches them. Keep one spatial anchor fixed (the Sun at far left), let the moving
+subject travel normally at first, then hold it near three-quarters width while the world
+zooms or rescales behind it. This preserves object identity while making enormous scale
+changes legible. Prefer a wide, shallow hero that still leaves sliders and live results
+visible on a 768px laptop. Use the standing series palette to distinguish important objects
+and regions, but keep structural lines quiet. Always provide replay and honour
+`prefers-reduced-motion`.
+
 **Link targets.** Internal links to pages on madeclear.ca (catalogue tiles, navigation and
 contextual cross-links) open in the same tab. External links to sources, papers and other
 websites open in a new tab (`target="_blank"` with `rel="noopener"`), so readers keep their

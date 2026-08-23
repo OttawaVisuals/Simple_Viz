@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 330" role="img" aria-labelledby="title desc">
+  <title id="title">Four icon options for Constant Acceleration</title>
+  <desc id="desc">Paper-plane rocket, needle rocket, acceleration chevrons, and a relativity curve.</desc>
+  <style>
+    .bg { fill:#F7F5F0 } .card { fill:none; stroke:#D7D1C4; stroke-width:1.5 }
+    .ink { fill:#1B1A17 } .muted { fill:#6E675D } .accent { fill:#2F6BD8 }
+    .line { fill:none; stroke:#2F6BD8; stroke-width:5; stroke-linecap:round; stroke-linejoin:round }
+    .fine { fill:none; stroke:#6E675D; stroke-width:2; stroke-linecap:round; stroke-linejoin:round }
+    text { font-family: ui-monospace, Consolas, monospace } .num { font-size:12px; letter-spacing:2px; fill:#6E675D }
+    .label { font-family: Georgia, serif; font-size:23px; font-style:italic; fill:#1B1A17 } .note { font-size:11px; fill:#6E675D }
+  </style>
+  <rect class="bg" width="1120" height="330" rx="12"/>
+  <g transform="translate(18 18)">
+    <g><rect class="card" width="256" height="294" rx="7"/><text class="num" x="20" y="30">OPTION 01</text>
+      <path class="fine" d="M47 149h70" opacity=".45"/><path class="line" d="M102 112 L181 149 L102 186 L119 149 Z"/><path class="fine" d="M82 149h17"/>
+      <text class="label" x="20" y="236">Paper-plane rocket</text><text class="note" x="20" y="259">Fast, clean, readable at small sizes.</text><text class="note" x="20" y="276">Recommended moving marker.</text>
+    </g>
+    <g transform="translate(276)"><rect class="card" width="256" height="294" rx="7"/><text class="num" x="20" y="30">OPTION 02</text>
+      <path class="fine" d="M45 149h55" opacity=".45"/><path class="line" d="M101 149 C119 126 150 118 181 149 C150 180 119 172 101 149 Z"/><circle class="accent" cx="151" cy="149" r="5"/><path class="line" d="M119 133 L111 120 M119 165 L111 178"/>
+      <text class="label" x="20" y="236">Needle rocket</text><text class="note" x="20" y="259">A more literal spacecraft silhouette.</text><text class="note" x="20" y="276">Technical, but slightly busier.</text>
+    </g>
+    <g transform="translate(552)"><rect class="card" width="256" height="294" rx="7"/><text class="num" x="20" y="30">OPTION 03</text>
+      <path class="fine" d="M48 149h22" opacity=".45"/><path class="line" d="M78 116 L113 149 L78 182 M124 116 L159 149 L124 182 M170 116 L205 149 L170 182"/>
+      <text class="label" x="20" y="236">Acceleration chevrons</text><text class="note" x="20" y="259">Abstract motion and rising speed.</text><text class="note" x="20" y="276">Strongest tiny icon; least literal.</text>
+    </g>
+    <g transform="translate(828)"><rect class="card" width="256" height="294" rx="7"/><text class="num" x="20" y="30">OPTION 04</text>
+      <path class="fine" d="M48 183h158" opacity=".45"/><path class="line" d="M70 181 C91 181 117 178 137 158 S174 106 200 104"/><path class="accent" d="M190 94 L215 103 L195 119 Z"/><circle class="ink" cx="70" cy="181" r="6"/>
+      <text class="label" x="20" y="236">Relativity curve</text><text class="note" x="20" y="259">Distance turning into a light-speed arc.</text><text class="note" x="20" y="276">Best distinctive page/card mark.</text>
+    </g>
+  </g>
+</svg>

@@ -80,8 +80,10 @@
 
   .hero{position:relative;width:100%;margin:clamp(28px,4vw,44px) 0 0}
   .hero svg{width:100%;height:auto;display:block}
-  .hero .lbl{position:absolute;display:flex;align-items:center;gap:4px;font:500 10.5px ui-monospace,monospace;letter-spacing:.03em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
+  .hero .lbl{position:absolute;display:flex;align-items:center;gap:4px;font:500 10.5px ui-monospace,monospace;letter-spacing:.03em;color:var(--muted);white-space:nowrap;transition:opacity .2s,font-size .15s,font-weight .15s}
   .hero .item-icon{width:13px;height:13px;flex:none;overflow:visible}
+  .hero .lbl.is-closest{font-size:13px;font-weight:700;letter-spacing:0}
+  .hero .lbl.is-closest .item-icon{width:16px;height:16px}
   .hero .lbl.you{color:var(--fg);font-weight:700}
   .hero .lbl.cur{color:var(--accent);font-weight:600}
 
@@ -520,6 +522,15 @@
     var py = function(y){ return (y/g.vbH*100)+'%'; };
     itemLabelY=[];
 
+    var curSize = Math.pow(10, state.logS);
+    var closestIndex = -1, closestDistance = Infinity;
+    OBJS.forEach(function(o,i){
+      var inRange=o.size>=minEnd().size && o.size<=maxEnd().size;
+      var visible=inRange && (w>=620 || MOBILE_KEYS.indexOf(o.key)!==-1);
+      var distance=Math.abs(logOf(curSize)-logOf(o.size));
+      if(visible && distance<closestDistance){ closestDistance=distance; closestIndex=i; }
+    });
+
     OBJS.forEach(function(o,i){
       var x = xFor(w,g.pad,o.size);
       var lane = o.lane || LANES[i%4];
@@ -529,14 +540,17 @@
       t.line.style.display=visible?'':'none'; t.dot.style.display=visible?'':'none';
       lblEls[i].lbl.style.display=visible?'':'none';
       if(!visible) return;
+      var isClosest=i===closestIndex;
+      lblEls[i].lbl.classList.toggle('is-closest',isClosest);
       lblEls[i].lbl.style.transform=o.key===minKey ? 'translateX(0)' : (o.key===maxKey ? 'translateX(-100%)' : 'translateX(-50%)');
       t.line.setAttribute('x1',x); t.line.setAttribute('x2',x);
       t.line.setAttribute('y1', g.axisY); t.line.setAttribute('y2', g.axisY+lane.tick);
       var colour = selectionColour(o.size);
       t.line.setAttribute('stroke', colour);
+      t.line.setAttribute('stroke-width', isClosest ? 3 : 1);
       t.dot.setAttribute('cx',x); t.dot.setAttribute('cy',g.axisY);
       t.dot.setAttribute('fill', colour);
-      t.dot.setAttribute('r', o.you ? 3.5 : 2.5);
+      t.dot.setAttribute('r', isClosest ? 4.25 : (o.you ? 3.5 : 2.5));
 
       var le = lblEls[i];
       le.lbl.style.left = px(x); le.lbl.style.top = py(g.axisY+lane.label);
@@ -554,7 +568,6 @@
       youDot.setAttribute('fill',youColour);
     }
 
-    var curSize = Math.pow(10, state.logS);
     var cx = xFor(w,g.pad,curSize);
     var aboveScore=0,belowScore=0;
     OBJS.forEach(function(o,i){

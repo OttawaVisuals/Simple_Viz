@@ -22,17 +22,17 @@
 <style>
   :root{
     --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
-    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--good:#2E7D4F;--bad:#A83D2A;--track:#E2DDD2;
   }
   @media (prefers-color-scheme:dark){
     :root:not([data-theme="light"]){
       --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
-      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--good:#65C88B;--bad:#E68075;--track:#28304A;
     }
   }
   :root[data-theme="dark"]{
     --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
-    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--good:#65C88B;--bad:#E68075;--track:#28304A;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
@@ -189,11 +189,13 @@
     <div class="lbl" id="lblArea"></div>
     <svg id="heroSvg" role="img" aria-label="One large pizza circle compared with two smaller pizza circles, plus an area-equivalent square overlaid by two stacked rectangles representing the smaller pizzas.">
       <circle id="circBig" fill="none" stroke-width="1.5"></circle>
+      <circle id="circBigCopy" fill="none" stroke-width="1.5"></circle>
       <circle id="circSmall1" fill="none" stroke-width="1.5"></circle>
       <circle id="circSmall2" fill="none" stroke-width="1.5"></circle>
       <rect id="areaBig" fill="none" stroke="var(--accent)" stroke-width="1.5"></rect>
       <rect id="areaSmall1" stroke="var(--fg)" stroke-width="1.25"></rect>
       <rect id="areaSmall2" stroke="var(--fg)" stroke-width="1.25"></rect>
+      <rect id="excessOverlay" pointer-events="none"></rect>
       <line id="vDivider" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 5"></line>
     </svg>
     <div class="lbl" id="lblVs" style="font-style:italic;font-family:Georgia,serif"></div>
@@ -289,10 +291,13 @@
   var state = { big:18, small:12, active:null, drag:null };
 
   var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
-  var circBig=$('circBig'), circSmall1=$('circSmall1'), circSmall2=$('circSmall2'), vDivider=$('vDivider');
+  var circBig=$('circBig'), circBigCopy=$('circBigCopy'), circSmall1=$('circSmall1'), circSmall2=$('circSmall2'), vDivider=$('vDivider');
   var areaBig=$('areaBig'), areaSmall1=$('areaSmall1'), areaSmall2=$('areaSmall2');
+  var excessOverlay=$('excessOverlay');
   var lblBig=$('lblBig'), lblSmall=$('lblSmall'), lblVs=$('lblVs'), lblArea=$('lblArea');
   var heroW = 0;
+  var reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var heroAnim={start:0,key:null,raf:0,geom:null};
 
   // ---- hero geometry: viewBox width == measured CSS px width, so 1 unit = 1px ----
   function geom(w, big, small){
@@ -330,7 +335,7 @@
       leftCx:leftCx, rBig:rBig,
       sm1Cx:sm1Cx, sm2Cx:sm2Cx, rSmall:rSmall,
       dividerX:dividerX,dividerY:dividerY,narrow:narrow,
-      vsX:(leftCx+rBig+sm1Cx-rSmall)/2, vsY:cy,
+      vsX:(leftCx+rBig+sm1Cx-rSmall)/2, vsY:circleTop-14,
       squareX:squareX,squareY:squareY,squareSide:squareSide,rectH:rectH,
       panelCx:panelLeft+panelWidth/2,panelBottom:panelBottom,totalRatio:totalRatio
     };
@@ -377,11 +382,56 @@
     lblSmall.textContent = 'two ' + state.small + '" · ' + fmtArea(2*area(state.small)) + ' sq in';
 
     lblVs.style.left = px(h.vsX); lblVs.style.top = py(h.vsY);
-    lblVs.style.transform = 'translate(-50%,-50%)';
+    lblVs.style.transform = 'translateX(-50%)';
     lblVs.textContent = 'vs';
 
     lblArea.style.left=px(h.panelCx);lblArea.style.top=py(h.panelBottom+7);lblArea.style.transform='translateX(-50%)';
     lblArea.textContent='two small = '+(h.totalRatio*100).toFixed(1)+'% of big';
+    heroAnim.geom=h;
+    startHeroAnimation();
+  }
+
+  function lerp(a,b,t){ return a+(b-a)*t; }
+  function ease(t){ return t<0?0:t>1?1:1-Math.pow(1-t,3); }
+  function setCircle(node,x,y,r,opacity){ node.setAttribute('cx',x);node.setAttribute('cy',y);node.setAttribute('r',r);node.setAttribute('opacity',opacity); }
+  function setRect(node,x,y,w,h,opacity){ node.setAttribute('x',x);node.setAttribute('y',y);node.setAttribute('width',Math.max(0,w));node.setAttribute('height',Math.max(0,h));node.setAttribute('opacity',opacity); }
+  function applyHeroFrame(now){
+    var h=heroAnim.geom;if(!h) return;
+    var elapsed=reduceMotion?7200:(now-heroAnim.start)%7600;
+    var bigMove=ease((elapsed-700)/900), bigSquare=ease((elapsed-1600)/1050);
+    var smallAppear=ease((elapsed-2700)/550), smallSquare=ease((elapsed-3300)/1450);
+    var final=ease((elapsed-4800)/350);
+    var midX=h.narrow?h.w*.72:h.dividerX-34, midY=h.narrow?h.cy:h.cy;
+    var copyX=lerp(h.leftCx,midX,bigMove), copyY=lerp(h.cy,midY,bigMove);
+    var startSquareX=copyX-h.rBig,startSquareY=copyY-h.rBig,startSquareSide=2*h.rBig;
+    var squareX=lerp(startSquareX,h.squareX,bigSquare), squareY=lerp(startSquareY,h.squareY,bigSquare), squareSide=lerp(startSquareSide,h.squareSide,bigSquare);
+    var target1Y=h.panelBottom-h.rectH,target2Y=h.panelBottom-2*h.rectH;
+    function rectFromCircle(node,cx,cy,targetY){
+      setRect(node,lerp(cx-h.rSmall,h.squareX,smallSquare),lerp(cy-h.rSmall,targetY,smallSquare),lerp(2*h.rSmall,h.squareSide,smallSquare),lerp(2*h.rSmall,h.rectH,smallSquare),smallSquare);
+    }
+    setCircle(circBig,h.leftCx,h.cy,h.rBig,1);
+    circBig.setAttribute('stroke','var(--accent)');circBig.setAttribute('fill','color-mix(in srgb, var(--accent) 12%, transparent)');
+    setCircle(circBigCopy,copyX,copyY,h.rBig,Math.max(0,1-bigSquare)*(elapsed>=700?1:0));
+    circBigCopy.setAttribute('stroke','var(--accent)');circBigCopy.setAttribute('fill','color-mix(in srgb, var(--accent) 12%, transparent)');
+    setRect(areaBig,squareX,squareY,squareSide,squareSide,bigSquare);
+    areaBig.setAttribute('fill','color-mix(in srgb, var(--accent) 8%, transparent)');
+    setCircle(circSmall1,h.sm1Cx,h.cy,h.rSmall,smallAppear);
+    setCircle(circSmall2,h.sm2Cx,h.cy,h.rSmall,smallAppear);
+    [circSmall1,circSmall2].forEach(function(c){c.setAttribute('stroke','var(--fg)');c.setAttribute('fill','color-mix(in srgb, var(--fg) 8%, transparent)');});
+    rectFromCircle(areaSmall1,h.sm1Cx,h.cy,target1Y);rectFromCircle(areaSmall2,h.sm2Cx,h.cy,target2Y);
+    [areaSmall1,areaSmall2].forEach(function(r){r.setAttribute('fill','color-mix(in srgb, var(--fg) 10%, transparent)');});
+    var spare=h.totalRatio<=1, overlayY=spare?h.squareY:target2Y, overlayH=spare?target2Y-h.squareY:h.squareY-target2Y;
+    setRect(excessOverlay,h.squareX,overlayY,h.squareSide,overlayH,final*(.15+.45*(Math.sin(now/130)+1)/2));
+    excessOverlay.setAttribute('fill',spare?'var(--good)':'var(--bad)');
+    lblBig.style.opacity=1;lblVs.style.opacity=smallAppear;lblSmall.style.opacity=smallAppear;lblArea.style.opacity=final;
+    if(!reduceMotion) heroAnim.raf=requestAnimationFrame(applyHeroFrame);
+  }
+  function startHeroAnimation(){
+    var key=state.big+'_'+state.small+'_'+heroW;
+    if(key===heroAnim.key) return;
+    heroAnim.key=key;heroAnim.start=performance.now();
+    if(heroAnim.raf) cancelAnimationFrame(heroAnim.raf);
+    applyHeroFrame(heroAnim.start);
   }
 
   // ---- equation colouring ----

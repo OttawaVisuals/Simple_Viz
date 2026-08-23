@@ -95,20 +95,21 @@
   .playbtn:hover{color:var(--accent);border-color:var(--accent)}
   .flighttxt{font:12px ui-monospace,monospace;color:var(--muted)}
 
-  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  .resultrow{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
   @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
 
-  .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
-  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctrls{display:grid;gap:12px;align-content:start}
+  .ctrl{display:grid;grid-template-columns:minmax(88px,1fr) minmax(100px,1.7fr) auto;gap:12px;align-items:center;min-width:0}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;grid-column:1;grid-row:1}
   .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
   .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;text-transform:none;transition:color .2s}
   .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
-  .readout{font-family:ui-monospace,monospace;font-size:clamp(24px,2.6vw,32px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
-  .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
+  .readout{font-family:ui-monospace,monospace;font-size:clamp(18px,2vw,24px);font-weight:400;letter-spacing:-.02em;margin:0;grid-column:3;grid-row:1;white-space:nowrap}
+  .track{position:relative;height:28px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin:0;grid-column:2;grid-row:1}
   .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
   .track .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
   .track .thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
-  .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .track-range{display:none}
   .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
 
   .result{text-align:left}
@@ -126,7 +127,7 @@
   .gauge .ticklabel{position:absolute;top:33px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
   .gauge .mark{position:absolute;top:11px;height:16px;width:3px;border-radius:2px;transition:left .12s linear}
   .gauge .marklabel{position:absolute;top:-3px;white-space:nowrap;font:500 11px ui-monospace,monospace;transition:left .12s linear}
-  .effort2{margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+  @media (max-width:700px){.ctrl{grid-template-columns:minmax(78px,1fr) minmax(88px,1.4fr) auto;gap:8px}.ctrl-title{font-size:10px}.ctrl-rel{display:none}}
 
   .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
   .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
@@ -201,6 +202,7 @@
   <div class="hero" id="heroWrap">
     <div class="lbl" id="lblH0" style="transform:translateX(-50%)"></div>
     <div class="lbl" id="lblHole" style="transform:translateX(-50%)"></div>
+    <div class="lbl" id="lblZoom" style="transform:translateX(-100%)"></div>
     <svg id="heroSvg" role="img" aria-label="Side view of a throw from a release height, arcing toward a hole in the ground 3 metres away."></svg>
     <div class="playbar">
       <button class="playbtn" id="throwBtn" type="button">&#9654; Throw</button>
@@ -262,13 +264,6 @@
         <div class="marklabel mono" id="gMarkLabel"></div>
         <div id="gTicks"></div>
         <div id="gLabels"></div>
-      </div>
-
-      <div class="effort2">
-        <div class="result-label">Energy to launch it</div>
-        <div class="result-value"><span class="num mono" id="throwJ"></span><span class="unit mono">J</span></div>
-        <div class="verdict-sub" id="throwForce"></div>
-        <div class="effort-line" id="throwCompare"></div>
       </div>
     </div>
   </div>
@@ -335,7 +330,7 @@
 
   var $ = function(id){ return document.getElementById(id); };
   var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
-  var lblH0=$('lblH0'), lblHole=$('lblHole');
+  var lblH0=$('lblH0'), lblHole=$('lblHole'), lblZoom=$('lblZoom');
 
   function flightFor(h0, angleDeg, v0){
     var th = angleDeg*Math.PI/180;
@@ -360,16 +355,20 @@
   function geom(w, f){
     var narrow = w < 620;
     var leftPad = narrow?30:44, rightPad=16, topPad=narrow?18:22, bottomPad=narrow?34:40;
-    var XMAX = Math.max(HOLE_D+1.5, f.xLand*1.15, 5);
+    var naturalXMAX = Math.max(HOLE_D+1.5, f.xLand*1.15, 5);
     var YMAX = Math.max(state.h0, f.apexY, 1.2)*1.1;
     var plotW = Math.max(60, w-leftPad-rightPad);
+    // Keep a tall lob in the same visual panel by expanding the visible horizontal range.
+    // This preserves equal x/y scale instead of vertically squashing the trajectory.
+    var maxPlotH = narrow ? 210 : 320;
+    var XMAX = Math.max(naturalXMAX, plotW*YMAX/maxPlotH);
     var scale = plotW/XMAX;
     var plotH = YMAX*scale;
     var groundY = topPad+plotH;
     var vbH = groundY+bottomPad;
     function px(xm){ return leftPad+xm*scale; }
     function py(ym){ return groundY-ym*scale; }
-    return { w:w, vbH:vbH, groundY:groundY, scale:scale, XMAX:XMAX, YMAX:YMAX, px:px, py:py, leftPad:leftPad, plotW: plotW };
+    return { w:w, vbH:vbH, groundY:groundY, scale:scale, XMAX:XMAX, YMAX:YMAX, px:px, py:py, leftPad:leftPad, plotW: plotW, zoomed:XMAX>naturalXMAX+.01 };
   }
 
   function pathFor(f, g){
@@ -506,6 +505,8 @@
     lblH0.style.transform = 'translate(6px,-50%)'; lblH0.style.textAlign='left';
     lblHole.style.left = px(holeX); lblHole.style.top = py(g.groundY+16);
     lblHole.textContent = 'hole, 3.00 m';
+    lblZoom.style.left = px(w-10); lblZoom.style.top = py(3);
+    lblZoom.textContent = g.zoomed ? 'view zoomed out for high arc' : '';
   }
 
   // ---- equation + legend colouring ----
@@ -615,7 +616,8 @@
       verdictSubEl.textContent = 'Overshoots the hole by '+(diff-HOLE_R).toFixed(2)+' m.';
     }
 
-    effortLineEl.textContent = f.tLand.toFixed(2)+' s flight · hits at '+f.speedImpact.toFixed(1)+' m/s ('+f.ke.toFixed(1)+' J)';
+    var launchEnergy = .5 * POTATO_M * state.v0 * state.v0;
+    effortLineEl.textContent = f.tLand.toFixed(2)+' s flight · '+f.speedImpact.toFixed(1)+' m/s impact · '+launchEnergy.toFixed(1)+' J launch energy';
 
     var XMAX = Math.max(HOLE_D+1.5, f.xLand*1.15, 5);
     function pos(x){ return clamp(x/XMAX,0,1)*100; }
@@ -640,17 +642,6 @@
     }
     gTicksEl.innerHTML = ticksHtml;
     gLabelsEl.innerHTML = labelsHtml;
-  }
-
-  // ---- launch energy (mass and speed only — angle and height don't change it) ----
-  var throwJEl=$('throwJ'), throwForceEl=$('throwForce'), throwCompareEl=$('throwCompare');
-  function drawEffort(){
-    var joules = 0.5*POTATO_M*state.v0*state.v0;
-    var force = joules/ARM_SWING;
-    throwJEl.textContent = joules.toFixed(1);
-    throwForceEl.textContent = '≈ '+force.toFixed(1)+' N of push over the ~0.6 m your arm travels through the throw — a rough estimate, since real form varies.';
-    var catE = CAT_M*G*CAT_TREE_H, chairE = PERSON_M*G*CHAIR_H;
-    throwCompareEl.textContent = 'about 1/'+Math.round(catE/joules)+' the energy of a cat climbing a 3 m tree, or 1/'+Math.round(chairE/joules)+' of what it takes an adult to step up onto a chair.';
   }
 
   // ---- throw playback ----
@@ -732,7 +723,6 @@
     $('angleReadout').textContent = state.angle.toFixed(0)+'°';
     $('v0Readout').textContent = state.v0.toFixed(1)+' m/s';
     drawResult();
-    drawEffort();
     if(anim.playing){
       var f = flight();
       flightTxt.textContent = 't = '+Math.min(anim.t,f.tLand).toFixed(2)+' / '+f.tLand.toFixed(2)+' s';

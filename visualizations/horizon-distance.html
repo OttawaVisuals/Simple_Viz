@@ -84,7 +84,7 @@
   .legend .name{font-size:12.5px;color:var(--muted2)}
   .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
 
-  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero{position:relative;width:min(100%,1100px);margin:clamp(28px,4vw,48px) auto 0}
   .hero svg{width:100%;height:auto;display:block}
   .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
 
@@ -200,7 +200,6 @@
   <div class="hero" id="heroWrap">
     <div class="lbl" id="lblH"></div>
     <div class="lbl" id="lblD" style="font-weight:500;color:var(--muted2)"></div>
-    <div class="lbl" id="lblScale" style="color:var(--muted)"></div>
     <svg id="heroSvg" role="img" aria-label="A side-view horizon diagram for the selected world.">
       <path id="earthArc" fill="none" stroke="var(--line2)" stroke-width="1.5"></path>
       <path id="earthFill" fill="var(--bg)"></path>
@@ -209,7 +208,7 @@
       <circle id="groundPt" r="2.5" fill="var(--line2)"></circle>
       <circle id="eyePt" r="4.5" fill="var(--accent)"></circle>
       <circle id="horizonPt" r="3.5" fill="var(--fg)"></circle>
-      <circle id="refDot" r="1.5" fill="var(--muted)"></circle>
+      <g id="distanceMarksG" aria-hidden="true"></g>
     </svg>
   </div>
 
@@ -263,7 +262,7 @@
     <button class="preset" data-p="iss">the ISS</button>
   </div>
 
-  <p class="note">Distance to the horizon is the exact straight-line distance from your eye to the horizon point, <span class="mono">d = &radic;(2Rh + h&sup2;)</span> &mdash; the tangent length from the right triangle formed by your eye, the world's centre, and the horizon point itself, not an approximation. Each world's slider is capped at the same h&divide;R fraction as Earth's, so switching worlds doesn't change how honest the picture is. Jupiter has no solid surface; its "radius" and this page's h are both measured from the standard cloud-top reference level. The English Channel reference line stays fixed to Earth's real 34&nbsp;km width even when comparing other worlds' horizons, as a familiar yardstick rather than a claim about their own geography. This still ignores atmospheric refraction, which bends light slightly around the curve and extends the real visible horizon by roughly 7% beyond the geometric value calculated here, and it's the straight sight-line distance rather than the distance measured <em style="font-style:italic">along the curved ground</em> &mdash; at Earth's 500&nbsp;km (roughly the ISS), that ground-arc distance is a further 3% shorter again. The hero diagram is schematic and its curvature exaggerated &mdash; a world's actual curve over these heights is far too gentle to draw at true scale &mdash; but the dashed sight line is always a genuine tangent to the circle drawn: as the slider moves, both the circle's curvature and the eye's height change together, computed from the same right-triangle geometry as the equation above, rather than a horizon point just eyeballed into a plausible-looking place. See <a href="https://en.wikipedia.org/wiki/Horizon#Distance_to_the_horizon" target="_blank" rel="noopener">Wikipedia: Horizon &mdash; Distance to the horizon</a>.</p>
+  <p class="note">The formula above, <span class="mono">d = &radic;(2Rh + h&sup2;)</span>, gives the exact straight-line distance to the horizon &mdash; not an approximation. Two simplifications worth knowing: real light bends slightly as it passes through the atmosphere, pushing the true horizon about 7% farther than shown here; and this is straight-line distance, not distance along the curved ground, which is a bit shorter still at large heights. The diagram is schematic &mdash; a real world's curve is far too gentle to draw at true scale, so the curvature here is exaggerated to make it visible &mdash; but the dashed sight line is always a genuine tangent, recalculated every time the slider moves. Jupiter has no solid surface, so its radius and height are both measured from its cloud tops, and the English Channel marker always shows Earth's real 34&nbsp;km width, even when you're comparing other worlds, just as a familiar yardstick. See <a href="https://en.wikipedia.org/wiki/Horizon#Distance_to_the_horizon" target="_blank" rel="noopener">Wikipedia: Horizon &mdash; Distance to the horizon</a>.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -343,17 +342,17 @@
   var $ = function(id){ return document.getElementById(id); };
   var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
   var earthArc=$('earthArc'), earthFill=$('earthFill'), sightLine=$('sightLine'), stalk=$('stalk');
-  var groundPt=$('groundPt'), eyePt=$('eyePt'), horizonPt=$('horizonPt'), refDot=$('refDot');
-  var lblH=$('lblH'), lblD=$('lblD'), lblScale=$('lblScale');
+  var groundPt=$('groundPt'), eyePt=$('eyePt'), horizonPt=$('horizonPt'), distanceMarksG=$('distanceMarksG');
+  var lblH=$('lblH'), lblD=$('lblD');
 
   function h(){ return Math.pow(10, state.he); }
   function d(){ return distanceFor(h()); }
 
   // ---- hero geometry ----
   // Schematic side view built from a real circle, not a hand-tuned curve: the ground point G
-  // sits on a circle of schematic radius Rs centred directly below it; the eye E sits a
-  // schematic height hs straight above G (so E, G and the circle's centre are colinear); the
-  // horizon point H is the actual point of tangency from E onto the circle. That makes the
+  // sits on a circle of schematic radius Rs centred directly below it; the eye E is drawn
+  // slightly back from G to use the available width. The horizon point H is the actual point
+  // of tangency from E onto the circle. That makes the
   // dashed sight line E→H a true tangent by construction — it can't drift out of true no matter
   // how Rs/hs are chosen. The observer sits close to the left edge so almost the whole width is
   // free for the curve; Rs is set as a multiple of the diagram's own width (huge — nearly flat —
@@ -364,28 +363,34 @@
     var narrow = w < 620;
     var arcSpan = w - 40;
     var x0 = 20, x1 = w - 20;
-    var eyeX = x0 + 14; // observer kept near the left edge, leaving the rest of the width to the curve
-    var t = (state.he - LOGMIN) / (logMax() - LOGMIN); // 0..1, log-scale height fraction
+    var groundX = x0 + arcSpan*(narrow ? .18 : .16);
+    var t = (Math.log10(hv) - LOGMIN) / (logMax() - LOGMIN); // 0..1, log-scale height fraction
 
     // Eye rise is about half of what it was: height should read as a modest lift, not the
     // dominant motion — curvature is what's supposed to carry the "farther up" feeling now.
-    var hsMin = 8, hsMax = narrow ? 54 : 74;
+    var hsMin = 12, hsMax = narrow ? 90 : 110;
     var hs = hsMin + t*(hsMax-hsMin);
 
     // baseY/vbH sized from hsMax so there's always enough room above the ground line for the
     // eye + its label, and enough below it for the horizon point's vertical drop (which grows
     // with curvature) — this is what was clipping the horizon out of the picture above ~9 m.
-    var baseY = hsMax + 35;
-    var vbH = baseY + hsMax + 20;
+    var baseY = hsMax + 42;
+    var vbH = baseY + hsMax + 45;
 
     var RsMaxMult = 4.5, RsMinMult = 1.15;
     var Rs = RsMaxMult*arcSpan - t*((RsMaxMult-RsMinMult)*arcSpan);
 
-    var cx = eyeX, cy = baseY + Rs; // circle centre, directly below the ground point G
-    var theta = Math.acos(clamp(Rs/(Rs+hs), -1, 1)); // tangent angle from the G direction
+    var cx = groundX, cy = baseY + Rs; // circle centre, directly below the ground point G
+    // Lean the height indicator back toward the observer. The sight line is still calculated
+    // as a true tangent from the eye point, rather than assumed from the diagram's layout.
+    var eyeX = groundX - Math.min(narrow ? 24 : 42, hs*.42);
     var eyeY = baseY - hs;
-    var horizX = cx + Rs*Math.sin(theta);
-    var horizY = cy - Rs*Math.cos(theta);
+    var eyeDX=eyeX-cx, eyeDY=eyeY-cy, eyeRadius=Math.sqrt(eyeDX*eyeDX+eyeDY*eyeDY);
+    var eyeUX=eyeDX/eyeRadius, eyeUY=eyeDY/eyeRadius;
+    var tangentAngle=Math.acos(clamp(Rs/eyeRadius, -1, 1));
+    var horizX = cx + Rs*(eyeUX*Math.cos(tangentAngle)-eyeUY*Math.sin(tangentAngle));
+    var horizY = cy + Rs*(eyeUY*Math.cos(tangentAngle)+eyeUX*Math.sin(tangentAngle));
+    var schematicHorizonAngle=Math.atan2(horizX-cx, cy-horizY);
 
     // Draw the arc all the way from x0 to x1 — the full width — independent of where the
     // tangent point happens to land; the world keeps curving away past the horizon, which is
@@ -398,17 +403,14 @@
     var arcPath = 'M'+p0x+','+p0y+' A'+Rs+','+Rs+' 0 0 1 '+p1x+','+p1y;
     var fillPath = arcPath+' L'+p1x+','+vbH+' L'+p0x+','+vbH+' Z';
 
-    var refA = aStart + (aEnd-aStart)*0.03;
-    var refX = cx + Rs*Math.sin(refA), refY = cy - Rs*Math.cos(refA);
-
+    var realTheta = Math.acos(R/(R+hv));
     var dTxt = fmtD(distanceFor(hv));
     var hTxt = fmtH(hv);
     return {
-      w:w, vbH:vbH, x0:x0, x1:x1, baseY:baseY,
+      w:w, vbH:vbH, x0:x0, x1:x1, baseY:baseY, groundX:groundX,
       eyeX:eyeX, eyeY:eyeY, horizX:horizX, horizY:horizY,
       dTxt:dTxt.join(' '), hTxt:hTxt.join(' '),
-      arcPath: arcPath, fillPath: fillPath,
-      refX: refX, refY: refY
+      arcPath: arcPath, fillPath: fillPath, Rs:Rs, cx:cx, cy:cy, theta:schematicHorizonAngle, arcDistance:R*realTheta
     };
   }
 
@@ -417,30 +419,47 @@
     if(w && w !== heroW){ heroW = w; render(); }
   }
 
-  function drawHero(){
+  function drawHero(hv){
     var w = heroW || heroWrap.clientWidth || 1100;
-    var hv = h();
+    hv = hv || h();
     var g = geom(w, hv);
 
     heroSvg.setAttribute('aria-label', 'A side-view diagram of an observer at height h above '+state.body+'\u2019s curved surface, with a line of sight running to the horizon at distance d.');
 
     heroSvg.setAttribute('viewBox','0 0 '+w+' '+g.vbH);
-    heroSvg.setAttribute('preserveAspectRatio','none');
+    heroSvg.setAttribute('preserveAspectRatio','xMidYMid meet');
 
     earthArc.setAttribute('d', g.arcPath);
     earthFill.setAttribute('d', g.fillPath);
     earthFill.setAttribute('opacity', 0.5);
 
-    stalk.setAttribute('x1', g.eyeX); stalk.setAttribute('x2', g.eyeX);
+    stalk.setAttribute('x1', g.groundX); stalk.setAttribute('x2', g.eyeX);
     stalk.setAttribute('y1', g.baseY); stalk.setAttribute('y2', g.eyeY);
 
     sightLine.setAttribute('x1', g.eyeX); sightLine.setAttribute('y1', g.eyeY);
     sightLine.setAttribute('x2', g.horizX); sightLine.setAttribute('y2', g.horizY);
 
-    groundPt.setAttribute('cx', g.eyeX); groundPt.setAttribute('cy', g.baseY);
+    groundPt.setAttribute('cx', g.groundX); groundPt.setAttribute('cy', g.baseY);
     eyePt.setAttribute('cx', g.eyeX); eyePt.setAttribute('cy', g.eyeY);
     horizonPt.setAttribute('cx', g.horizX); horizonPt.setAttribute('cy', g.horizY);
-    refDot.setAttribute('cx', g.refX); refDot.setAttribute('cy', g.refY);
+    distanceMarksG.innerHTML='';
+    var distances = [
+      {value:REF.val, label:'English Channel · 34 km'},
+      {value:100000, label:'100 km'},
+      {value:1000000, label:'1,000 km'},
+      {value:10000000, label:'10,000 km'}
+    ];
+    var lastX=-Infinity;
+    distances.forEach(function(mark){
+      if(mark.value >= g.arcDistance) return;
+      var angle=g.theta*mark.value/g.arcDistance, x=g.cx+g.Rs*Math.sin(angle), y=g.cy-g.Rs*Math.cos(angle);
+      if(x-lastX<68) return;
+      lastX=x;
+      distanceMarksG.appendChild(el('line',{x1:x,y1:y,x2:x+4*Math.sin(angle),y2:y-8*Math.cos(angle),stroke:'var(--line2)','stroke-width':'1'}));
+      var text=el('text',{x:x+6,y:y-10,fill:'var(--muted)','font-family':'ui-monospace, monospace','font-size':'10'});
+      text.textContent=mark.label;
+      distanceMarksG.appendChild(text);
+    });
 
     var px = function(x){ return (x/w*100)+'%'; };
     var py = function(y){ return (y/g.vbH*100)+'%'; };
@@ -449,8 +468,6 @@
     lblD.style.left = px((g.eyeX+g.horizX)/2); lblD.style.top = py((g.eyeY+g.horizY)/2-16);
     lblD.style.transform = 'translateX(-50%)';
     lblD.textContent = 'd = '+g.dTxt;
-    lblScale.style.left = px(g.x0); lblScale.style.top = py(g.vbH-14);
-    lblScale.textContent = 'schematic — curvature exaggerated, sight line is a true tangent';
   }
 
   // ---- equation + legend ----

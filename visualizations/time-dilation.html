@@ -22,17 +22,17 @@
 <style>
   :root{
     --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
-    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;--tier0:#756F65;--tier1:#2F6BD8;--tier2:#B36A20;--tier3:#A83D2A;
   }
   @media (prefers-color-scheme:dark){
     :root:not([data-theme="light"]){
       --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
-      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;--tier0:#8B93A8;--tier1:#6FA0F2;--tier2:#E5A954;--tier3:#E68075;
     }
   }
   :root[data-theme="dark"]{
     --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
-    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;--tier0:#8B93A8;--tier1:#6FA0F2;--tier2:#E5A954;--tier3:#E68075;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
@@ -90,8 +90,14 @@
   .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
   .hero svg{width:100%;height:auto;display:block}
   .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s,color .2s}
+  .animation-row{display:grid;grid-template-columns:minmax(280px,.72fr) minmax(0,1.5fr);gap:clamp(26px,4vw,58px);align-items:center;margin:clamp(20px,3vw,36px) 0 0}
+  .animation-row>.hero{margin:0}
+  .animation-row>.lightclock{margin:0;padding:0;border:0;min-width:0}
+  .animation-row .lchero{margin-top:16px}
+  .animation-row .lightclock .sub{font-size:clamp(.87rem,1vw,.98rem);line-height:1.42;margin-top:6px}
+  @media (max-width:820px){.animation-row{grid-template-columns:1fr}.animation-row>.hero{max-width:560px;margin:0 auto}.animation-row>.lightclock{padding-top:22px;border-top:1px solid var(--line)}}
 
-  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  .resultrow{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
   @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
 
   .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
@@ -113,6 +119,13 @@
   .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(30px,3.6vw,44px);line-height:1;letter-spacing:-.03em}
   .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
   .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px}
+  .result[data-tier="0"] .result-value .num,.result[data-tier="0"] .result-value .v{color:var(--tier0)}
+  .result[data-tier="1"] .result-value .num,.result[data-tier="1"] .result-value .v{color:var(--tier1)}
+  .result[data-tier="2"] .result-value .num,.result[data-tier="2"] .result-value .v{color:var(--tier2)}
+  .result[data-tier="3"] .result-value .num,.result[data-tier="3"] .result-value .v{color:var(--tier3)}
+  .result-scale{display:flex;flex-wrap:wrap;gap:5px 11px;margin-top:8px;font:11px/1.35 ui-monospace,monospace;color:var(--muted)}
+  .result-scale span{opacity:.34;transition:opacity .18s,font-weight .18s}.result-scale span.is-active{opacity:1;font-weight:700}
+  .result-scale .tier0{color:var(--tier0)}.result-scale .tier1{color:var(--tier1)}.result-scale .tier2{color:var(--tier2)}.result-scale .tier3{color:var(--tier3)}
   .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
   .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;line-height:1.5}
   .gauge{position:relative;height:56px;margin-top:16px;max-width:460px}
@@ -137,7 +150,11 @@
   .lchero svg{width:100%;height:auto;display:block}
   .lc-caption{margin:8px 0 0;font-size:11.5px;color:var(--muted);font-family:ui-monospace,monospace}
   .lc-derive{margin:12px 0 0;font-size:13.5px;line-height:1.6;color:var(--muted2);font-family:ui-monospace,monospace}
-  .lc-reset{cursor:pointer;border:0;background:none;padding:0 0 2px;margin:14px 0 0;font:12px ui-monospace,monospace;color:var(--muted);border-bottom:1px solid var(--line2)}
+  .lc-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:14px}
+  .lc-play{cursor:pointer;border:1px solid var(--accent);border-radius:999px;background:var(--accent);color:#fff;padding:8px 13px;font:600 12px/1 ui-monospace,monospace;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  .lc-play:hover,.lc-play:focus-visible{filter:brightness(1.08);outline:2px solid color-mix(in srgb,var(--accent) 38%,transparent);outline-offset:2px}
+  .lc-play:disabled{cursor:wait;opacity:.72}
+  .lc-reset{cursor:pointer;border:0;background:none;padding:2px 0;margin:0;font:12px ui-monospace,monospace;color:var(--muted);border-bottom:1px solid var(--line2)}
   .lc-reset:hover,.lc-reset:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
 
   .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
@@ -216,13 +233,26 @@
     </div>
   </div>
 
-  <div class="hero" id="heroWrap">
-    <div class="lbl" id="lblTitleA" style="transform:translateX(-50%);font-weight:500;color:var(--muted2)"></div>
-    <div class="lbl" id="lblTitleB" style="transform:translateX(-50%);font-weight:500"></div>
-    <div class="lbl" id="lblTimeA" style="transform:translateX(-50%)"></div>
-    <div class="lbl" id="lblTimeB" style="transform:translateX(-50%)"></div>
-    <div class="lbl" id="lblCaption" style="transform:translateX(-50%)"></div>
-    <svg id="heroSvg" role="img" aria-label="Two clock faces side by side, a stationary clock and one moving at the selected fraction of light speed, whose second hand visibly lags as speed increases."></svg>
+  <div class="animation-row">
+    <div class="hero" id="heroWrap">
+      <div class="lbl" id="lblTitleA" style="transform:translateX(-50%);font-weight:500;color:var(--muted2)"></div>
+      <div class="lbl" id="lblTitleB" style="transform:translateX(-50%);font-weight:500"></div>
+      <div class="lbl" id="lblTimeA" style="transform:translateX(-50%)"></div>
+      <div class="lbl" id="lblTimeB" style="transform:translateX(-50%)"></div>
+      <div class="lbl" id="lblCaption" style="transform:translateX(-50%)"></div>
+      <svg id="heroSvg" role="img" aria-label="Two clock faces side by side, a stationary clock and one moving at the selected fraction of light speed, whose second hand visibly lags as speed increases."></svg>
+    </div>
+
+    <div class="lightclock">
+      <div class="hero lchero" id="lcWrap">
+        <svg id="lcSvg" role="img" aria-label="A light clock at rest, bouncing a photon straight up and down between two mirrors, beside the same clock travelling left to right, its mirrors sliding sideways as the photon traces a longer diagonal zigzag path."></svg>
+      </div>
+      <p class="lc-caption">Schematic, not to scale &mdash; sideways drift is exaggerated to keep the diagonal visible.</p>
+      <div class="lc-actions">
+        <button class="lc-play" id="lcPlayBtn" type="button">&#9654; Play one tick</button>
+        <button class="lc-reset" id="lcResetBtn" type="button">Reset clocks</button>
+      </div>
+    </div>
   </div>
 
   <div class="resultrow">
@@ -242,10 +272,11 @@
       </div>
     </div>
 
-    <div class="result">
-      <div class="result-label">Time gap after 1&nbsp;year (moving clock's own time)</div>
+    <div class="result" id="resultBox" data-tier="0">
+      <div class="result-label">1.00 year on the moving clock =</div>
       <div class="result-value"><span class="num mono" id="gapValue"></span><span class="unit mono" id="gapUnit"></span><span class="v" id="verdict"></span></div>
       <div class="verdict-sub" id="verdictSub"></div>
+      <div class="result-scale" aria-label="Time-dilation magnitude scale"><span class="tier0">negligible</span><span class="tier1">small</span><span class="tier2">measurable</span><span class="tier3">large</span></div>
       <div class="effort-line" id="effortLine"></div>
       <div class="gauge" id="gauge">
         <div class="track"></div>
@@ -270,15 +301,9 @@
     <button class="preset" data-p="v99">v/c = 0.99</button>
   </div>
 
-  <div class="lightclock">
+  <div class="lightclock lightclock-explanation">
     <h2>Where <em>&gamma;</em> actually comes from</h2>
-    <p class="sub">Picture a &ldquo;light clock&rdquo;: two mirrors facing each other, with one photon bouncing between them &mdash; one round trip is one tick. Riding along with the clock, the photon just goes straight up and down. Watching it fly past at speed <em>v</em>, the photon has to cover that same up&ndash;down distance <em>plus</em> the sideways drift &mdash; a longer diagonal path, at the same fixed speed <em>c</em>. Same speed, longer path, more time per tick &mdash; that's the whole effect, geometrically.</p>
-    <div class="hero lchero" id="lcWrap">
-      <svg id="lcSvg" role="img" aria-label="A light clock at rest, bouncing a photon straight up and down between two mirrors, beside the same clock travelling left to right, its two mirrors sliding sideways as the photon bounces so that the photon traces a longer diagonal zigzag path."></svg>
-    </div>
-    <p class="lc-caption">Schematic, not to scale &mdash; the sideways drift is exaggerated so the diagonal stays visible at every speed; it tracks the <em>v</em> slider above.</p>
-    <p class="lc-derive mono" id="lcDerive"></p>
-    <button class="lc-reset" id="lcResetBtn" type="button">&#8634; reset to slowest &amp; re-sync the clocks</button>
+    <p class="sub">The light travels at the same fixed speed <em>c</em> in both clocks. The moving clock&rsquo;s photon takes the longer diagonal path, so one tick takes longer.</p>
   </div>
 
   <p class="note">The Lorentz factor &gamma; = 1/&radic;(1&minus;v&sup2;/c&sup2;) comes from <a href="https://en.wikipedia.org/wiki/Time_dilation" target="_blank" rel="noopener">special relativity</a>, the theory Albert Einstein published in 1905. A clock moving at speed v ticks slow by a factor of 1/&gamma; as measured by a stationary observer &mdash; so over &tau; seconds of the moving clock's own (proper) time, the stationary clock counts &gamma;&middot;&tau;, an extra (&gamma;&minus;1)&middot;&tau;. This page only models that velocity term. GPS satellites' real onboard clock correction (about +38 &micro;s/day, running fast overall) also includes general-relativity <em style="font-style:italic">gravitational</em> time dilation &mdash; clocks run faster higher up in a weaker gravity well &mdash; which is a separate, larger effect this page does not model; don't read this page's velocity-only &minus;7&nbsp;&micro;s/day figure as the real GPS correction on its own. The "1 year" reference duration is a Julian year (365.25 days = 31,557,600 s). Orbital speeds (ISS, GPS) are treated as constant for this estimate, using the standard instantaneous-velocity time-dilation formula even though orbital motion is technically accelerating, not inertial.</p>
@@ -428,19 +453,19 @@
   var circA, circB, dotA, dotB, handA, handB, ticksA=[], ticksB=[];
   (function buildHero(){
     circA = el('circle',{fill:'var(--bg)',stroke:'var(--line2)','stroke-width':1.5});
-    circB = el('circle',{fill:'var(--bg)',stroke:'var(--line2)','stroke-width':1.5});
+    circB = el('circle',{fill:'var(--bg)',stroke:'var(--accent)','stroke-width':1.8});
     heroSvg.appendChild(circA); heroSvg.appendChild(circB);
     for(var i=0;i<12;i++){
       var ta = el('line',{stroke:'var(--line2)','stroke-width':1.5});
-      var tb = el('line',{stroke:'var(--line2)','stroke-width':1.5});
+      var tb = el('line',{stroke:'var(--accent)','stroke-width':1.5});
       heroSvg.appendChild(ta); heroSvg.appendChild(tb);
       ticksA.push(ta); ticksB.push(tb);
     }
     handA = el('line',{stroke:'var(--fg)','stroke-width':2.5,'stroke-linecap':'round'});
-    handB = el('line',{stroke:'var(--fg)','stroke-width':2.5,'stroke-linecap':'round'});
+    handB = el('line',{stroke:'var(--accent)','stroke-width':2.5,'stroke-linecap':'round'});
     heroSvg.appendChild(handA); heroSvg.appendChild(handB);
     dotA = el('circle',{r:3,fill:'var(--fg)'});
-    dotB = el('circle',{r:3,fill:'var(--fg)'});
+    dotB = el('circle',{r:3,fill:'var(--accent)'});
     heroSvg.appendChild(dotA); heroSvg.appendChild(dotB);
   })();
 
@@ -500,44 +525,46 @@
     line.setAttribute('y2',(cy+len*Math.sin(rad)).toFixed(2));
   }
 
-  var simYears = 0;
+  var simTicks = 0;
   function updateHands(){
     if(!geomCache) return;
     var g = gammaOf(vcFromP(state.p));
-    var movingYears = simYears/g;
-    setHand(handA, geomCache.cx1, geomCache.cy, geomCache.r*0.82, (simYears%1)*360);
-    setHand(handB, geomCache.cx2, geomCache.cy, geomCache.r*0.82, (movingYears%1)*360);
-    var bColor = state.active==='v' ? 'var(--accent)' : 'var(--fg)';
+    var movingTicks = simTicks/g;
+    setHand(handA, geomCache.cx1, geomCache.cy, geomCache.r*0.82, (simTicks%1)*360);
+    setHand(handB, geomCache.cx2, geomCache.cy, geomCache.r*0.82, (movingTicks%1)*360);
+    var bColor = 'var(--accent)';
     handB.setAttribute('stroke', bColor);
     lblTitleB.style.color = bColor;
     lblTitleB.textContent = 'Moving — v = '+fmtVc(vcFromP(state.p))+' c';
-    lblTimeA.textContent = simYears.toFixed(2)+' yr elapsed (own time)';
-    lblTimeB.textContent = movingYears.toFixed(2)+' yr elapsed (own time)';
+    lblTimeA.textContent = simTicks.toFixed(2)+' ticks elapsed';
+    lblTimeB.textContent = movingTicks.toFixed(2)+' ticks elapsed';
+    lblCaption.textContent = 'moving clock: '+(simTicks-movingTicks).toFixed(2)+' tick'+(simTicks-movingTicks===1?'':'s')+' behind';
   }
 
   // ---- light-clock diagram: stationary mirror pair (photon bounces straight up/down)
   // beside the same clock moving sideways at the slider's v (photon traces a longer
   // diagonal zigzag) — the geometric derivation of gamma, not just the stated formula.
-  var lcWrap=$('lcWrap'), lcSvg=$('lcSvg'), lcDerive=$('lcDerive');
-  var LC_SEGS = 4; // two round trips drawn in the moving panel
+  var lcWrap=$('lcWrap'), lcSvg=$('lcSvg');
+  var LC_SEGS = 2; // one full round trip, matching the stationary clock's displayed tick
   var lc = {};
   (function buildLightClock(){
     lc.statTop = el('line',{stroke:'var(--line2)','stroke-width':2});
     lc.statBot = el('line',{stroke:'var(--line2)','stroke-width':2});
+    lc.statPath = el('line',{stroke:'var(--muted2)','stroke-width':1.5,'stroke-dasharray':'3,3'});
     lc.movTop = el('line',{stroke:'var(--line2)','stroke-width':2});
     lc.movBot = el('line',{stroke:'var(--line2)','stroke-width':2});
     lc.movPath = el('polyline',{fill:'none',stroke:'var(--muted2)','stroke-width':1.5,'stroke-linejoin':'round'});
     lc.triV = el('line',{stroke:'var(--muted)','stroke-width':1,'stroke-dasharray':'3,3'});
     lc.triH = el('line',{stroke:'var(--muted)','stroke-width':1,'stroke-dasharray':'3,3'});
     lc.statDot = el('circle',{r:4,fill:'var(--fg)'});
-    lc.movDot = el('circle',{r:4,fill:'var(--fg)'});
+    lc.movDot = el('circle',{r:4,fill:'var(--accent)'});
     lc.statTitle = el('text',{fill:'var(--muted2)','font-size':11,'font-family':'ui-monospace,monospace','text-anchor':'middle'});
     lc.movTitle = el('text',{fill:'var(--fg)','font-size':11,'font-family':'ui-monospace,monospace','text-anchor':'middle'});
     lc.statL = el('text',{fill:'var(--muted)','font-size':11,'font-family':'ui-monospace,monospace','text-anchor':'end'});
     lc.triVL = el('text',{fill:'var(--muted)','font-size':11,'font-family':'ui-monospace,monospace','text-anchor':'end'});
     lc.triHL = el('text',{fill:'var(--muted)','font-size':11,'font-family':'ui-monospace,monospace','text-anchor':'middle'});
     lc.triCL = el('text',{fill:'var(--accent)','font-size':11,'font-family':'ui-monospace,monospace','text-anchor':'middle'});
-    [lc.statTop,lc.statBot,lc.movTop,lc.movBot,lc.movPath,lc.triV,lc.triH,
+    [lc.statTop,lc.statBot,lc.statPath,lc.movTop,lc.movBot,lc.movPath,lc.triV,lc.triH,
      lc.statDot,lc.movDot,lc.statTitle,lc.movTitle,lc.statL,lc.triVL,lc.triHL,lc.triCL
     ].forEach(function(node){ lcSvg.appendChild(node); });
   })();
@@ -566,8 +593,7 @@
     lcGeomCache = g;
     lcSvg.setAttribute('viewBox','0 0 '+w+' '+g.vbH);
 
-    var vc = vcFromP(state.p), gam = gammaOf(vc);
-    var accentOn = state.active==='v';
+    var vc = vcFromP(state.p);
 
     // stationary panel
     var sx1=g.statX0, sx2=g.statX0+g.statW, scx=(sx1+sx2)/2;
@@ -575,6 +601,8 @@
     lc.statTop.setAttribute('y1',g.cy-g.L); lc.statTop.setAttribute('y2',g.cy-g.L);
     lc.statBot.setAttribute('x1',sx1); lc.statBot.setAttribute('x2',sx2);
     lc.statBot.setAttribute('y1',g.cy+g.L); lc.statBot.setAttribute('y2',g.cy+g.L);
+    lc.statPath.setAttribute('x1',scx); lc.statPath.setAttribute('x2',scx);
+    lc.statPath.setAttribute('y1',g.cy-g.L); lc.statPath.setAttribute('y2',g.cy+g.L);
     lc.statTitle.setAttribute('x',scx); lc.statTitle.setAttribute('y',g.cy-g.L-10);
     lc.statTitle.textContent='Stationary';
     lc.statL.setAttribute('x',sx2+14); lc.statL.setAttribute('y',g.cy+3.5);
@@ -600,10 +628,10 @@
     lc.movTop.setAttribute('y1',g.cy-g.L); lc.movTop.setAttribute('y2',g.cy-g.L);
     lc.movBot.setAttribute('y1',g.cy+g.L); lc.movBot.setAttribute('y2',g.cy+g.L);
     lc.movPath.setAttribute('points', pts.map(function(p){ return p[0].toFixed(1)+','+p[1].toFixed(1); }).join(' '));
-    lc.movPath.setAttribute('stroke', accentOn?'var(--accent)':'var(--muted2)');
+    lc.movPath.setAttribute('stroke','var(--accent)');
     var mcx=(mx1+mx2)/2;
     lc.movTitle.setAttribute('x',mcx); lc.movTitle.setAttribute('y',g.cy-g.L-10);
-    lc.movTitle.setAttribute('fill', accentOn?'var(--accent)':'var(--fg)');
+    lc.movTitle.setAttribute('fill','var(--accent)');
     lc.movTitle.textContent='Moving — v = '+fmtVc(vc)+' c';
 
     // first half-tick triangle: vertical leg L, horizontal leg vt, hypotenuse ct
@@ -618,10 +646,8 @@
     lc.triHL.textContent = halfStep<18 ? 'vt' : 'v·t';
     var midx=(p0[0]+p1[0])/2, midy=(p0[1]+p1[1])/2;
     lc.triCL.setAttribute('x',midx+ (halfStep<18?10:16)); lc.triCL.setAttribute('y',midy-4);
-    lc.triCL.setAttribute('fill', accentOn?'var(--accent)':'var(--muted2)');
+    lc.triCL.setAttribute('fill','var(--accent)');
     lc.triCL.textContent = halfStep<18 ? 'ct' : 'c·t';
-
-    lcDerive.innerHTML = '(c&middot;t)&sup2; = (v&middot;t)&sup2; + L&sup2; &nbsp;&rArr;&nbsp; t = t&#8320;&middot;&gamma;, with &gamma; = '+fmtGammaLegend(gam)+' at v = '+fmtVc(vc)+' c &mdash; the same factor as the result below.';
 
     // Both dots represent the same photon speed c, so they must move at the same pixel
     // speed — the moving dot only *appears* slower per tick because its zigzag path (the
@@ -631,14 +657,13 @@
     // contradicting it.
     lc.Dstat = 2*g.L; // one-way mirror-to-mirror distance, stationary panel
     var segLen = Math.sqrt(halfStep*halfStep + (2*g.L)*(2*g.L));
-    lc.Dmov = LC_SEGS*segLen; // one-way distance across the full drawn zigzag
+    lc.Dmov = LC_SEGS*segLen; // one full moving-clock round trip across the drawn zigzag
 
     updateLightClockDots();
   }
 
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var lcStatAccum=0, lcMovAccum=0;
-  var LC_SPEED = 60; // shared px/s "photon speed" driving both dots — see note above
   function triWave(t){ return t<0.5 ? t*2 : (1-t)*2; }
   function updateLightClockDots(){
     if(!lcGeomCache || !lcPts) return;
@@ -675,16 +700,44 @@
     lc.movDot.setAttribute('opacity',fade);
   }
 
-  var rafId=null, lastTs=null;
-  function tick(ts){
-    rafId = requestAnimationFrame(tick);
-    if(lastTs===null) lastTs=ts;
-    var dt=(ts-lastTs)/1000; lastTs=ts;
-    simYears += dt/3; // one full lap of the stationary hand every 3 real seconds
+  var rafId=null, lastTs=null, demoRunning=false, demoProgress=0;
+  var DEMO_SECONDS = 2.8;
+  function setDemoProgress(progress){
+    demoProgress=clamp(progress,0,1);
+    simTicks=demoProgress;
+    if(lc.Dstat && lc.Dmov){
+      lcStatAccum=demoProgress*2*lc.Dstat;
+      lcMovAccum=Math.min(1,demoProgress/gammaOf(vcFromP(state.p)))*lc.Dmov;
+    }
     updateHands();
-    lcStatAccum += LC_SPEED*dt;
-    lcMovAccum += LC_SPEED*dt;
     updateLightClockDots();
+  }
+  function resetDemo(){
+    demoRunning=false;
+    if(rafId){ cancelAnimationFrame(rafId); rafId=null; }
+    lastTs=null;
+    setDemoProgress(0);
+    $('lcPlayBtn').disabled=false;
+    $('lcPlayBtn').textContent='▶ Play one tick';
+  }
+  function playOneTick(){
+    resetDemo();
+    if(reduceMotion){ setDemoProgress(1); return; }
+    demoRunning=true;
+    $('lcPlayBtn').disabled=true;
+    $('lcPlayBtn').textContent='Playing…';
+    rafId=requestAnimationFrame(tick);
+  }
+  function tick(ts){
+    if(lastTs===null) lastTs=ts;
+    demoProgress += (ts-lastTs)/(DEMO_SECONDS*1000); lastTs=ts;
+    setDemoProgress(demoProgress);
+    if(demoProgress<1 && demoRunning) rafId=requestAnimationFrame(tick);
+    else {
+      demoRunning=false; rafId=null;
+      $('lcPlayBtn').disabled=false;
+      $('lcPlayBtn').textContent='↻ Replay one tick';
+    }
   }
 
   // ---- equation + legend colouring ----
@@ -724,6 +777,7 @@
       var f = clamp((x-r.left)/r.width, 0, 1);
       state.p = clamp(Math.round(f*PMAX), 0, PMAX);
       state.presetKey = null;
+      resetDemo();
       render();
     }
     track.addEventListener('pointerdown', function(e){
@@ -744,7 +798,7 @@
       else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = state.p+step;
       else if(e.key==='Home') v = 0;
       else if(e.key==='End') v = PMAX;
-      if(v!==null){ e.preventDefault(); state.p = clamp(v,0,PMAX); state.presetKey=null; render(); }
+      if(v!==null){ e.preventDefault(); state.p = clamp(v,0,PMAX); state.presetKey=null; resetDemo(); render(); }
     });
     return {
       draw: function(){
@@ -762,7 +816,7 @@
   $('vCtrl').addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
 
   // ---- result box ----
-  var gapValueEl=$('gapValue'), gapUnitEl=$('gapUnit'), verdictEl=$('verdict'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+  var resultBox=$('resultBox'), gapValueEl=$('gapValue'), gapUnitEl=$('gapUnit'), verdictEl=$('verdict'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
   var gReach=$('gReach'), gLimit=$('gLimit'), gLimitLabel=$('gLimitLabel'), gMark=$('gMark'), gMarkLabel=$('gMarkLabel');
   var gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
   var GAUGE_REFS = [
@@ -777,10 +831,19 @@
     var extraDay = (g-1)*DAY_S;
 
     var parts = fmtDurationParts(extraYear);
-    gapValueEl.textContent = parts.value; gapUnitEl.textContent = parts.unit;
+    var tierIndex = extraYear<1 ? 0 : extraYear<DAY_S ? 1 : extraYear<YEAR_S*0.5 ? 2 : 3;
+    resultBox.dataset.tier=tierIndex;
+    Array.prototype.forEach.call(resultBox.querySelectorAll('.result-scale span'), function(item, index){ item.classList.toggle('is-active', index===tierIndex); });
+    if(g-1<0.001 && extraYear>0){
+      gapValueEl.textContent = '1 yr + '+parts.value;
+      gapUnitEl.textContent = parts.unit+' extra on Earth';
+    } else {
+      gapValueEl.textContent = fmtNum(g);
+      gapUnitEl.textContent = 'years on Earth';
+    }
     verdictEl.textContent = tier(extraYear);
 
-    verdictSubEl.textContent = 'Over one year of the moving clock’s own ticking, the stationary clock counts an extra '+parts.value+' '+parts.unit+'. (γ = '+fmtGammaLegend(g)+'.)';
+    verdictSubEl.textContent = 'The Earth clock records '+fmtNum(g)+' years while the moving clock records 1.00 year — '+parts.value+' '+parts.unit+' more. (γ = '+fmtGammaLegend(g)+'.)';
 
     var dayParts = fmtDurationParts(extraDay);
     var line = '≈ '+dayParts.value+' '+dayParts.unit+' extra per day.';
@@ -860,20 +923,16 @@
       state.p = pFromVc(PRESETS[key].vc);
       state.presetKey = key;
       state.active = 'v';
+      resetDemo();
       render();
     });
   });
 
-  // ---- light-clock reset: jump to the slowest speed and zero both animation-distance
-  // accumulators, so the two dots start a fresh tick together instead of wherever they'd
-  // drifted to under the previous (possibly much faster) speed.
+  // ---- one-tick replay: the stationary clock finishes a full tick while the moving
+  // clock advances only 1/γ of one. Changing speed re-syncs the demonstration.
+  $('lcPlayBtn').addEventListener('click', playOneTick);
   $('lcResetBtn').addEventListener('click', function(){
-    state.p = 0;
-    state.presetKey = null;
-    state.active = 'v';
-    lcStatAccum = 0;
-    lcMovAccum = 0;
-    simYears = 0;
+    resetDemo();
     render();
   });
 
@@ -920,11 +979,8 @@
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
 
   render();
-  // The clock hands are a continuous decorative loop with no pause control (same category as
-  // straw-hose-flow's flow dashes and terminal-velocity's airflow streaks): under reduced
-  // motion the loop simply never starts, and the page still renders correctly at rest with both
-  // hands parked at 0.00 yr elapsed — the numeric readouts already carry all the information.
-  if(!reduceMotion) rafId = requestAnimationFrame(tick);
+  // The initial state is deliberately synchronized. The animation only runs when the reader
+  // asks for one tick, so the final time gap remains visible long enough to compare.
 })();
 </script>
 <script>

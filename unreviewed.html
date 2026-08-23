@@ -183,9 +183,6 @@
         <path d="M50 52q10-7 20 0M48 56q12-8 24 0" stroke="var(--accent)"/>
         <path d="M88 15v38M84 15h8M84 53h8M83 20l5-5 5 5M83 48l5 5 5-5" stroke-width="1.3"/>
       </symbol>
-      <symbol id="icon-constant-acceleration" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M8 51h104M14 49V11" stroke-width="1.3"/><path d="M14 48C31 19 53 14 107 12" stroke="var(--accent)" stroke-width="3"/><path d="M14 12h98" stroke-dasharray="3 4"/><path d="M57 38l19-6-11-10-5 7-10 2z" fill="var(--accent)" stroke="var(--accent)"/>
-      </symbol>
       <symbol id="icon-dew-point-window" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="26" y="6" width="68" height="52"/><path d="M60 6v52M26 32h68"/><path d="M42 17c5 6-4 10 1 16M75 17c5 6-4 10 1 16M44 39c5 6-4 10 1 15M76 39c5 6-4 10 1 15" stroke="var(--accent)"/>
       </symbol>
@@ -270,6 +267,9 @@
       <symbol id="icon-coriolis-effect" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <ellipse cx="60" cy="34" rx="48" ry="20"/><path d="M18 34a42 18 0 0084 0" stroke-dasharray="3 4"/><path d="M18 34C40 20 80 20 96 20" stroke="var(--accent)" stroke-width="3"/><path d="M88 15l8 5-6 7" stroke="var(--accent)"/>
       </symbol>
+      <symbol id="icon-what-is-vacuum" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 12h33v39H12zM75 12h33v39H75zM45 42h30v9H45z"/><path d="M12 37h33v14H12zM75 37h33v14H75z" fill="var(--accent)" opacity=".25"/><path d="M51 31h17M63 26l6 5-6 5" stroke="var(--accent)"/><circle cx="22" cy="22" r="2" fill="currentColor"/><circle cx="34" cy="29" r="2" fill="currentColor"/><circle cx="87" cy="24" r="1.3" fill="var(--accent)"/><path d="M16 17v11M28 17v11M40 17v11" stroke="var(--accent)" stroke-width="1.3"/>
+      </symbol>
     </defs>
   </svg>
 
@@ -323,11 +323,10 @@
   <section class="group" aria-labelledby="cat-discoveries">
     <div class="cat-head">
       <h2 id="cat-discoveries">Discoveries</h2>
-      <span class="cat-count">Twenty-four pages</span>
+      <span class="cat-count">Twenty-three pages</span>
     </div>
     <div class="tile-grid">
       <a class="tile" data-cat="Discoveries" data-desc="Copper, brass, steel, ceramic, plastic and glass may all look solid &mdash; but their atoms organise in fundamentally different ways." href="visualizations/materials-arrangement.html"><span class="meta">Discoveries</span><h3>Why materials are not all arranged alike</h3></a>
-      <a class="tile" data-cat="Discoveries" data-desc="Hold a rocket at 1 g, 2 g or more and see the onboard time, Earth time and distance needed to approach &mdash; never reach &mdash; light speed." href="visualizations/constant-acceleration.html"><span class="meta">Discoveries</span><h3>How long to almost reach light speed?</h3></a>
       <a class="tile" data-cat="Discoveries" data-desc="Change a double-slit experiment and see wave fringes, individual detection events, and why making the path measurable removes the interference pattern." href="visualizations/double-slit.html"><span class="meta">Discoveries</span><h3>One particle, two slits</h3></a>
       <a class="tile" data-cat="Discoveries" data-desc="Open one rear window and swing the opposite front door to see why a pressure pulse clears cabin air faster than one opening alone." href="visualizations/hot-car-flush.html"><span class="meta">Discoveries</span><h3>Flush the hot air from a parked car</h3></a>
       <a class="tile" data-cat="Discoveries" data-desc="Set room temperature, humidity and the glass surface temperature to see exactly when invisible vapour turns into droplets." href="visualizations/dew-point-window.html"><span class="meta">Discoveries</span><h3>Why this window is fogging up</h3></a>
@@ -356,7 +355,7 @@
   <section class="group" aria-labelledby="cat-fun">
     <div class="cat-head">
       <h2 id="cat-fun">Fun physics</h2>
-      <span class="cat-count">Fifteen pages</span>
+      <span class="cat-count">Sixteen pages</span>
     </div>
     <div class="tile-grid">
       <a class="tile" data-cat="Fun physics" data-desc="Change a liquid and an ideal glass-tube radius to see what sets capillary height and speed, then test the limits with a simple glass-gap experiment at home." href="visualizations/capillary-rise.html"><span class="meta">Fun physics</span><h3>How water climbs</h3></a>
@@ -373,7 +372,7 @@
       <a class="tile" data-cat="Fun physics" data-desc="Load cargo onto a steel hull and watch it settle lower in the water, until it finally floods and sinks." href="visualizations/ship-buoyancy.html"><span class="meta">Fun physics</span><h3>Why ships float</h3></a>
       <a class="tile" data-cat="Fun physics" data-desc="Stack humans, livestock, and every wild mammal on Earth by total weight, not headcount." href="visualizations/animal-biomass.html"><span class="meta">Fun physics</span><h3>All animal life, by weight</h3></a>
       <a class="tile" data-cat="Fun physics" data-desc="Drop a real ball onto a real surface and watch each rebound keep the same fraction of the last one's height &mdash; then turn on a balloon drum and keep counting after your eyes give up." href="visualizations/bounce-restitution.html"><span class="meta">Fun physics</span><h3>Count the bounces</h3></a>
-      <a class="tile" data-cat="Fun physics" data-desc="Apply the same mouth pressure to a narrow straw and a wide hose, then compare the airflow each can actually deliver using compressible Darcy&ndash;Weisbach." href="visualizations/straw-hose-flow-darcy.html"><span class="meta">Fun physics</span><h3>Why the straw gives up &mdash; airflow model</h3></a>
+      <a class="tile" data-cat="Fun physics" data-desc="Lower the pressure on one side of a liquid and see why the surrounding air pushes it across &mdash; then see why gravity keeps most of Earth's atmosphere from escaping into space." href="visualizations/what-is-vacuum.html"><span class="meta">Fun physics</span><h3>What is a vacuum?</h3></a>
     </div>
   </section>
 
@@ -413,14 +412,13 @@
   var SVG_NS = 'http://www.w3.org/2000/svg';
   document.querySelectorAll('.tile[href^="visualizations/"]').forEach(function(card){
     var slug = card.getAttribute('href').split('/').pop().replace(/\.html$/, '');
-    var iconSlug = slug === 'straw-hose-flow-darcy' ? 'straw-hose-flow' : slug;
     var icon = document.createElementNS(SVG_NS, 'svg');
     var use = document.createElementNS(SVG_NS, 'use');
     icon.setAttribute('class', 'tile-icon');
     icon.setAttribute('viewBox', '0 0 120 64');
     icon.setAttribute('aria-hidden', 'true');
     icon.setAttribute('focusable', 'false');
-    use.setAttribute('href', '#icon-' + iconSlug);
+    use.setAttribute('href', '#icon-' + slug);
     icon.appendChild(use);
     card.insertBefore(icon, card.firstChild);
   });

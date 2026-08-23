@@ -224,6 +224,7 @@
     <svg id="heroSvg" role="img" aria-label="Two sticks sit a known distance apart on an exaggerated curved Earth surface. Each casts a shadow at its own angle; the difference between those angles forms a highlighted wedge on the small globe and is used to estimate Earth's circumference.">
       <circle id="globeCircle" fill="none" stroke="var(--line2)" stroke-width="1.25"></circle>
       <path id="globeWedge" fill="var(--accent)" opacity="0.22" stroke="none"></path>
+      <path id="globeArc" fill="none" stroke="var(--accent)" stroke-width="2"></path>
       <circle id="globeDot1" r="2.5" fill="var(--fg)"></circle>
       <circle id="globeDot2" r="2.5" fill="var(--accent)"></circle>
       <path id="earthFill" fill="color-mix(in srgb, var(--accent) 5%, transparent)" stroke="none"></path>
@@ -240,6 +241,8 @@
       <line id="stick2" stroke="var(--fg)" stroke-width="2.5" stroke-linecap="round"></line>
       <line id="shadow2" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"></line>
       <circle id="base2" r="2.5" fill="var(--fg)"></circle>
+      <text id="city1" class="mono" font-size="10" fill="var(--muted)"></text>
+      <text id="city2" class="mono" font-size="10" fill="var(--accent)"></text>
       <line id="dimBase" stroke="var(--line)" stroke-width="1"></line>
       <line id="dimLeftV" stroke="var(--line2)" stroke-width="1"></line>
       <line id="dimRightV" stroke="var(--line2)" stroke-width="1"></line>
@@ -385,14 +388,15 @@
 
   var state = { d:800, theta1:0, theta2:7.2, active:null, drag:null, ghostD:null };
   var heroW = 0;
+  var reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches, heroReveal=1, heroAnim={key:null,raf:0};
 
   var $ = function(id){ return document.getElementById(id); };
   var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
-  var globeCircle=$('globeCircle'), globeWedge=$('globeWedge'), globeDot1=$('globeDot1'), globeDot2=$('globeDot2');
+  var globeCircle=$('globeCircle'), globeWedge=$('globeWedge'), globeArc=$('globeArc'), globeDot1=$('globeDot1'), globeDot2=$('globeDot2');
   var earthFill=$('earthFill'), groundLine=$('groundLine');
   var ray1=$('ray1'), rayVertGuide1=$('rayVertGuide1'), angleArc1=$('angleArc1'), stick1=$('stick1'), shadow1=$('shadow1'), base1=$('base1');
   var ray2=$('ray2'), rayVertGuide2=$('rayVertGuide2'), angleArc=$('angleArc'), stick2=$('stick2'), shadow2=$('shadow2'), base2=$('base2');
-  var dimBase=$('dimBase'), dimLeftV=$('dimLeftV'), dimRightV=$('dimRightV');
+  var dimBase=$('dimBase'), dimLeftV=$('dimLeftV'), dimRightV=$('dimRightV'), city1=$('city1'), city2=$('city2');
   var lblD=$('lblD'), lblTheta=$('lblTheta'), lblGlobe=$('lblGlobe'), lblScale=$('lblScale');
 
   function angleDifference(){ return Math.abs(state.theta2-state.theta1); }
@@ -434,6 +438,7 @@
     var p2 = polarTop(g.globeCx, g.globeCy, g.globeR, deltaTheta);
     var largeArc = deltaTheta > 180 ? 1 : 0;
     globeWedge.setAttribute('d', 'M '+g.globeCx+' '+g.globeCy+' L '+p1.x+' '+p1.y+' A '+g.globeR+' '+g.globeR+' 0 '+largeArc+' 1 '+p2.x+' '+p2.y+' Z');
+    globeArc.setAttribute('d', 'M '+p1.x+' '+p1.y+' A '+g.globeR+' '+g.globeR+' 0 '+largeArc+' 1 '+p2.x+' '+p2.y);
     globeDot1.setAttribute('cx', p1.x); globeDot1.setAttribute('cy', p1.y);
     globeDot2.setAttribute('cx', p2.x); globeDot2.setAttribute('cy', p2.y);
 
@@ -449,21 +454,23 @@
 
     // stick 1
     var base1Y=surfaceY(g.stick1X);
-    var tip1 = { x:g.stick1X, y:base1Y-g.stickH };
+    // The Sun is effectively infinitely far away, so both incoming rays are parallel.
+    // What changes from city to city is the local vertical, shown by each tilted stick.
+    var tip1 = { x:g.stick1X+g.stickH*Math.sin(theta1Rad), y:base1Y-g.stickH*Math.cos(theta1Rad) };
     stick1.setAttribute('x1', g.stick1X); stick1.setAttribute('y1', base1Y);
     stick1.setAttribute('x2', tip1.x); stick1.setAttribute('y2', tip1.y);
     base1.setAttribute('cx', g.stick1X); base1.setAttribute('cy', base1Y);
     var ray1Len=30;
-    ray1.setAttribute('x1', tip1.x-ray1Len*Math.sin(theta1Rad)); ray1.setAttribute('y1', tip1.y-ray1Len*Math.cos(theta1Rad));
+    ray1.setAttribute('x1', tip1.x); ray1.setAttribute('y1', tip1.y-ray1Len);
     ray1.setAttribute('x2', tip1.x); ray1.setAttribute('y2', tip1.y);
     rayVertGuide1.setAttribute('x1',tip1.x);rayVertGuide1.setAttribute('y1',tip1.y-24);rayVertGuide1.setAttribute('x2',tip1.x);rayVertGuide1.setAttribute('y2',tip1.y);
-    var arc1R=18, arc1Start={x:tip1.x,y:tip1.y-arc1R}, arc1End={x:tip1.x-arc1R*Math.sin(theta1Rad),y:tip1.y-arc1R*Math.cos(theta1Rad)};
+    var arc1R=18, arc1Start={x:tip1.x,y:tip1.y-arc1R}, arc1End={x:tip1.x+arc1R*Math.sin(theta1Rad),y:tip1.y-arc1R*Math.cos(theta1Rad)};
     angleArc1.setAttribute('d','M '+arc1Start.x+' '+arc1Start.y+' A '+arc1R+' '+arc1R+' 0 0 0 '+arc1End.x+' '+arc1End.y);
     shadow1.setAttribute('x1',g.stick1X);shadow1.setAttribute('y1',base1Y);shadow1.setAttribute('x2',g.stick1X+g.stickH*Math.tan(theta1Rad));shadow1.setAttribute('y2',base1Y);
 
     // stick 2
     var base2Y=surfaceY(g.stick2X);
-    var tip2 = { x:g.stick2X, y:base2Y-g.stickH };
+    var tip2 = { x:g.stick2X+g.stickH*Math.sin(theta2Rad), y:base2Y-g.stickH*Math.cos(theta2Rad) };
     stick2.setAttribute('x1', g.stick2X); stick2.setAttribute('y1', base2Y);
     stick2.setAttribute('x2', tip2.x); stick2.setAttribute('y2', tip2.y);
     base2.setAttribute('cx', g.stick2X); base2.setAttribute('cy', base2Y);
@@ -474,7 +481,7 @@
     shadow2.setAttribute('x2', shadowEndX); shadow2.setAttribute('y2', base2Y);
 
     var rayLen = 30;
-    var ray2Start = { x: tip2.x - rayLen*Math.sin(theta2Rad), y: tip2.y - rayLen*Math.cos(theta2Rad) };
+    var ray2Start = { x: tip2.x, y: tip2.y - rayLen };
     ray2.setAttribute('x1', ray2Start.x); ray2.setAttribute('y1', ray2Start.y);
     ray2.setAttribute('x2', tip2.x); ray2.setAttribute('y2', tip2.y);
     rayVertGuide2.setAttribute('x1', tip2.x); rayVertGuide2.setAttribute('y1', tip2.y-24);
@@ -482,7 +489,7 @@
 
     var arcR = 18;
     var arcStart = { x: tip2.x, y: tip2.y-arcR };
-    var arcEnd = { x: tip2.x - arcR*Math.sin(theta2Rad), y: tip2.y - arcR*Math.cos(theta2Rad) };
+    var arcEnd = { x: tip2.x + arcR*Math.sin(theta2Rad), y: tip2.y - arcR*Math.cos(theta2Rad) };
     angleArc.setAttribute('d', 'M '+arcStart.x+' '+arcStart.y+' A '+arcR+' '+arcR+' 0 0 0 '+arcEnd.x+' '+arcEnd.y);
 
     // distance dimension line
@@ -506,8 +513,15 @@
     lblTheta.style.color = (state.active==='theta1'||state.active==='theta2') ? 'var(--accent)' : 'var(--muted)';
 
     lblGlobe.style.left = px(g.globeCx); lblGlobe.style.top = py(g.globeCy+g.globeR+10);
+    lblGlobe.textContent = 'Δθ = '+deltaTheta.toFixed(1)+'° · d = '+fmtKm(state.d)+' km';
     lblScale.style.left = px(g.panelEndX); lblScale.style.top = py(g.vbH-14);
     lblScale.style.transform = 'translateX(-100%)';
+    city1.setAttribute('x',g.stick1X-4);city1.setAttribute('y',base1Y+42);city1.setAttribute('text-anchor','middle');city1.textContent=state.d===800&&state.theta1===0&&state.theta2===7.2?'SYENE':'STICK 1';
+    city2.setAttribute('x',g.stick2X+4);city2.setAttribute('y',base2Y+42);city2.setAttribute('text-anchor','middle');city2.textContent=state.d===800&&state.theta1===0&&state.theta2===7.2?'ALEXANDRIA':'STICK 2';
+    var raysP=clamp(heroReveal/.35,0,1), shadowsP=clamp((heroReveal-.28)/.35,0,1), wedgeP=clamp((heroReveal-.58)/.42,0,1);
+    [ray1,ray2,rayVertGuide1,rayVertGuide2].forEach(function(node){node.style.opacity=raysP;});
+    [stick1,stick2,shadow1,shadow2,base1,base2,angleArc1,angleArc].forEach(function(node){node.style.opacity=shadowsP;});
+    globeWedge.style.opacity=.22*wedgeP;globeArc.style.opacity=wedgeP;globeDot1.style.opacity=wedgeP;globeDot2.style.opacity=wedgeP;lblGlobe.style.opacity=wedgeP;
   }
 
   // ---- equation + legend colouring ----
@@ -607,12 +621,12 @@
 
   function drawResult(){
     var D = diameter();
-    if(!isFinite(D)){
+    if(!isFinite(D) || angleDifference()<0.3){
       dValueEl.textContent = '—';
       dValueEl.style.color = 'var(--bad)';
       verdictEl.textContent = '';
-      verdictSubEl.textContent = 'The two angles must differ to estimate Earth’s size.';
-      effortLineEl.textContent = 'Δθ = 0° makes the circumference undefined.';
+      verdictSubEl.textContent = 'Nearly equal shadows cannot give a reliable Earth-size estimate.';
+      effortLineEl.textContent = 'Use a larger angle difference (at least about 0.3°).';
       gMark.style.display='none'; gMarkLabel.style.display='none'; gReach.style.width='0';
       return;
     }
@@ -741,14 +755,26 @@
     if(w && w !== heroW){ heroW = w; render(); }
   }
 
+  function startHeroReveal(){
+    var key=state.d+'_'+state.theta1+'_'+state.theta2+'_'+heroW;
+    if(key===heroAnim.key) return;
+    heroAnim.key=key;
+    if(heroAnim.raf) cancelAnimationFrame(heroAnim.raf);
+    if(reduceMotion){heroReveal=1;drawHero();return;}
+    var start=performance.now(),duration=1150;
+    function frame(now){heroReveal=Math.min(1,(now-start)/duration);drawHero();if(heroReveal<1)heroAnim.raf=requestAnimationFrame(frame);else heroAnim.raf=0;}
+    heroAnim.raf=requestAnimationFrame(frame);
+  }
+
   function render(){
-    drawHero();
+    heroReveal=1;drawHero();
     drawEquationAndLegend();
     dSlider.draw(); theta1Slider.draw(); theta2Slider.draw();
     $('dReadout').textContent = fmtKm(state.d)+' km';
     $('theta1Readout').textContent = state.theta1.toFixed(1)+'°';
     $('theta2Readout').textContent = state.theta2.toFixed(1)+'°';
     drawResult();
+    startHeroReveal();
   }
 
   new ResizeObserver(measure).observe(heroWrap);

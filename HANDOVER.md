@@ -1,5 +1,92 @@
 # Handover
 
+## Constant acceleration promoted — 2026-08-23
+
+- **`visualizations/constant-acceleration.html`** is reviewed and complete. It was promoted from `unreviewed.html` to the main catalogue in `index.html`.
+- Its homepage icon is the approved object-in-diagram mark: a small rocket following a dashed relativity curve, using the 2.2px subject / 1.3px context stroke ladder.
+- `tracker.html` now defaults this page to **Checked — Reviewed and complete** for fresh browser profiles.
+
+## Straw page merges the compressible airflow model, retires the Darcy page — 2026-08-23
+
+- **`visualizations/straw-hose-flow.html`** (reviewed, live) now shows **two equations**
+  (Hagen–Poiseuille and Darcy–Weisbach) stacked in the equation box; whichever one actually
+  describes the current flow (`Re ≤ 2,300` vs. above) is highlighted, the other dims. This
+  fixed a real bug: the page previously always displayed the laminar Hagen–Poiseuille formula
+  even when water's Reynolds number had crossed into turbulent territory and the *computed*
+  pressure had silently switched to a Darcy–Weisbach correction underneath — the equation on
+  screen and the number on screen could disagree with no visual indication.
+- **Air is no longer on the plain laminar formula regardless of speed.** It's far more wrong
+  than the water case above: the Tim Vine straw preset (air, 1.5 m, 1.5 mm) hits ~170 m/s
+  (Mach ≈ 0.5) and Re ≈ 16,900 — both turbulent *and* transonic, nowhere near where
+  incompressible Hagen–Poiseuille applies. Air's pressure is now solved from the compressible
+  Darcy–Weisbach momentum balance (`p1²−p2² = G²fLRT/D`, fixed exit at atmospheric), inverted
+  to solve directly for the mouth pressure needed at a *fixed* target flow rate `Q` — this
+  needs no iteration (unlike `straw-hose-flow-darcy.html`'s fixed-mouth-pressure direction,
+  which iterates because `f` depends on the very flow it's solving for): fixing `Q` fixes the
+  mass flux and therefore `Re` and `f` directly, so `p1` falls out in closed form. This is
+  algebraically the same friction physics as the incompressible form (they agree at low
+  pressure drop), not a third equation — the note now says so explicitly.
+  - **Verified in-browser against hand calculation**: Tim Vine preset now reads **222 kPa**
+    (up from the old, wrong 66 kPa), Re ≈ 16,939 (turbulent), Mach 0.49 — flagged as
+    "beyond this model's low-speed assumption" since Mach ≥ 0.3. Milkshake preset still
+    reads laminar/Hagen–Poiseuille active, Re ≈ 7. Garden hose preset (air, 10 m, 10 mm)
+    reads transitional, Re ≈ 2,541, matching hand-derived values.
+  - **Deliberately no choking guard added**, unlike the known-unfixed gap flagged in
+    `pipe-flow-reference.html` for the old Darcy page (which could return Mach > 1 past the
+    ~0.845 isothermal choking limit because it fixed mouth pressure and solved for flow).
+    This page's fixed-`Q` direction bounds Mach to ≈0.5 at the narrowest slider setting
+    (velocity depends only on `Q/A`), structurally below the choking limit — confirmed by
+    checking the slider bounds, not by adding a runtime check for a case that can't occur.
+- **Reynolds number is now a result** (`Re ≈ …`, current regime, linking to
+  `reynolds-number.html`) computed the same way for every fluid, including air — the old
+  `reynoldsFor()` special-cased air to `null`; giving air an explicit `rho:1.204` (exit/
+  atmospheric density) let that special case disappear entirely.
+- **`visualizations/straw-hose-flow-darcy.html` is retired** — it was never promoted to
+  `index.html`, so its tile was removed from `unreviewed.html` and `tracker.html` instead,
+  along with the icon-slug fallback that mapped its tile to the straw icon (no longer needed
+  with no tile to map). The file itself is left in place, unlinked, rather than deleted.
+  `reynolds-number.html`'s companion-pages link and closing note were updated to point only
+  at the merged `straw-hose-flow.html` instead of the now-orphaned airflow model page.
+- No console errors; no horizontal overflow confirmed at 375px and desktop widths via
+  `scrollWidth`/`clientWidth`. **Not yet re-reviewed after this change** — recommend a human
+  visual pass before considering the merge fully signed off, since the equation-box redesign
+  (two stacked equations instead of one) hasn't been eyeballed, only measured.
+
+## Time dilation — one-tick comparison and compact top layout, 2026-08-23
+
+- **`visualizations/time-dilation.html`** now uses a user-triggered, bounded **“Play one tick”**
+  sequence rather than a continuous decorative loop. It starts both clocks and photons together;
+  the stationary clock completes one round trip while the moving clock advances by `1/γ`, then
+  holds the final gap for comparison. Slider and preset changes re-sync it. Reduced motion jumps
+  to the final state.
+- The top animation is a two-column comparison: the two clock faces occupy the left column and
+  the light-clock path uses the remaining width on the right. The moving path has exactly one
+  round trip, matching the stationary path; this avoids a false speed difference at everyday
+  speeds. Moving-clock elements use the accent colour consistently.
+- The playback control is adjacent to the light-clock animation. The explanatory γ copy sits
+  below the controls instead of competing with the animation, and the redundant Pythagorean
+  derivation line was removed.
+- The result is an even 50/50 controls/results row. It now reads directly as **“1.00 year on
+  the moving clock = … years on Earth”**, retains the extra-time explanation, and marks the
+  active magnitude on a semantic colour scale: negligible, small, measurable, large.
+- JavaScript syntax and diff-whitespace checks passed. Browser visual QA was not available in
+  this session; review the two-column top layout at desktop and mobile widths before publishing.
+
+## Pizza comparison animation pattern — 2026-08-23
+
+- **`visualizations/pizza-area.html`** now uses a quantity-comparison transformation pattern:
+  a familiar source object stays visible, a copy moves and changes shape, then the transformed
+  pieces assemble into the comparison area. The source/target quantities use distinct colours
+  and the outcome is explicit: remaining space blinks green; overflow blinks orange. This is a
+  page-specific pattern, not a replacement for the scale-reveal style used elsewhere.
+
+## Well-depth primary playback control — 2026-08-23
+
+- **`visualizations/well-depth.html`** establishes the primary playback-control treatment:
+  a compact filled accent pill with play icon and action label, positioned clear of the opening
+  animation state. It changes to a disabled running state and then a replay label. The style is
+  documented in `STYLE_GUIDE.md` for pages where playback is the primary action.
+
 ## Live animation detail pass — potato and braking, 2026-08-23
 
 - **`visualizations/potato-trajectory.html`** keeps the same projectile equations, controls and playback timing. The hero now shows a launch-velocity arrow before release, a live tangent velocity vector and gravity arrow during flight, an accent trail along the portion already travelled, potato spin/details, a clearer target ring, and hit/miss impact marks. The playback caption now reports the miss distance when applicable.
@@ -14,9 +101,9 @@
 - A text-styled **“Play the full cycle”** control runs the single bounded 3.9-second sequence. Device buttons and comparison presets replay it automatically. The displayed particle count is illustrative; arrow widths and exact kWh labels remain the quantitative encoding. `prefers-reduced-motion` skips to the final energy-balance sentence.
 - JavaScript syntax, duplicate-ID, missing-static-element-reference and diff-whitespace checks pass. Browser playback QA remains open because the in-app browser bridge rejected its trusted dependency during this session; review the hero once at desktop and mobile widths before the next publish.
 
-## Constant-acceleration page — new draft, 2026-08-22
+## Constant-acceleration page — development history, 2026-08-22
 
-- **`visualizations/constant-acceleration.html`** is a new, unreviewed special-relativity page. It is listed in `unreviewed.html` under Discoveries and in `tracker.html`.
+- **`visualizations/constant-acceleration.html`** began as an unreviewed special-relativity draft. It was promoted to `index.html` on 2026-08-23; the notes below preserve its implementation history.
 - It uses constant **proper** acceleration (what passengers feel). The speed control is rapidity `η = ατ/c`, which maps to `v/c = tanh η` and gives useful resolution near light speed without ever selecting `c`.
 - Current default: 1 g for `η = 1` gives 76.16% c after about 0.97 onboard years, 1.14 Earth years, and 0.53 light-years. The displayed distance, Earth time and onboard time assume one acceleration leg; stopping takes an equal deceleration leg.
 - It does not model propellant, energy, radiation, collisions, gravity or engineering feasibility. Review source-link wording and visual layout at desktop/mobile before moving it to the reviewed catalogue.
@@ -29,7 +116,7 @@
 - The main hero is now a top-down radial view. “Zoom out” animates the view radius logarithmically from 40 AU through the heliopause, Oort Cloud and nearby-star scale while the target-speed position stays marked. Planetary orbits, heliopause and the Oort annulus use radial distances to scale; nearby-star directions are explicitly schematic. `prefers-reduced-motion` jumps to the final scale.
 - **Animation direction revised:** the hero is now a wide, left-anchored flight view. It begins with the Sun at far left and Earth–Neptune spread schematically across the width with dotted orbit arcs. The rocket launches from Earth and passes the planets; after reaching roughly three-quarters width it stays fixed while the Sun remains anchored and the horizontal distance scale expands logarithmically to the selected endpoint. Heliopause (~120 AU), Voyager 1 (~173 AU in 2026), the Oort Cloud and nearby stars appear when their scale is reached.
 - **Animation polish:** the opening frame contains only Sun, Earth and Mars, with Mars at three-quarters width. The rocket travels from Earth to Mars; zooming begins there, holding the rocket/Mars screen position while Jupiter through Neptune enter naturally from the right as the distance scale expands. The run time is 15 seconds. Planet orbits and bodies, heliopause, Voyager and the Oort Cloud use the approved `--s1`–`--s5` series palette. This animation is documented in `STYLE_GUIDE.md` as the preferred wide, anchored scale-reveal pattern.
-- **Session closed:** the draft is functionally complete and passes JavaScript syntax, duplicate-ID, missing-element-reference and diff-whitespace checks. Automated browser QA was unavailable because the local browser-control bridge failed; refresh and review the 15-second animation at desktop and mobile widths before promoting the page from the unreviewed catalogue.
+- **Session closed:** the draft was functionally complete and passed JavaScript syntax, duplicate-ID, missing-element-reference and diff-whitespace checks. It was subsequently reviewed and promoted on 2026-08-23.
 
 Working log for switching between Claude and Codex on this project. Update this file
 whenever a design direction is decided, reversed, or left open — the goal is that either

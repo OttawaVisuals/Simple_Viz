@@ -199,11 +199,16 @@
     <div class="lbl" id="lblActual"></div>
     <svg id="heroSvg" role="img" aria-label="A mass shown as a circle, converted through c squared into a full energy bar, with the sliver actually delivered by the selected real-world process highlighted inside it.">
       <circle id="massDot" fill="var(--fg)"></circle>
+      <circle id="energyPulse" fill="none" stroke-width="2" opacity="0"></circle>
       <line id="arrowLine" stroke="currentColor" stroke-opacity=".35"></line>
       <polygon id="arrowTip" fill="currentColor" opacity=".5"></polygon>
       <rect id="barTrack" fill="none" stroke="currentColor" stroke-opacity=".2"></rect>
       <rect id="fullBar" fill="currentColor" opacity=".16"></rect>
       <rect id="actualBar" fill="var(--accent)" opacity=".92"></rect>
+      <rect id="zoomWindow" fill="none" stroke-width="1.5"></rect>
+      <rect id="actualZoomTrack" fill="none" stroke="currentColor" stroke-opacity=".2"></rect>
+      <rect id="actualZoomBar" opacity=".9"></rect>
+      <g id="processCue" aria-hidden="true"></g>
     </svg>
   </div>
 
@@ -345,6 +350,8 @@
   }
 
   var $ = function(id){ return document.getElementById(id); };
+  var NS='http://www.w3.org/2000/svg';
+  function svg(tag,attrs){ var node=document.createElementNS(NS,tag); for(var key in attrs) node.setAttribute(key,attrs[key]); return node; }
 
   // ---- fuel processes ----
   // Specific energy release (J/kg of the same mass being converted). Sources: TNT by
@@ -354,11 +361,11 @@
   // widely-cited astrophysics figure), and full matter-antimatter annihilation as the
   // 100% ceiling. See the Sources note below the page.
   var FUELS = [
-    { name:'TNT, exploding',      spec:4.184e6 },
-    { name:'Gasoline, burning',   spec:46e6 },
-    { name:'Uranium-235, fissioning', spec:8.213e13 },
-    { name:'Hydrogen, fusing (as in the Sun)', spec:6.29e14 },
-    { name:'Matter and antimatter, annihilating', spec:C*C }
+    { name:'TNT, exploding',      spec:4.184e6, color:'#D45B3F' },
+    { name:'Gasoline, burning',   spec:46e6, color:'#C98332' },
+    { name:'Uranium-235, fissioning', spec:8.213e13, color:'#7D6CC4' },
+    { name:'Hydrogen, fusing (as in the Sun)', spec:6.29e14, color:'#D4A72C' },
+    { name:'Matter and antimatter, annihilating', spec:C*C, color:'#2F8D79' }
   ];
   FUELS.forEach(function(f){ f.pct = f.spec/(C*C)*100; });
   var fuelState = { fuel: 1 }; // default: gasoline
@@ -367,8 +374,10 @@
   var heroW = 0;
 
   var heroWrap=$('heroWrap'), heroSvg=$('heroSvg');
-  var massDot=$('massDot'), arrowLine=$('arrowLine'), arrowTip=$('arrowTip'), barTrack=$('barTrack'), fullBar=$('fullBar'), actualBar=$('actualBar');
+  var massDot=$('massDot'), energyPulse=$('energyPulse'), arrowLine=$('arrowLine'), arrowTip=$('arrowTip'), barTrack=$('barTrack'), fullBar=$('fullBar'), actualBar=$('actualBar'), zoomWindow=$('zoomWindow'), actualZoomTrack=$('actualZoomTrack'), actualZoomBar=$('actualZoomBar'), processCue=$('processCue');
   var lblMass=$('lblMass'), lblTimes=$('lblTimes'), lblFull=$('lblFull'), lblActual=$('lblActual');
+  var reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var heroAnim={key:null,raf:0};
 
   function mass(){ return Math.pow(10, state.me); }
   function energy(){ return mass()*C*C; }
@@ -384,49 +393,90 @@
     var barH = narrow ? 28 : 36;
     var frac = clamp((state.me-MMIN)/(MMAX-MMIN), 0, 1);
     var dotR = 14 + frac*32;
-    return { w:w, vbH:vbH, cy:cy, dotX:dotX, barX:barX, barW:barW, barH:barH, dotR:dotR, frac:frac };
+    return { w:w, vbH:vbH, cy:cy, dotX:dotX, barX:barX, barW:barW, barH:barH, dotR:dotR, frac:frac, insetY:cy+barH/2+25, insetH:10 };
   }
 
-  function drawHero(){
+  function massReference(m){
+    if(m<.001) return 'a grain of sand';
+    if(m<.03) return 'a paperclip';
+    if(m<.25) return 'a small apple';
+    if(m<1) return 'a litre of water';
+    if(m<5) return 'a house cat';
+    if(m<30) return 'a loaded suitcase';
+    if(m<150) return 'a person';
+    return 'a small car';
+  }
+  function zoomPercent(f){
+    if(fuelState.fuel===2 || fuelState.fuel===3) return 1;
+    if(fuelState.fuel===4) return 100;
+    return f.pct<.000001 ? .000001 : .0001;
+  }
+  function drawHero(progress){
     var w = heroW || heroWrap.clientWidth || 1100;
     var g = geom(w);
     var f = currentFuel();
+    var p = progress===undefined ? 1 : progress;
+    var fullP = clamp((p-.18)/.42,0,1), actualP = clamp((p-.62)/.25,0,1);
     heroSvg.setAttribute('viewBox','0 0 '+w+' '+g.vbH);
     heroSvg.setAttribute('preserveAspectRatio','none');
 
-    massDot.setAttribute('cx', g.dotX); massDot.setAttribute('cy', g.cy); massDot.setAttribute('r', g.dotR);
+    massDot.setAttribute('cx', g.dotX); massDot.setAttribute('cy', g.cy); massDot.setAttribute('r', g.dotR*(1+.1*Math.sin(Math.min(1,p)*Math.PI)));
     massDot.setAttribute('fill', state.active==='m' ? 'var(--accent)' : 'var(--fg)');
 
     var lineX1 = g.dotX + g.dotR + 14, lineX2 = g.barX - 14;
     arrowLine.setAttribute('x1', lineX1); arrowLine.setAttribute('y1', g.cy);
     arrowLine.setAttribute('x2', lineX2); arrowLine.setAttribute('y2', g.cy);
     arrowTip.setAttribute('points', lineX2+','+g.cy+' '+(lineX2-12)+','+(g.cy-7)+' '+(lineX2-12)+','+(g.cy+7));
+    var pulseP=clamp((p-.05)/.42,0,1), pulseX=lineX1+(lineX2-lineX1)*pulseP;
+    energyPulse.setAttribute('cx',pulseX);energyPulse.setAttribute('cy',g.cy);energyPulse.setAttribute('r',5+10*pulseP);energyPulse.setAttribute('stroke',f.color);energyPulse.setAttribute('opacity',pulseP<1?.85*(1-pulseP):0);
 
     barTrack.setAttribute('x', g.barX); barTrack.setAttribute('y', g.cy-g.barH/2);
     barTrack.setAttribute('width', g.barW); barTrack.setAttribute('height', g.barH);
 
-    var fullW = Math.max(3, g.barW*g.frac);
+    var fullW = Math.max(3, g.barW*g.frac*fullP);
     fullBar.setAttribute('x', g.barX); fullBar.setAttribute('y', g.cy-g.barH/2);
     fullBar.setAttribute('width', fullW); fullBar.setAttribute('height', g.barH);
 
-    var actualW = Math.max(2, fullW*(f.pct/100));
+    var actualW = Math.max(2, fullW*(f.pct/100)*actualP);
     actualBar.setAttribute('x', g.barX); actualBar.setAttribute('y', g.cy-g.barH/2);
     actualBar.setAttribute('width', actualW); actualBar.setAttribute('height', g.barH);
+    actualBar.setAttribute('fill',f.color);
+    var zoomPct=zoomPercent(f), zoomW=Math.max(3,fullW*zoomPct/100), zoomFill=clamp(f.pct/zoomPct,0,1);
+    zoomWindow.setAttribute('x',g.barX);zoomWindow.setAttribute('y',g.cy-g.barH/2-3);zoomWindow.setAttribute('width',zoomW);zoomWindow.setAttribute('height',g.barH+6);zoomWindow.setAttribute('stroke',f.color);
+    actualZoomTrack.setAttribute('x',g.barX);actualZoomTrack.setAttribute('y',g.insetY);actualZoomTrack.setAttribute('width',g.barW);actualZoomTrack.setAttribute('height',g.insetH);
+    actualZoomBar.setAttribute('x',g.barX);actualZoomBar.setAttribute('y',g.insetY);actualZoomBar.setAttribute('width',g.barW*zoomFill*actualP);actualZoomBar.setAttribute('height',g.insetH);actualZoomBar.setAttribute('fill',f.color);
+    processCue.innerHTML='';
+    if(actualP>0){
+      var cueX=g.barX+g.barW*actualP+9, cueOpacity=(actualP*.7).toFixed(2), cue;
+      if(fuelState.fuel===0){
+        for(var i=0;i<3;i++){ cue=svg('circle',{cx:cueX+i*8,cy:g.cy+(i-1)*7,r:2+i%2,fill:f.color,opacity:cueOpacity});processCue.appendChild(cue); }
+      }else if(fuelState.fuel===1){
+        cue=svg('path',{d:'M'+cueX+' '+g.cy+' q6 -10 12 0 t12 0',fill:'none',stroke:f.color,'stroke-width':'2',opacity:cueOpacity});processCue.appendChild(cue);
+      }else if(fuelState.fuel===2){
+        cue=svg('path',{d:'M'+cueX+' '+g.cy+' h18 m-9 0 l-6 -6 m6 6 l-6 6 m6-6 l6 -6 m-6 6 l6 6',fill:'none',stroke:f.color,'stroke-width':'2',opacity:cueOpacity});processCue.appendChild(cue);
+      }else if(fuelState.fuel===3){
+        cue=svg('circle',{cx:cueX+10,cy:g.cy,r:8,fill:'none',stroke:f.color,'stroke-width':'2',opacity:cueOpacity});processCue.appendChild(cue);
+        cue=svg('circle',{cx:cueX+10,cy:g.cy,r:3,fill:f.color,opacity:cueOpacity});processCue.appendChild(cue);
+      }else{
+        cue=svg('circle',{cx:cueX+5,cy:g.cy,r:4,fill:f.color,opacity:cueOpacity});processCue.appendChild(cue);
+        cue=svg('circle',{cx:cueX+18,cy:g.cy,r:4,fill:'var(--bg)',stroke:f.color,'stroke-width':'2',opacity:cueOpacity});processCue.appendChild(cue);
+      }
+    }
 
     var px = function(x){ return (x/w*100)+'%'; };
     var py = function(y){ return (y/g.vbH*100)+'%'; };
     lblMass.style.left = px(g.dotX); lblMass.style.top = py(g.cy + g.dotR + 14);
-    lblMass.textContent = 'mass: '+fmtMass(mass());
+    lblMass.textContent = 'mass: '+fmtMass(mass())+' · about '+massReference(mass());
     lblMass.classList.toggle('acc', state.active==='m');
     lblTimes.style.left = px((lineX1+lineX2)/2); lblTimes.style.top = py(g.cy - 22);
 
     lblFull.style.left = px(g.barX+fullW); lblFull.style.top = py(g.cy - g.barH/2 - 22);
     lblFull.style.transform = 'translateX(-100%)';
-    lblFull.textContent = 'full mc²: '+fmtEnergy(energy()).join(' ');
+    lblFull.textContent = 'theoretical full mc²: '+fmtEnergy(energy()).join(' ');
 
-    lblActual.style.left = px(g.barX); lblActual.style.top = py(g.cy + g.barH/2 + 14);
-    lblActual.classList.add('acc');
-    lblActual.textContent = f.name.split(',')[0] + ' actually releases: ' + fmtEnergy(mass()*f.spec).join(' ') + ' (' + fmtPct(f.pct) + ')';
+    lblActual.style.left = px(g.barX); lblActual.style.top = py(g.insetY + g.insetH + 8);
+    lblActual.style.color=f.color;
+    lblActual.textContent = 'zoom: first '+fmtPct(zoomPct)+' of mc² — '+f.name.split(',')[0]+' fills '+fmtPct(zoomFill*100)+' of it';
 
     return g;
   }
@@ -626,13 +676,30 @@
     if(w && w !== heroW){ heroW = w; render(); }
   }
 
+  function startHeroAnimation(){
+    var key=state.me+'_'+fuelState.fuel+'_'+heroW;
+    if(key===heroAnim.key) return;
+    heroAnim.key=key;
+    if(heroAnim.raf) cancelAnimationFrame(heroAnim.raf);
+    if(reduceMotion){ drawHero(1); return; }
+    var start=performance.now(),duration=2100;
+    function frame(now){
+      var p=Math.min(1,(now-start)/duration),eased=1-Math.pow(1-p,3);
+      drawHero(eased);
+      if(p<1) heroAnim.raf=requestAnimationFrame(frame);
+      else heroAnim.raf=0;
+    }
+    heroAnim.raf=requestAnimationFrame(frame);
+  }
+
   function render(){
-    drawHero();
+    drawHero(1);
     drawEquationAndLegend();
     mSlider.draw();
     $('mReadout').textContent = fmtMass(mass());
     drawFuelNote();
     drawEquiv();
+    startHeroAnimation();
   }
 
   new ResizeObserver(measure).observe(heroWrap);

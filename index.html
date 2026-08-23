@@ -277,6 +277,10 @@
         <circle cx="86" cy="20" r="2" fill="var(--accent)" stroke="none"/>
         <path d="M75 7h30M100 4l5 3-5 3" stroke="var(--accent)" stroke-width="1.3"/>
       </symbol>
+      <symbol id="icon-constant-acceleration" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 51h104" stroke-width="1.3"/><path d="M14 50C38 50 53 47 68 34S91 11 108 11" stroke="var(--accent)" stroke-width="1.3" stroke-dasharray="3 4"/><circle cx="14" cy="50" r="2.8" fill="currentColor" stroke="none"/>
+        <g transform="translate(94 15) rotate(-29)"><path d="M-10 0C-4-6 4-6 10 0C4 6-4 6-10 0Z" fill="var(--bg)" stroke="var(--accent)"/><circle cx="3" cy="0" r="1.8" fill="var(--accent)" stroke="none"/><path d="M-7-4l-3-4M-7 4l-3 4" stroke="var(--accent)"/><path d="M-11 0h-6" stroke="var(--accent)" stroke-width="1.3"/></g>
+      </symbol>
       <symbol id="icon-bayes-theorem" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <g fill="currentColor" stroke="none"><circle cx="18" cy="17" r="3"/><circle cx="32" cy="17" r="3"/><circle cx="46" cy="17" r="3"/><circle cx="60" cy="17" r="3"/><circle cx="74" cy="17" r="3"/><circle cx="88" cy="17" r="3"/><circle cx="102" cy="17" r="3"/><circle cx="18" cy="32" r="3"/><circle cx="32" cy="32" r="3"/><circle cx="46" cy="32" r="3"/><circle cx="60" cy="32" r="3"/><circle cx="74" cy="32" r="3"/><circle cx="88" cy="32" r="3"/><circle cx="102" cy="32" r="3"/><circle cx="18" cy="47" r="3"/><circle cx="32" cy="47" r="3"/><circle cx="46" cy="47" r="3"/><circle cx="60" cy="47" r="3"/><circle cx="74" cy="47" r="3"/><circle cx="88" cy="47" r="3"/><circle cx="102" cy="47" r="3"/></g><circle cx="18" cy="17" r="7" stroke="var(--accent)"/><circle cx="32" cy="17" r="7" stroke="var(--bad)"/>
       </symbol>
@@ -366,7 +370,7 @@
       <span class="brand-word" aria-hidden="true"><span>m</span><span class="sub">ade</span><span>c</span><span class="sub">lear</span></span>
     </a>
     <div class="topbar-right">
-      <span class="count">Fifteen equations</span>
+      <span class="count">Sixteen equations</span>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
     </div>
   </div>
@@ -396,7 +400,7 @@
   <section class="catalogue" aria-labelledby="cat-all">
     <div class="section-head">
       <h2 id="cat-all">All pages</h2>
-      <span class="cat-count">Fifteen pages</span>
+      <span class="cat-count">Sixteen pages</span>
     </div>
     <p class="cat-sub">Everything built so far, coloured by category. Shuffle the order if you would rather stumble into something than go looking for it.</p>
 
@@ -410,7 +414,7 @@
       </select>
       <button class="text-btn" id="shuffleBtn" type="button">Shuffle</button>
       <button class="text-btn" id="resetOrderBtn" type="button" hidden>Reset order</button>
-      <span class="results-count" id="resultsCount" aria-live="polite">15 pages</span>
+      <span class="results-count" id="resultsCount" aria-live="polite">16 pages</span>
     </div>
 
     <div class="tile-grid" id="catalogueGrid">
@@ -424,6 +428,7 @@
       <a class="tile" data-cat="Discoveries" data-desc="Turn an ordinary amount of mass into the energy hidden in E = mc2, then compare it against what real fuels &mdash; and everyday quantities like a Ford F-150 tank or a marathon &mdash; actually deliver." href="visualizations/mass-energy.html"><span class="meta">Discoveries</span><h3>How much energy is in matter?</h3></a>
       <a class="tile" data-cat="Discoveries" data-desc="Compare shadow angles at two cities a known distance apart, the way Eratosthenes sized up the Earth around 240 BC." href="visualizations/eratosthenes-shadow.html"><span class="meta">Discoveries</span><h3>Two sticks measure a planet</h3></a>
       <a class="tile" data-cat="Discoveries" data-desc="Drag a clock&rsquo;s speed toward light itself and watch two ticking dials &mdash; one stationary, one moving &mdash; pull apart." href="visualizations/time-dilation.html"><span class="meta">Discoveries</span><h3>Moving clocks run slow</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Hold a rocket at 1 g, 2 g or more and see the onboard time, Earth time and distance needed to approach &mdash; never reach &mdash; light speed." href="visualizations/constant-acceleration.html"><span class="meta">Discoveries</span><h3>How long to almost reach light speed?</h3></a>
       <a class="tile" data-cat="Discoveries" data-desc="Drag the outside temperature down and watch a heat pump keep delivering more heat than the electricity it uses &mdash; then compare it against an electric heater and a gas furnace." href="visualizations/heat-pump-magic.html"><span class="meta">Discoveries</span><h3>Heat Pump <del>magic</del> <em>Science</em></h3></a>
       <a class="tile" data-cat="Fun physics" data-desc="See why a long drink straw becomes impossible to sip through while a much longer garden hose stays effortless." href="visualizations/straw-hose-flow.html"><span class="meta">Fun physics</span><h3>Why the straw gives up</h3></a>
       <a class="tile" data-cat="Fun physics" data-desc="Use melted spots and a microwave&rsquo;s frequency to estimate light speed, with compatible units and a standing-wave side view." href="visualizations/microwave-chocolate.html"><span class="meta">Fun physics</span><h3>Measuring light speed with chocolate</h3></a>

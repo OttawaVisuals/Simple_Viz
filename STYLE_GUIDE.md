@@ -208,6 +208,24 @@ visible on a 768px laptop. Use the standing series palette to distinguish import
 and regions, but keep structural lines quiet. Always provide replay and honour
 `prefers-reduced-motion`.
 
+**Animation standard.** Choose the motion pattern that best reveals that page's mechanism:
+[`constant-acceleration.html`](visualizations/constant-acceleration.html) is the reference for
+scale reveal; [`pizza-area.html`](visualizations/pizza-area.html) is a useful copy → transform →
+assemble pattern for quantity comparisons. Do not force either pattern onto an unrelated idea.
+Across types, use distinct semantic colours, one understandable idea per beat, calm easing, and
+a clear final result. For paired time-based diagrams, first match their baseline visual cycle;
+only then apply the physical difference, so the animation does not invent a difference at the
+zero/everyday-speed case. If colour signals remaining space, use green; use orange/red for excess
+or overflow, and state the result in text too. Restart slider-linked sequences when inputs change
+and honour `prefers-reduced-motion`.
+
+**Primary animation control.** When starting or replaying the animation is the page's main
+action, use a compact filled accent pill with a play icon, clear action label (`Drop the stone`,
+`Play`, `Replay`) and visible keyboard focus. Place it clear of the moving subject and important
+labels; do not overlay the animation's opening state. During playback, disable it and show a
+plain running label. Use this stronger treatment sparingly—secondary or optional playback can
+remain an outlined/text control.
+
 **Link targets.** Internal links to pages on madeclear.ca (catalogue tiles, navigation and
 contextual cross-links) open in the same tab. External links to sources, papers and other
 websites open in a new tab (`target="_blank"` with `rel="noopener"`), so readers keep their

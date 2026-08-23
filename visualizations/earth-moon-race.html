@@ -95,19 +95,20 @@
   .legend .name{font-size:12.5px;color:var(--muted2);transition:color .2s}
   .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
 
-  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero-controls{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:clamp(16px,2vw,24px) 0 0}.hero-controls .ctrl-title{flex:none}.hero-controls .playback{margin:0}.hero-controls .speed-buttons{margin:0}
+  .hero{position:relative;width:100%;margin:clamp(10px,1.5vw,18px) 0 0}
   .hero svg{width:100%;height:auto;display:block;overflow:visible}
   .hero .lane{transition:opacity .25s}
   .hero .lane.dim{opacity:.32}
 
-  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
-  @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
+  .resultrow{display:grid;grid-template-columns:1fr;margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
 
   .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
-  .playback{display:flex;align-items:center;gap:14px;margin-top:12px}
-  .playback button{cursor:pointer;background:none;border:0;padding:0 0 2px;color:var(--fg);font:15px/1 Georgia,serif;font-style:italic;border-bottom:1px solid var(--line2)}
-  .playback button:hover{color:var(--accent);border-color:var(--accent)}
-  .playback .sep{color:var(--line2)}
+  .playback{display:flex;align-items:center;gap:12px;margin-top:12px}
+  .playback button{cursor:pointer;font:600 11px/1.3 ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase}
+  .playback #playBtn{border:1px solid var(--accent);border-radius:999px;background:var(--accent);color:var(--bg);padding:8px 13px;box-shadow:0 2px 5px rgba(0,0,0,.16)}
+  .playback #playBtn::before{content:'▶';margin-right:7px;font-size:.82em}.playback #playBtn.is-playing::before{content:'Ⅱ'}.playback #playBtn:hover{transform:translateY(-1px);box-shadow:0 4px 9px rgba(0,0,0,.2)}
+  .playback #resetBtn{border:0;border-bottom:1px solid var(--line2);background:transparent;color:var(--muted2);padding:5px 0}.playback #resetBtn:hover{color:var(--accent);border-color:var(--accent)}
   .playback .clock{margin-left:auto;color:var(--muted);font-size:12.5px}
 
   .speed-buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:20px}
@@ -127,6 +128,7 @@
   .gauge .tick{position:absolute;top:22px;width:1px;height:5px;background:var(--line2)}
   .gauge .ticklabel{position:absolute;top:24px;white-space:nowrap;font:400 10px ui-monospace,monospace;color:var(--muted)}
   #cumGauge{height:62px}
+  .cum-clarifier{margin-top:5px;font:10.5px/1.45 ui-monospace,monospace;color:var(--muted)}
 
   .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
   .note a{color:var(--muted2);text-decoration-color:var(--line2)}
@@ -177,7 +179,7 @@
   <div class="topgrid">
     <div class="headleft">
       <h1>Earth to the Moon, <em>at real speed</em>.</h1>
-      <p class="sub">A beam of light crosses the <b>384,400&nbsp;km</b> to the Moon in about 1.3 seconds &mdash; fast enough to watch, bouncing back and forth below in true, unsped-up time. NASA's Parker Solar Probe, a rifle bullet, a jet airliner, and even sound itself move at their real speed too, just far too slowly to see against that same distance &mdash; on this same line they'd barely inch away from Earth, which is why the first 5,000&nbsp;km is magnified underneath instead.</p>
+      <p class="sub">A beam of light crosses the <b>384,400&nbsp;km</b> to the Moon in about 1.3 seconds, bouncing back and forth below in real, unsped-up time. Every slower traveller &mdash; a solar probe, a bullet, even sound &mdash; barely inches forward at this scale, so the first 5,000&nbsp;km is magnified underneath instead.</p>
     </div>
 
     <div class="eqnbox">
@@ -195,6 +197,12 @@
     <div class="legendbox">
       <div class="legend" id="legend"></div>
     </div>
+  </div>
+
+  <div class="hero-controls">
+    <span class="ctrl-title">Playback</span>
+    <div class="playback"><button id="playBtn" type="button">Start race</button><button id="resetBtn" type="button">Reset</button><span class="clock mono" id="clockReadout">0.0 s elapsed</span></div>
+    <div class="speed-buttons" id="speedButtons" role="group" aria-label="Playback speed"></div>
   </div>
 
   <div class="hero" id="heroWrap">
@@ -223,8 +231,10 @@
       <ellipse cx="97" cy="89" rx="8" ry="5.5" fill="var(--earth-land)" opacity="0.8" transform="rotate(12 97 89)"/>
       <text x="86" y="128" text-anchor="middle" class="mono" font-size="10.5" fill="currentColor" opacity="0.45">EARTH</text>
 
-      <circle cx="1132" cy="78" r="11.5" fill="url(#moonGrad)"/>
+      <circle id="moonPulse" cx="1132" cy="78" r="12" fill="none" stroke="var(--c-light)" stroke-width="2" opacity="0"/>
+      <circle id="moon" cx="1132" cy="78" r="11.5" fill="url(#moonGrad)"/>
       <text x="1132" y="128" text-anchor="middle" class="mono" font-size="10.5" fill="currentColor" opacity="0.45">MOON</text>
+      <text id="arrivalNote" x="1108" y="44" text-anchor="end" class="mono" font-size="11" fill="var(--c-light)" opacity="0"></text>
 
       <line x1="128" y1="78" x2="1110" y2="78" stroke="currentColor" stroke-opacity="0.12"/>
       <text x="619" y="42" text-anchor="middle" class="mono" font-size="13" fill="var(--c-light)" opacity="0.9">384,400 km &middot; light arrives in 1.28 s</text>
@@ -248,82 +258,72 @@
            width is itself part of the honest picture, not a schematic box — tall enough to
            visibly enclose both the light line and the Parker line above ===== -->
       <rect x="128" y="64" width="12.8" height="54" rx="1.5" fill="color-mix(in srgb, var(--accent) 14%, transparent)" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2.5 2.5"/>
-      <text x="148" y="90" class="mono" font-size="10.5" fill="var(--accent)">5,000 km &mdash; magnified ~81&times; below</text>
+      <text x="128" y="59" class="mono" font-size="10.5" fill="var(--accent)">5,000 km &mdash; magnified ~81&times; below</text>
 
       <!-- ===== zoom: a full frame around the whole magnified ruler below, with straight
            callout lines funnelling down from the small to-scale box above ===== -->
-      <rect x="60" y="200" width="1080" height="330" rx="4" fill="none" stroke="currentColor" stroke-opacity="0.18" stroke-width="1.25"/>
-      <line x1="128" y1="118" x2="60" y2="200" stroke="currentColor" stroke-opacity="0.16"/>
-      <line x1="140.8" y1="118" x2="1140" y2="200" stroke="currentColor" stroke-opacity="0.16"/>
-      <g transform="translate(80,216)" fill="none" stroke="currentColor" stroke-opacity="0.4" stroke-width="1.3">
+      <rect x="60" y="188" width="1080" height="342" rx="4" fill="none" stroke="currentColor" stroke-opacity="0.18" stroke-width="1.25"/>
+      <line x1="128" y1="118" x2="60" y2="188" stroke="currentColor" stroke-opacity="0.16"/>
+      <line x1="140.8" y1="118" x2="1140" y2="188" stroke="currentColor" stroke-opacity="0.16"/>
+      <g transform="translate(80,204)" fill="none" stroke="currentColor" stroke-opacity="0.4" stroke-width="1.3">
         <circle cx="0" cy="0" r="5"/>
         <line x1="3.6" y1="3.6" x2="8" y2="8" stroke-linecap="round"/>
       </g>
-      <text x="600" y="222" text-anchor="middle" class="mono" font-size="10.5" fill="currentColor" opacity="0.5">THE FIRST 5,000 KM OF THE TRIP, MAGNIFIED</text>
+      <text id="zoomHeading" x="600" y="206" text-anchor="middle" class="mono" font-size="10.5" fill="currentColor" opacity="0.5">THE FIRST 5,000 KM OF THE TRIP, MAGNIFIED</text>
 
       <g class="lane" id="lane-parker">
-        <text x="80" y="248" class="mono" font-size="13" font-weight="600" fill="var(--c-parker)">PARKER SOLAR PROBE</text>
-        <text x="1120" y="248" text-anchor="end" class="mono" font-size="11" fill="var(--c-parker)" opacity="0.85">192 km/s &middot; 33.4 min to Moon</text>
-        <polygon id="mk-parker" points="-7,0 6,-5.5 6,5.5" fill="var(--c-parker)" transform="translate(80,266)"/>
-        <text id="readout-parker" x="94" y="270" class="mono" font-size="11" fill="currentColor" opacity="0.6">0 km</text>
+        <text x="80" y="242" class="mono" font-size="13" font-weight="600" fill="var(--c-parker)">PARKER SOLAR PROBE</text>
+        <text x="80" y="258" class="mono" font-size="11" fill="var(--c-parker)" opacity="0.85">192 km/s &middot; 33.4 min</text>
+        <polygon id="mk-parker" points="-7,0 6,-5.5 6,5.5" fill="var(--c-parker)" transform="translate(260,250)"/>
+        <text id="readout-parker" x="274" y="254" class="mono" font-size="11" fill="currentColor" opacity="0.6">0 km</text>
       </g>
 
       <g class="lane" id="lane-soundwater">
-        <text x="80" y="298" class="mono" font-size="13" font-weight="600" fill="var(--c-soundwater)">SPEED OF SOUND, WATER</text>
-        <text x="1120" y="298" text-anchor="end" class="mono" font-size="11" fill="var(--c-soundwater)" opacity="0.85">1.48 km/s &middot; 3.0 days to Moon</text>
-        <polygon id="mk-soundwater" points="0,-6 6,0 0,6 -6,0" fill="var(--c-soundwater)" transform="translate(80,316)"/>
-        <text id="readout-soundwater" x="94" y="320" class="mono" font-size="11" fill="currentColor" opacity="0.6">0 km</text>
+        <text x="80" y="292" class="mono" font-size="13" font-weight="600" fill="var(--c-soundwater)">SPEED OF SOUND, WATER</text>
+        <text x="80" y="308" class="mono" font-size="11" fill="var(--c-soundwater)" opacity="0.85">1.48 km/s &middot; 3.0 days</text>
+        <polygon id="mk-soundwater" points="0,-6 6,0 0,6 -6,0" fill="var(--c-soundwater)" transform="translate(260,300)"/>
+        <text id="readout-soundwater" x="274" y="304" class="mono" font-size="11" fill="currentColor" opacity="0.6">0 km</text>
       </g>
 
       <g class="lane" id="lane-bullet">
-        <text x="80" y="348" class="mono" font-size="13" font-weight="600" fill="var(--c-bullet)">RIFLE BULLET</text>
-        <text x="1120" y="348" text-anchor="end" class="mono" font-size="11" fill="var(--c-bullet)" opacity="0.85">1 km/s &middot; 4.45 days to Moon</text>
-        <rect id="mk-bullet" x="-7" y="-3" width="14" height="6" rx="3" fill="var(--c-bullet)" transform="translate(80,366)"/>
-        <text id="readout-bullet" x="94" y="370" class="mono" font-size="11" fill="currentColor" opacity="0.6">0 km</text>
+        <text x="80" y="342" class="mono" font-size="13" font-weight="600" fill="var(--c-bullet)">RIFLE BULLET</text>
+        <text x="80" y="358" class="mono" font-size="11" fill="var(--c-bullet)" opacity="0.85">1 km/s &middot; 4.45 days</text>
+        <rect id="mk-bullet" x="-7" y="-3" width="14" height="6" rx="3" fill="var(--c-bullet)" transform="translate(260,350)"/>
+        <text id="readout-bullet" x="274" y="354" class="mono" font-size="11" fill="currentColor" opacity="0.6">0 km</text>
       </g>
 
       <g class="lane" id="lane-soundair">
-        <text x="80" y="398" class="mono" font-size="13" font-weight="600" fill="var(--c-soundair)">SPEED OF SOUND, AIR</text>
-        <text x="1120" y="398" text-anchor="end" class="mono" font-size="11" fill="var(--c-soundair)" opacity="0.85">0.343 km/s &middot; 13.0 days to Moon</text>
-        <circle id="mk-soundair" r="5.5" fill="var(--c-soundair)" transform="translate(80,416)"/>
-        <text id="readout-soundair" x="94" y="420" class="mono" font-size="11" fill="currentColor" opacity="0.6">0 km</text>
+        <text x="80" y="392" class="mono" font-size="13" font-weight="600" fill="var(--c-soundair)">SPEED OF SOUND, AIR</text>
+        <text x="80" y="408" class="mono" font-size="11" fill="var(--c-soundair)" opacity="0.85">0.343 km/s &middot; 13.0 days</text>
+        <circle id="mk-soundair" r="5.5" fill="var(--c-soundair)" transform="translate(260,400)"/>
+        <text id="readout-soundair" x="274" y="404" class="mono" font-size="11" fill="currentColor" opacity="0.6">0 km</text>
       </g>
 
       <g class="lane" id="lane-jet">
-        <text x="80" y="448" class="mono" font-size="13" font-weight="600" fill="var(--c-jet)">JET AIRLINER</text>
-        <text x="1120" y="448" text-anchor="end" class="mono" font-size="11" fill="var(--c-jet)" opacity="0.85">0.25 km/s &middot; 17.8 days to Moon</text>
-        <polygon id="mk-jet" points="-7,-4 7,0 -7,4 -2,0" fill="var(--c-jet)" transform="translate(80,466)"/>
-        <text id="readout-jet" x="94" y="470" class="mono" font-size="11" fill="currentColor" opacity="0.6">0 km</text>
+        <text x="80" y="442" class="mono" font-size="13" font-weight="600" fill="var(--c-jet)">JET AIRLINER</text>
+        <text x="80" y="458" class="mono" font-size="11" fill="var(--c-jet)" opacity="0.85">0.25 km/s &middot; 17.8 days</text>
+        <polygon id="mk-jet" points="-7,-4 7,0 -7,4 -2,0" fill="var(--c-jet)" transform="translate(260,450)"/>
+        <text id="readout-jet" x="274" y="454" class="mono" font-size="11" fill="currentColor" opacity="0.6">0 km</text>
       </g>
 
-      <line x1="80" y1="488" x2="1120" y2="488" stroke="currentColor" stroke-opacity="0.16"/>
+      <line x1="260" y1="488" x2="1120" y2="488" stroke="currentColor" stroke-opacity="0.16"/>
       <g class="mono" font-size="10.5" fill="currentColor" opacity="0.4">
-        <text x="80" y="508" text-anchor="middle">0</text>
-        <text x="288" y="508" text-anchor="middle">1,000 km</text>
-        <text x="496" y="508" text-anchor="middle">2,000 km</text>
-        <text x="704" y="508" text-anchor="middle">3,000 km</text>
-        <text x="912" y="508" text-anchor="middle">4,000 km</text>
+        <text x="260" y="508" text-anchor="middle">0</text>
+        <text x="432" y="508" text-anchor="middle">1,000 km</text>
+        <text x="604" y="508" text-anchor="middle">2,000 km</text>
+        <text x="776" y="508" text-anchor="middle">3,000 km</text>
+        <text x="948" y="508" text-anchor="middle">4,000 km</text>
         <text x="1120" y="508" text-anchor="end">5,000 km</text>
       </g>
     </svg>
   </div>
 
   <div class="resultrow">
-    <div class="ctrls">
-      <span class="ctrl-title">Playback</span>
-      <div class="playback">
-        <button id="playBtn" type="button">Pause</button>
-        <span class="sep">&middot;</span>
-        <button id="resetBtn" type="button">Reset</button>
-        <span class="clock mono" id="clockReadout">0.0 s elapsed</span>
-      </div>
-      <div class="speed-buttons" id="speedButtons" role="group" aria-label="Playback speed"></div>
-    </div>
-
     <div class="result">
       <div class="result-label">Total distance light has crossed</div>
       <div class="result-value"><span class="num mono" id="cumValue"></span><span class="unit mono">km</span></div>
       <div class="verdict-sub" id="cumNote"></div>
+      <div class="cum-clarifier">Total path travelled, not current position.</div>
       <div class="gauge" id="cumGauge">
         <div class="track"></div>
         <div class="reach" id="cumReach"></div>
@@ -334,9 +334,9 @@
     </div>
   </div>
 
-  <p class="note">Distance is the Moon's <a href="https://spaceplace.nasa.gov/moon-distance/en/" target="_blank" rel="noopener">average distance from Earth</a>; light speed is <a href="https://en.wikipedia.org/wiki/Speed_of_light" target="_blank" rel="noopener">299,792&nbsp;km/s</a> in vacuum, giving <b class="mono">t&nbsp;=&nbsp;d/v&nbsp;=&nbsp;384,400&nbsp;km&nbsp;&divide;&nbsp;299,792&nbsp;km/s&nbsp;=&nbsp;1.28&nbsp;s</b> one-way. The lower ruler is not a second trip: it is the first 5,000&nbsp;km of the route above, magnified about 81&times; so the slower travellers can be seen moving at all &mdash; the accent box above encloses that same 5,000&nbsp;km on the full-scale line, with the Parker Solar Probe's own faint line drawn right beside light's, the only traveller fast enough to visibly creep even at full scale. Sound and the rest only become visible once magnified, which is exactly why the zoom exists. The speed control multiplies every clock equally; nothing is warped relative to anything else.</p>
+  <p class="note">Distance is the Moon's <a href="https://spaceplace.nasa.gov/moon-distance/en/" target="_blank" rel="noopener">average distance from Earth</a>; light speed is <a href="https://en.wikipedia.org/wiki/Speed_of_light" target="_blank" rel="noopener">299,792&nbsp;km/s</a> in vacuum, giving <b class="mono">t&nbsp;=&nbsp;d/v&nbsp;=&nbsp;384,400&nbsp;km&nbsp;&divide;&nbsp;299,792&nbsp;km/s&nbsp;=&nbsp;1.28&nbsp;s</b> one-way. The lower ruler isn't a second trip &mdash; it's the same first 5,000&nbsp;km, magnified about 81&times; so the slower travellers become visible at all; Parker Solar Probe is the only one fast enough to see creeping even at full scale, drawn as a faint line beside light's. The speed control multiplies every clock equally; nothing is warped relative to anything else.</p>
 
-  <p class="note">Speeds and sources: Parker Solar Probe's 192.2&nbsp;km/s is its record closest-approach speed near the Sun in December 2024, not one it reaches near Earth &mdash; treated here as our fastest machine, hypothetically let loose on this trip (<a href="https://science.nasa.gov/science-research/heliophysics/nasas-parker-solar-probe-makes-history-with-closest-pass-to-sun/" target="_blank" rel="noopener">NASA</a>). The rifle bullet's 1&nbsp;km/s is a typical rifle muzzle velocity, not any one cartridge (<a href="https://en.wikipedia.org/wiki/Muzzle_velocity" target="_blank" rel="noopener">Wikipedia</a>). The jet airliner's 0.25&nbsp;km/s (900&nbsp;km/h) is a widebody's typical cruising speed (<a href="https://www.boeing.com/commercial/747-8/design-highlights" target="_blank" rel="noopener">Boeing 747-8</a>). Speed of sound in air, 343&nbsp;m/s at 20&deg;C (<a href="https://www.grc.nasa.gov/www/k-12/airplane/sound.html" target="_blank" rel="noopener">NASA Glenn</a>); in fresh water, 1,481&nbsp;m/s at 20&deg;C (<a href="https://www.engineeringtoolbox.com/sound-speed-water-d_598.html" target="_blank" rel="noopener">The Engineering ToolBox</a>) &mdash; sound genuinely travels faster through water than a rifle bullet does through air. The &ldquo;total distance crossed&rdquo; comparison below uses Mars, Jupiter, and Saturn's average <em style="font-style:italic">distance from the Sun</em>, not from Earth (232, 795, and 1,511&nbsp;million&nbsp;km &mdash; about 12.9, 44.2, and 84 light-minutes, <a href="https://spacemath.gsfc.nasa.gov/planets/10Page2.pdf" target="_blank" rel="noopener">NASA Goddard</a>): it's a benchmark for the size of the number light has racked up, not a claim about where it's actually headed.</p>
+  <p class="note">Speeds and sources: Parker Solar Probe's 192.2&nbsp;km/s is its record closest-approach speed near the Sun (<a href="https://science.nasa.gov/science-research/heliophysics/nasas-parker-solar-probe-makes-history-with-closest-pass-to-sun/" target="_blank" rel="noopener">NASA</a>), not a speed it reaches near Earth &mdash; used here as our fastest machine, hypothetically let loose on this trip. The rifle bullet's 1&nbsp;km/s is a typical muzzle velocity (<a href="https://en.wikipedia.org/wiki/Muzzle_velocity" target="_blank" rel="noopener">Wikipedia</a>); the jet airliner's 0.25&nbsp;km/s (900&nbsp;km/h) a widebody's typical cruise speed (<a href="https://www.boeing.com/commercial/747-8/design-highlights" target="_blank" rel="noopener">Boeing 747-8</a>). Speed of sound: 343&nbsp;m/s in air (<a href="https://www.grc.nasa.gov/www/k-12/airplane/sound.html" target="_blank" rel="noopener">NASA Glenn</a>), 1,481&nbsp;m/s in fresh water (<a href="https://www.engineeringtoolbox.com/sound-speed-water-d_598.html" target="_blank" rel="noopener">The Engineering ToolBox</a>) &mdash; water genuinely beats a rifle bullet. The distance-crossed comparison below uses Mars, Jupiter, and Saturn's average distance from the Sun, not Earth (232, 795, and 1,511&nbsp;million&nbsp;km, <a href="https://spacemath.gsfc.nasa.gov/planets/10Page2.pdf" target="_blank" rel="noopener">NASA Goddard</a>), as a benchmark for the size of the number, not a claim about where light is actually headed.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -372,14 +372,14 @@
 <script>
 (function(){
   var D = 384400, TRACK_X0 = 128, TRACK_X1 = 1110, T_LIGHT = 1.2822;
-  var ZOOM_KM = 5000, ZOOM_X0 = 80, ZOOM_X1 = 1120;
+  var ZOOM_KM = 5000, ZOOM_X0 = 260, ZOOM_X1 = 1120;
   var lanes = {
     light:      { speed: 299792, name:'Light',                    val:'299,792 km/s', color:'var(--c-light)' },
-    parker:     { speed: 192,    zoomY: 266, mainY: 102, name:'Parker Solar Probe',      val:'192 km/s' },
-    soundwater: { speed: 1.481,  zoomY: 316,             name:'Speed of sound (water)',  val:'1.48 km/s' },
-    bullet:     { speed: 1,      zoomY: 366,             name:'Rifle bullet',            val:'1 km/s' },
-    soundair:   { speed: 0.343,  zoomY: 416,             name:'Speed of sound (air)',    val:'0.343 km/s' },
-    jet:        { speed: 0.25,   zoomY: 466,             name:'Jet airliner',            val:'0.25 km/s' }
+    parker:     { speed: 192,    zoomY: 250, mainY: 102, name:'Parker Solar Probe',      val:'192 km/s' },
+    soundwater: { speed: 1.481,  zoomY: 300,             name:'Speed of sound (water)',  val:'1.48 km/s' },
+    bullet:     { speed: 1,      zoomY: 350,             name:'Rifle bullet',            val:'1 km/s' },
+    soundair:   { speed: 0.343,  zoomY: 400,             name:'Speed of sound (air)',    val:'0.343 km/s' },
+    jet:        { speed: 0.25,   zoomY: 450,             name:'Jet airliner',            val:'0.25 km/s' }
   };
   var TRAVELLER_KEYS = ['light','parker','soundwater','bullet','soundair','jet'];
 
@@ -410,7 +410,7 @@
   var SPEEDS = [1,2,4,8,16,32];
   var speedIdx = 0;
   var simSeconds = 0;
-  var playing = !reduceMotion;
+  var playing = false;
   var lastTs = null;
   var rafId = null;
   var state = { active: null, activeVar: null };
@@ -463,7 +463,7 @@
   SPEEDS.forEach(function(s, i){
     var b = document.createElement('button');
     b.type = 'button';
-    b.textContent = s + '×';
+    b.textContent = s === 1 ? '1× real time' : s + '×';
     b.addEventListener('click', function(){ speedIdx = i; drawSpeedButtons(); });
     speedButtonsEl.appendChild(b);
   });
@@ -486,6 +486,11 @@
     var tailLen = 36;
     trail.setAttribute('x1', phase <= T_LIGHT ? Math.max(TRACK_X0, x - tailLen) : Math.min(TRACK_X1, x + tailLen));
     trail.setAttribute('x2', x);
+    var arrivalPulse = Math.max(0, 1 - Math.abs(phase-T_LIGHT)/.18);
+    $('moonPulse').setAttribute('r', 12 + arrivalPulse*16);
+    $('moonPulse').setAttribute('opacity', arrivalPulse ? (.2+.8*arrivalPulse) : 0);
+    $('arrivalNote').setAttribute('opacity', arrivalPulse ? 1 : 0);
+    $('arrivalNote').textContent = arrivalPulse ? 'ARRIVED · 1.28 s' : '';
   }
 
   function renderLane(key){
@@ -567,6 +572,7 @@
     renderLane('soundair');
     renderLane('jet');
     renderMainLane('parker');
+    $('zoomHeading').textContent = 'THE FIRST 5,000 KM OF THE TRIP, MAGNIFIED';
     renderCum();
   }
 
@@ -581,13 +587,14 @@
 
   function setPlaying(next){
     playing = next;
-    playBtn.textContent = playing ? 'Pause' : 'Play';
+    playBtn.textContent = playing ? 'Pause race' : (simSeconds > 0 ? 'Resume race' : 'Start race');
+    playBtn.classList.toggle('is-playing', playing);
     if (playing){ lastTs = null; rafId = requestAnimationFrame(tick); }
     else if (rafId){ cancelAnimationFrame(rafId); rafId = null; }
   }
 
   playBtn.addEventListener('click', function(){ setPlaying(!playing); });
-  resetBtn.addEventListener('click', function(){ simSeconds = 0; lastTs = null; render(); });
+  resetBtn.addEventListener('click', function(){ simSeconds = 0; lastTs = null; setPlaying(false); render(); });
 
   // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
   var STORAGE_KEY = 'earth-moon-race-theme';
@@ -617,10 +624,8 @@
   render();
 
   if (reduceMotion){
-    playBtn.textContent = 'Play';
+    playBtn.textContent = 'Start race';
     playBtn.title = 'Autoplay disabled (reduced motion)';
-  } else {
-    rafId = requestAnimationFrame(tick);
   }
 })();
 </script>

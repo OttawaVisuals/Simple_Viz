@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 256" role="img" aria-label="Small rocket following a relativity curve">
+  <rect width="480" height="256" rx="14" fill="#F7F5F0"/>
+  <g transform="translate(60 72) scale(3)">
+    <!-- Context / trajectory: 1.3px -->
+    <path d="M7 48 H112" fill="none" stroke="#6E675D" stroke-width="1.3" stroke-linecap="round" opacity=".55"/>
+    <path d="M12 47 C36 47 51 44 66 31 S89 8 108 8" fill="none" stroke="#2F6BD8" stroke-width="1.3" stroke-linecap="round" stroke-dasharray="3 4"/>
+    <circle cx="12" cy="47" r="2.8" fill="#1B1A17"/>
+    <!-- Subject / rocket: 2.2px -->
+    <g transform="translate(94 12) rotate(-29)">
+      <path d="M-11 0 C-5 -7 4 -7 11 0 C4 7 -5 7 -11 0 Z" fill="#F7F5F0" stroke="#2F6BD8" stroke-width="2.2" stroke-linejoin="round"/>
+      <circle cx="3" cy="0" r="1.8" fill="#2F6BD8"/>
+      <path d="M-7 -4 L-10 -8 M-7 4 L-10 8" fill="none" stroke="#2F6BD8" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M-12 0 H-18" fill="none" stroke="#2F6BD8" stroke-width="1.3" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>

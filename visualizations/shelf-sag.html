@@ -86,15 +86,15 @@
   .legend .name{font-size:12.5px;color:var(--muted2)}
   .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
 
-  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
+  .hero{position:relative;width:100%;margin:clamp(8px,1.2vw,14px) 0 0}
   .hero svg{width:100%;height:auto;display:block}
   .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
 
-  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(14px,1.8vw,24px);border-top:1px solid var(--line);padding-top:clamp(12px,1.6vw,20px)}
   @media (max-width:980px){.resultrow{grid-template-columns:1fr}}
 
-  .ctrls{display:grid;grid-template-columns:1fr 1fr;gap:clamp(22px,2.6vw,36px)}
-  .slider-stack{display:grid;gap:clamp(18px,2.2vw,28px)}
+  .ctrls{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,1.8vw,24px)}
+  .slider-stack{display:grid;gap:clamp(10px,1.4vw,16px)}
   .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
   .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
   .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;text-transform:none;transition:color .2s}
@@ -103,25 +103,24 @@
   .pick-buttons button{cursor:pointer;font-family:Georgia,serif;font-style:italic;font-size:15px;padding:6px 13px 7px;border-radius:999px;transition:all .18s ease;border:1px solid var(--border);background:transparent;color:var(--muted)}
   .pick-buttons button:hover{color:var(--fg)}
   .pick-note{margin-top:11px;font-size:13.5px;line-height:1.45;color:var(--muted)}
-  .section-picker{margin-top:10px;display:grid;grid-template-columns:minmax(150px,190px) 1fr;gap:12px;align-items:center}
+  .section-picker{margin-top:10px}
   .section-picker svg{display:block;width:100%;height:auto;touch-action:none;user-select:none}
   .section-picker .selector-bg{fill:color-mix(in srgb,var(--line) 30%,transparent)}
   .section-picker .selector-grid{stroke:var(--line2);stroke-width:1;stroke-dasharray:2 4}
   .section-picker .selector-rect{fill:color-mix(in srgb,var(--accent) 16%,transparent);stroke:var(--accent);stroke-width:1.5}
   .section-picker .selector-handle{fill:var(--bg);stroke:var(--accent);stroke-width:2;cursor:nwse-resize}
   .section-picker .selector-axis{fill:var(--muted);font:10px ui-monospace,monospace}
-  .section-readout{font:12px/1.6 ui-monospace,monospace;color:var(--muted2)}
-  .section-readout strong{display:block;color:var(--fg);font-size:20px;font-weight:400}
+  .section-readout{margin-top:10px;display:flex;align-items:baseline;gap:10px;font:12px/1.6 ui-monospace,monospace;color:var(--muted2)}
+  .section-readout strong{color:var(--fg);font-size:20px;font-weight:400}
   @media (min-width:981px){
-    .slider-stack{gap:14px}
+    .slider-stack{gap:8px}
     .slider-stack .ctrl{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"head head" "track value" "range range";column-gap:14px;align-items:center}
     .slider-stack .ctrl-head{grid-area:head}
     .slider-stack .readout{grid-area:value;margin:0;min-width:7ch;text-align:right;font-size:22px}
     .slider-stack .track{grid-area:track;margin-top:0}
     .slider-stack .track-range{grid-area:range}
-    .section-picker svg{max-width:190px}
   }
-  @media (max-width:620px){.ctrls{grid-template-columns:1fr}.section-picker{grid-template-columns:1fr}.section-picker svg{max-width:230px}}
+  @media (max-width:620px){.ctrls{grid-template-columns:1fr}}
   .readout{font-family:ui-monospace,monospace;font-size:clamp(26px,2.8vw,34px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
   .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
   .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
@@ -138,9 +137,9 @@
   .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px}
   .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
   .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
-  .stress-eqn{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font:15px/1.5 ui-monospace,monospace;color:var(--muted2)}
+  .stress-eqn{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font:15px/1.5 ui-monospace,monospace;color:var(--muted2)}
   .stress-eqn .stress-value{color:var(--fg)}
-  .gauge{position:relative;height:66px;margin-top:16px;max-width:420px}
+  .gauge{position:relative;height:66px;margin-top:10px;max-width:420px}
   .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
   .gauge .reach{position:absolute;top:14px;height:10px;border-radius:2px 0 0 2px;background:color-mix(in srgb, var(--accent) 16%, transparent);left:0}
   .gauge .tick{position:absolute;top:26px;width:1px;height:5px;background:var(--line2)}
@@ -213,15 +212,16 @@
 
     <div class="eqnbox">
       <div class="eqn">
-        <span><em>&delta;</em><sub>a</sub></span>
+        <span><em>&delta;</em><sub>max</sub></span>
         <span class="eq">=</span>
         <span class="frac">
-          <span class="row num"><em id="pTerm">P</em><em id="aTerm">a</em><sup>2</sup><span>(</span><em id="laTerm">L&minus;a</em><span>)</span><sup>2</sup></span>
+          <span class="row num"><em id="pTerm">P</em><em id="sTerm">s</em><span>(</span><em id="lTerm2">L</em><sup>2</sup><span class="eq">&minus;</span><em id="sTerm2">s</em><sup>2</sup><span>)</span><sup>3&frasl;2</sup></span>
           <span class="bar"></span>
-          <span class="row den"><span class="eq">3</span><em id="eTerm">E</em><em id="iTerm">I</em><em id="lTerm">L</em></span>
+          <span class="row den"><span class="eq">9&radic;3</span><em id="eTerm">E</em><em id="iTerm">I</em><em id="lTerm">L</em></span>
         </span>
       </div>
       <div class="subeqn"><em id="iSubTerm">I</em> = <em id="bTerm">b</em><em id="hTerm">h</em><sup>3</sup> / 12</div>
+      <div class="subeqn"><em id="sSubTerm">s</em> = min(<em id="aTerm">a</em>, <em id="laTerm">L&minus;a</em>)</div>
     </div>
 
     <div class="legendbox">
@@ -243,6 +243,7 @@
       <line id="groundR" stroke="var(--line2)" stroke-width="1"></line>
       <line id="loadLine" stroke="var(--fg)" stroke-width="1.5"></line>
       <polygon id="loadHead" fill="var(--fg)"></polygon>
+      <circle id="maxPt" r="3.5" fill="var(--accent)"></circle>
       <g id="breakMark" opacity="0">
         <line id="breakA" stroke="var(--bad)" stroke-width="2"></line>
         <line id="breakB" stroke="var(--bad)" stroke-width="2"></line>
@@ -301,22 +302,22 @@
           <span class="ctrl-title">Cross-section <em id="sectionLabel">b &times; h</em></span>
           <span class="ctrl-rel">drag the corner</span>
         </div>
+        <div class="section-readout"><strong id="sectionReadout"></strong><span id="sectionHint">20&ndash;200 mm each</span></div>
         <div class="section-picker">
-          <svg id="sectionSvg" viewBox="0 0 220 150" role="group" aria-label="Beam cross-section selector">
-            <rect class="selector-bg" x="20" y="10" width="190" height="120"></rect>
-            <path class="selector-grid" d="M20 40H210M20 70H210M20 100H210M67.5 10V130M115 10V130M162.5 10V130"></path>
+          <svg id="sectionSvg" viewBox="0 0 220 104" role="group" aria-label="Beam cross-section selector">
+            <rect class="selector-bg" x="20" y="8" width="190" height="68"></rect>
+            <path class="selector-grid" d="M20 25H210M20 42H210M20 59H210M67.5 8V76M115 8V76M162.5 8V76"></path>
             <rect class="selector-rect" id="sectionRect"></rect>
             <circle class="selector-handle" id="sectionHandle" r="9" tabindex="0" role="button" aria-label="Resize beam cross-section; arrow keys adjust width and height"></circle>
-            <text class="selector-axis" x="115" y="145" text-anchor="middle">width b</text>
-            <text class="selector-axis" x="8" y="70" text-anchor="middle" transform="rotate(-90 8 70)">height h</text>
+            <text class="selector-axis" x="115" y="96" text-anchor="middle">width b</text>
+            <text class="selector-axis" x="8" y="42" text-anchor="middle" transform="rotate(-90 8 42)">height h</text>
           </svg>
-          <div class="section-readout"><strong id="sectionReadout"></strong><span id="sectionHint">20&ndash;200 mm each</span></div>
         </div>
       </div>
     </div>
 
     <div class="result">
-      <div class="result-label">Deflection under the load</div>
+      <div class="result-label">Maximum deflection</div>
       <div class="result-value"><span class="num mono" id="sagValue"></span><span class="unit mono">mm</span><span class="v" id="verdict"></span></div>
       <div class="verdict-sub" id="verdictSub"></div>
       <div class="effort-line" id="effortLine"></div>
@@ -343,7 +344,7 @@
     <button class="preset" data-p="long">the long span</button>
   </div>
 
-  <p class="note">For a simply supported beam with a point load <em>P</em> placed <em>a</em> metres from the left support, Euler&ndash;Bernoulli beam theory gives the deflection under that load as &delta;<sub>a</sub> = Pa&sup2;(L&minus;a)&sup2;/(3EIL). The drawn curve uses the corresponding piecewise equation along the whole span, not a fixed bow shape. For a rectangular section, I = bh&sup3;/12. The material is representative No.&nbsp;2 spruce&ndash;pine&ndash;fir: E&nbsp;=&nbsp;8.27&nbsp;GPa and reference bending value F<sub>b</sub>&nbsp;=&nbsp;6.03&nbsp;MPa (1.2&times;10<sup>6</sup> and 875&nbsp;psi). The red region begins where &sigma; = Mc/I exceeds F<sub>b</sub>; this is a conservative design threshold, not a prediction of the exact crack load. Real lumber strength varies with grade, knots, moisture, load duration, size, and restraint, and design requires the applicable adjustment factors. The L/360 line is a serviceability comparison for visible sag. Sag is shown at a fixed 12&times; magnification, capped after failure so extreme elastic predictions do not run off the diagram. Read more on Wikipedia: <a href="https://en.wikipedia.org/wiki/Deflection_(engineering)" target="_blank" rel="noopener">beam deflection</a>, <a href="https://en.wikipedia.org/wiki/Bending" target="_blank" rel="noopener">bending stress</a>, and <a href="https://en.wikipedia.org/wiki/Second_moment_of_area" target="_blank" rel="noopener">second moment of area</a>.</p>
+  <p class="note">For a simply supported beam with a point load <em>P</em>, Euler&ndash;Bernoulli beam theory gives the true maximum deflection &mdash; not just the deflection under the load itself, which is smaller whenever the load sits off-centre &mdash; as &delta;<sub>max</sub> = Ps(L&sup2;&minus;s&sup2;)<sup>3&frasl;2</sup>/(9&radic;3&nbsp;EIL), where <em>s</em> is the distance from the load to whichever support is nearer. That point sits a little closer to mid-span than the load does, marked on the diagram; the two deflections, and their locations, only coincide exactly when the load is at mid-span. The drawn curve itself uses the exact piecewise deflection equation along the whole span, not a fixed bow shape. For a rectangular section, the second moment of area is I = bh&sup3;/12. The material is representative No.&nbsp;2 spruce&ndash;pine&ndash;fir: E&nbsp;=&nbsp;8.27&nbsp;GPa and reference bending value F<sub>b</sub>&nbsp;=&nbsp;6.03&nbsp;MPa (1.2&times;10<sup>6</sup> and 875&nbsp;psi), from the <a href="https://awc.org/wp-content/uploads/2021/10/AWC_NDS2018-Supplement_20200827_AWCWebsite_Chapter4.pdf" target="_blank" rel="noopener">American Wood Council's NDS design value tables</a>. The red region begins where &sigma; = Mc/I exceeds F<sub>b</sub>, evaluated at the load itself where bending stress always peaks; this is a conservative design threshold, not a prediction of the exact crack load. Real lumber strength varies with grade, knots, moisture, load duration, size, and restraint, and design requires the applicable adjustment factors. The L/360 line is a serviceability comparison for visible sag. Sag is shown at a fixed 15&times; magnification, capped after failure so extreme elastic predictions do not run off the diagram. Read more on Wikipedia: <a href="https://en.wikipedia.org/wiki/Deflection_(engineering)" target="_blank" rel="noopener">beam deflection</a>, <a href="https://en.wikipedia.org/wiki/Bending" target="_blank" rel="noopener">bending stress</a>, and <a href="https://en.wikipedia.org/wiki/Second_moment_of_area" target="_blank" rel="noopener">second moment of area</a>.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -385,7 +386,7 @@
   var LMIN=0.3, LMAX=2.4, PMIN=5, PMAX=100;
   var BMIN=20, BMAX=200, HMIN=20, HMAX=200;
   var LIMIT_DIV = 360;                 // deflection limit = span / 360
-  var SAG_MAG = 12;
+  var SAG_MAG = 15;
 
   function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
   function ratioTxt(x){
@@ -412,16 +413,12 @@
   var baseLine=$('baseLine'), beamPath=$('beamPath'), overstressPath=$('overstressPath');
   var supL=$('supL'), supR=$('supR'), groundL=$('groundL'), groundR=$('groundR');
   var loadLine=$('loadLine'), loadHead=$('loadHead');
-  var breakMark=$('breakMark'), breakA=$('breakA'), breakB=$('breakB');
+  var breakMark=$('breakMark'), breakA=$('breakA'), breakB=$('breakB'), maxPt=$('maxPt');
   var lblBoard=$('lblBoard'), lblSag=$('lblSag'), lblMag=$('lblMag');
 
   function I_mm4(b,h){ return b*Math.pow(h,3)/12; }
   function I_m4(){ return I_mm4(state.b,state.h)/1e12; }
   function loadA(){ return state.L*state.aFrac; }
-  function deflectionUnderLoad(){
-    var a=loadA(), right=state.L-a, Pn=state.P*G;
-    return Pn*a*a*right*right/(3*E_PA*I_m4()*state.L);
-  }
   function deflectionAt(x){
     var L=state.L, a=loadA(), right=L-a, Pn=state.P*G, EI=E_PA*I_m4();
     if(x<=a) return Pn*right*x*(L*L-right*right-x*x)/(6*L*EI);
@@ -434,7 +431,21 @@
   }
   function stressAt(x){ return momentAt(x)*(state.h/2000)/I_m4(); }
   function maxStress(){ return stressAt(loadA()); }
-  function deflection(){ return deflectionUnderLoad(); }
+  // The true maximum deflection anywhere on the span, not just under the load — the two only
+  // coincide when the load sits at mid-span. s is the distance from the load to whichever
+  // support is nearer; the standard closed form (matching Wikipedia/Roark's beam tables) is
+  // δmax = P·s·(L²−s²)^1.5 / (9√3·E·I·L), located a distance √((L²−s²)/3) from the support on
+  // the FAR side of the load (the side bounding the longer segment).
+  function deflectionMax(){
+    var a=loadA(), L=state.L, s=Math.min(a,L-a), Pn=state.P*G, EI=E_PA*I_m4();
+    return Pn*s*Math.pow(L*L-s*s,1.5)/(9*Math.sqrt(3)*L*EI);
+  }
+  function xMaxDeflection(){
+    var a=loadA(), L=state.L, s=Math.min(a,L-a);
+    var x1=Math.sqrt((L*L-s*s)/3);
+    return a>=L-a ? x1 : L-x1;
+  }
+  function deflection(){ return deflectionMax(); }
   function limit(){ return state.L/LIMIT_DIV; }
 
   // ---- hero geometry: viewBox width == measured CSS px width, so 1 unit = 1px ----
@@ -443,11 +454,12 @@
     var spanAvail = Math.max(80, w - PAD - RMARGIN);
     var pxPerM = spanAvail/LMAX;
     var startX = PAD, spanPx = state.L*pxPerM, endX = startX+spanPx;
-    var Y0 = 96, vbH = 224;
-    var hPx = clamp(state.h*(pxPerM/1000)*0.55, 2.5, 28);
-    var dLoad = deflection();
+    var Y0 = 96, vbH = 270;
+    var hPx = clamp(state.h*(pxPerM/1000)*0.1375, 0.625, 7);
+    var dAtLoad = deflectionAt(loadA());
+    var dMax = deflectionMax(), xMax = xMaxDeflection();
     var magPxPerM = pxPerM*SAG_MAG;
-    var maxSagPx = 92;
+    var maxSagPx = 130;
     var N=64, pts=[], failD='', wasFail=false, trueMax=0;
     for(var i=0;i<=N;i++){
       var f = i/N;
@@ -461,12 +473,14 @@
     }
     var pathD = 'M'+pts.map(function(p){ return p[0]+','+p[1]; }).join('L');
     var loadX=startX+state.aFrac*spanPx;
-    var loadDeflPx=Math.min(dLoad*magPxPerM,maxSagPx);
+    var loadDeflPx=Math.min(dAtLoad*magPxPerM,maxSagPx);
+    var maxX=startX+(xMax/state.L)*spanPx;
+    var maxDeflPx=Math.min(dMax*magPxPerM,maxSagPx);
 
     return {
       w:w, vbH:vbH, startX:startX, endX:endX, spanPx:spanPx, pxPerM:pxPerM, Y0:Y0,
       hPx:hPx, pathD:pathD, failD:failD, loadX:loadX, loadDeflPx:loadDeflPx,
-      dLoad:dLoad, capped:trueMax*magPxPerM>maxSagPx
+      maxX:maxX, maxDeflPx:maxDeflPx, dMax:dMax, capped:trueMax*magPxPerM>maxSagPx
     };
   }
 
@@ -503,19 +517,22 @@
     breakA.setAttribute('x1',bx-7);breakA.setAttribute('y1',by-7);breakA.setAttribute('x2',bx+7);breakA.setAttribute('y2',by+7);
     breakB.setAttribute('x1',bx+7);breakB.setAttribute('y1',by-7);breakB.setAttribute('x2',bx-7);breakB.setAttribute('y2',by+7);
 
+    maxPt.setAttribute('cx', h.maxX); maxPt.setAttribute('cy', h.Y0+h.maxDeflPx);
+
     var px = function(x){ return (x/w*100)+'%'; };
     var py = function(y){ return (y/h.vbH*100)+'%'; };
     lblBoard.style.left = px(h.startX); lblBoard.style.top = py(h.Y0-58);
     lblBoard.textContent = state.b+' × '+state.h+' mm cross-section';
-    lblSag.style.left = px(h.loadX+12); lblSag.style.top = py(h.Y0+h.loadDeflPx-7);
-    lblSag.textContent = fmtMM(h.dLoad)+' mm'+(broken?' · limit exceeded':'');
+    lblSag.style.left = px(h.maxX+12); lblSag.style.top = py(h.Y0+h.maxDeflPx-7);
+    lblSag.textContent = fmtMM(h.dMax)+' mm'+(broken?' · limit exceeded':'');
     lblMag.style.left = px(h.endX); lblMag.style.top = py(h.vbH-16);
     lblMag.textContent = 'sag shown '+SAG_MAG+'×'+(h.capped?' · capped after failure':'');
   }
 
   // ---- equation + legend colouring ----
   var accent = 'var(--accent)';
-  var pTerm=$('pTerm'), lTerm=$('lTerm'), aTerm=$('aTerm'), laTerm=$('laTerm');
+  var pTerm=$('pTerm'), lTerm=$('lTerm'), lTerm2=$('lTerm2'), aTerm=$('aTerm'), laTerm=$('laTerm');
+  var sTerm=$('sTerm'), sTerm2=$('sTerm2'), sSubTerm=$('sSubTerm');
   var iTerm=$('iTerm'), iSubTerm=$('iSubTerm'), bTerm=$('bTerm'), hTerm=$('hTerm');
   var pLabel=$('pLabel'), lLabel=$('lLabel'), aLabel=$('aLabel'), sectionLabel=$('sectionLabel');
   var legendEl = $('legend');
@@ -523,16 +540,18 @@
   function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
 
   function drawEquationAndLegend(){
-    pTerm.style.color = activeColor('P'); lTerm.style.color = activeColor('L');
-    aTerm.style.color=activeColor('aFrac');laTerm.style.color=state.active==='aFrac'||state.active==='L'?accent:'var(--fg)';
+    pTerm.style.color = activeColor('P'); lTerm.style.color = activeColor('L'); lTerm2.style.color = activeColor('L');
+    aTerm.style.color=activeColor('aFrac');laTerm.style.color=activeColor('aFrac');
+    sTerm.style.color=activeColor('aFrac');sTerm2.style.color=activeColor('aFrac');sSubTerm.style.color=activeColor('aFrac');
     iTerm.style.color=activeColor('section');iSubTerm.style.color=activeColor('section');
     bTerm.style.color = activeColor('section'); hTerm.style.color = activeColor('section');
     pLabel.style.color = activeColor('P'); lLabel.style.color = activeColor('L'); aLabel.style.color=activeColor('aFrac'); sectionLabel.style.color=activeColor('section');
 
-    var a=loadA();
+    var a=loadA(), s=Math.min(a, state.L-a);
     var rows = [
       {sym:'P', name:'point load', val:state.P+' kg', key:'P'},
       {sym:'a', name:'distance from left support', val:a.toFixed(2)+' m', key:'aFrac'},
+      {sym:'s', name:'distance to nearer support', val:s.toFixed(2)+' m', key:'aFrac'},
       {sym:'L', name:'span between supports', val:state.L.toFixed(2)+' m', key:'L'},
       {sym:'E', name:'modulus, No. 2 SPF', val:'8.27 GPa', key:null},
       {sym:'b×h', name:'rectangular cross-section', val:state.b+'×'+state.h+' mm', key:'section'},
@@ -553,13 +572,13 @@
   // ---- draggable rectangular cross-section ----
   var sectionSvg=$('sectionSvg'), sectionRect=$('sectionRect'), sectionHandle=$('sectionHandle');
   function sectionPoint(){
-    return {x:20+(state.b-BMIN)/(BMAX-BMIN)*190,y:130-(state.h-HMIN)/(HMAX-HMIN)*120};
+    return {x:20+(state.b-BMIN)/(BMAX-BMIN)*190,y:76-(state.h-HMIN)/(HMAX-HMIN)*68};
   }
   function setSectionFromPointer(clientX,clientY){
     var r=sectionSvg.getBoundingClientRect();
-    var x=(clientX-r.left)/r.width*220, y=(clientY-r.top)/r.height*150;
+    var x=(clientX-r.left)/r.width*220, y=(clientY-r.top)/r.height*104;
     state.b=clamp(Math.round((BMIN+clamp((x-20)/190,0,1)*(BMAX-BMIN))/2)*2,BMIN,BMAX);
-    state.h=clamp(Math.round((HMIN+clamp((130-y)/120,0,1)*(HMAX-HMIN))/2)*2,HMIN,HMAX);
+    state.h=clamp(Math.round((HMIN+clamp((76-y)/68,0,1)*(HMAX-HMIN))/2)*2,HMIN,HMAX);
     state.active='section';render();
   }
   var sectionDragging=false;
@@ -574,7 +593,7 @@
   });
   function drawSection(){
     var p=sectionPoint();
-    sectionRect.setAttribute('x',20);sectionRect.setAttribute('y',p.y);sectionRect.setAttribute('width',p.x-20);sectionRect.setAttribute('height',130-p.y);
+    sectionRect.setAttribute('x',20);sectionRect.setAttribute('y',p.y);sectionRect.setAttribute('width',p.x-20);sectionRect.setAttribute('height',76-p.y);
     sectionHandle.setAttribute('cx',p.x);sectionHandle.setAttribute('cy',p.y);
     sectionHandle.setAttribute('aria-valuetext',state.b+' millimetres wide by '+state.h+' millimetres high');
     $('sectionReadout').textContent=state.b+' × '+state.h+' mm';

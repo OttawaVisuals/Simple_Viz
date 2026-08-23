@@ -67,9 +67,15 @@
   .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
 
   .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
-  .eqn{display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);font-size:clamp(30px,4vw,46px);line-height:1;font-weight:300}
+  .eqn-stack{display:flex;flex-direction:column;align-items:center;gap:clamp(10px,1.6vw,18px)}
+  .eqn-group{display:flex;flex-direction:column;align-items:center;gap:5px;transition:opacity .25s ease}
+  .eqn-group.inactive{opacity:.32}
+  .eqn-tag{font:500 10px ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);transition:color .25s ease}
+  .eqn-group:not(.inactive) .eqn-tag{color:var(--accent)}
+  .eqn{display:flex;align-items:center;gap:clamp(6px,1vw,10px);font-size:clamp(19px,2.5vw,28px);line-height:1;font-weight:300}
   .eqn .eq{color:var(--muted)}
   .eqn .frac{display:inline-flex;flex-direction:column;align-items:center}
+  .eqn .frac.small{font-size:.72em}
   .eqn .frac .row{display:flex;gap:.16em;align-items:flex-start}
   .eqn .frac .num{padding:0 .3em .06em}
   .eqn .frac .den{padding:.06em .3em 0}
@@ -94,9 +100,8 @@
   .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:clamp(18px,2.2vw,28px) clamp(20px,2.4vw,32px)}
   .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
   .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
-  /* text-transform:none: .ctrl-title uppercases its label, but the em here carries a
-     case-bearing equation symbol (r, not R) — without this it rendered "R" and contradicted
-     the equation above it. Same fix as bike-gears.html. */
+  /* Keep equation/control symbols in their authored case instead of inheriting the
+     uppercase treatment used for the surrounding control title. */
   .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;text-transform:none;transition:color .2s}
   .ctrl-rel{font:400 11px ui-monospace,monospace;color:var(--muted)}
   .fluid-buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
@@ -119,6 +124,9 @@
   .result-value .v{font-size:clamp(16px,1.7vw,19px);font-weight:600;margin-left:4px}
   .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
   .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:1.4em}
+  .re-line{font-size:12.5px;margin-top:2px;min-height:1.4em}
+  .re-line a{color:var(--muted);text-decoration-color:var(--line2)}
+  .re-line a:hover{color:var(--accent);text-decoration-color:var(--accent)}
   .gauge{position:relative;height:66px;margin-top:16px;max-width:420px}
   .gauge .track{position:absolute;left:0;right:0;top:14px;height:10px;background:var(--track);border-radius:2px}
   .gauge .reach{position:absolute;top:14px;height:10px;border-radius:2px 0 0 2px;background:color-mix(in srgb, var(--accent) 16%, transparent);left:0}
@@ -177,7 +185,7 @@
       <span class="brand-word" aria-hidden="true"><span>m</span><span class="sub">ade</span><span>c</span><span class="sub">lear</span></span>
     </a>
     <div class="topbar-right">
-      <span>Hagen&ndash;Poiseuille</span>
+      <span>Hagen&ndash;Poiseuille &middot; Darcy&ndash;Weisbach</span>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
     </div>
   </div>
@@ -185,18 +193,41 @@
   <div class="topgrid">
     <div class="headleft">
       <h1>Why the straw <em>gives up</em>.</h1>
-      <p class="sub">Push a fluid through a tube and it fights back with viscous drag. Here's the equation behind that &mdash; and why one setup below famously failed on live TV.</p>
+      <p class="sub">Push a fluid through a tube and it fights back with viscous drag. Two equations describe that fight, depending on how rough the flow gets &mdash; and one setup below famously failed on live TV.</p>
     </div>
 
     <div class="eqnbox">
-      <div class="eqn">
-        <span>&Delta;<em>P</em></span>
-        <span class="eq">=</span>
-        <span class="frac">
-          <span class="row num"><span>8</span><em id="etaTerm">&eta;</em><em id="LTerm">L</em><em>Q</em></span>
-          <span class="bar"></span>
-          <span class="row den"><em>&pi;</em><em id="rTerm">r</em><sup>4</sup></span>
-        </span>
+      <div class="eqn-stack">
+        <div class="eqn-group" id="eqnGroupHP">
+          <div class="eqn-tag" id="hpTag">Hagen&ndash;Poiseuille &middot; laminar</div>
+          <div class="eqn">
+            <span>&Delta;<em>P</em></span>
+            <span class="eq">=</span>
+            <span class="frac">
+              <span class="row num"><span>8</span><em id="etaTerm">&eta;</em><em id="LTerm">L</em><em>Q</em></span>
+              <span class="bar"></span>
+              <span class="row den"><em>&pi;</em><em id="rTerm">r</em><sup>4</sup></span>
+            </span>
+          </div>
+        </div>
+        <div class="eqn-group" id="eqnGroupDW">
+          <div class="eqn-tag" id="dwTag">Darcy&ndash;Weisbach</div>
+          <div class="eqn">
+            <span>&Delta;<em>P</em></span>
+            <span class="eq">=</span>
+            <em>f</em>
+            <span class="frac small">
+              <span class="row num"><em>L</em></span>
+              <span class="bar"></span>
+              <span class="row den"><em>D</em></span>
+            </span>
+            <span class="frac">
+              <span class="row num"><em>&rho;v</em><sup>2</sup></span>
+              <span class="bar"></span>
+              <span class="row den"><span>2</span></span>
+            </span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -230,7 +261,7 @@
       <div class="ctrl" id="fluidCtrl">
         <div class="ctrl-head">
           <span class="ctrl-title">Fluid <em id="etaLabel">&eta;</em></span>
-          <span class="ctrl-rel">&eta; &prop; &Delta;P</span>
+          <span class="ctrl-rel" id="etaRelation">&eta; &prop; &Delta;P</span>
         </div>
         <div class="fluid-buttons" id="fluidButtons" role="group" aria-label="Fluid"></div>
         <div class="fluid-note" id="fluidNote"></div>
@@ -239,7 +270,7 @@
       <div class="ctrl" id="lengthCtrl">
         <div class="ctrl-head">
           <span class="ctrl-title">Length <em id="LLabel">L</em></span>
-          <span class="ctrl-rel">L &prop; &Delta;P</span>
+          <span class="ctrl-rel" id="lengthRelation">L &prop; &Delta;P</span>
         </div>
         <div class="readout mono" id="lenReadout"></div>
         <div class="track" id="lenTrack" tabindex="0" role="slider" aria-label="Tube length">
@@ -247,13 +278,13 @@
           <div class="fill" id="lenFill"></div>
           <div class="thumb" id="lenThumb"></div>
         </div>
-        <div class="track-range"><span>0.1 m</span><span class="mid">double L &middot; double the effort</span><span>10 m</span></div>
+        <div class="track-range"><span>0.1 m</span><span class="mid" id="lengthHint">double L &middot; double the effort</span><span>10 m</span></div>
       </div>
 
       <div class="ctrl" id="diamCtrl">
         <div class="ctrl-head">
-          <span class="ctrl-title">Diameter <em id="rLabel">r</em></span>
-          <span class="ctrl-rel">r&#8315;&#8308; &prop; &Delta;P</span>
+          <span class="ctrl-title">Diameter <em id="rLabel">D</em></span>
+          <span class="ctrl-rel" id="diamRelation">D&#8315;&#8308; &prop; &Delta;P</span>
         </div>
         <div class="readout mono" id="diamReadout"></div>
         <div class="track" id="diamTrack" tabindex="0" role="slider" aria-label="Tube diameter">
@@ -261,7 +292,7 @@
           <div class="fill" id="diamFill"></div>
           <div class="thumb" id="diamThumb"></div>
         </div>
-        <div class="track-range"><span>1.5 mm</span><span class="mid">halve r &middot; 16&times; the effort</span><span>10 mm</span></div>
+        <div class="track-range"><span>1.5 mm</span><span class="mid" id="diamHint">halve D &middot; 16&times; the effort</span><span>10 mm</span></div>
       </div>
     </div>
 
@@ -270,6 +301,7 @@
       <div class="result-value"><span class="num mono" id="paValue"></span><span class="unit mono" id="paUnit"></span><span class="v" id="verdict"></span></div>
       <div class="verdict-sub" id="verdictSub"></div>
       <div class="effort-line" id="effortLine"></div>
+      <div class="re-line mono" id="reLine"><a href="reynolds-number.html">Re &asymp; <span id="reValue"></span> &mdash; <span id="reRegime"></span> &middot; Reynolds number page &rarr;</a></div>
       <div class="gauge" id="gauge">
         <div class="track"></div>
         <div class="reach" id="gReach"></div>
@@ -291,7 +323,7 @@
     <button class="preset" data-p="shake">milkshake straw</button>
   </div>
 
-  <p class="note">The <a href="https://en.wikipedia.org/wiki/Hagen%E2%80%93Poiseuille_equation" target="_blank" rel="noopener">Hagen&ndash;Poiseuille equation</a> shown above describes slow, steady (laminar) flow through a round tube, where &eta; is viscosity, L is length, r is inner radius (half the diameter set above), and Q is a fixed, representative flow rate. It's exact for milkshake and honey across this page's whole slider range &mdash; both stay laminar (Reynolds number well under 2,300) even at the narrowest, longest setting. Water can leave that regime: at the narrow end of the diameter slider its Reynolds number passes 4,000, so the pressure shown there blends in a turbulent-flow correction (<a href="https://en.wikipedia.org/wiki/Darcy%E2%80%93Weisbach_equation" target="_blank" rel="noopener">Darcy&ndash;Weisbach</a> with an empirical friction factor) rather than extrapolating the laminar formula past where it's valid &mdash; the result box flags it ("turbulent flow, Re&asymp;&hellip;") whenever this is happening. Air is left on the plain laminar formula here regardless: at the pressures needed to push it through something straw-narrow, air's density changing along the tube (compressibility) is a bigger source of error than turbulence alone, and fixing that needs a different equation entirely, not just a friction-factor correction. The scale's limits are rough estimates of what a person can sustain by mouth, not hard numbers, drawn from <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4001942/" target="_blank" rel="noopener">clinical measurements of maximal mouth pressure</a> (the same PImax/PEmax test used to check respiratory-muscle strength, not a drinking-straw study specifically). Sucking and blowing are <em style="font-style:italic">not</em> the same limit: healthy adults typically manage on the order of 10&nbsp;kPa sucking (PImax) but close to double that blowing, around 20&nbsp;kPa (PEmax), since the muscles used to exhale are stronger than the ones used to inhale &mdash; which is why air's limit is set higher than water's, milkshake's, or honey's above. The gauge below uses a <strong>log scale</strong> (each major tick is 1,000&times; the last), since achievable pressures span nine orders of magnitude from a light sip to a seized industrial line. <strong>This models horizontal flow only</strong> &mdash; a straw held upright also fights gravity, and no amount of suction can lift water more than about 10 m, since that alone needs a full atmosphere of pressure difference. It's also the reason a long drinking straw is so much harder to use than a garden hose of similar length: on <em style="font-style:italic">Taskmaster</em>, comedian Tim Vine taped a chain of drinking straws together and couldn't blow a candle out through them, while a garden hose of the same length worked fine &mdash; try both presets above. Real chained drinking straws also kink at their joints, choking flow by a mechanism this equation doesn't capture, likely a bigger factor in Tim Vine's attempt than viscosity alone.</p>
+  <p class="note">This is a <strong>fixed-flow model</strong>: it calculates the pressure needed to maintain the representative Q shown above, not the smaller flow a real person would achieve after reaching their pressure limit. The highlighted equation follows the current regime. The <a href="https://en.wikipedia.org/wiki/Hagen%E2%80%93Poiseuille_equation" target="_blank" rel="noopener">Hagen&ndash;Poiseuille equation</a> covers laminar flow; water can cross into transition or turbulence, where the calculation uses <a href="https://en.wikipedia.org/wiki/Darcy%E2%80%93Weisbach_equation" target="_blank" rel="noopener">Darcy&ndash;Weisbach</a> with a smooth-pipe friction factor. Milkshake and honey remain laminar across the controls, but their results still assume Newtonian fluids with fixed representative viscosities; real mixtures can change viscosity with temperature, composition, and shear rate. Air uses the full one-dimensional isothermal momentum balance, p<sub>1</sub>&sup2;&minus;p<sub>2</sub>&sup2;&minus;2G&sup2;RT&nbsp;ln(p<sub>1</sub>/p<sub>2</sub>)=G&sup2;fLRT/D, solved numerically with the exit at atmospheric pressure. Results at Mach 0.3 or above are flagged because heat transfer and entrance details become more important. The mouth limits are rough estimates based on <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4001942/" target="_blank" rel="noopener">clinical maximal-mouth-pressure measurements</a>, not a straw study; blowing and sucking have different limits. A suction-driven liquid cannot sustain a pressure drop of a full atmosphere: larger displayed values describe pressure that would have to be supplied by pushing from the source side. The gauge uses a <strong>log scale</strong>. <strong>This models horizontal, straight, smooth tubing</strong>; it omits gravity and local losses at entrances, bends, kinks, and taped joints. Those joint losses likely mattered more in Tim Vine's real chained-straw attempt than wall friction alone.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -327,7 +359,7 @@
 <script>
 (function(){
   var LIQ = [
-    {key:'air',name:'Air',eta:1.81e-5,etaTxt:'1.8 × 10⁻⁵ Pa·s',Q:3e-4,qTxt:'0.3 L/s',verb:'blow',color:'#8FA3B8',easy:5000,limit:20000,
+    {key:'air',name:'Air',eta:1.81e-5,etaTxt:'1.8 × 10⁻⁵ Pa·s',rho:1.204,compressible:true,Q:3e-4,qTxt:'0.3 L/s',verb:'blow',color:'#8FA3B8',easy:5000,limit:20000,
      note:'Barely viscous — but you have to move a lot of it, fast.'},
     {key:'water',name:'Water',eta:1.0e-3,etaTxt:'1.0 × 10⁻³ Pa·s',rho:1000,Q:5e-6,qTxt:'5 mL/s',verb:'suck',color:'#4E7FC4',easy:4000,limit:10000,
      note:'The baseline: 55 times thicker than air.'},
@@ -339,6 +371,8 @@
   var LMIN=0.1, LMAX=10, DMIN=1.5, DMAX=10;
   var LOGMIN=-1, LOGMAX=8;
   var SUP='⁰¹²³⁴⁵⁶⁷⁸⁹';
+  // Ideal-gas constants for air's compressible pressure-drop solve.
+  var P_ATM=101325, GAS_R=287.05, GAS_T=293.15, GAMMA=1.4;
 
   function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
   function sup(n){ return String(n).split('').map(function(c){ return c==='-'?'⁻':SUP[+c]; }).join(''); }
@@ -385,26 +419,51 @@
     return 64/2300 + t*t*(3-2*t)*(turbulent(4000)-64/2300);
   }
   function reynoldsFor(L,D,fluidIdx){
-    var l = LIQ[fluidIdx];
-    if(!l.rho) return null; // air: see pressureFor's note
-    var D_m=D/1000, r=D_m/2, v=l.Q/(Math.PI*r*r);
+    var l = LIQ[fluidIdx], D_m=D/1000, r=D_m/2, v=l.Q/(Math.PI*r*r);
     return l.rho*v*D_m/l.eta;
   }
   function pressureFor(L,D,fluidIdx){
     var l = LIQ[fluidIdx], D_m=D/1000, r=D_m/2;
-    // Air is left on the pure laminar (Hagen-Poiseuille) formula: at the pressures needed
-    // to push air through something straw-narrow, compressibility (density changing along
-    // the tube) is the dominant source of error, not just turbulence — fixing that needs
-    // the compressible model, not a friction-factor correction on an incompressible one.
-    if(!l.rho) return 8*l.eta*L*l.Q/(Math.PI*Math.pow(r,4));
-    // Liquids: general Darcy-Weisbach, ΔP = f(L/D)(ρv²/2). At Re≤2300 this is algebraically
-    // identical to Hagen-Poiseuille (f=64/Re reduces it to the same 8ηLQ/(πr⁴)), so honey
-    // and milkshake are unaffected across the whole slider range — only water, which can
-    // reach Re≈4,200 at the narrow end of the diameter slider, actually changes.
+    // General Darcy-Weisbach for every fluid: f comes from Reynolds number (laminar
+    // f=64/Re, a smooth-pipe turbulent correlation above Re=4000, blended between). At
+    // Re≤2300 this reduces algebraically to plain Hagen-Poiseuille (8ηLQ/(πr⁴)), so honey
+    // and milkshake are unaffected across the whole slider range — only water and air,
+    // which can cross Re=2,300, actually see a correction.
     var v = l.Q/(Math.PI*r*r), re = l.rho*v*D_m/l.eta, f = frictionFactor(re);
+    if(l.compressible){
+      // Full one-dimensional isothermal momentum balance, including the acceleration
+      // caused by falling density. With exit pressure p2=P_ATM and C=G²RT:
+      // p1²-p2²-2C ln(p1/p2)=C f L/D, where G=rho*v is constant mass flux.
+      // The equation is implicit in p1, so solve its monotonic subsonic branch by bisection.
+      var G = l.rho*v;
+      var C = G*G*GAS_R*GAS_T;
+      var target = C*f*L/D_m;
+      function residual(p){
+        return p*p - P_ATM*P_ATM - 2*C*Math.log(p/P_ATM) - target;
+      }
+      var low = P_ATM, high = P_ATM*2;
+      while(residual(high)<0 && high<1e10) high *= 2;
+      for(var i=0;i<80;i++){
+        var mid=(low+high)/2;
+        if(residual(mid)<0) low=mid; else high=mid;
+      }
+      var p1 = (low+high)/2;
+      return p1 - P_ATM;
+    }
     return f*(L/D_m)*(l.rho*v*v/2);
   }
   function pressure(){ return pressureFor(state.L, state.D, state.fluid); }
+  function machFor(D,fluidIdx){
+    var l = LIQ[fluidIdx];
+    if(!l.compressible) return null;
+    var r=D/2000, v=l.Q/(Math.PI*r*r), a=Math.sqrt(GAMMA*GAS_R*GAS_T);
+    return v/a;
+  }
+  // Note: unlike straw-hose-flow-darcy.html's now-retired fixed-mouth-pressure solve
+  // (which could return Mach>1 past the isothermal choking limit, ~0.845 — see
+  // pipe-flow-reference.html), Mach here depends only on Q/A and is bounded by the
+  // diameter slider alone (max ≈0.5 at D=DMIN), never reaching that limit — no choking
+  // guard is needed for this page's fixed-Q direction.
 
   // ---- hero geometry: viewBox width == measured CSS px width, so 1 unit = 1px ----
   function geom(w,L,D,l){
@@ -518,7 +577,10 @@
   var accent = 'var(--accent)';
   var etaTerm=$('etaTerm'), LTerm=$('LTerm'), rTerm=$('rTerm');
   var etaLabel=$('etaLabel'), LLabel=$('LLabel'), rLabel=$('rLabel');
+  var etaRelation=$('etaRelation'), lengthRelation=$('lengthRelation'), diamRelation=$('diamRelation');
+  var lengthHint=$('lengthHint'), diamHint=$('diamHint');
   var legendEl = $('legend');
+  var eqnGroupHP=$('eqnGroupHP'), eqnGroupDW=$('eqnGroupDW'), dwTag=$('dwTag');
 
   function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
 
@@ -529,6 +591,30 @@
     etaLabel.style.color = activeColor('eta');
     LLabel.style.color = activeColor('L');
     rLabel.style.color = activeColor('r');
+
+    // Whichever equation actually describes the current flow gets highlighted; the other
+    // dims rather than disappearing, so the swap itself is visible as Re crosses 2,300.
+    var re = reynoldsFor(state.L, state.D, state.fluid);
+    var laminar = re<=2300;
+    eqnGroupHP.classList.toggle('inactive', !laminar);
+    eqnGroupDW.classList.toggle('inactive', laminar);
+    var l0 = liq();
+    var dwState = re>=4000 ? 'turbulent' : 'transitional';
+    dwTag.textContent = 'Darcy–Weisbach · ' + dwState + (l0.compressible ? ', compressible' : '');
+
+    if(laminar){
+      etaRelation.textContent = 'η ∝ ΔP';
+      lengthRelation.textContent = 'L ∝ ΔP';
+      lengthHint.textContent = 'double L · double the effort';
+      diamRelation.textContent = 'D⁻⁴ ∝ ΔP';
+      diamHint.textContent = 'halve D · 16× the effort';
+    } else {
+      etaRelation.textContent = 'η changes Re and friction';
+      lengthRelation.textContent = l0.compressible ? 'nonlinear with L' : 'L ∝ ΔP';
+      lengthHint.textContent = l0.compressible ? 'longer · increasingly more effort' : 'double L · double the effort';
+      diamRelation.textContent = 'no single power law';
+      diamHint.textContent = 'narrower · sharply more effort';
+    }
 
     var l = liq();
     var rows = [
@@ -644,23 +730,22 @@
     var verdictSub;
     if(!over) verdictSub = 'A mouth can manage that.';
     else if(l.verb==='blow') verdictSub = 'by mouth — an air compressor could still push it through.';
-    else {
-      var devices=[{n:'A household vacuum cleaner',p:20000},{n:'A shop-vac',p:30000},{n:'An industrial vacuum pump',p:90000}];
-      var dev = devices.find(function(d){ return d.p>=pa; });
-      verdictSub = dev ? 'by mouth. '+dev.n+' could still do it.' : 'for anything short of a hydraulic pump.';
-    }
+    else if(pa>=P_ATM) verdictSub = 'by suction — it would require pressurizing the source side.';
+    else verdictSub = 'by mouth — a suitable vacuum pump could create that pressure difference.';
     verdictSubEl.textContent = verdictSub;
 
     effortLineEl.textContent = over
       ? ('needs '+sci(pa/l.limit).replace(/×$/,'')+(pa/l.limit>=1000?' times':'×')+' the mouth limit')
       : (Math.max(1,Math.round(pa/l.limit*100))+'% of the mouth limit');
 
-    // flag when the flow has left the laminar regime the equation above illustrates, so the
-    // number and the displayed formula don't silently disagree
-    var re = reynoldsFor(state.L, state.D, state.fluid);
-    if(re!==null && re>2300){
-      effortLineEl.textContent += ' · ' + (re>=4000?'turbulent':'transitional') + ' flow, Re≈' + Math.round(re).toLocaleString();
+    var mach = machFor(state.D, state.fluid);
+    if(mach!==null && mach>=0.3){
+      effortLineEl.textContent += ' · Mach ' + mach.toFixed(2) + ' — sensitive to heat transfer and entrance details, treat as approximate';
     }
+
+    var re = reynoldsFor(state.L, state.D, state.fluid);
+    $('reValue').textContent = Math.round(re).toLocaleString();
+    $('reRegime').textContent = re<=2300 ? 'laminar' : re>=4000 ? 'turbulent' : 'transitional';
 
     // gauge
     var markPct = pos(pa);

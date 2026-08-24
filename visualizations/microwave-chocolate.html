@@ -642,7 +642,9 @@
   }
 
   // ---- presets ----
-  document.querySelectorAll('.preset').forEach(function(b){
+  document.querySelectorAll('.preset[data-p]').forEach(function(b){
+    // Scoped to [data-p]: #freqReset also carries class="preset" for its styling but sets the
+    // frequency, not the spacing, and matching it here threw on every click.
     var presets = {
       real:{spacing:6.12},
       short:{spacing:5.5},
@@ -650,6 +652,7 @@
     };
     b.addEventListener('click', function(){
       var p = presets[b.dataset.p];
+      if(!p) return;
       state.spacing=p.spacing;
       render();
     });

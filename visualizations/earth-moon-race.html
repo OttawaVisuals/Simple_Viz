@@ -258,7 +258,7 @@
            width is itself part of the honest picture, not a schematic box — tall enough to
            visibly enclose both the light line and the Parker line above ===== -->
       <rect x="128" y="64" width="12.8" height="54" rx="1.5" fill="color-mix(in srgb, var(--accent) 14%, transparent)" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2.5 2.5"/>
-      <text x="128" y="59" class="mono" font-size="10.5" fill="var(--accent)">5,000 km &mdash; magnified ~81&times; below</text>
+      <text x="128" y="59" class="mono" font-size="10.5" fill="var(--accent)">5,000 km &mdash; magnified ~67&times; below</text>
 
       <!-- ===== zoom: a full frame around the whole magnified ruler below, with straight
            callout lines funnelling down from the small to-scale box above ===== -->
@@ -334,9 +334,9 @@
     </div>
   </div>
 
-  <p class="note">Distance is the Moon's <a href="https://spaceplace.nasa.gov/moon-distance/en/" target="_blank" rel="noopener">average distance from Earth</a>; light speed is <a href="https://en.wikipedia.org/wiki/Speed_of_light" target="_blank" rel="noopener">299,792&nbsp;km/s</a> in vacuum, giving <b class="mono">t&nbsp;=&nbsp;d/v&nbsp;=&nbsp;384,400&nbsp;km&nbsp;&divide;&nbsp;299,792&nbsp;km/s&nbsp;=&nbsp;1.28&nbsp;s</b> one-way. The lower ruler isn't a second trip &mdash; it's the same first 5,000&nbsp;km, magnified about 81&times; so the slower travellers become visible at all; Parker Solar Probe is the only one fast enough to see creeping even at full scale, drawn as a faint line beside light's. The speed control multiplies every clock equally; nothing is warped relative to anything else.</p>
+  <p class="note">Distance is the Moon's <a href="https://spaceplace.nasa.gov/moon-distance/en/" target="_blank" rel="noopener">average distance from Earth</a>; light speed is <a href="https://en.wikipedia.org/wiki/Speed_of_light" target="_blank" rel="noopener">299,792&nbsp;km/s</a> in vacuum, giving <b class="mono">t&nbsp;=&nbsp;d/v&nbsp;=&nbsp;384,400&nbsp;km&nbsp;&divide;&nbsp;299,792&nbsp;km/s&nbsp;=&nbsp;1.28&nbsp;s</b> one-way. The lower ruler isn't a second trip &mdash; it's the same first 5,000&nbsp;km, magnified about 67&times; so the slower travellers become visible at all; Parker Solar Probe is the only one fast enough to see creeping even at full scale, drawn as a faint line beside light's. The speed control multiplies every clock equally; nothing is warped relative to anything else.</p>
 
-  <p class="note">Speeds and sources: Parker Solar Probe's 192.2&nbsp;km/s is its record closest-approach speed near the Sun (<a href="https://science.nasa.gov/science-research/heliophysics/nasas-parker-solar-probe-makes-history-with-closest-pass-to-sun/" target="_blank" rel="noopener">NASA</a>), not a speed it reaches near Earth &mdash; used here as our fastest machine, hypothetically let loose on this trip. The rifle bullet's 1&nbsp;km/s is a typical muzzle velocity (<a href="https://en.wikipedia.org/wiki/Muzzle_velocity" target="_blank" rel="noopener">Wikipedia</a>); the jet airliner's 0.25&nbsp;km/s (900&nbsp;km/h) a widebody's typical cruise speed (<a href="https://www.boeing.com/commercial/747-8/design-highlights" target="_blank" rel="noopener">Boeing 747-8</a>). Speed of sound: 343&nbsp;m/s in air (<a href="https://www.grc.nasa.gov/www/k-12/airplane/sound.html" target="_blank" rel="noopener">NASA Glenn</a>), 1,481&nbsp;m/s in fresh water (<a href="https://www.engineeringtoolbox.com/sound-speed-water-d_598.html" target="_blank" rel="noopener">The Engineering ToolBox</a>) &mdash; water genuinely beats a rifle bullet. The distance-crossed comparison below uses Mars, Jupiter, and Saturn's average distance from the Sun, not Earth (232, 795, and 1,511&nbsp;million&nbsp;km, <a href="https://spacemath.gsfc.nasa.gov/planets/10Page2.pdf" target="_blank" rel="noopener">NASA Goddard</a>), as a benchmark for the size of the number, not a claim about where light is actually headed.</p>
+  <p class="note">Speeds and sources: Parker Solar Probe's 192.2&nbsp;km/s is its record closest-approach speed near the Sun (<a href="https://science.nasa.gov/science-research/heliophysics/nasas-parker-solar-probe-makes-history-with-closest-pass-to-sun/" target="_blank" rel="noopener">NASA</a>), not a speed it reaches near Earth &mdash; used here as our fastest machine, hypothetically let loose on this trip. The rifle bullet's 1&nbsp;km/s is a typical muzzle velocity (<a href="https://en.wikipedia.org/wiki/Muzzle_velocity" target="_blank" rel="noopener">Wikipedia</a>); the jet airliner's 0.25&nbsp;km/s (900&nbsp;km/h) a widebody's typical cruise speed (<a href="https://www.boeing.com/commercial/747-8/design-highlights" target="_blank" rel="noopener">Boeing 747-8</a>). Speed of sound: 343&nbsp;m/s in air (<a href="https://www.grc.nasa.gov/www/k-12/airplane/sound.html" target="_blank" rel="noopener">NASA Glenn</a>), 1,481&nbsp;m/s in fresh water (<a href="https://www.engineeringtoolbox.com/sound-speed-water-d_598.html" target="_blank" rel="noopener">The Engineering ToolBox</a>) &mdash; water genuinely beats a rifle bullet. The distance-crossed comparison below uses Mars, Jupiter, and Saturn's average distance from the Sun, not Earth (228, 778, and 1,432&nbsp;million&nbsp;km, <a href="https://nssdc.gsfc.nasa.gov/planetary/factsheet/" target="_blank" rel="noopener">NASA Planetary Fact Sheet</a>), as a benchmark for the size of the number, not a claim about where light is actually headed.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -387,9 +387,9 @@
   // size-of-number benchmarks for the cumulative-distance gauge — see the note's sourcing.
   var MILESTONES = [
     { key:'moon',    name:'Moon',    km:384400 },
-    { key:'mars',    name:'Mars',    km:232000000 },
-    { key:'jupiter', name:'Jupiter', km:795200000 },
-    { key:'saturn',  name:'Saturn',  km:1511000000 }
+    { key:'mars',    name:'Mars',    km:227900000 },
+    { key:'jupiter', name:'Jupiter', km:778500000 },
+    { key:'saturn',  name:'Saturn',  km:1432000000 }
   ];
   var CUM_LOGMIN = 5, CUM_LOGMAX = 9.3;
 

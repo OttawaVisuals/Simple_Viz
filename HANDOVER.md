@@ -1,5 +1,90 @@
 # Handover
 
+## Physics and runtime fixes from a live-page review — 2026-08-23
+
+A deep review of the 17 pages linked from `index.html` turned up eight numeric/copy errors and
+two defects. All ten are fixed below; every fix was re-verified in-browser against a hand
+calculation, and all 17 pages were re-checked afterwards for console errors, thrown click
+handlers and horizontal overflow at 375px and 1280px (all clean).
+
+- **`mass-energy.html` — China's annual energy was 1000x too small.** `CHINA_ANNUAL_J` was
+  `168386888e9`, but the comment beside it correctly says *168,386,888 **TJ*** and 1 TJ = 1e12 J.
+  Every "years of China's total annual energy supply" row was therefore 1000x too high (1 kg of
+  matter appeared to be worth 0.53 years of it; the real figure is 5.3x10^-4). Now `e12`.
+  - The `1.5x China's yearly energy` preset had been calibrated against the *buggy* constant, so
+    its 2.81 kg was really 0.0015x. The honest mass for 1.5x is ~2,810 kg, above the slider's
+    1000 kg ceiling — so the preset is now **`½x China's yearly energy`** at `data-m="2.972"`
+    (936.8 kg), which lands on exactly 0.500x. The Sources note was updated to match.
+- **`mass-energy.html` — horizontal overflow at 375px** (document was 526px wide). Two
+  independent causes, both fixed: `#lblActual` ("zoom: first … of mc² — …") is left-anchored and
+  `white-space:nowrap`, so it ran to x=542; it now wraps inside the hero at narrow widths
+  (`geom()` returns `narrow` for this). And the stacked `.resultrow` used `1fr`, whose automatic
+  `min-content` floor was pinned at 460px by the fuel-picker pills; now
+  `minmax(0,1fr)` + `min-width:0` on `.ctrls`/`.result`. Verified 0 overflow at 320/375/414/700/820/1280.
+- **`earth-moon-race.html` — the magnification was 67x, not 81x.** Both rulers share one
+  viewBox, so the factor is `((ZOOM_X1−ZOOM_X0)/ZOOM_KM) / ((TRACK_X1−TRACK_X0)/D)` = **67.3x**.
+  Corrected in the in-diagram label and the closing note.
+- **`earth-moon-race.html` — wrong planet distances and a dead source.** The note claimed Mars,
+  Jupiter and Saturn sit 232 / 795 / 1,511 million km from the Sun; NASA's planetary fact sheet
+  gives **227.9 / 778.5 / 1,432** (Saturn was off by 5.5%). `MILESTONES` and the note now use those.
+  The cited `spacemath.gsfc.nasa.gov` URL no longer resolves at all — replaced with
+  `nssdc.gsfc.nasa.gov/planetary/factsheet/`. (A sweep of all 77 external links across the 17
+  live pages found this was the only dead one.)
+- **`index.html` — the braking tile said "stopping distance".** Stopping distance doesn't
+  quadruple; only the *braking* component goes as v², which is the page's whole point. The tile's
+  own `data-desc` and the page's `<h1>` both already said braking. Fixed to match.
+- **`constant-acceleration.html` — the slider maximum displayed "100% c".** `speed()` used a
+  fixed `maximumFractionDigits:6`, and `tanh(10)x100 = 99.9999996` rounds up to 100 — on a page
+  whose slider label says "never reaches c". The same saturation also made the top ~7 steps print
+  an identical "99.999999% c". Precision is now scaled to the remaining gap
+  (`ceil(-log10((1-b)*100))+1` decimals), so every attainable speed shows two significant digits
+  of its shortfall and every step is distinct. Slider max now reads **99.99999959% c**; the
+  static range label was corrected to match (it had said 99.999996%, a third different number).
+- **`cosmic-scale.html` — the scale-factor formula printed "= 0.0".** `factorText()` only used
+  scientific notation above 100, so for everything below the geometric midpoint (quark, weak
+  force, proton, virus — and the whole lower half of the slider) the line read
+  "(selected ÷ smallest) ÷ (biggest ÷ selected) = 0.0" while the headline above it showed the
+  reciprocal as e.g. 1.42x10^32. It now falls back to `sci()` below 0.1 as well: the quark reads
+  `7.03 x 10^-33`.
+- **`eratosthenes-shadow.html` — the "150 km apart" preset didn't reconcile.** It stored
+  `theta2:5.55`, off the angle sliders' 0.1° grid, so the legend showed Δθ = **1.3°** while the
+  circumference was computed from 1.35°: a reader doing 360x150/1.3 got 41,538 km, not the
+  40,000 km printed. Snapped to `theta2:5.5`. The preset now reads C = 41,538 km, D = 13,222 km,
+  **+3.8% off** — which is more honest anyway: a 150 km baseline *should* visibly amplify a
+  rounded angle, and the old preset implied it was as good as Eratosthenes' 800 km one.
+- **`eratosthenes-shadow.html` — the two "actual" figures disagreed.** The gauge compares against
+  the mean diameter (12,742 km, i.e. C = 40,030 km) while the effort line cited the *equatorial*
+  circumference (40,075 km). Two sticks on a shared meridian measure the north–south circle, so
+  that line now reads **"actual: 40,008 km through the poles"**.
+- **`microwave-chocolate.html` — "reset to 2.45 GHz" threw on every click.** `#freqReset` carries
+  `class="preset"` for its styling but has no `data-p`, so the shared handler ran
+  `presets[undefined].spacing` → `TypeError`. (The reset still worked — its own listener is
+  registered separately and later listeners survive an exception — but it was the only uncaught
+  error on the site.) The selector is now scoped to `.preset[data-p]`, with a `if(!p) return;`
+  guard behind it.
+
+### Two stale entries in this file, corrected
+
+- The straw-page entry below describes air as solved from the closed form
+  `p1²−p2² = G²fLRT/D` giving **222 kPa** for the Tim Vine preset. The shipped code implements the
+  fuller isothermal balance *including* the acceleration term,
+  `p1²−p2²−2G²RT·ln(p1/p2) = G²fLRT/D`, solved by bisection — which gives **235 kPa**. The page's
+  own `.note` describes the shipped version correctly; only this file was behind. Hand-verified.
+- The heat-pump entry's `+15°C` control point does not exist in `COP_CURVE`; the array goes
+  `-20, -15, -8, 0, 8, 20`. +15°C falls on the same straight extrapolated segment by
+  interpolation, so the behaviour is as described — only the wording is off.
+
+### Known, not fixed in this pass
+
+Style-level findings from the same review, left for a separate pass: `constant-acceleration.html`
+has no `data-feedback` section at all; `basic-functions.html` has a forked feedback block, a
+non-canonical brand wordmark and no `prefers-reduced-motion` (nor does `potato-trajectory.html`);
+the standing `--s1`–`--s5` series palette is used only by `constant-acceleration.html`, and the
+six pages inventing their own hexes declare no dark-mode variants (`braking-distance.html`'s
+snow label is `#AFC6DB` on the light background — 1.62:1); `time-dilation.html`'s `.lc-play`
+uses `color:#fff` instead of `var(--bg)`, 2.63:1 in dark mode; and `heat-pump-magic.html`'s
+equation box shows the Carnot COP while the headline reports the real machine's.
+
 ## Primary animation controls standardized — 2026-08-23
 
 - **`constant-acceleration.html`**, **`heat-pump-magic.html`**, and **`potato-trajectory.html`** now use the same filled accent playback pill as `well-depth.html`: play icon + clear action label, disabled running state, and replay label after completion.

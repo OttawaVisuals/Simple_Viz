@@ -85,7 +85,7 @@
   .hero .lbl.acc{color:var(--accent)}
 
   .resultrow{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,4vw,56px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
-  @media (max-width:820px){.resultrow{grid-template-columns:1fr}}
+  @media (max-width:820px){.resultrow{grid-template-columns:minmax(0,1fr)}.ctrls,.result{min-width:0}}
   .ctrls{display:flex;flex-direction:column;gap:clamp(22px,2.6vw,30px)}
   .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
   .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
@@ -260,13 +260,13 @@
     <button class="preset" data-m="-3">paperclip</button>
     <button class="preset" data-m="-2.1">coin</button>
     <button class="preset" data-m="0">1 kg</button>
-    <button class="preset" data-m="0.449">1.5&times; China's yearly energy</button>
+    <button class="preset" data-m="2.972">&frac12;&times; China's yearly energy</button>
     <button class="preset" data-m="2">100 kg</button>
   </div>
 
   <p class="note">Einstein's <a href="https://en.wikipedia.org/wiki/Mass%E2%80%93energy_equivalence" target="_blank" rel="noopener">mass&ndash;energy equivalence</a>, E = mc&sup2;, with c = 299,792,458 m/s so that every kilogram of mass is worth 89,875,517,873,681,764 joules if converted completely. This is not a promise that an ordinary object can release all of this energy &mdash; complete conversion is a useful theoretical comparison, not something real processes achieve; nuclear fission converts only a tiny fraction of a percent of its fuel's mass, for instance.</p>
 
-  <p class="note">Sources: TNT's yield (<a href="https://en.wikipedia.org/wiki/TNT_equivalent" target="_blank" rel="noopener">4.184&nbsp;MJ/kg</a>) is the defining value behind the &ldquo;tons of TNT&rdquo; unit; <a href="https://en.wikipedia.org/wiki/Gasoline#Energy_content" target="_blank" rel="noopener">gasoline's</a> (&asymp;46&nbsp;MJ/kg) is a standard lower-heating-value figure for motor fuel. <a href="https://en.wikipedia.org/wiki/Nuclear_fission" target="_blank" rel="noopener">Uranium&ndash;235 fission</a> is calculated from 200&nbsp;MeV released per fission event, a standard nuclear-physics figure. <a href="https://en.wikipedia.org/wiki/Proton%E2%80%93proton_chain" target="_blank" rel="noopener">Hydrogen fusion</a> uses the widely-cited &asymp;0.7% mass-to-energy conversion of the Sun's proton&ndash;proton chain. Matter&ndash;antimatter annihilation is definitionally 100%. China's total annual energy supply (used to calibrate the &ldquo;1.5&times;&rdquo; mass preset and its own row in the table) &mdash; 168,386,888&nbsp;TJ in 2023, the largest of any country or region &mdash; is from the <a href="https://www.iea.org/world/energy-mix" target="_blank" rel="noopener">IEA's World Energy Balances</a>. An average Canadian home's annual energy use, 87.6&nbsp;GJ (2023), is from <a href="https://oee.nrcan.gc.ca/corporate/statistics/neud/dpa/showTable.cfm?type=CP&amp;sector=res&amp;juris=ca&amp;year=2023&amp;rn=1&amp;page=0" target="_blank" rel="noopener">Natural Resources Canada</a>. The Ford&nbsp;F-150 round trip assumes a &asymp;4,600&nbsp;km one-way driving distance between Vancouver and Montreal and &asymp;12.5&nbsp;L/100&nbsp;km combined fuel consumption. The hamster-wheel figure assumes roughly 1&nbsp;W of mechanical output over 30 minutes, a rough order-of-magnitude estimate, not a measured figure. The marathon figure uses a commonly-cited &asymp;2,600&nbsp;kcal gross energy expenditure for an average runner completing 42.195&nbsp;km.</p>
+  <p class="note">Sources: TNT's yield (<a href="https://en.wikipedia.org/wiki/TNT_equivalent" target="_blank" rel="noopener">4.184&nbsp;MJ/kg</a>) is the defining value behind the &ldquo;tons of TNT&rdquo; unit; <a href="https://en.wikipedia.org/wiki/Gasoline#Energy_content" target="_blank" rel="noopener">gasoline's</a> (&asymp;46&nbsp;MJ/kg) is a standard lower-heating-value figure for motor fuel. <a href="https://en.wikipedia.org/wiki/Nuclear_fission" target="_blank" rel="noopener">Uranium&ndash;235 fission</a> is calculated from 200&nbsp;MeV released per fission event, a standard nuclear-physics figure. <a href="https://en.wikipedia.org/wiki/Proton%E2%80%93proton_chain" target="_blank" rel="noopener">Hydrogen fusion</a> uses the widely-cited &asymp;0.7% mass-to-energy conversion of the Sun's proton&ndash;proton chain. Matter&ndash;antimatter annihilation is definitionally 100%. China's total annual energy supply (used to calibrate the &ldquo;&frac12;&times;&rdquo; mass preset and its own row in the table) &mdash; 168,386,888&nbsp;TJ in 2023, the largest of any country or region &mdash; is from the <a href="https://www.iea.org/world/energy-mix" target="_blank" rel="noopener">IEA's World Energy Balances</a>. An average Canadian home's annual energy use, 87.6&nbsp;GJ (2023), is from <a href="https://oee.nrcan.gc.ca/corporate/statistics/neud/dpa/showTable.cfm?type=CP&amp;sector=res&amp;juris=ca&amp;year=2023&amp;rn=1&amp;page=0" target="_blank" rel="noopener">Natural Resources Canada</a>. The Ford&nbsp;F-150 round trip assumes a &asymp;4,600&nbsp;km one-way driving distance between Vancouver and Montreal and &asymp;12.5&nbsp;L/100&nbsp;km combined fuel consumption. The hamster-wheel figure assumes roughly 1&nbsp;W of mechanical output over 30 minutes, a rough order-of-magnitude estimate, not a measured figure. The marathon figure uses a commonly-cited &asymp;2,600&nbsp;kcal gross energy expenditure for an average runner completing 42.195&nbsp;km.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -393,7 +393,7 @@
     var barH = narrow ? 28 : 36;
     var frac = clamp((state.me-MMIN)/(MMAX-MMIN), 0, 1);
     var dotR = 14 + frac*32;
-    return { w:w, vbH:vbH, cy:cy, dotX:dotX, barX:barX, barW:barW, barH:barH, dotR:dotR, frac:frac, insetY:cy+barH/2+25, insetH:10 };
+    return { w:w, vbH:vbH, narrow:narrow, cy:cy, dotX:dotX, barX:barX, barW:barW, barH:barH, dotR:dotR, frac:frac, insetY:cy+barH/2+25, insetH:10 };
   }
 
   function massReference(m){
@@ -474,7 +474,11 @@
     lblFull.style.transform = 'translateX(-100%)';
     lblFull.textContent = 'theoretical full mc²: '+fmtEnergy(energy()).join(' ');
 
-    lblActual.style.left = px(g.barX); lblActual.style.top = py(g.insetY + g.insetH + 8);
+    lblActual.style.left = px(g.narrow ? 4 : g.barX); lblActual.style.top = py(g.insetY + g.insetH + 8);
+    // Left-anchored and normally nowrap; at narrow widths that runs past the right edge and
+    // pushes the whole page into horizontal overflow, so wrap it inside the hero instead.
+    lblActual.style.whiteSpace = g.narrow ? 'normal' : 'nowrap';
+    lblActual.style.maxWidth = g.narrow ? 'calc(100% - 8px)' : 'none';
     lblActual.style.color=f.color;
     lblActual.textContent = 'zoom: first '+fmtPct(zoomPct)+' of mc² — '+f.name.split(',')[0]+' fills '+fmtPct(zoomFill*100)+' of it';
 
@@ -585,7 +589,7 @@
   // expenditure for an average runner over 42.195 km, a commonly-cited estimate. Hamster
   // wheel: ~1 W mechanical output for 30 minutes, an order-of-magnitude estimate, not a
   // measured figure. See the Sources note below.
-  var CHINA_ANNUAL_J = 168386888e9;
+  var CHINA_ANNUAL_J = 168386888e12;  // 168,386,888 TJ -> J (1 TJ = 1e12 J)
   var CANADIAN_HOME_J = 87.6e9;
   var FORD_TRIP_J = (9200/100) * 12.5 * 34.3e6;
   var MARATHON_J = 2600 * 4184;

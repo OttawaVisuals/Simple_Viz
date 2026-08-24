@@ -641,7 +641,7 @@
     verdictEl.textContent = (errPct>=0?'+':'')+errPct.toFixed(1)+'%';
     verdictEl.style.color = resultColor;
     verdictSubEl.textContent = 'off from Earth’s true mean diameter of 12,742 km.';
-    effortLineEl.textContent = 'implied circumference: '+fmtKm(circumference())+' km (actual: 40,075 km)';
+    effortLineEl.textContent = 'implied circumference: '+fmtKm(circumference())+' km (actual: 40,008 km through the poles)';
 
     var markPct = pos(D);
     var limitPct = pos(TRUE_DIAM);
@@ -673,7 +673,7 @@
     var presets = {
       eratosthenes:{d:800,theta1:0,theta2:7.2},
       ten:{d:1112,theta1:2.5,theta2:12.5},
-      close:{d:150,theta1:4.2,theta2:5.55}
+      close:{d:150,theta1:4.2,theta2:5.5}
     };
     b.addEventListener('click', function(){
       var p = presets[b.dataset.p];

@@ -688,7 +688,14 @@
 
     var fromSmall=size/minEnd().size, toBig=maxEnd().size/size;
     var scaleRatio=fromSmall/toBig;
-    function factorText(value){ return value>=100 ? sci(value) : value.toFixed(value>=10?0:1); }
+    // Small values need scientific notation as much as large ones do: the ratio itself is
+    // below 1 for everything under the geometric midpoint, and a plain toFixed(1) printed
+    // it as a flat "0.0" that contradicted the reciprocal shown as the headline above it.
+    function factorText(value){
+      if(!isFinite(value) || value<=0) return '0';
+      if(value>=100 || value<0.1) return sci(value);
+      return value.toFixed(value>=10?0:1);
+    }
     if(!isFinite(scaleRatio)){
       linearValueEl.textContent='At smallest end';
       linearVerdictEl.textContent='The biggest end is closer in multiplicative size.';

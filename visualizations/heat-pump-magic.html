@@ -92,9 +92,9 @@
   .hero svg{width:100%;height:auto;display:block}
   .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
   .hero .lbl.big{font-size:12px}
-  .hero-playbar{display:flex;align-items:baseline;gap:12px;margin-top:8px;min-height:20px}
-  .hero-play{cursor:pointer;border:0;border-bottom:1px solid var(--line2);background:none;color:var(--fg);padding:0 0 2px;font:italic 14px/1.25 Georgia,"Iowan Old Style","Palatino Linotype",serif}
-  .hero-play:hover,.hero-play:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+  .hero-playbar{display:flex;align-items:center;gap:12px;margin-top:8px;min-height:36px}
+  .hero-play{cursor:pointer;border:1px solid var(--accent);border-radius:999px;background:var(--accent);color:var(--bg);padding:8px 13px;font:600 11px/1.3 ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 2px 5px rgba(0,0,0,.16);transition:transform .15s ease,box-shadow .15s ease}
+  .hero-play:hover{transform:translateY(-1px);box-shadow:0 4px 9px rgba(0,0,0,.2)}.hero-play:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.hero-play:disabled{cursor:progress;opacity:.72;transform:none;box-shadow:none}
   .hero-status{font:10.5px/1.45 ui-monospace,monospace;color:var(--muted);text-wrap:pretty}
   @media (max-width:520px){.hero-playbar{display:block}.hero-status{display:block;margin-top:5px}}
 
@@ -268,7 +268,7 @@
         <g id="energyParticles" aria-hidden="true"></g>
       </svg>
       <div class="hero-playbar">
-        <button class="hero-play" id="energyPlay" type="button">Play the full cycle</button>
+        <button class="hero-play" id="energyPlay" type="button">▶ Play the full cycle</button>
         <span class="hero-status" id="energyStatus" aria-live="polite"></span>
       </div>
     </div>
@@ -787,7 +787,8 @@
     energy.raf=null;
     energy.playing=false; energy.start=0; energy.progress=0;
     qcLine.style.strokeDashoffset='0px';qhLine.style.strokeDashoffset='0px';wLine.style.strokeDashoffset='0px';
-    energyPlay.textContent='Play the full cycle';
+    energyPlay.disabled=false;
+    energyPlay.textContent='▶ Play the full cycle';
     updateEnergyParticles();
   }
 
@@ -798,11 +799,13 @@
     if(reduceMotion){
       energy.playing=false; energy.progress=1;
       setEnergyStatus(energySummary());
-      energyPlay.textContent='Replay the full cycle';
+      energyPlay.disabled=false;
+      energyPlay.textContent='↻ Replay the full cycle';
       updateEnergyParticles();
       return;
     }
     energy.playing=true;
+    energyPlay.disabled=true;
     energyPlay.textContent='Playing…';
     setEnergyStatus(energyStage());
     updateEnergyParticles();
@@ -1160,7 +1163,8 @@
       energy.start=0;
       energy.raf=null;
       setEnergyStatus(energySummary());
-      energyPlay.textContent='Replay the full cycle';
+      energyPlay.disabled=false;
+      energyPlay.textContent='↻ Replay the full cycle';
       updateEnergyParticles();
       return;
     }

@@ -91,8 +91,8 @@
   .hero svg{width:100%;height:auto;display:block}
   .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
   .playbar{display:flex;align-items:center;gap:14px;margin-top:10px}
-  .playbtn{cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted2);border-radius:999px;padding:6px 16px;font:12px/1 ui-monospace,monospace;letter-spacing:.05em}
-  .playbtn:hover{color:var(--accent);border-color:var(--accent)}
+  .playbtn{cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--bg);border-radius:999px;padding:8px 13px;font:600 11px/1.3 ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 2px 5px rgba(0,0,0,.16);transition:transform .15s ease,box-shadow .15s ease}
+  .playbtn:hover{transform:translateY(-1px);box-shadow:0 4px 9px rgba(0,0,0,.2)}.playbtn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.playbtn:disabled{cursor:progress;opacity:.72;transform:none;box-shadow:none}
   .flighttxt{font:12px ui-monospace,monospace;color:var(--muted)}
 
   .resultrow{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
@@ -205,7 +205,7 @@
     <div class="lbl" id="lblZoom" style="transform:translateX(-100%)"></div>
     <svg id="heroSvg" role="img" aria-label="Side view of a throw from a release height, arcing toward a hole in the ground 3 metres away."></svg>
     <div class="playbar">
-      <button class="playbtn" id="throwBtn" type="button">&#9654; Throw</button>
+      <button class="playbtn" id="throwBtn" type="button">▶ Throw</button>
       <span class="flighttxt mono" id="flightTxt"></span>
     </div>
   </div>
@@ -649,6 +649,7 @@
   function resetThrow(){
     if(anim.raf) cancelAnimationFrame(anim.raf);
     anim.playing = false; anim.t = 0; anim.thrown = false;
+    throwBtn.disabled = false;
     throwBtn.textContent = '▶ Throw';
     flightTxt.textContent = '';
   }
@@ -660,7 +661,8 @@
     if(elapsed >= f.tLand){
       anim.t = f.tLand; anim.playing = false; anim.thrown = true;
       render();
-      throwBtn.textContent = '▶ Throw again';
+      throwBtn.disabled = false;
+      throwBtn.textContent = '↻ Throw again';
       return;
     }
     render();
@@ -668,7 +670,7 @@
   }
   throwBtn.addEventListener('click', function(){
     if(anim.raf) cancelAnimationFrame(anim.raf);
-    anim.playing = true; anim.t = 0; anim.start = 0; anim.thrown = false;
+    anim.playing = true; anim.t = 0; anim.start = 0; anim.thrown = false; throwBtn.disabled = true;
     throwBtn.textContent = 'Throwing…';
     anim.raf = requestAnimationFrame(stepAnim);
   });

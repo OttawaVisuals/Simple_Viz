@@ -1,5 +1,10 @@
 # Handover
 
+## Primary animation controls standardized — 2026-08-23
+
+- **`constant-acceleration.html`**, **`heat-pump-magic.html`**, and **`potato-trajectory.html`** now use the same filled accent playback pill as `well-depth.html`: play icon + clear action label, disabled running state, and replay label after completion.
+- Inline controls such as `basic-functions.html`'s Play/Pause remain text-styled because they assist a slider rather than start a page's primary animation.
+
 ## Constant acceleration promoted — 2026-08-23
 
 - **`visualizations/constant-acceleration.html`** is reviewed and complete. It was promoted from `unreviewed.html` to the main catalogue in `index.html`.

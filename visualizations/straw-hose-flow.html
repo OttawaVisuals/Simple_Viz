@@ -22,17 +22,17 @@
 <style>
   :root{
     --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
-    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;--s1:var(--accent);--s2:#D9A41F;--s3:#C4522B;--s4:#3E8E6E;--s5:#8A5AA8;
   }
   @media (prefers-color-scheme:dark){
     :root:not([data-theme="light"]){
       --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
-      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
-    }
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;--s1:var(--accent);--s2:#F0C766;--s3:#E08A6A;--s4:#6FBFA0;--s5:#B98FD4;
+  }
   }
   :root[data-theme="dark"]{
     --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
-    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;--s1:var(--accent);--s2:#F0C766;--s3:#E08A6A;--s4:#6FBFA0;--s5:#B98FD4;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
@@ -359,13 +359,13 @@
 <script>
 (function(){
   var LIQ = [
-    {key:'air',name:'Air',eta:1.81e-5,etaTxt:'1.8 × 10⁻⁵ Pa·s',rho:1.204,compressible:true,Q:3e-4,qTxt:'0.3 L/s',verb:'blow',color:'#8FA3B8',easy:5000,limit:20000,
+    {key:'air',name:'Air',eta:1.81e-5,etaTxt:'1.8 × 10⁻⁵ Pa·s',rho:1.204,compressible:true,Q:3e-4,qTxt:'0.3 L/s',verb:'blow',color:'var(--s4)',easy:5000,limit:20000,
      note:'Barely viscous — but you have to move a lot of it, fast.'},
-    {key:'water',name:'Water',eta:1.0e-3,etaTxt:'1.0 × 10⁻³ Pa·s',rho:1000,Q:5e-6,qTxt:'5 mL/s',verb:'suck',color:'#4E7FC4',easy:4000,limit:10000,
+    {key:'water',name:'Water',eta:1.0e-3,etaTxt:'1.0 × 10⁻³ Pa·s',rho:1000,Q:5e-6,qTxt:'5 mL/s',verb:'suck',color:'var(--s1)',easy:4000,limit:10000,
      note:'The baseline: 55 times thicker than air.'},
-    {key:'shake',name:'Milkshake',eta:0.3,etaTxt:'3.0 × 10⁻¹ Pa·s',rho:1030,Q:5e-6,qTxt:'5 mL/s',verb:'suck',color:'#C48AA8',easy:4000,limit:10000,
+    {key:'shake',name:'Milkshake',eta:0.3,etaTxt:'3.0 × 10⁻¹ Pa·s',rho:1030,Q:5e-6,qTxt:'5 mL/s',verb:'suck',color:'var(--s5)',easy:4000,limit:10000,
      note:'Three hundred times thicker than water.'},
-    {key:'honey',name:'Honey',eta:5,etaTxt:'5.0 Pa·s',rho:1420,Q:5e-6,qTxt:'5 mL/s',verb:'suck',color:'#C89A3F',easy:4000,limit:10000,
+    {key:'honey',name:'Honey',eta:5,etaTxt:'5.0 Pa·s',rho:1420,Q:5e-6,qTxt:'5 mL/s',verb:'suck',color:'var(--s2)',easy:4000,limit:10000,
      note:'Five thousand times thicker than water.'}
   ];
   var LMIN=0.1, LMAX=10, DMIN=1.5, DMAX=10;

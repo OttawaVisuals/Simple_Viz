@@ -22,17 +22,17 @@
 <style>
   :root{
     --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
-    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;--s1:var(--accent);--s2:#D9A41F;--s3:#C4522B;--s4:#3E8E6E;--s5:#8A5AA8;
   }
   @media (prefers-color-scheme:dark){
     :root:not([data-theme="light"]){
       --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
-      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
-    }
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;--s1:var(--accent);--s2:#F0C766;--s3:#E08A6A;--s4:#6FBFA0;--s5:#B98FD4;
+  }
   }
   :root[data-theme="dark"]{
     --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
-    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;--s1:var(--accent);--s2:#F0C766;--s3:#E08A6A;--s4:#6FBFA0;--s5:#B98FD4;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
@@ -361,11 +361,11 @@
   // widely-cited astrophysics figure), and full matter-antimatter annihilation as the
   // 100% ceiling. See the Sources note below the page.
   var FUELS = [
-    { name:'TNT, exploding',      spec:4.184e6, color:'#D45B3F' },
-    { name:'Gasoline, burning',   spec:46e6, color:'#C98332' },
-    { name:'Uranium-235, fissioning', spec:8.213e13, color:'#7D6CC4' },
-    { name:'Hydrogen, fusing (as in the Sun)', spec:6.29e14, color:'#D4A72C' },
-    { name:'Matter and antimatter, annihilating', spec:C*C, color:'#2F8D79' }
+    { name:'TNT, exploding',      spec:4.184e6, color:'var(--s3)' },
+    { name:'Gasoline, burning',   spec:46e6, color:'var(--s2)' },
+    { name:'Uranium-235, fissioning', spec:8.213e13, color:'var(--s5)' },
+    { name:'Hydrogen, fusing (as in the Sun)', spec:6.29e14, color:'var(--s1)' },
+    { name:'Matter and antimatter, annihilating', spec:C*C, color:'var(--s4)' }
   ];
   FUELS.forEach(function(f){ f.pct = f.spec/(C*C)*100; });
   var fuelState = { fuel: 1 }; // default: gasoline

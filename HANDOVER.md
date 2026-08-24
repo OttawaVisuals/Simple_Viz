@@ -1,5 +1,67 @@
 # Handover
 
+## Style-guide conformance pass across the live pages — 2026-08-23
+
+Second half of the live-page review (the physics/runtime half is the entry below). All nine
+style findings are fixed. Re-verified across all 17 pages afterwards: no console errors, no
+thrown click handlers, no horizontal overflow at 375px or 1280px, and every page now reports
+a canonical feedback block, the brand wordmark, and full canonical/OG metadata.
+
+- **`constant-acceleration.html` had no feedback section at all** — the only live page missing
+  it. Ported the canonical CSS, markup and IIFE verbatim from `straw-hose-flow.html`.
+- **`basic-functions.html` had a forked feedback block** — its own heading ("Was this useful?"),
+  its own choices (Useful/Confusing/I have an idea), `maxlength="2000"` against the canonical
+  1200, and bespoke JS with no honeypot, no context collector and no `file:` fallback. Replaced
+  wholesale with the canonical copy. Its brand mark was also a plain `<span>madeclear</span>`
+  rather than the `m·ade·c·lear` wordmark; it now uses the standard markup plus the
+  `.brand-word` rules (verified identical 61px metrics against `straw-hose-flow.html`).
+- **Series palette adopted on four pages.** `mass-energy`, `heat-pump-magic`, `straw-hose-flow`
+  and `reynolds-number` now use `--s1`–`--s5` instead of per-page hexes, mapped by closest hue
+  so nothing visually scrambles. The two fluid pages now agree colour-for-colour, which they
+  didn't before. See STYLE_GUIDE.md for the mapping and the reasoning.
+- **`braking-distance.html` keeps its road palette, as a documented exception** — the standing
+  set's hues fight the concept there (dry asphalt isn't blue, ice isn't green). Its four
+  surfaces are now real tokens with light *and* dark values. **This fixed a live legibility
+  bug:** snow was `#AFC6DB` in both themes and that colour is applied to the gauge's *label
+  text*, so it rendered at 1.62:1 on the light background. Measured after: snow 2.91 light /
+  9.86 dark, ice 3.64 / 8.52, all four surfaces now in a consistent band in both themes.
+- **`time-dilation.html`'s play button used `color:#fff`** where every other primary playback
+  pill uses `color:var(--bg)` — 2.63:1 against the dark-mode accent, versus 6.60:1 for the
+  token. Also brought its font-size, letter-spacing, uppercase and shadow into line with the
+  other five.
+- **`heat-pump-magic.html`'s equation box reported a different number than it displayed.** The
+  box showed the Carnot formula (18.4× at 5°C) while the headline showed the real machine's COP
+  (3.72×) from the Daikin curve. Restructured into the same two-equation `eqn-stack` pattern
+  `straw-hose-flow.html` uses: `COP = Q_H/W` active and tagged with the live value
+  ("heat pump · 3.72×"), the Carnot expression dimmed and tagged as the ceiling
+  ("Carnot ceiling · 18.4×", or "heat pumps only" for the electric/gas devices). Same class of
+  fix as the straw page's, same reason.
+- **`prefers-reduced-motion` added to the two pages missing it.** `basic-functions.html`
+  autoplayed a continuous loop on load with no way to have opted out; it now starts paused
+  under reduced motion and sets the button label from state rather than hardcoding "Pause".
+  `potato-trajectory.html` now jumps straight to the landed state instead of playing the arc.
+- **Metadata gaps closed.** `basic-functions`, `cosmic-scale`, `reynolds-number` and
+  `well-depth` had no canonical link, no OG/Twitter tags and no meta description;
+  `constant-acceleration` had description + canonical but no OG set. All five now match the
+  12 pages that already had the full block.
+- **Three subtitles carried no real number**, against CLAUDE.md's "states the real numbers and
+  the concept in one breath". Rewritten to ~40 words, two sentences, keeping second person:
+  `cosmic-scale` (62 orders of magnitude; a 1.7 m human at 57%), `shelf-sag` (60 kg on a 1.2 m
+  shelf bends 4 mm, past L/360), `basic-functions` (sine repeats every 2π; a hair and Earth's
+  diameter are 11 powers of ten apart).
+- Also corrected in passing: `heat-pump-magic.html`'s gas-furnace note said COP "sits just under
+  1" for a value of 0.90, which is 10% short, not "just under".
+
+### Note for whoever measures this next
+
+Two measurement traps cost time here, both harness artifacts rather than page bugs. When the
+Browser pane is hidden the page stops compositing, so (a) `getComputedStyle().color` on any
+element with a `color` transition returns the frozen pre-transition value — inject
+`*{transition:none!important}` before reading colours — and (b) `requestAnimationFrame` never
+fires in an offscreen iframe, so animated readouts look stuck. Also: `python -m http.server`
+serves `304`s aggressively, so append a cache-busting query string when re-checking a file you
+just edited, or you will verify the old bytes.
+
 ## Physics and runtime fixes from a live-page review — 2026-08-23
 
 A deep review of the 17 pages linked from `index.html` turned up eight numeric/copy errors and
@@ -76,14 +138,8 @@ handlers and horizontal overflow at 375px and 1280px (all clean).
 
 ### Known, not fixed in this pass
 
-Style-level findings from the same review, left for a separate pass: `constant-acceleration.html`
-has no `data-feedback` section at all; `basic-functions.html` has a forked feedback block, a
-non-canonical brand wordmark and no `prefers-reduced-motion` (nor does `potato-trajectory.html`);
-the standing `--s1`–`--s5` series palette is used only by `constant-acceleration.html`, and the
-six pages inventing their own hexes declare no dark-mode variants (`braking-distance.html`'s
-snow label is `#AFC6DB` on the light background — 1.62:1); `time-dilation.html`'s `.lc-play`
-uses `color:#fff` instead of `var(--bg)`, 2.63:1 in dark mode; and `heat-pump-magic.html`'s
-equation box shows the Carnot COP while the headline reports the real machine's.
+Style-level findings from the same review were left for a separate pass — **all of them were
+fixed the same day; see the style-guide conformance entry above.**
 
 ## Primary animation controls standardized — 2026-08-23
 

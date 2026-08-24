@@ -668,8 +668,17 @@
     render();
     anim.raf = requestAnimationFrame(stepAnim);
   }
+  // Reduced motion: jump straight to the landed state rather than playing the arc out, the
+  // same bounded-sequence treatment the other playback pages use.
+  var reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   throwBtn.addEventListener('click', function(){
     if(anim.raf) cancelAnimationFrame(anim.raf);
+    if(reduceMotion){
+      anim.playing = false; anim.t = flight().tLand; anim.thrown = true;
+      render();
+      throwBtn.textContent = '↻ Throw again';
+      return;
+    }
     anim.playing = true; anim.t = 0; anim.start = 0; anim.thrown = false; throwBtn.disabled = true;
     throwBtn.textContent = 'Throwing…';
     anim.raf = requestAnimationFrame(stepAnim);

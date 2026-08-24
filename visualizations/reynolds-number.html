@@ -3,21 +3,37 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>When smooth flow breaks into turbulence</title>
+<meta name="description" content="Change the flow, the fluid or the pipe and watch the Reynolds number cross from smooth laminar flow into turbulence.">
+<link rel="canonical" href="https://madeclear.ca/visualizations/reynolds-number">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Made clear">
+<meta property="og:title" content="When smooth flow breaks into turbulence">
+<meta property="og:description" content="Change the flow, the fluid or the pipe and watch the Reynolds number cross from smooth laminar flow into turbulence.">
+<meta property="og:url" content="https://madeclear.ca/visualizations/reynolds-number">
+<meta property="og:image" content="https://madeclear.ca/assets/brand/madeclear-social-wide-1200x630.png">
+<meta property="og:image:secure_url" content="https://madeclear.ca/assets/brand/madeclear-social-wide-1200x630.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Made clear — Physics you can see">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://madeclear.ca/assets/brand/madeclear-social-wide-1200x630.png">
+<meta name="twitter:image:alt" content="Made clear — Physics you can see">
 <style>
   :root{
     --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
     --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--track:#E2DDD2;
-    --laminar:#357F99;--transition:#A77B2E;--turbulent:#B85F52;--bad:#A83D2A;
+    --laminar:#357F99;--transition:#A77B2E;--turbulent:#B85F52;--bad:#A83D2A;--s1:var(--accent);--s2:#D9A41F;--s3:#C4522B;--s4:#3E8E6E;--s5:#8A5AA8;
   }
   @media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
     --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
     --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--track:#28304A;
-    --laminar:#6DBAD3;--transition:#D6A750;--turbulent:#E58C80;--bad:#E68075;
+    --laminar:#6DBAD3;--transition:#D6A750;--turbulent:#E58C80;--bad:#E68075;--s1:var(--accent);--s2:#F0C766;--s3:#E08A6A;--s4:#6FBFA0;--s5:#B98FD4;
   }}
   :root[data-theme="dark"]{
     --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
     --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--track:#28304A;
-    --laminar:#6DBAD3;--transition:#D6A750;--turbulent:#E58C80;--bad:#E68075;
+    --laminar:#6DBAD3;--transition:#D6A750;--turbulent:#E58C80;--bad:#E68075;--s1:var(--accent);--s2:#F0C766;--s3:#E08A6A;--s4:#6FBFA0;--s5:#B98FD4;
   }
   *{box-sizing:border-box}html,body{margin:0;padding:0}
   body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
@@ -78,10 +94,10 @@
 <script>
 (function(){
   var FLUIDS=[
-    {key:'air',name:'Air',rho:1.204,mu:1.81e-5,muTxt:'1.81 × 10⁻⁵ Pa·s',color:'#8FA3B8',note:'Low density, but extremely low viscosity. Re rises quickly once air moves fast.'},
-    {key:'water',name:'Water',rho:1000,mu:1e-3,muTxt:'1.00 × 10⁻³ Pa·s',color:'#4E7FC4',note:'The straw-page baseline. At 5 mL/s and 3 mm diameter it sits just below transition.'},
-    {key:'shake',name:'Milkshake',rho:1030,mu:.3,muTxt:'0.30 Pa·s',color:'#C48AA8',note:'A representative effective viscosity: thick enough to keep these flows strongly laminar.'},
-    {key:'honey',name:'Honey',rho:1420,mu:5,muTxt:'5.0 Pa·s',color:'#C89A3F',note:'Thousands of times more viscous than water, so viscosity overwhelms inertia here.'}
+    {key:'air',name:'Air',rho:1.204,mu:1.81e-5,muTxt:'1.81 × 10⁻⁵ Pa·s',color:'var(--s4)',note:'Low density, but extremely low viscosity. Re rises quickly once air moves fast.'},
+    {key:'water',name:'Water',rho:1000,mu:1e-3,muTxt:'1.00 × 10⁻³ Pa·s',color:'var(--s1)',note:'The straw-page baseline. At 5 mL/s and 3 mm diameter it sits just below transition.'},
+    {key:'shake',name:'Milkshake',rho:1030,mu:.3,muTxt:'0.30 Pa·s',color:'var(--s5)',note:'A representative effective viscosity: thick enough to keep these flows strongly laminar.'},
+    {key:'honey',name:'Honey',rho:1420,mu:5,muTxt:'5.0 Pa·s',color:'var(--s2)',note:'Thousands of times more viscous than water, so viscosity overwhelms inertia here.'}
   ];
   var LOGQ_MIN=-6,LOGQ_MAX=Math.log10(3e-4),D_MIN=1.5,D_MAX=30;
   var state={fluid:1,logQ:Math.log10(5e-6),diam:3,active:null,drag:null};

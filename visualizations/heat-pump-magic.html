@@ -22,17 +22,17 @@
 <style>
   :root{
     --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
-    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;--s1:var(--accent);--s2:#D9A41F;--s3:#C4522B;--s4:#3E8E6E;--s5:#8A5AA8;
   }
   @media (prefers-color-scheme:dark){
     :root:not([data-theme="light"]){
       --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
-      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
-    }
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;--s1:var(--accent);--s2:#F0C766;--s3:#E08A6A;--s4:#6FBFA0;--s5:#B98FD4;
+  }
   }
   :root[data-theme="dark"]{
     --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
-    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;--s1:var(--accent);--s2:#F0C766;--s3:#E08A6A;--s4:#6FBFA0;--s5:#B98FD4;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
@@ -68,7 +68,7 @@
   .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0;text-wrap:pretty}
 
   .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
-  .eqn{display:flex;align-items:center;gap:clamp(8px,1.2vw,14px);font-size:clamp(26px,3.6vw,40px);line-height:1;font-weight:300}
+  .eqn-stack{display:flex;flex-direction:column;align-items:center;gap:clamp(10px,1.6vw,18px)}.eqn-group{display:flex;flex-direction:column;align-items:center;gap:5px;transition:opacity .25s ease}.eqn-group.inactive{opacity:.32}.eqn-tag{font:500 10px ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);transition:color .25s ease}.eqn-group:not(.inactive) .eqn-tag{color:var(--accent)}.eqn{display:flex;align-items:center;gap:clamp(6px,1vw,10px);font-size:clamp(19px,2.5vw,28px);line-height:1;font-weight:300}
   .eqn .eq{color:var(--muted)}
   .eqn .frac{display:inline-flex;flex-direction:column;align-items:center}
   .eqn .frac .row{display:flex;gap:.16em;align-items:flex-start}
@@ -228,14 +228,31 @@
     </div>
 
     <div class="eqnbox">
-      <div class="eqn">
-        <span>COP</span>
-        <span class="eq">=</span>
-        <span class="frac">
-          <span class="row num"><em id="thTerm">T<sub>H</sub></em></span>
-          <span class="bar"></span>
-          <span class="row den"><em id="thTerm2">T<sub>H</sub></em><span class="eq">&minus;</span><em id="tcTerm">T<sub>C</sub></em></span>
-        </span>
+      <div class="eqn-stack">
+        <div class="eqn-group" id="eqnGroupDef">
+          <div class="eqn-tag" id="defTag">what this page reports</div>
+          <div class="eqn">
+            <span>COP</span>
+            <span class="eq">=</span>
+            <span class="frac">
+              <span class="row num"><em>Q<sub>H</sub></em></span>
+              <span class="bar"></span>
+              <span class="row den"><em>W</em></span>
+            </span>
+          </div>
+        </div>
+        <div class="eqn-group inactive" id="eqnGroupCarnot">
+          <div class="eqn-tag" id="carnotTag">Carnot ceiling</div>
+          <div class="eqn">
+            <span>COP</span>
+            <span class="eq">=</span>
+            <span class="frac">
+              <span class="row num"><em id="thTerm">T<sub>H</sub></em></span>
+              <span class="bar"></span>
+              <span class="row den"><em id="thTerm2">T<sub>H</sub></em><span class="eq">&minus;</span><em id="tcTerm">T<sub>C</sub></em></span>
+            </span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -280,7 +297,7 @@
       <div class="chart-legend">
         <span><i style="border-color:var(--accent)"></i>real heat pump</span>
         <span><i class="dashed" style="border-color:var(--line2)"></i>Carnot ceiling</span>
-        <span><i style="border-color:#C4703F"></i>gas furnace, 90%</span>
+        <span><i style="border-color:var(--s3)"></i>gas furnace, 90%</span>
       </div>
     </div>
   </div>
@@ -400,7 +417,7 @@
   var DEVICES = [
     {key:'hp', name:'Heat pump', input:'electricity', inputSym:'W', icon:'plug', note:'Moves heat with a refrigeration cycle — can deliver more heat than the electricity it uses.'},
     {key:'electric', name:'Electric heater', input:'electricity', inputSym:'W', icon:'plug', note:'Converts electricity straight to heat (a resistance element) — capped at COP 1, no matter the weather.'},
-    {key:'gas', name:'Natural gas', input:'fuel', inputSym:'Fuel', icon:'flame', note:'Burns fuel directly, no refrigeration cycle — about 10% of the energy escapes up the flue, so COP sits just under 1, regardless of outdoor temperature.'}
+    {key:'gas', name:'Natural gas', input:'fuel', inputSym:'Fuel', icon:'flame', note:'Burns fuel directly, no refrigeration cycle — about 10% of the energy escapes up the flue, so COP sits at about 0.9, regardless of outdoor temperature.'}
   ];
   var TC_MIN=-20, TC_MAX=20;
   var TH_C = 21; // fixed indoor target, °C
@@ -535,15 +552,15 @@
     if(state.Tc<=0){
       [[-18,-28],[4,-31],[19,-18]].forEach(function(p){
         var x=h.cloudX+p[0],y=h.cy+p[1];
-        addLine(weatherDetails,x-3,y,x+3,y,'#5B8FBF',1,.75);
-        addLine(weatherDetails,x,y-3,x,y+3,'#5B8FBF',1,.75);
+        addLine(weatherDetails,x-3,y,x+3,y,'var(--s1)',1,.75);
+        addLine(weatherDetails,x,y-3,x,y+3,'var(--s1)',1,.75);
       });
     }else if(state.Tc>=9){
       var sx=h.cloudX-13,sy=h.cy-30;
-      weatherDetails.appendChild(el('circle',{cx:sx,cy:sy,r:5,fill:'none',stroke:'#C9A227','stroke-width':1.2,opacity:.8}));
+      weatherDetails.appendChild(el('circle',{cx:sx,cy:sy,r:5,fill:'none',stroke:'var(--s2)','stroke-width':1.2,opacity:.8}));
       for(var a=0;a<8;a++){
         var ang=a*Math.PI/4;
-        addLine(weatherDetails,sx+Math.cos(ang)*8,sy+Math.sin(ang)*8,sx+Math.cos(ang)*11,sy+Math.sin(ang)*11,'#C9A227',1,.7);
+        addLine(weatherDetails,sx+Math.cos(ang)*8,sy+Math.sin(ang)*8,sx+Math.cos(ang)*11,sy+Math.sin(ang)*11,'var(--s2)',1,.7);
       }
     }
   }
@@ -556,19 +573,19 @@
       // outside/electrical energy that ultimately leaves through the indoor condenser.
       var evap={x:x+w*.18,y:cy},comp={x:cx,y:y+hh*.74},cond={x:x+w*.82,y:cy},valve={x:cx,y:y+hh*.25};
       h.cycle={evap:evap,comp:comp,cond:cond,valve:valve};
-      unitDetails.appendChild(el('path',{d:'M'+evap.x+' '+evap.y+' L'+comp.x+' '+comp.y,fill:'none',stroke:'#5B8FBF','stroke-width':2.2,'stroke-dasharray':'5 4','stroke-linecap':'round'}));
-      unitDetails.appendChild(el('path',{d:'M'+comp.x+' '+comp.y+' L'+cond.x+' '+cond.y,fill:'none',stroke:'#C4703F','stroke-width':2.8,'stroke-dasharray':'6 4','stroke-linecap':'round'}));
-      unitDetails.appendChild(el('path',{d:'M'+cond.x+' '+cond.y+' L'+valve.x+' '+valve.y,fill:'none',stroke:'#C4703F','stroke-width':2,'stroke-dasharray':'3 3','stroke-linecap':'round'}));
-      unitDetails.appendChild(el('path',{d:'M'+valve.x+' '+valve.y+' L'+evap.x+' '+evap.y,fill:'none',stroke:'#5B8FBF','stroke-width':2,'stroke-dasharray':'3 3','stroke-linecap':'round'}));
+      unitDetails.appendChild(el('path',{d:'M'+evap.x+' '+evap.y+' L'+comp.x+' '+comp.y,fill:'none',stroke:'var(--s1)','stroke-width':2.2,'stroke-dasharray':'5 4','stroke-linecap':'round'}));
+      unitDetails.appendChild(el('path',{d:'M'+comp.x+' '+comp.y+' L'+cond.x+' '+cond.y,fill:'none',stroke:'var(--s3)','stroke-width':2.8,'stroke-dasharray':'6 4','stroke-linecap':'round'}));
+      unitDetails.appendChild(el('path',{d:'M'+cond.x+' '+cond.y+' L'+valve.x+' '+valve.y,fill:'none',stroke:'var(--s3)','stroke-width':2,'stroke-dasharray':'3 3','stroke-linecap':'round'}));
+      unitDetails.appendChild(el('path',{d:'M'+valve.x+' '+valve.y+' L'+evap.x+' '+evap.y,fill:'none',stroke:'var(--s1)','stroke-width':2,'stroke-dasharray':'3 3','stroke-linecap':'round'}));
 
       // Evaporator and condenser coils.
       [evap,cond].forEach(function(node,index){
-        var col=index===0?'#5B8FBF':'#C4703F',coil='M'+(node.x-8)+' '+(node.y-11);
+        var col=index===0?'var(--s1)':'var(--s3)',coil='M'+(node.x-8)+' '+(node.y-11);
         for(var row=0;row<4;row++) coil+=' L'+(node.x+(row%2? -8:8))+' '+(node.y-11+(row+1)*5.5);
         unitDetails.appendChild(el('path',{d:coil,fill:'none',stroke:col,'stroke-width':2,'stroke-linecap':'round','stroke-linejoin':'round'}));
       });
-      unitDetails.appendChild(el('circle',{cx:comp.x,cy:comp.y,r:9,fill:'var(--bg)',stroke:'#C9A227','stroke-width':1.8}));
-      unitDetails.appendChild(el('path',{d:'M'+(comp.x-4)+' '+comp.y+' q4 -5 8 0 q-4 5 -8 0',fill:'none',stroke:'#C9A227','stroke-width':1.3}));
+      unitDetails.appendChild(el('circle',{cx:comp.x,cy:comp.y,r:9,fill:'var(--bg)',stroke:'var(--s2)','stroke-width':1.8}));
+      unitDetails.appendChild(el('path',{d:'M'+(comp.x-4)+' '+comp.y+' q4 -5 8 0 q-4 5 -8 0',fill:'none',stroke:'var(--s2)','stroke-width':1.3}));
       unitDetails.appendChild(el('path',{d:'M'+(valve.x-8)+' '+(valve.y-5)+' L'+valve.x+' '+valve.y+' L'+(valve.x-8)+' '+(valve.y+5)+' M'+(valve.x+8)+' '+(valve.y-5)+' L'+valve.x+' '+valve.y+' L'+(valve.x+8)+' '+(valve.y+5),fill:'none',stroke:'var(--muted2)','stroke-width':1.4,'stroke-linejoin':'round'}));
 
       var labelSize=w<170?8.8:9.4;
@@ -579,8 +596,8 @@
     }else if(d.key==='electric'){
       var left=x+w*.18,right=x+w*.82,top=y+hh*.27,step=(right-left)/8,path='M'+left+' '+top;
       for(var e=1;e<=8;e++) path+=' L'+(left+e*step)+' '+(top+(e%2?14:-2));
-      unitDetails.appendChild(el('path',{d:path,fill:'none',stroke:'#C4703F','stroke-width':2.4,'stroke-linecap':'round','stroke-linejoin':'round'}));
-      for(var er=0;er<3;er++) unitDetails.appendChild(el('path',{d:'M'+(left+10+er*20)+' '+(y+hh*.68)+' q7 -7 14 0',fill:'none',stroke:'#C4703F','stroke-width':1.2,opacity:.7}));
+      unitDetails.appendChild(el('path',{d:path,fill:'none',stroke:'var(--s3)','stroke-width':2.4,'stroke-linecap':'round','stroke-linejoin':'round'}));
+      for(var er=0;er<3;er++) unitDetails.appendChild(el('path',{d:'M'+(left+10+er*20)+' '+(y+hh*.68)+' q7 -7 14 0',fill:'none',stroke:'var(--s3)','stroke-width':1.2,opacity:.7}));
     }else{
       var fx=cx,fy=y+hh*.55;
       unitDetails.appendChild(el('path',{d:'M'+fx+' '+(fy-22)+' C'+(fx+12)+' '+(fy-10)+' '+(fx+9)+' '+(fy+4)+' '+fx+' '+(fy+8)+' C'+(fx-10)+' '+(fy+4)+' '+(fx-12)+' '+(fy-10)+' '+fx+' '+(fy-22)+' Z',fill:'color-mix(in srgb,var(--bad) 12%,var(--bg))',stroke:'var(--bad)','stroke-width':1.5,'stroke-linejoin':'round'}));
@@ -593,8 +610,8 @@
     energyParticles.innerHTML='';
     heroRefrigerant.innerHTML='';
     energy.geom=h;
-    var streams=[{key:'w',count:4,color:'#C9A227',r:2.6},{key:'qh',count:Math.min(9,Math.max(4,Math.round(c*1.6))),color:'#C4703F',r:3.1}];
-    if(d.key==='hp') streams.push({key:'qc',count:Math.min(8,Math.max(3,Math.round((c-1)*1.8))),color:'#5B8FBF',r:3});
+    var streams=[{key:'w',count:4,color:'var(--s2)',r:2.6},{key:'qh',count:Math.min(9,Math.max(4,Math.round(c*1.6))),color:'var(--s3)',r:3.1}];
+    if(d.key==='hp') streams.push({key:'qc',count:Math.min(8,Math.max(3,Math.round((c-1)*1.8))),color:'var(--s1)',r:3});
     if(d.key==='gas') streams.push({key:'loss',count:2,color:'var(--bad)',r:2.8});
     streams.forEach(function(stream){
       for(var i=0;i<stream.count;i++){
@@ -602,7 +619,7 @@
       }
     });
     if(d.key==='hp'&&h.cycle){
-      for(var rp=0;rp<7;rp++) heroRefrigerant.appendChild(el('circle',{r:2.5,fill:'#5B8FBF',opacity:0,'data-cycle-index':rp}));
+      for(var rp=0;rp<7;rp++) heroRefrigerant.appendChild(el('circle',{r:2.5,fill:'var(--s1)',opacity:0,'data-cycle-index':rp}));
     }
     updateEnergyParticles();
   }
@@ -637,7 +654,7 @@
         if(f<0) f+=1;
         var seg=Math.min(3,Math.floor(f*4)),q=f*4-seg,a=pts[seg],b=pts[seg+1];
         dot.setAttribute('cx',a.x+(b.x-a.x)*q);dot.setAttribute('cy',a.y+(b.y-a.y)*q);
-        dot.setAttribute('fill',seg===0||seg===3?'#5B8FBF':'#C4703F');
+        dot.setAttribute('fill',seg===0||seg===3?'var(--s1)':'var(--s3)');
         dot.setAttribute('opacity',energy.playing ? .95 : 0);
       });
     }
@@ -679,9 +696,9 @@
     var roof = el('polygon', {points: (hx-hw/2-3)+','+(hy-hh/2)+' '+hx+','+(hy-hh/2-14)+' '+(hx+hw/2+3)+','+(hy-hh/2), fill:'var(--bg)', stroke:'var(--line2)', 'stroke-width':1.25});
     var body = el('rect', {x:hx-hw/2, y:hy-hh/2, width:hw, height:hh, fill:'var(--bg)', stroke:'var(--line2)', 'stroke-width':1.25});
     var door = el('rect', {x:hx-4, y:hy+hh/2-12, width:8, height:12, fill:'none', stroke:'var(--line2)', 'stroke-width':1});
-    var windowPane = el('rect', {x:hx-12, y:hy-5, width:7, height:7, fill:'color-mix(in srgb,#C4703F 12%,var(--bg))', stroke:'var(--line2)', 'stroke-width':.8});
+    var windowPane = el('rect', {x:hx-12, y:hy-5, width:7, height:7, fill:'color-mix(in srgb,var(--s3) 12%,var(--bg))', stroke:'var(--line2)', 'stroke-width':.8});
     houseIcon.appendChild(roof); houseIcon.appendChild(body); houseIcon.appendChild(door); houseIcon.appendChild(windowPane);
-    for(var wave=0;wave<3;wave++) houseIcon.appendChild(el('path',{d:'M'+(hx-11+wave*8)+' '+(hy+8)+' q4 -5 8 0',fill:'none',stroke:'#C4703F','stroke-width':1,opacity:.7,'stroke-linecap':'round'}));
+    for(var wave=0;wave<3;wave++) houseIcon.appendChild(el('path',{d:'M'+(hx-11+wave*8)+' '+(hy+8)+' q4 -5 8 0',fill:'none',stroke:'var(--s3)','stroke-width':1,opacity:.7,'stroke-linecap':'round'}));
 
     // input icon: plug for electricity, flame for gas
     plugIcon.innerHTML='';
@@ -701,19 +718,19 @@
     // Qc arrow (outside -> unit), only meaningful for heat pump
     qcLine.setAttribute('x1', h.qcX1); qcLine.setAttribute('x2', h.qcX2);
     qcLine.setAttribute('y1', h.cy); qcLine.setAttribute('y2', h.cy);
-    qcLine.setAttribute('stroke', '#5B8FBF'); qcLine.setAttribute('stroke-width', h.qcW);
+    qcLine.setAttribute('stroke', 'var(--s1)'); qcLine.setAttribute('stroke-width', h.qcW);
     qcLine.setAttribute('stroke-dasharray', '9 10'); qcLine.setAttribute('opacity', isHp ? 0.85 : 0);
 
     // Qh arrow (unit -> house)
     qhLine.setAttribute('x1', h.qhX1); qhLine.setAttribute('x2', h.qhX2);
     qhLine.setAttribute('y1', h.cy); qhLine.setAttribute('y2', h.cy);
-    qhLine.setAttribute('stroke', '#C4703F'); qhLine.setAttribute('stroke-width', h.qhW);
+    qhLine.setAttribute('stroke', 'var(--s3)'); qhLine.setAttribute('stroke-width', h.qhW);
     qhLine.setAttribute('stroke-dasharray', '9 10'); qhLine.setAttribute('opacity', 0.9);
 
     // W arrow (plug -> unit, vertical)
     wLine.setAttribute('x1', h.plugX); wLine.setAttribute('x2', h.plugX);
     wLine.setAttribute('y1', h.wY1); wLine.setAttribute('y2', h.wY2);
-    wLine.setAttribute('stroke', '#C9A227'); wLine.setAttribute('stroke-width', h.wW);
+    wLine.setAttribute('stroke', 'var(--s2)'); wLine.setAttribute('stroke-width', h.wW);
     wLine.setAttribute('stroke-dasharray', '7 8'); wLine.setAttribute('opacity', 0.9);
 
     // Loss arrow (unit -> up and out), only for a device whose COP is below 1 (gas): the
@@ -821,7 +838,17 @@
 
   function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
 
+  var defTag=$('defTag'), carnotTag=$('carnotTag');
+
   function drawEquationAndLegend(){
+    // The headline number comes from Q_H/W, not from the Carnot formula, so the definition is
+    // the active equation and the Carnot expression is labelled for what it is: the ceiling.
+    var d0 = dev();
+    defTag.textContent = d0.name.toLowerCase()+' · '+cop().toFixed(2)+'×';
+    carnotTag.textContent = d0.key==='hp'
+      ? 'Carnot ceiling · '+carnotCOP(state.Tc).toFixed(1)+'×'
+      : 'Carnot ceiling · heat pumps only';
+
     thTerm.style.color = activeColor('th');
     thTerm2.style.color = activeColor('th');
     tcTerm.style.color = activeColor('tc');
@@ -1054,7 +1081,7 @@
     parts.push('<rect x="'+g.padL+'" y="'+g.padT+'" width="'+g.plotW+'" height="'+g.plotH+'" fill="none" stroke="var(--line2)" stroke-width="1"/>');
 
     // gas furnace: flat line, unaffected by outdoor temperature
-    parts.push('<polyline points="'+g.xs(TC_MIN)+','+g.ys(GAS_COP)+' '+g.xs(TC_MAX)+','+g.ys(GAS_COP)+'" fill="none" stroke="#C4703F" stroke-width="2"/>');
+    parts.push('<polyline points="'+g.xs(TC_MIN)+','+g.ys(GAS_COP)+' '+g.xs(TC_MAX)+','+g.ys(GAS_COP)+'" fill="none" stroke="var(--s3)" stroke-width="2"/>');
 
     // real heat pump curve
     var realPts=[];
@@ -1077,7 +1104,7 @@
     // current-temperature marker line + dots on each curve that's on-scale
     var tc0 = state.Tc, markX = g.xs(tc0);
     parts.push('<line x1="'+markX+'" x2="'+markX+'" y1="'+g.padT+'" y2="'+(g.padT+g.plotH)+'" stroke="var(--fg)" stroke-width="1" stroke-dasharray="2 3" opacity="0.35"/>');
-    parts.push('<circle cx="'+markX+'" cy="'+g.ys(GAS_COP)+'" r="3.2" fill="#C4703F"/>');
+    parts.push('<circle cx="'+markX+'" cy="'+g.ys(GAS_COP)+'" r="3.2" fill="var(--s3)"/>');
     parts.push('<circle cx="'+markX+'" cy="'+g.ys(realisticCOP(tc0))+'" r="3.6" fill="var(--accent)"/>');
     var carnotNow = carnotCOP(tc0);
     if(carnotNow<=CHART_YMAX){ parts.push('<circle cx="'+markX+'" cy="'+g.ys(carnotNow)+'" r="3.2" fill="var(--line2)"/>'); }
@@ -1089,7 +1116,7 @@
       'At '+tc0.toFixed(0)+'&deg;C: '+
       '<span class="dot" style="background:var(--accent)"></span>heat pump <b>'+realisticCOP(tc0).toFixed(2)+'&times;</b>'+
       '<span class="dot" style="background:var(--line2)"></span>Carnot ceiling <b>'+carnotText+'</b>'+
-      '<span class="dot" style="background:#C4703F"></span>gas furnace <b>'+GAS_COP.toFixed(2)+'&times;</b>';
+      '<span class="dot" style="background:var(--s3)"></span>gas furnace <b>'+GAS_COP.toFixed(2)+'&times;</b>';
   }
 
   // ---- "more details" live figure: sensible heat available in the outside air, cross-checked

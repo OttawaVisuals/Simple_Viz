@@ -97,6 +97,28 @@ in-page toggle, see below) must work:
 - Per-concept accent colors that don't fit the series set above (e.g. a single non-accent
   prop color) still sit outside the token set as their own hex constant, since they carry
   specific semantic meaning rather than being theme chrome.
+
+  **Adopted across the live pages on 2026-08-23.** `mass-energy.html`, `heat-pump-magic.html`,
+  `straw-hose-flow.html` and `reynolds-number.html` now draw their series colors from
+  `--s1`&ndash;`--s5` instead of per-page hexes, chosen by closest hue so the existing semantics
+  survive (water &rarr; `--s1`, honey &rarr; `--s2`, TNT &rarr; `--s3`, antimatter &rarr;
+  `--s4`, uranium &rarr; `--s5`). A useful side effect: the two pages that share a fluid set
+  now agree color-for-color, which they didn't before.
+
+  **`braking-distance.html` is a sanctioned exception.** Its four road surfaces are the one
+  case where the standing set's hues fight the concept: dry asphalt is not blue, snow is not
+  terracotta, ice is not green. It keeps its own semantic road palette
+  (`--surf-dry`/`--surf-wet`/`--surf-snow`/`--surf-ice`) &mdash; but declared as real tokens
+  in all three `:root` blocks with light *and* dark values, which is the part that actually
+  matters. **A per-concept color set is only allowed if it ships a dark variant.** The reason
+  this rule exists: the snow surface was `#AFC6DB` in both themes, and since that color is
+  applied to the gauge's *label text*, it rendered at 1.62:1 on the light background &mdash;
+  effectively invisible. Note the practical bar here is graphic-color separation, not
+  WCAG-AA text contrast: the approved set itself runs 2.08:1 (`--s2`) to 4.69:1 (`--s5`) in
+  light mode, so match that band rather than chasing 4.5:1.
+
+  **Prop colors stay outside the set.** `potato-trajectory.html`'s two browns describe the
+  potato itself, not a series, and are correctly left as page-local hexes.
 - **`index.html` only:** the homepage tile grid colors each tile by category
   (`--cat-everyday` / `--cat-discoveries` / `--cat-fun`, added 2026-08-20 at the user's
   request). Each tile rebinds `--accent` locally to its category hue, which also recolors the

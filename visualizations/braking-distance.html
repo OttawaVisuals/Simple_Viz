@@ -22,17 +22,17 @@
 <style>
   :root{
     --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
-    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;--surf-dry:#8A7A63;--surf-wet:#4E7FC4;--surf-snow:#7C93AB;--surf-ice:#1F8D95;
   }
   @media (prefers-color-scheme:dark){
     :root:not([data-theme="light"]){
       --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
-      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
-    }
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;--surf-dry:#A89881;--surf-wet:#6FA0F2;--surf-snow:#AFC6DB;--surf-ice:#4FC6CF;
+  }
   }
   :root[data-theme="dark"]{
     --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
-    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;--surf-dry:#A89881;--surf-wet:#6FA0F2;--surf-snow:#AFC6DB;--surf-ice:#4FC6CF;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
@@ -403,13 +403,13 @@
 <script>
 (function(){
   var SURF = [
-    {key:'dry', name:'Dry asphalt', mu:0.8, color:'#8A7A63',
+    {key:'dry', name:'Dry asphalt', mu:0.8, color:'var(--surf-dry)',
      note:'A well-maintained dry road, in good tires.'},
-    {key:'wet', name:'Wet asphalt', mu:0.4, color:'#4E7FC4',
+    {key:'wet', name:'Wet asphalt', mu:0.4, color:'var(--surf-wet)',
      note:'Rain cuts grip roughly in half.'},
-    {key:'snow', name:'Snow', mu:0.2, color:'#AFC6DB',
+    {key:'snow', name:'Snow', mu:0.2, color:'var(--surf-snow)',
      note:'Packed snow — grip drops to a quarter of dry asphalt.'},
-    {key:'ice', name:'Ice', mu:0.1, color:'#2AACB5',
+    {key:'ice', name:'Ice', mu:0.1, color:'var(--surf-ice)',
      note:'Black ice — almost no grip at all.'}
   ];
   var G = 9.81;

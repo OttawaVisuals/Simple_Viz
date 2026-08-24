@@ -23,24 +23,27 @@
   :root{
     --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
     --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
-    --c-light:#A8720C;--c-parker:#187E88;--c-bullet:#A8493A;--c-jet:#4D58A0;
-    --c-soundwater:#1E7FAE;--c-soundair:#8B5FA3;
+    --s1:var(--accent);--s2:#D9A41F;--s3:#C4522B;--s4:#3E8E6E;--s5:#8A5AA8;
+    --c-light:var(--s2);--c-parker:var(--s4);--c-bullet:var(--s3);--c-jet:var(--s5);
+    --c-soundwater:var(--s1);--c-soundair:var(--s1);
     --earth-ocean:#3F7DC4;--earth-ocean-2:#2A5D99;--earth-land:#4F8F5B;--moon-fill:#8F887D;
   }
   @media (prefers-color-scheme:dark){
     :root:not([data-theme="light"]){
       --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
       --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
-      --c-light:#F2B84E;--c-parker:#6FB3BF;--c-bullet:#C98A7E;--c-jet:#8891B8;
-      --c-soundwater:#6FC4E0;--c-soundair:#C9A8E0;
+      --s1:var(--accent);--s2:#F0C766;--s3:#E08A6A;--s4:#6FBFA0;--s5:#B98FD4;
+      --c-light:var(--s2);--c-parker:var(--s4);--c-bullet:var(--s3);--c-jet:var(--s5);
+      --c-soundwater:var(--s1);--c-soundair:var(--s1);
       --earth-ocean:#3A72AB;--earth-ocean-2:#204B7D;--earth-land:#5C9468;--moon-fill:#9B9489;
     }
   }
   :root[data-theme="dark"]{
     --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
     --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
-    --c-light:#F2B84E;--c-parker:#6FB3BF;--c-bullet:#C98A7E;--c-jet:#8891B8;
-    --c-soundwater:#6FC4E0;--c-soundair:#C9A8E0;
+    --s1:var(--accent);--s2:#F0C766;--s3:#E08A6A;--s4:#6FBFA0;--s5:#B98FD4;
+    --c-light:var(--s2);--c-parker:var(--s4);--c-bullet:var(--s3);--c-jet:var(--s5);
+    --c-soundwater:var(--s1);--c-soundair:var(--s1);
     --earth-ocean:#3A72AB;--earth-ocean-2:#204B7D;--earth-land:#5C9468;--moon-fill:#9B9489;
   }
 
@@ -158,6 +161,12 @@
   .footer a{color:var(--muted2);text-decoration-color:var(--line2)}
   .footer a:hover{color:var(--accent);text-decoration-color:var(--accent)}
   @media (max-width:700px){.feedback-head{grid-template-columns:1fr}.feedback-choices{justify-content:flex-start}.footer{grid-template-columns:1fr;gap:10px}}
++  /* Make the final action read as a button, not a quiet text link. */
+  .feedback-send{border:1px solid var(--accent);border-radius:4px;background:var(--accent);color:var(--bg);padding:9px 14px;font:600 11px/1.2 ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 1px 3px rgba(0,0,0,.16)}
+  .feedback-send:hover,.feedback-send:focus-visible{color:var(--bg);border-color:var(--accent);filter:brightness(1.08);outline:2px solid color-mix(in srgb,var(--accent) 38%,transparent);outline-offset:2px}
+  .feedback-send:disabled{cursor:wait;opacity:.58}
+  .feedback-status[data-state="success"]{color:var(--accent)}
+  .feedback-status[data-state="error"]{color:var(--bad)}
 </style>
 <main>
 <div class="wrap">
@@ -356,7 +365,7 @@
       <textarea id="feedbackComment" name="comment" maxlength="1200" placeholder="A confusing step, a possible mistake, or an idea..."></textarea>
       <label class="feedback-trap" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
       <div class="feedback-actions">
-        <button class="feedback-send" type="submit">Send private feedback</button>
+        <button class="feedback-send" type="submit">Send feedback</button>
         <span class="feedback-status" role="status" aria-live="polite"></span>
       </div>
     </form>
@@ -639,6 +648,7 @@
   var status = root.querySelector('.feedback-status');
   var send = root.querySelector('.feedback-send');
   var rating = '';
+  send.textContent = 'Send feedback';
 
   choices.forEach(function(choice){
     choice.addEventListener('click', function(){
@@ -646,6 +656,7 @@
       choices.forEach(function(item){ item.setAttribute('aria-pressed', item===choice ? 'true' : 'false'); });
       form.hidden = false;
       status.textContent = '';
+      status.removeAttribute('data-state');
     });
   });
 
@@ -674,10 +685,13 @@
     if(!rating) return;
     if(location.protocol==='file:'){
       status.textContent = 'Feedback can be sent from madeclear.ca.';
+      status.dataset.state = 'error';
       return;
     }
     send.disabled = true;
+    send.setAttribute('aria-busy','true');
     status.textContent = 'Sending…';
+    status.removeAttribute('data-state');
     fetch('/api/feedback', {
       method:'POST',
       credentials:'same-origin',
@@ -690,12 +704,20 @@
         context:currentContext()
       })
     }).then(function(response){
-      if(!response.ok) throw new Error('request failed');
-      status.textContent = 'Thank you — your feedback is private.';
+      return response.json().catch(function(){ return {}; }).then(function(data){
+        if(!response.ok) throw new Error(data.error || 'Could not send feedback.');
+      });
+    }).then(function(){
+      status.textContent = 'Feedback saved — thank you.';
+      status.dataset.state = 'success';
       textarea.value = '';
-    }).catch(function(){
-      status.innerHTML = 'Could not send. Try <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.';
-    }).then(function(){ send.disabled = false; });
+    }).catch(function(error){
+      status.textContent = (error && error.message ? error.message : 'Could not send feedback.')+' Try again or email hello@madeclear.ca.';
+      status.dataset.state = 'error';
+    }).then(function(){
+      send.disabled = false;
+      send.removeAttribute('aria-busy');
+    });
   });
 })();
 </script>

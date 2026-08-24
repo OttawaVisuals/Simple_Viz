@@ -203,6 +203,12 @@
   .footer a{color:var(--muted2);text-decoration-color:var(--line2)}
   .footer a:hover{color:var(--accent);text-decoration-color:var(--accent)}
   @media (max-width:700px){.feedback-head{grid-template-columns:1fr}.feedback-choices{justify-content:flex-start}.footer{grid-template-columns:1fr;gap:10px}}
++  /* Make the final action read as a button, not a quiet text link. */
+  .feedback-send{border:1px solid var(--accent);border-radius:4px;background:var(--accent);color:var(--bg);padding:9px 14px;font:600 11px/1.2 ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 1px 3px rgba(0,0,0,.16)}
+  .feedback-send:hover,.feedback-send:focus-visible{color:var(--bg);border-color:var(--accent);filter:brightness(1.08);outline:2px solid color-mix(in srgb,var(--accent) 38%,transparent);outline-offset:2px}
+  .feedback-send:disabled{cursor:wait;opacity:.58}
+  .feedback-status[data-state="success"]{color:var(--accent)}
+  .feedback-status[data-state="error"]{color:var(--bad)}
 </style>
 <main>
 <div class="wrap">
@@ -224,7 +230,7 @@
   <div class="topgrid">
     <div class="headleft">
       <h1>Heat Pump <del>magic</del> <em>Science</em></h1>
-      <p class="sub">Heat pumps don't create heat &mdash; they move it. Put in 1&nbsp;kWh of electricity and get 3&ndash;5&nbsp;kWh of heat back, not by breaking physics but by pulling the rest for free from the outside air, even when that air is cold.</p>
+      <p class="sub">Heat pumps don't create heat &mdash; they move it. Put in 1&nbsp;kWh of electricity and this example delivers about 1.9&ndash;5.1&nbsp;kWh of heat, depending on outdoor temperature, by pulling the rest from the outside air rather than breaking physics.</p>
     </div>
 
     <div class="eqnbox">
@@ -399,7 +405,7 @@
       <textarea id="feedbackComment" name="comment" maxlength="1200" placeholder="A confusing step, a possible mistake, or an idea..."></textarea>
       <label class="feedback-trap" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
       <div class="feedback-actions">
-        <button class="feedback-send" type="submit">Send private feedback</button>
+        <button class="feedback-send" type="submit">Send feedback</button>
         <span class="feedback-status" role="status" aria-live="polite"></span>
       </div>
     </form>
@@ -1209,6 +1215,7 @@
   var status = root.querySelector('.feedback-status');
   var send = root.querySelector('.feedback-send');
   var rating = '';
+  send.textContent = 'Send feedback';
 
   choices.forEach(function(choice){
     choice.addEventListener('click', function(){
@@ -1216,6 +1223,7 @@
       choices.forEach(function(item){ item.setAttribute('aria-pressed', item===choice ? 'true' : 'false'); });
       form.hidden = false;
       status.textContent = '';
+      status.removeAttribute('data-state');
     });
   });
 
@@ -1244,10 +1252,13 @@
     if(!rating) return;
     if(location.protocol==='file:'){
       status.textContent = 'Feedback can be sent from madeclear.ca.';
+      status.dataset.state = 'error';
       return;
     }
     send.disabled = true;
+    send.setAttribute('aria-busy','true');
     status.textContent = 'Sending…';
+    status.removeAttribute('data-state');
     fetch('/api/feedback', {
       method:'POST',
       credentials:'same-origin',
@@ -1260,12 +1271,20 @@
         context:currentContext()
       })
     }).then(function(response){
-      if(!response.ok) throw new Error('request failed');
-      status.textContent = 'Thank you — your feedback is private.';
+      return response.json().catch(function(){ return {}; }).then(function(data){
+        if(!response.ok) throw new Error(data.error || 'Could not send feedback.');
+      });
+    }).then(function(){
+      status.textContent = 'Feedback saved — thank you.';
+      status.dataset.state = 'success';
       textarea.value = '';
-    }).catch(function(){
-      status.innerHTML = 'Could not send. Try <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.';
-    }).then(function(){ send.disabled = false; });
+    }).catch(function(error){
+      status.textContent = (error && error.message ? error.message : 'Could not send feedback.')+' Try again or email hello@madeclear.ca.';
+      status.dataset.state = 'error';
+    }).then(function(){
+      send.disabled = false;
+      send.removeAttribute('aria-busy');
+    });
   });
 })();
 </script>

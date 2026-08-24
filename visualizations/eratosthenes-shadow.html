@@ -175,6 +175,12 @@
   .footer a{color:var(--muted2);text-decoration-color:var(--line2)}
   .footer a:hover{color:var(--accent);text-decoration-color:var(--accent)}
   @media (max-width:700px){.feedback-head{grid-template-columns:1fr}.feedback-choices{justify-content:flex-start}.footer{grid-template-columns:1fr;gap:10px}}
++  /* Make the final action read as a button, not a quiet text link. */
+  .feedback-send{border:1px solid var(--accent);border-radius:4px;background:var(--accent);color:var(--bg);padding:9px 14px;font:600 11px/1.2 ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 1px 3px rgba(0,0,0,.16)}
+  .feedback-send:hover,.feedback-send:focus-visible{color:var(--bg);border-color:var(--accent);filter:brightness(1.08);outline:2px solid color-mix(in srgb,var(--accent) 38%,transparent);outline-offset:2px}
+  .feedback-send:disabled{cursor:wait;opacity:.58}
+  .feedback-status[data-state="success"]{color:var(--accent)}
+  .feedback-status[data-state="error"]{color:var(--bad)}
 </style>
 <main>
 <div class="wrap">
@@ -359,7 +365,7 @@
       <textarea id="feedbackComment" name="comment" maxlength="1200" placeholder="A confusing step, a possible mistake, or an idea..."></textarea>
       <label class="feedback-trap" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
       <div class="feedback-actions">
-        <button class="feedback-send" type="submit">Send private feedback</button>
+        <button class="feedback-send" type="submit">Send feedback</button>
         <span class="feedback-status" role="status" aria-live="polite"></span>
       </div>
     </form>
@@ -376,6 +382,7 @@
 (function(){
   var DMIN=100, DMAX=2000, TMAX=20;
   var TRUE_DIAM = 12742; // km, mean
+  var TRUE_CIRC = Math.PI * TRUE_DIAM;
 
   function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
   function fmtKm(n){ return Math.round(n).toLocaleString('en-US'); }
@@ -475,8 +482,7 @@
     stick2.setAttribute('x2', tip2.x); stick2.setAttribute('y2', tip2.y);
     base2.setAttribute('cx', g.stick2X); base2.setAttribute('cy', base2Y);
 
-    var shadowLen = g.stickH * Math.tan(theta2Rad);
-    var shadowEndX = tip2.x + shadowLen;
+    var shadowEndX = g.stick2X + g.stickH * Math.tan(theta2Rad);
     shadow2.setAttribute('x1', g.stick2X); shadow2.setAttribute('y1', base2Y);
     shadow2.setAttribute('x2', shadowEndX); shadow2.setAttribute('y2', base2Y);
 
@@ -641,7 +647,7 @@
     verdictEl.textContent = (errPct>=0?'+':'')+errPct.toFixed(1)+'%';
     verdictEl.style.color = resultColor;
     verdictSubEl.textContent = 'off from Earth’s true mean diameter of 12,742 km.';
-    effortLineEl.textContent = 'implied circumference: '+fmtKm(circumference())+' km (actual: 40,008 km through the poles)';
+    effortLineEl.textContent = 'implied circumference: '+fmtKm(circumference())+' km (mean-diameter reference: '+fmtKm(TRUE_CIRC)+' km)';
 
     var markPct = pos(D);
     var limitPct = pos(TRUE_DIAM);
@@ -795,6 +801,7 @@
   var status = root.querySelector('.feedback-status');
   var send = root.querySelector('.feedback-send');
   var rating = '';
+  send.textContent = 'Send feedback';
 
   choices.forEach(function(choice){
     choice.addEventListener('click', function(){
@@ -802,6 +809,7 @@
       choices.forEach(function(item){ item.setAttribute('aria-pressed', item===choice ? 'true' : 'false'); });
       form.hidden = false;
       status.textContent = '';
+      status.removeAttribute('data-state');
     });
   });
 
@@ -830,10 +838,13 @@
     if(!rating) return;
     if(location.protocol==='file:'){
       status.textContent = 'Feedback can be sent from madeclear.ca.';
+      status.dataset.state = 'error';
       return;
     }
     send.disabled = true;
+    send.setAttribute('aria-busy','true');
     status.textContent = 'Sending…';
+    status.removeAttribute('data-state');
     fetch('/api/feedback', {
       method:'POST',
       credentials:'same-origin',
@@ -846,12 +857,20 @@
         context:currentContext()
       })
     }).then(function(response){
-      if(!response.ok) throw new Error('request failed');
-      status.textContent = 'Thank you — your feedback is private.';
+      return response.json().catch(function(){ return {}; }).then(function(data){
+        if(!response.ok) throw new Error(data.error || 'Could not send feedback.');
+      });
+    }).then(function(){
+      status.textContent = 'Feedback saved — thank you.';
+      status.dataset.state = 'success';
       textarea.value = '';
-    }).catch(function(){
-      status.innerHTML = 'Could not send. Try <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.';
-    }).then(function(){ send.disabled = false; });
+    }).catch(function(error){
+      status.textContent = (error && error.message ? error.message : 'Could not send feedback.')+' Try again or email hello@madeclear.ca.';
+      status.dataset.state = 'error';
+    }).then(function(){
+      send.disabled = false;
+      send.removeAttribute('aria-busy');
+    });
   });
 })();
 </script>

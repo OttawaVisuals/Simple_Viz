@@ -156,6 +156,12 @@
   .footer a{color:var(--muted2);text-decoration-color:var(--line2)}
   .footer a:hover{color:var(--accent);text-decoration-color:var(--accent)}
   @media (max-width:700px){.feedback-head{grid-template-columns:1fr}.feedback-choices{justify-content:flex-start}.footer{grid-template-columns:1fr;gap:10px}}
++  /* Make the final action read as a button, not a quiet text link. */
+  .feedback-send{border:1px solid var(--accent);border-radius:4px;background:var(--accent);color:var(--bg);padding:9px 14px;font:600 11px/1.2 ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 1px 3px rgba(0,0,0,.16)}
+  .feedback-send:hover,.feedback-send:focus-visible{color:var(--bg);border-color:var(--accent);filter:brightness(1.08);outline:2px solid color-mix(in srgb,var(--accent) 38%,transparent);outline-offset:2px}
+  .feedback-send:disabled{cursor:wait;opacity:.58}
+  .feedback-status[data-state="success"]{color:var(--accent)}
+  .feedback-status[data-state="error"]{color:var(--bad)}
 </style>
 <main>
 <div class="wrap">
@@ -177,7 +183,7 @@
   <div class="topgrid">
     <div class="headleft">
       <h1>Melt the chocolate, <em>measure the light</em>.</h1>
-      <p class="sub">Pull the turntable out of a microwave and its standing wave stops averaging out &mdash; melted spots on a flat tray of chocolate land half a wavelength apart. Measure that spacing and multiply by twice the oven's known frequency, and you've timed the speed of light with dessert. Only a microwave oven has the contained power to run this test.</p>
+      <p class="sub">Pull the turntable out of a microwave and its standing wave stops averaging out &mdash; in the ideal pattern, melted spots on a flat tray of chocolate land half a wavelength apart. Measure that spacing and multiply by twice the oven's known frequency, and you've timed the speed of light with dessert. Only a microwave oven has the contained power to run this test.</p>
     </div>
 
     <div class="eqnbox">
@@ -282,7 +288,7 @@
     <button class="preset" data-p="long">measured a bit long</button>
   </div>
 
-  <p class="note">Sometimes called the "chocolate speed of light experiment" (marshmallows and cheese work too). A spinning turntable smears the standing-wave pattern evenly across a whole rotation, which is exactly why ovens have one &mdash; to heat food evenly, the opposite of what this experiment wants &mdash; so the first step is always to remove it. With the turntable out, running the oven briefly on a flat tray melts the food in stripes at the wave's antinodes, spaced exactly half a wavelength (&lambda;/2) apart. A household microwave's magnetron runs at a fixed, nameplate-printed frequency of f&nbsp;=&nbsp;2.45&nbsp;GHz, so &lambda; = c/f &asymp; 12.24 cm and &lambda;/2 &asymp; 6.12 cm. The frequency slider changes the diagram's theoretical geometry; it does not make other equipment suitable for the test. Wi-Fi routers, phones, mobile-network gear and ordinary radio transmitters do not confine or deliver enough power to melt chocolate. The equation requires compatible SI units: frequency is converted to hertz and spacing to metres before multiplying. If GHz and cm are multiplied directly, 1&nbsp;GHz&middot;cm = 10<sup>7</sup>&nbsp;m/s. For example, 2&nbsp;&times;&nbsp;2.45&nbsp;&times;&nbsp;6.39 = 31.311 therefore means 31.311&nbsp;&times;&nbsp;10<sup>7</sup>&nbsp;m/s = 3.1311&nbsp;&times;&nbsp;10<sup>8</sup>&nbsp;m/s. A ruler reading off by a couple of millimetres, real magnetrons drifting from their nominal frequency, and blurred melted spots all add real error. Read more on <a href="https://en.wikipedia.org/wiki/Microwave_oven" target="_blank" rel="noopener">Wikipedia's microwave oven article</a>.</p>
+  <p class="note">Sometimes called the "chocolate speed of light experiment" (marshmallows and cheese work too). A spinning turntable smears the standing-wave pattern evenly across a whole rotation, which is exactly why ovens have one &mdash; to heat food evenly, the opposite of what this experiment wants &mdash; so the first step is always to remove it. With the turntable out, running the oven briefly on a flat tray reveals hot spots. In the ideal single-mode picture used here, adjacent antinodes are spaced half a wavelength (&lambda;/2) apart; real oven cavities can support overlapping modes, making the melted pattern less regular. A household microwave's magnetron runs at a fixed, nameplate-printed frequency of f&nbsp;=&nbsp;2.45&nbsp;GHz, so &lambda; = c/f &asymp; 12.24 cm and &lambda;/2 &asymp; 6.12 cm. The frequency slider changes the diagram's theoretical geometry; it does not make other equipment suitable for the test. Wi-Fi routers, phones, mobile-network gear and ordinary radio transmitters do not confine or deliver enough power to melt chocolate. The equation requires compatible SI units: frequency is converted to hertz and spacing to metres before multiplying. If GHz and cm are multiplied directly, 1&nbsp;GHz&middot;cm = 10<sup>7</sup>&nbsp;m/s. For example, 2&nbsp;&times;&nbsp;2.45&nbsp;&times;&nbsp;6.39 = 31.311 therefore means 31.311&nbsp;&times;&nbsp;10<sup>7</sup>&nbsp;m/s = 3.1311&nbsp;&times;&nbsp;10<sup>8</sup>&nbsp;m/s. A ruler reading off by a couple of millimetres, magnetron-frequency tolerance, overlapping modes, and blurred melted spots all add real error. Read more on <a href="https://en.wikipedia.org/wiki/Microwave_oven" target="_blank" rel="noopener">Wikipedia's microwave oven article</a>.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -302,7 +308,7 @@
       <textarea id="feedbackComment" name="comment" maxlength="1200" placeholder="A confusing step, a possible mistake, or an idea..."></textarea>
       <label class="feedback-trap" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
       <div class="feedback-actions">
-        <button class="feedback-send" type="submit">Send private feedback</button>
+        <button class="feedback-send" type="submit">Send feedback</button>
         <span class="feedback-status" role="status" aria-live="polite"></span>
       </div>
     </form>
@@ -730,6 +736,7 @@
   var status = root.querySelector('.feedback-status');
   var send = root.querySelector('.feedback-send');
   var rating = '';
+  send.textContent = 'Send feedback';
 
   choices.forEach(function(choice){
     choice.addEventListener('click', function(){
@@ -737,6 +744,7 @@
       choices.forEach(function(item){ item.setAttribute('aria-pressed', item===choice ? 'true' : 'false'); });
       form.hidden = false;
       status.textContent = '';
+      status.removeAttribute('data-state');
     });
   });
 
@@ -765,10 +773,13 @@
     if(!rating) return;
     if(location.protocol==='file:'){
       status.textContent = 'Feedback can be sent from madeclear.ca.';
+      status.dataset.state = 'error';
       return;
     }
     send.disabled = true;
+    send.setAttribute('aria-busy','true');
     status.textContent = 'Sending…';
+    status.removeAttribute('data-state');
     fetch('/api/feedback', {
       method:'POST',
       credentials:'same-origin',
@@ -781,12 +792,20 @@
         context:currentContext()
       })
     }).then(function(response){
-      if(!response.ok) throw new Error('request failed');
-      status.textContent = 'Thank you — your feedback is private.';
+      return response.json().catch(function(){ return {}; }).then(function(data){
+        if(!response.ok) throw new Error(data.error || 'Could not send feedback.');
+      });
+    }).then(function(){
+      status.textContent = 'Feedback saved — thank you.';
+      status.dataset.state = 'success';
       textarea.value = '';
-    }).catch(function(){
-      status.innerHTML = 'Could not send. Try <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.';
-    }).then(function(){ send.disabled = false; });
+    }).catch(function(error){
+      status.textContent = (error && error.message ? error.message : 'Could not send feedback.')+' Try again or email hello@madeclear.ca.';
+      status.dataset.state = 'error';
+    }).then(function(){
+      send.disabled = false;
+      send.removeAttribute('aria-busy');
+    });
   });
 })();
 </script>

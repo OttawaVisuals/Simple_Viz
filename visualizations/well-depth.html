@@ -40,6 +40,12 @@
   .resultrow{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.result{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(22px,3vw,40px);align-items:start}.result-current{min-width:0}.solution{min-width:0;padding-left:clamp(20px,2.5vw,34px);border-left:1px solid var(--line)}.solution-equation{display:flex;align-items:center;gap:8px;margin-top:clamp(18px,3vw,34px);font-size:clamp(18px,2vw,27px);line-height:1.05;white-space:nowrap}.solution-equation .hvar{font-style:italic}.solution-equation .eq{color:var(--muted)}.solution-equation .frac{display:inline-flex;flex-direction:column;align-items:center}.solution-equation .numerator{padding:0 .12em .16em}.solution-equation .fraction-bar{height:1.5px;width:100%;background:var(--fg)}.solution-equation .denominator{padding-top:.16em}.solution-note{margin-top:16px;font:10.5px/1.55 ui-monospace,monospace;color:var(--muted)}.timeline-sound{background:var(--sound)}#soundPhase.active{color:var(--sound)}#heroSvg path[stroke="var(--accent)"]{stroke:var(--sound)}
   .timeline-fall{background:var(--stone)}#fallPhase.active{color:var(--stone)}
   @media(max-width:760px){.resultrow{grid-template-columns:1fr}}@media(max-width:620px){.result{grid-template-columns:1fr}.solution{margin-top:6px;padding:22px 0 0;border-left:0;border-top:1px solid var(--line)}.solution-equation{margin-top:16px;font-size:clamp(20px,7vw,27px)}}
++  /* Make the final action read as a button, not a quiet text link. */
+  .feedback-send{border:1px solid var(--accent);border-radius:4px;background:var(--accent);color:var(--bg);padding:9px 14px;font:600 11px/1.2 ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 1px 3px rgba(0,0,0,.16)}
+  .feedback-send:hover,.feedback-send:focus-visible{color:var(--bg);border-color:var(--accent);filter:brightness(1.08);outline:2px solid color-mix(in srgb,var(--accent) 38%,transparent);outline-offset:2px}
+  .feedback-send:disabled{cursor:wait;opacity:.58}
+  .feedback-status[data-state="success"]{color:var(--accent)}
+  .feedback-status[data-state="error"]{color:var(--bad)}
 </style>
 <main><div class="wrap">
   <div class="topbar"><a class="brand" href="../index.html" aria-label="Made clear — home"><svg class="brand-icon" viewBox="0 0 58 28" aria-hidden="true"><text x="22" y="16">mc</text><path d="M1 22 C3 22 3 16 5 16 S7 26 9 26 S11 13 13 13 S15 23 17 23 S19 18 21 18 L57 18"/></svg><span class="brand-word" aria-hidden="true"><span>m</span><span class="sub">ade</span><span>c</span><span class="sub">lear</span></span></a><div class="topbar-right"><span>Free fall + sound</span><button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button></div></div>
@@ -58,7 +64,7 @@
   </div>
   <div class="presets"><span class="presets-title">Try</span><button class="preset" data-time="1">one-second wait</button><button class="preset" data-time="4">four-second wait</button><button class="preset" data-time="8">eight-second wait</button><button class="preset" data-time="12">twelve-second wait</button></div>
   <p class="note"><strong>The stopwatch includes both the fall and the returning sound.</strong> The stone is treated as starting from rest and falling in vacuum under constant <em>g</em>&nbsp;=&nbsp;9.81&nbsp;m/s², so fall time is √(2h/g). Sound speed is approximated as <em>c</em>&nbsp;=&nbsp;331.3&nbsp;+&nbsp;0.606T m/s for dry air at temperature T in °C, and return time is h/c. The page solves their sum for h. Air drag would make a real stone fall more slowly, while echoes, reaction time, wind, humidity and an uncertain release instant add measurement error; those effects are omitted. For a deep shaft or a light stone, ignoring drag can overestimate depth. The motion equations follow standard <a href="https://openstax.org/books/physics/pages/3-2-representing-acceleration-with-equations-and-graphs" target="_blank" rel="noopener">constant-acceleration kinematics</a>; the temperature dependence of sound speed is summarized by <a href="https://www.engineeringtoolbox.com/air-speed-sound-d_603.html" target="_blank" rel="noopener">Engineering ToolBox</a>.</p>
-  <section class="feedback" data-feedback aria-labelledby="feedbackHeading"><div class="feedback-head"><div><p class="feedback-kicker">Private feedback</p><h2 id="feedbackHeading">Was this clear?</h2><p class="feedback-copy">Your response is private and helps improve this page.</p></div><div class="feedback-choices" role="group" aria-label="Clarity rating"><button class="feedback-choice" type="button" data-rating="clear" aria-pressed="false">Yes</button><button class="feedback-choice" type="button" data-rating="almost" aria-pressed="false">Almost</button><button class="feedback-choice" type="button" data-rating="not-yet" aria-pressed="false">Not yet</button></div></div><form class="feedback-form" hidden><label for="feedbackComment">What could be clearer? Optional.</label><textarea id="feedbackComment" name="comment" maxlength="1200" placeholder="A confusing step, a possible mistake, or an idea..."></textarea><label class="feedback-trap" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label><div class="feedback-actions"><button class="feedback-send" type="submit">Send private feedback</button><span class="feedback-status" role="status" aria-live="polite"></span></div></form></section>
+  <section class="feedback" data-feedback aria-labelledby="feedbackHeading"><div class="feedback-head"><div><p class="feedback-kicker">Private feedback</p><h2 id="feedbackHeading">Was this clear?</h2><p class="feedback-copy">Your response is private and helps improve this page.</p></div><div class="feedback-choices" role="group" aria-label="Clarity rating"><button class="feedback-choice" type="button" data-rating="clear" aria-pressed="false">Yes</button><button class="feedback-choice" type="button" data-rating="almost" aria-pressed="false">Almost</button><button class="feedback-choice" type="button" data-rating="not-yet" aria-pressed="false">Not yet</button></div></div><form class="feedback-form" hidden><label for="feedbackComment">What could be clearer? Optional.</label><textarea id="feedbackComment" name="comment" maxlength="1200" placeholder="A confusing step, a possible mistake, or an idea..."></textarea><label class="feedback-trap" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label><div class="feedback-actions"><button class="feedback-send" type="submit">Send feedback</button><span class="feedback-status" role="status" aria-live="polite"></span></div></form></section>
   <div class="footer"><span>Designed and maintained by Simon using AI-assisted development. Sources and approximations are stated on each page.</span><span>Spot a mistake or have an idea? Write to <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.</span></div>
 </div></main>
 <script>
@@ -81,6 +87,86 @@
 })();
 </script>
 <script>
-(function(){var root=document.querySelector('[data-feedback]');if(!root)return;var form=root.querySelector('.feedback-form'),choices=Array.prototype.slice.call(root.querySelectorAll('.feedback-choice')),textarea=root.querySelector('textarea'),status=root.querySelector('.feedback-status'),send=root.querySelector('.feedback-send'),rating='';choices.forEach(function(choice){choice.addEventListener('click',function(){rating=choice.dataset.rating;choices.forEach(function(item){item.setAttribute('aria-pressed',item===choice?'true':'false')});form.hidden=false;status.textContent=''})});form.addEventListener('submit',function(e){e.preventDefault();if(!rating)return;if(location.protocol==='file:'){status.textContent='Feedback submission is available on madeclear.ca.';return}send.disabled=true;status.textContent='Sending…';fetch('/api/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({page:'well-depth',rating:rating,comment:textarea.value.trim(),website:(form.elements.website&&form.elements.website.value)||''})}).then(function(res){if(!res.ok)throw new Error('Request failed');status.textContent='Thank you — feedback sent.';textarea.value=''}).catch(function(){status.textContent='Could not send. Please try again.'}).then(function(){send.disabled=false})})})();
+(function(){
+  var root = document.querySelector('[data-feedback]');
+  if(!root) return;
+  var form = root.querySelector('.feedback-form');
+  var choices = Array.prototype.slice.call(root.querySelectorAll('.feedback-choice'));
+  var textarea = root.querySelector('textarea');
+  var status = root.querySelector('.feedback-status');
+  var send = root.querySelector('.feedback-send');
+  var rating = '';
+  send.textContent = 'Send feedback';
+
+  choices.forEach(function(choice){
+    choice.addEventListener('click', function(){
+      rating = choice.dataset.rating;
+      choices.forEach(function(item){ item.setAttribute('aria-pressed', item===choice ? 'true' : 'false'); });
+      form.hidden = false;
+      status.textContent = '';
+      status.removeAttribute('data-state');
+    });
+  });
+
+  function pageSlug(){
+    var file = location.pathname.split('/').pop() || '';
+    return file.replace(/\.html?$/i,'').toLowerCase() || 'visualization';
+  }
+
+  function currentContext(){
+    var values = [];
+    Array.prototype.forEach.call(document.querySelectorAll('[role="slider"]'), function(slider){
+      var label = slider.getAttribute('aria-label') || 'Control';
+      var value = slider.getAttribute('aria-valuetext') || slider.getAttribute('aria-valuenow');
+      if(value) values.push(label+': '+value);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('select'), function(select){
+      var label = select.getAttribute('aria-label') || select.name || 'Selection';
+      var option = select.options[select.selectedIndex];
+      if(option) values.push(label+': '+option.textContent.trim());
+    });
+    return values.slice(0,20);
+  }
+
+  form.addEventListener('submit', function(event){
+    event.preventDefault();
+    if(!rating) return;
+    if(location.protocol==='file:'){
+      status.textContent = 'Feedback can be sent from madeclear.ca.';
+      status.dataset.state = 'error';
+      return;
+    }
+    send.disabled = true;
+    send.setAttribute('aria-busy','true');
+    status.textContent = 'Sending…';
+    status.removeAttribute('data-state');
+    fetch('/api/feedback', {
+      method:'POST',
+      credentials:'same-origin',
+      headers:{'content-type':'application/json'},
+      body:JSON.stringify({
+        page:pageSlug(),
+        rating:rating,
+        comment:textarea.value,
+        website:form.elements.website.value,
+        context:currentContext()
+      })
+    }).then(function(response){
+      return response.json().catch(function(){ return {}; }).then(function(data){
+        if(!response.ok) throw new Error(data.error || 'Could not send feedback.');
+      });
+    }).then(function(){
+      status.textContent = 'Feedback saved — thank you.';
+      status.dataset.state = 'success';
+      textarea.value = '';
+    }).catch(function(error){
+      status.textContent = (error && error.message ? error.message : 'Could not send feedback.')+' Try again or email hello@madeclear.ca.';
+      status.dataset.state = 'error';
+    }).then(function(){
+      send.disabled = false;
+      send.removeAttribute('aria-busy');
+    });
+  });
+})();
 </script>
 </html>

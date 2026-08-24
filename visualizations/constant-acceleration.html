@@ -54,6 +54,12 @@
   .feedback-trap{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}
   @media(max-width:820px){.topgrid{grid-template-columns:1fr}.eqnbox{justify-content:flex-start}.legendbox{max-width:440px}.ctrls{grid-template-columns:1fr}.resultrow{grid-template-columns:1fr}.hero-caption{display:block}.hero-caption span{display:block;margin-top:2px}}
   @media(max-width:620px){main{padding-inline:14px}.result{grid-template-columns:1fr}.metric+.metric{padding:16px 0 0;border-left:0;border-top:1px solid var(--line)}.footer{grid-template-columns:1fr;gap:8px}.play-button{top:1px}}
++  /* Make the final action read as a button, not a quiet text link. */
+  .feedback-send{border:1px solid var(--accent);border-radius:4px;background:var(--accent);color:var(--bg);padding:9px 14px;font:600 11px/1.2 ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 1px 3px rgba(0,0,0,.16)}
+  .feedback-send:hover,.feedback-send:focus-visible{color:var(--bg);border-color:var(--accent);filter:brightness(1.08);outline:2px solid color-mix(in srgb,var(--accent) 38%,transparent);outline-offset:2px}
+  .feedback-send:disabled{cursor:wait;opacity:.58}
+  .feedback-status[data-state="success"]{color:var(--accent)}
+  .feedback-status[data-state="error"]{color:var(--bad)}
 </style>
 <main><div class="wrap">
   <div class="topbar">
@@ -82,7 +88,7 @@
     </div>
   </div>
   <div class="presets"><span class="presets-title">Try</span><button class="preset" data-a="1" data-r="1">1 g · one onboard year</button><button class="preset" data-a="1" data-r="2.3">1 g · 98% c</button><button class="preset" data-a="3" data-r="2">3 g · 96% c</button><button class="preset" data-a="1" data-r="5">1 g · 99.99% c</button></div>
-  <p class="note"><strong>A massive rocket never reaches light speed.</strong> Constant proper acceleration is the acceleration passengers feel. Starting from rest, <em>v</em> = c tanh(ατ/c), Earth-frame distance <em>x</em> = c²[cosh(ατ/c) − 1]/α, and kinetic energy <em>E</em><sub>k</sub> = (γ − 1)mc². The star directions are schematic; radial distances are to scale. Energy is for the selected dry mass only and excludes propellant, exhaust, inefficiency and braking. Sources: Wikipedia on <a href="https://en.wikipedia.org/wiki/Hyperbolic_motion_(relativity)" target="_blank" rel="noopener">hyperbolic motion</a>, <a href="https://en.wikipedia.org/wiki/Kinetic_energy#Relativistic_kinetic_energy" target="_blank" rel="noopener">relativistic kinetic energy</a>, the <a href="https://en.wikipedia.org/wiki/Heliosphere" target="_blank" rel="noopener">heliosphere</a>, <a href="https://en.wikipedia.org/wiki/Oort_cloud" target="_blank" rel="noopener">Oort Cloud</a> <a href="https://en.wikipedia.org/wiki/Alpha_Centauri" target="_blank" rel="noopener">Alpha Centauri</a> and <a href="https://en.wikipedia.org/wiki/Voyager_1" target="_blank" rel="noopener">Voyager 1</a>.</p>
+  <p class="note"><strong>A massive rocket never reaches light speed.</strong> Constant proper acceleration is the acceleration passengers feel. Starting from rest, <em>v</em> = c tanh(ατ/c), Earth-frame distance <em>x</em> = c²[cosh(ατ/c) − 1]/α, and kinetic energy <em>E</em><sub>k</sub> = (γ − 1)mc². The star directions are schematic; radial distances are to scale. Energy is for the selected dry mass only and excludes propellant, exhaust, inefficiency and braking. Sources: Wikipedia on <a href="https://en.wikipedia.org/wiki/Hyperbolic_motion_(relativity)" target="_blank" rel="noopener">hyperbolic motion</a>, <a href="https://en.wikipedia.org/wiki/Kinetic_energy#Relativistic_kinetic_energy" target="_blank" rel="noopener">relativistic kinetic energy</a>, the <a href="https://en.wikipedia.org/wiki/Heliosphere" target="_blank" rel="noopener">heliosphere</a>, <a href="https://en.wikipedia.org/wiki/Oort_cloud" target="_blank" rel="noopener">Oort Cloud</a>, <a href="https://en.wikipedia.org/wiki/Alpha_Centauri" target="_blank" rel="noopener">Alpha Centauri</a> and <a href="https://en.wikipedia.org/wiki/Voyager_1" target="_blank" rel="noopener">Voyager 1</a>.</p>
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
       <div>
@@ -101,7 +107,7 @@
       <textarea id="feedbackComment" name="comment" maxlength="1200" placeholder="A confusing step, a possible mistake, or an idea..."></textarea>
       <label class="feedback-trap" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
       <div class="feedback-actions">
-        <button class="feedback-send" type="submit">Send private feedback</button>
+        <button class="feedback-send" type="submit">Send feedback</button>
         <span class="feedback-status" role="status" aria-live="polite"></span>
       </div>
     </form>
@@ -153,6 +159,7 @@
   var status = root.querySelector('.feedback-status');
   var send = root.querySelector('.feedback-send');
   var rating = '';
+  send.textContent = 'Send feedback';
 
   choices.forEach(function(choice){
     choice.addEventListener('click', function(){
@@ -160,6 +167,7 @@
       choices.forEach(function(item){ item.setAttribute('aria-pressed', item===choice ? 'true' : 'false'); });
       form.hidden = false;
       status.textContent = '';
+      status.removeAttribute('data-state');
     });
   });
 
@@ -188,10 +196,13 @@
     if(!rating) return;
     if(location.protocol==='file:'){
       status.textContent = 'Feedback can be sent from madeclear.ca.';
+      status.dataset.state = 'error';
       return;
     }
     send.disabled = true;
+    send.setAttribute('aria-busy','true');
     status.textContent = 'Sending…';
+    status.removeAttribute('data-state');
     fetch('/api/feedback', {
       method:'POST',
       credentials:'same-origin',
@@ -204,12 +215,20 @@
         context:currentContext()
       })
     }).then(function(response){
-      if(!response.ok) throw new Error('request failed');
-      status.textContent = 'Thank you — your feedback is private.';
+      return response.json().catch(function(){ return {}; }).then(function(data){
+        if(!response.ok) throw new Error(data.error || 'Could not send feedback.');
+      });
+    }).then(function(){
+      status.textContent = 'Feedback saved — thank you.';
+      status.dataset.state = 'success';
       textarea.value = '';
-    }).catch(function(){
-      status.innerHTML = 'Could not send. Try <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.';
-    }).then(function(){ send.disabled = false; });
+    }).catch(function(error){
+      status.textContent = (error && error.message ? error.message : 'Could not send feedback.')+' Try again or email hello@madeclear.ca.';
+      status.dataset.state = 'error';
+    }).then(function(){
+      send.disabled = false;
+      send.removeAttribute('aria-busy');
+    });
   });
 })();
 </script>

@@ -20,9 +20,9 @@
 <meta name="twitter:image" content="https://madeclear.ca/assets/brand/madeclear-social-wide-1200x630.png">
 <meta name="twitter:image:alt" content="Made clear — Physics you can see">
 <style>
-:root{--bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;--line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--compare:#9A6723;--bad:#A83D2A;--track:#E2DDD2}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;--line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--compare:#E7B96B;--bad:#E68075;--track:#28304A}}
-:root[data-theme="dark"]{--bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;--line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--compare:#E7B96B;--bad:#E68075;--track:#28304A}
+:root{--bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;--line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--s1:var(--accent);--s2:#D9A41F;--s3:#C4522B;--s4:#3E8E6E;--s5:#8A5AA8;--compare:var(--s2);--bad:#A83D2A;--track:#E2DDD2}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;--line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--s1:var(--accent);--s2:#F0C766;--s3:#E08A6A;--s4:#6FBFA0;--s5:#B98FD4;--compare:var(--s2);--bad:#E68075;--track:#28304A}}
+:root[data-theme="dark"]{--bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;--line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--s1:var(--accent);--s2:#F0C766;--s3:#E08A6A;--s4:#6FBFA0;--s5:#B98FD4;--compare:var(--s2);--bad:#E68075;--track:#28304A}
 *{box-sizing:border-box}html,body{margin:0;padding:0}body{background:var(--bg);color:var(--fg);font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif;-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}a:hover{color:var(--accent);text-decoration-color:var(--accent)}.mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
 main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}.wrap{max-width:1320px;margin:auto}.topbar{display:flex;justify-content:space-between;align-items:center;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}.topbar a{text-decoration:none}.brand{display:flex;align-items:center;gap:8px;color:var(--fg);text-transform:none;letter-spacing:0}.brand:hover{color:var(--accent)}.brand-icon{display:block;width:42px;height:20px;overflow:visible}.brand-icon text{fill:currentColor;font:italic 16px Georgia,serif}.brand-icon path{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}.brand-word{display:flex;align-items:baseline;font:italic 18px/1 Georgia,"Iowan Old Style","Palatino Linotype",serif;white-space:nowrap}.brand-word .sub{font-size:.54em;line-height:1;transform:translateY(.38em);margin-right:.18em;color:inherit}.topbar-right{display:flex;gap:16px;align-items:baseline}.theme-toggle{cursor:pointer;border:0;background:none;padding:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted)}.theme-toggle:hover{color:var(--accent)}
 .topgrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}h1 em{font-style:italic;font-weight:300}.sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:52ch;margin:10px 0 0}.eqnbox{display:flex;align-items:center;justify-content:center;text-align:center}.eqn{font-size:clamp(25px,3vw,37px);font-weight:300;line-height:1}.eqn em{font-style:italic;color:var(--accent);transition:color .2s}.legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line);align-self:center}.legend .row{display:grid;grid-template-columns:1.6em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:8px 2px}.sym{font-size:17px;color:var(--accent);font-style:italic}.name{font-size:12.5px;color:var(--muted2)}.val{font:11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
@@ -36,6 +36,12 @@ main{padding:clamp(10px,1.4vw,18px) clamp(16px,4vw,56px) 40px}.topgrid{gap:clamp
 .function-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(82px,1fr))}.func{width:100%;white-space:nowrap}
 /* Always-visible explanatory prose uses the full page width. Keep this after component defaults. */
 .more p{max-width:none}
++  /* Make the final action read as a button, not a quiet text link. */
+  .feedback-send{border:1px solid var(--accent);border-radius:4px;background:var(--accent);color:var(--bg);padding:9px 14px;font:600 11px/1.2 ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 1px 3px rgba(0,0,0,.16)}
+  .feedback-send:hover,.feedback-send:focus-visible{color:var(--bg);border-color:var(--accent);filter:brightness(1.08);outline:2px solid color-mix(in srgb,var(--accent) 38%,transparent);outline-offset:2px}
+  .feedback-send:disabled{cursor:wait;opacity:.58}
+  .feedback-status[data-state="success"]{color:var(--accent)}
+  .feedback-status[data-state="error"]{color:var(--bad)}
 </style>
 <main><div class="wrap">
 <div class="topbar"><a class="brand" href="../index.html" aria-label="Made clear — home"><svg class="brand-icon" viewBox="0 0 58 28" aria-hidden="true"><text x="22" y="16">mc</text><path d="M1 22 C3 22 3 16 5 16 S7 26 9 26 S11 13 13 13 S15 23 17 23 S19 18 21 18 L57 18"/></svg><span class="brand-word" aria-hidden="true"><span>m</span><span class="sub">ade</span><span>c</span><span class="sub">lear</span></span></a><div class="topbar-right"><span>Basic functions</span><button class="theme-toggle" id="themeToggle" type="button">Dark mode</button></div></div>
@@ -63,7 +69,7 @@ main{padding:clamp(10px,1.4vw,18px) clamp(16px,4vw,56px) 40px}.topgrid{gap:clamp
       <textarea id="feedbackComment" name="comment" maxlength="1200" placeholder="A confusing step, a possible mistake, or an idea..."></textarea>
       <label class="feedback-trap" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
       <div class="feedback-actions">
-        <button class="feedback-send" type="submit">Send private feedback</button>
+        <button class="feedback-send" type="submit">Send feedback</button>
         <span class="feedback-status" role="status" aria-live="polite"></span>
       </div>
     </form>
@@ -72,7 +78,7 @@ main{padding:clamp(10px,1.4vw,18px) clamp(16px,4vw,56px) 40px}.topgrid{gap:clamp
 </div></main>
 <script>
 (function(){
-var functions={sin:{label:'sin(x)',eq:'sin(<em>x</em>)',fn:function(x){return Math.sin(x)},lo:-6.283,hi:6.283,yLo:-1.25,yHi:1.25,gLo:-1,gHi:1,about:'The sine wave repeats every 2π.'},cos:{label:'cos(x)',eq:'cos(<em>x</em>)',fn:function(x){return Math.cos(x)},lo:-6.283,hi:6.283,yLo:-1.25,yHi:1.25,gLo:-1,gHi:1,about:'Cosine is sine shifted one quarter-cycle.'},tan:{label:'tan(x)',eq:'tan(<em>x</em>)',fn:function(x){return Math.tan(x)},lo:-4.65,hi:4.65,yLo:-4,yHi:4,gLo:-4,gHi:4,about:'Tangent shoots through a vertical asymptote every π/2.',asym:function(x){return Math.abs(Math.cos(x))<.035}},exp:{label:'eˣ',eq:'e<sup><em>x</em></sup>',fn:function(x){return Math.exp(x)},lo:-3.2,hi:3.2,yLo:-1,yHi:25,gLo:0,gHi:25,about:'Each step of +1 multiplies the output by e ≈ 2.718.'},ln:{label:'ln(x)',eq:'ln(<em>x</em>)',fn:function(x){return Math.log(x)},lo:.02,hi:10,yLo:-5,yHi:3,gLo:-5,gHi:3,about:'ln(x) is the inverse of eˣ: it asks which exponent makes x.'},log:{label:'log₁₀(x)',eq:'log<sub>10</sub>(<em>x</em>)',fn:function(x){return Math.log10(x)},lo:.02,hi:100,yLo:-3,yHi:2.2,gLo:-3,gHi:2,about:'Every tenfold increase in x adds exactly 1 to log₁₀(x).'}};
+var functions={sin:{label:'sin(x)',eq:'sin(<em>x</em>)',fn:function(x){return Math.sin(x)},lo:-6.283,hi:6.283,yLo:-1.25,yHi:1.25,gLo:-1,gHi:1,about:'The sine wave repeats every 2π.'},cos:{label:'cos(x)',eq:'cos(<em>x</em>)',fn:function(x){return Math.cos(x)},lo:-6.283,hi:6.283,yLo:-1.25,yHi:1.25,gLo:-1,gHi:1,about:'Cosine is sine shifted one quarter-cycle.'},tan:{label:'tan(x)',eq:'tan(<em>x</em>)',fn:function(x){return Math.tan(x)},lo:-4.65,hi:4.65,yLo:-4,yHi:4,gLo:-4,gHi:4,about:'Tangent has vertical asymptotes at odd multiples of π/2, spaced π apart.',asym:function(x){return Math.abs(Math.cos(x))<.035}},exp:{label:'eˣ',eq:'e<sup><em>x</em></sup>',fn:function(x){return Math.exp(x)},lo:-3.2,hi:3.2,yLo:-1,yHi:25,gLo:0,gHi:25,about:'Each step of +1 multiplies the output by e ≈ 2.718.'},ln:{label:'ln(x)',eq:'ln(<em>x</em>)',fn:function(x){return Math.log(x)},lo:.02,hi:10,yLo:-5,yHi:3,gLo:-5,gHi:3,about:'ln(x) is the inverse of eˣ: it asks which exponent makes x.'},log:{label:'log₁₀(x)',eq:'log<sub>10</sub>(<em>x</em>)',fn:function(x){return Math.log10(x)},lo:.02,hi:100,yLo:-3,yHi:2.2,gLo:-3,gHi:2,about:'Every tenfold increase in x adds exactly 1 to log₁₀(x).'}};
 functions.linear={label:'x',eq:'<em>x</em>',fn:function(x){return x},lo:-6,hi:6,yLo:-6.5,yHi:6.5,gLo:-6,gHi:6,about:'The identity function sends every input straight through unchanged.'};functions.quadratic={label:'x²',eq:'<em>x</em><sup>2</sup>',fn:function(x){return x*x},lo:-3.5,hi:3.5,yLo:-1,yHi:13,gLo:0,gHi:12,about:'A quadratic makes the familiar upward-opening parabola.'};functions.absolute={label:'|x|',eq:'|<em>x</em>|',fn:function(x){return Math.abs(x)},lo:-6,hi:6,yLo:-1,yHi:7,gLo:0,gHi:6,about:'Absolute value keeps distance from zero, but drops the sign.'};functions.reciprocal={label:'1/x',eq:'1/<em>x</em>',fn:function(x){return 1/x},lo:-6,hi:6,yLo:-6,yHi:6,gLo:-6,gHi:6,about:'The reciprocal has two branches and never reaches either axis.',asym:function(x){return Math.abs(x)<.04}};functions.sqrt={label:'√x',eq:'√<em>x</em>',fn:function(x){return Math.sqrt(x)},lo:0,hi:16,yLo:-1,yHi:5,gLo:0,gHi:4,about:'Square root only accepts non-negative real inputs.'};
 var reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
 var state={key:'sin',compare:null,x:0,playing:!reduceMotion,last:performance.now()};var plot=document.getElementById('plot'),layers=document.getElementById('plotLayers'),curve=document.getElementById('curve'),compareCurve=document.getElementById('compareCurve'),traceV=document.getElementById('traceV'),traceH=document.getElementById('traceH'),traceDot=document.getElementById('traceDot'),compareDot=document.getElementById('compareDot');var W=1100,H=350,L=64,R=24,T=16,B=38;
@@ -94,7 +100,7 @@ function animate(now){if(state.playing){var q=xr(),dt=Math.min(.05,(now-state.la
 var key='basic-functions-theme',toggle=document.getElementById('themeToggle');function current(){var a=document.documentElement.getAttribute('data-theme');if(a)return a;try{return localStorage.getItem(key)||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){return 'light'}}function theme(t){document.documentElement.setAttribute('data-theme',t);toggle.textContent=t==='dark'?'Light mode':'Dark mode';try{localStorage.setItem(key,t)}catch(e){}}toggle.addEventListener('click',function(){theme(current()==='dark'?'light':'dark')});theme(current());
 setInterval(renderComparison,80);
 var logDetails=document.querySelector('details.more');if(logDetails){var logSection=document.createElement('section'),logHeading=document.createElement('h2');logSection.className='more';logHeading.textContent=logDetails.querySelector('summary').textContent;logSection.appendChild(logHeading);Array.prototype.slice.call(logDetails.children,1).forEach(function(child){logSection.appendChild(child)});logDetails.replaceWith(logSection)}
-var ruler=document.querySelector('.log-rulers'),rails=ruler.querySelectorAll('.rail'),bands=document.createElementNS('http://www.w3.org/2000/svg','g');for(var decade=-1;decade<=10;decade++){var left=170+(decade+1.155)/11.26*780,right=170+(decade+2.155)/11.26*780,rect=document.createElementNS('http://www.w3.org/2000/svg','rect'),label=document.createElementNS('http://www.w3.org/2000/svg','text');rect.setAttribute('x',Math.max(170,left));rect.setAttribute('y','204');rect.setAttribute('width',Math.min(950,right)-Math.max(170,left));rect.setAttribute('height','58');rect.setAttribute('fill','var(--accent)');rect.setAttribute('opacity',decade%2===0?'.13':'.05');bands.appendChild(rect);label.setAttribute('x',(Math.max(170,left)+Math.min(950,right))/2);label.setAttribute('y','219');label.setAttribute('text-anchor','middle');label.setAttribute('class','decade-label');label.textContent='10^'+decade;bands.appendChild(label)}ruler.insertBefore(bands,rails[1]);
+var ruler=document.querySelector('.log-rulers'),rails=ruler.querySelectorAll('.rail'),bands=document.createElementNS('http://www.w3.org/2000/svg','g'),logMin=Math.log10(7e-5),logMax=Math.log10(1.2742e7);for(var decade=Math.ceil(logMin);decade<Math.ceil(logMax);decade++){var left=170+(decade-logMin)/(logMax-logMin)*780,right=170+(decade+1-logMin)/(logMax-logMin)*780,clipLeft=Math.max(170,left),clipRight=Math.min(950,right),rect=document.createElementNS('http://www.w3.org/2000/svg','rect'),label=document.createElementNS('http://www.w3.org/2000/svg','text');if(clipRight<=clipLeft)continue;rect.setAttribute('x',clipLeft);rect.setAttribute('y','204');rect.setAttribute('width',clipRight-clipLeft);rect.setAttribute('height','58');rect.setAttribute('fill','var(--accent)');rect.setAttribute('opacity',decade%2===0?'.13':'.05');bands.appendChild(rect);label.setAttribute('x',(clipLeft+clipRight)/2);label.setAttribute('y','219');label.setAttribute('text-anchor','middle');label.setAttribute('class','decade-label');label.textContent='10^'+decade;bands.appendChild(label)}ruler.insertBefore(bands,rails[1]);
 document.getElementById('playButton').textContent=state.playing?'Pause':'Play';
 render();requestAnimationFrame(animate);
 })();
@@ -109,6 +115,7 @@ render();requestAnimationFrame(animate);
   var status = root.querySelector('.feedback-status');
   var send = root.querySelector('.feedback-send');
   var rating = '';
+  send.textContent = 'Send feedback';
 
   choices.forEach(function(choice){
     choice.addEventListener('click', function(){
@@ -116,6 +123,7 @@ render();requestAnimationFrame(animate);
       choices.forEach(function(item){ item.setAttribute('aria-pressed', item===choice ? 'true' : 'false'); });
       form.hidden = false;
       status.textContent = '';
+      status.removeAttribute('data-state');
     });
   });
 
@@ -144,10 +152,13 @@ render();requestAnimationFrame(animate);
     if(!rating) return;
     if(location.protocol==='file:'){
       status.textContent = 'Feedback can be sent from madeclear.ca.';
+      status.dataset.state = 'error';
       return;
     }
     send.disabled = true;
+    send.setAttribute('aria-busy','true');
     status.textContent = 'Sending…';
+    status.removeAttribute('data-state');
     fetch('/api/feedback', {
       method:'POST',
       credentials:'same-origin',
@@ -160,12 +171,20 @@ render();requestAnimationFrame(animate);
         context:currentContext()
       })
     }).then(function(response){
-      if(!response.ok) throw new Error('request failed');
-      status.textContent = 'Thank you — your feedback is private.';
+      return response.json().catch(function(){ return {}; }).then(function(data){
+        if(!response.ok) throw new Error(data.error || 'Could not send feedback.');
+      });
+    }).then(function(){
+      status.textContent = 'Feedback saved — thank you.';
+      status.dataset.state = 'success';
       textarea.value = '';
-    }).catch(function(){
-      status.innerHTML = 'Could not send. Try <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.';
-    }).then(function(){ send.disabled = false; });
+    }).catch(function(error){
+      status.textContent = (error && error.message ? error.message : 'Could not send feedback.')+' Try again or email hello@madeclear.ca.';
+      status.dataset.state = 'error';
+    }).then(function(){
+      send.disabled = false;
+      send.removeAttribute('aria-busy');
+    });
   });
 })();
 </script>

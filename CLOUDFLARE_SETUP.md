@@ -29,30 +29,33 @@ In the Cloudflare dashboard:
 The secret creates a one-day duplicate-control key from request metadata. Raw IP addresses
 and user-agent strings are never stored.
 
-## 4. Configure email routing
+## 4. Configure the alert sender (optional)
 
-Under **Compute → Email Service → Email Routing**, add `hello@madeclear.ca` and forward it
-to the same verified destination currently used by `simon@madeclear.ca`.
+Feedback is saved to D1 whether or not email alerts are enabled. To receive an email for
+each submission, first onboard `madeclear.ca` under **Compute → Email Service → Email
+Sending** and complete Cloudflare's SPF/DKIM setup for the domain.
 
-## 5. Alert email on new feedback (optional)
+## 5. Add the alert email binding (optional)
 
-Each submission can also send a short alert email, via a Cloudflare Email Workers "Send
-Email" binding riding on the Email Routing configured above — no third-party service.
+Each submission can send a short alert through Cloudflare Email Service's `send_email`
+binding — no third-party mail relay is required.
 
-1. In the Pages project, go to **Settings → Functions** and find the **Email Bindings**
-   (a.k.a. "Send Email" binding) section — exact wording may vary by dashboard version.
-2. Add a binding named exactly `FEEDBACK_ALERT`, with its destination address set to the
-   same verified address `hello@madeclear.ca` forwards to.
+1. If the Pages dashboard offers a **Send Email** binding, add one named exactly
+   `FEEDBACK_ALERT` to the Function running `/api/feedback`. Restrict it to your verified
+   destination address if desired.
+2. If Pages does not offer that binding, deploy this API handler as a small Worker with its
+   own D1, secret, and `send_email` bindings, then route `/api/feedback` to that Worker.
+   A Service binding alone is not a drop-in replacement: this code expects the
+   `send_email` binding's `.send()` method.
 3. In **Settings → Variables and Secrets**, add a plain (non-secret) variable named exactly
    `FEEDBACK_ALERT_TO` with that same destination address as its value.
 4. Redeploy. Both `FEEDBACK_ALERT` and `FEEDBACK_ALERT_TO` must be present for alerts to
    send; if either is missing, feedback still saves to D1 as normal, just silently without
    an email.
 
-The alert email comes from `alerts@madeclear.ca` (needs no real inbox — just a `From`
-address on a domain Cloudflare already manages for you) and contains the page, rating,
-comment, and page-state context for that submission. Sending failures are logged but never
-block the feedback write itself.
+The alert email comes from `alerts@madeclear.ca` and contains the page, rating, comment,
+and page-state context. Sending failures appear in the Function logs but never block the
+feedback write itself.
 
 ## 6. Deploy and test
 
@@ -72,3 +75,8 @@ LIMIT 20;
 
 Feedback comments are private because the site exposes no read endpoint. Access is through
 the authenticated Cloudflare dashboard only.
+
+If the page says **Feedback saved** but no email arrives, the D1 write worked: check the
+`FEEDBACK_ALERT` binding, `FEEDBACK_ALERT_TO`, Email Service domain verification, and the
+Function logs. If the page reports **Could not save feedback**, verify the D1 migration and
+the production `FEEDBACK_DB` binding, then redeploy.

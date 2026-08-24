@@ -99,14 +99,18 @@
   /* grid-auto-rows:1fr keeps every tile in a grid the same height, so a two-line title and a
      four-line one still read as one even field of tiles. */
   .tile-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:1fr;gap:clamp(10px,1.3vw,16px)}
-  .tile{--accent:var(--cat);display:flex;flex-direction:column;gap:11px;padding:15px 14px 17px;border:1px solid color-mix(in srgb,var(--cat) 30%,transparent);border-radius:10px;background:color-mix(in srgb,var(--cat) 6%,transparent);color:inherit;text-decoration:none;transition:background .15s ease,border-color .15s ease}
-  .tile:hover{color:inherit;background:color-mix(in srgb,var(--cat) 13%,transparent);border-color:color-mix(in srgb,var(--cat) 60%,transparent)}
+  .tile{--accent:var(--cat);display:flex;flex-direction:column;gap:11px;padding:15px 14px 17px;border:1px solid color-mix(in srgb,var(--cat) 60%,transparent);border-radius:10px;background:color-mix(in srgb,var(--cat) 35%,transparent);color:inherit;text-decoration:none;transition:background .15s ease,border-color .15s ease}
+  .tile:hover{color:inherit;background:color-mix(in srgb,var(--cat) 45%,transparent);border-color:color-mix(in srgb,var(--cat) 75%,transparent)}
   .tile:hover h3{color:var(--cat)}
   .tile-icon{display:block;width:100%;height:64px;color:var(--fg);overflow:visible}
   .tile-icon use{pointer-events:none}
   .icon-sprite{position:absolute;width:0;height:0;overflow:hidden}
   .tile .meta{display:block;font:10.5px ui-monospace,"Cascadia Code",monospace;letter-spacing:.11em;text-transform:uppercase;color:var(--cat);margin:0}
   .tile h3{margin:0;font-size:.98rem;font-weight:400;line-height:1.3;letter-spacing:-.01em;text-wrap:pretty}
+
+  /* Dark mode keeps its quieter 6% category tint so navy remains the dominant surface. */
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tile{border-color:color-mix(in srgb,var(--cat) 30%,transparent);background:color-mix(in srgb,var(--cat) 6%,transparent)}:root:not([data-theme="light"]) .tile:hover{background:color-mix(in srgb,var(--cat) 13%,transparent);border-color:color-mix(in srgb,var(--cat) 60%,transparent)}}
+  :root[data-theme="dark"] .tile{border-color:color-mix(in srgb,var(--cat) 30%,transparent);background:color-mix(in srgb,var(--cat) 6%,transparent)}:root[data-theme="dark"] .tile:hover{background:color-mix(in srgb,var(--cat) 13%,transparent);border-color:color-mix(in srgb,var(--cat) 60%,transparent)}
 
   /* Featured: the same tiles, one step larger, above the search and filter so a first-time
      visitor lands on a hand-picked sample rather than whatever sorts first. */

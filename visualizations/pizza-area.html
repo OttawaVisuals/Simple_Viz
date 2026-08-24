@@ -82,6 +82,9 @@
   .hero{position:relative;width:100%;margin:clamp(12px,1.5vw,18px) 0 0}
   .hero svg{width:100%;height:auto;display:block}
   .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;text-align:center;transition:opacity .2s}
+  .hero-actions{display:flex;justify-content:flex-end;margin-top:4px}
+  .hero-replay{cursor:pointer;border:1px solid var(--line2);border-radius:999px;background:transparent;color:var(--muted2);padding:6px 11px;font:500 11px/1 ui-monospace,monospace;letter-spacing:.04em}
+  .hero-replay:hover,.hero-replay:focus-visible{border-color:var(--accent);color:var(--accent);outline:2px solid color-mix(in srgb,var(--accent) 30%,transparent);outline-offset:2px}
 
   .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(16px,2vw,24px);border-top:1px solid var(--line);padding-top:clamp(16px,2vw,22px)}
   @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
@@ -206,6 +209,7 @@
     </svg>
     <div class="lbl" id="lblVs" style="font-style:italic;font-family:Georgia,serif"></div>
   </div>
+  <div class="hero-actions"><button class="hero-replay" id="heroReplay" type="button">↻ Replay animation</button></div>
 
   <div class="resultrow">
     <div class="ctrls">
@@ -403,7 +407,7 @@
   function setRect(node,x,y,w,h,opacity){ node.setAttribute('x',x);node.setAttribute('y',y);node.setAttribute('width',Math.max(0,w));node.setAttribute('height',Math.max(0,h));node.setAttribute('opacity',opacity); }
   function applyHeroFrame(now){
     var h=heroAnim.geom;if(!h) return;
-    var elapsed=reduceMotion?7200:(now-heroAnim.start)%7600;
+    var elapsed=reduceMotion?7200:Math.min(now-heroAnim.start,7200);
     var bigMove=ease((elapsed-700)/900), bigSquare=ease((elapsed-1600)/1050);
     var smallAppear=ease((elapsed-2700)/550), smallSquare=ease((elapsed-3300)/1450);
     var final=ease((elapsed-4800)/350);
@@ -427,18 +431,20 @@
     rectFromCircle(areaSmall1,h.sm1Cx,h.cy,target1Y);rectFromCircle(areaSmall2,h.sm2Cx,h.cy,target2Y);
     [areaSmall1,areaSmall2].forEach(function(r){r.setAttribute('fill','color-mix(in srgb, var(--fg) 10%, transparent)');});
     var spare=h.totalRatio<=1, overlayY=spare?h.squareY:target2Y, overlayH=spare?target2Y-h.squareY:h.squareY-target2Y;
-    setRect(excessOverlay,h.squareX,overlayY,h.squareSide,overlayH,final*(.15+.45*(Math.sin(now/130)+1)/2));
+    setRect(excessOverlay,h.squareX,overlayY,h.squareSide,overlayH,final*.45);
     excessOverlay.setAttribute('fill',spare?'var(--good)':'var(--bad)');
     lblBig.style.opacity=1;lblVs.style.opacity=smallAppear;lblSmall.style.opacity=smallAppear;lblArea.style.opacity=final;
-    if(!reduceMotion) heroAnim.raf=requestAnimationFrame(applyHeroFrame);
+    if(!reduceMotion && elapsed<7200) heroAnim.raf=requestAnimationFrame(applyHeroFrame);
+    else heroAnim.raf=0;
   }
-  function startHeroAnimation(){
+  function startHeroAnimation(force){
     var key=state.big+'_'+state.small+'_'+heroW;
-    if(key===heroAnim.key) return;
-    heroAnim.key=key;heroAnim.start=performance.now();
+    if(!force && key===heroAnim.key) return;
     if(heroAnim.raf) cancelAnimationFrame(heroAnim.raf);
+    heroAnim.key=key;heroAnim.start=performance.now();
     applyHeroFrame(heroAnim.start);
   }
+  $('heroReplay').addEventListener('click',function(){ startHeroAnimation(true); });
 
   // ---- equation colouring ----
   var rTerm = $('rTerm');

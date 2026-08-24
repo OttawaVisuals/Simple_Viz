@@ -258,8 +258,8 @@
            light's own line ===== -->
       <g class="lane" id="mainlane-parker">
         <line x1="128" y1="102" x2="1110" y2="102" stroke="var(--c-parker)" stroke-opacity="0.2" stroke-width="1.5"/>
-        <text x="118" y="106" text-anchor="end" class="mono" font-size="10" fill="var(--c-parker)" opacity="0.85">PARKER</text>
         <circle id="mainmk-parker" cx="128" cy="102" r="3.5" fill="var(--c-parker)"/>
+        <text id="mainlabel-parker" x="128" y="120" text-anchor="middle" class="mono" font-size="10" fill="var(--c-parker)" opacity="0.85">PARKER</text>
         <text id="mainreadout-parker" x="137" y="106" class="mono" font-size="10" fill="currentColor" opacity="0.55">0 km</text>
       </g>
 
@@ -271,7 +271,7 @@
 
       <!-- ===== zoom: a full frame around the whole magnified ruler below, with straight
            callout lines funnelling down from the small to-scale box above ===== -->
-      <rect x="60" y="188" width="1080" height="342" rx="4" fill="none" stroke="currentColor" stroke-opacity="0.18" stroke-width="1.25"/>
+      <rect x="60" y="188" width="1080" height="342" rx="4" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="2.5 2.5"/>
       <line x1="128" y1="118" x2="60" y2="188" stroke="currentColor" stroke-opacity="0.16"/>
       <line x1="140.8" y1="118" x2="1140" y2="188" stroke="currentColor" stroke-opacity="0.16"/>
       <g transform="translate(80,204)" fill="none" stroke="currentColor" stroke-opacity="0.4" stroke-width="1.3">
@@ -523,6 +523,7 @@
     var x = TRACK_X0 + Math.min(1, distanceKm/D) * (TRACK_X1 - TRACK_X0);
 
     document.getElementById('mainmk-' + key).setAttribute('cx', x);
+    document.getElementById('mainlabel-' + key).setAttribute('x', x);
     var readout = document.getElementById('mainreadout-' + key);
     readout.textContent = formatKm(distanceKm);
     readout.setAttribute('x', reached ? TRACK_X1 - 4 : x + 9);

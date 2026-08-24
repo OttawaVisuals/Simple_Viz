@@ -699,8 +699,13 @@
     verdictEl.style.color = colour;
 
     var diff = Math.abs(f - humanF)*100;
-    var rel = f > humanF ? 'bigger, on this scale, than a human' : (f < humanF ? 'smaller, on this scale, than a human' : 'exactly where a human sits');
-    verdictSubEl.textContent = 'A human sits at '+(humanF*100).toFixed(1)+'% — this is '+diff.toFixed(1)+' points '+rel+'.';
+    var humanPrefix = 'A human sits at '+(humanF*100).toFixed(1)+'% — this is ';
+    if(diff < 0.05){
+      verdictSubEl.textContent = humanPrefix+'exactly where a human sits.';
+    }else{
+      var rel = f > humanF ? 'bigger, on this scale, than a human' : 'smaller, on this scale, than a human';
+      verdictSubEl.textContent = humanPrefix+diff.toFixed(1)+' points '+rel+'.';
+    }
     var logSize=logOf(size), smallGap=Math.abs(logSize-LOGMIN), bigGap=Math.abs(LOGMAX-logSize);
     var orderDifference=Math.abs(smallGap-bigGap);
     if(smallGap<1e-8) distanceKpiEl.textContent='At the smallest end.';

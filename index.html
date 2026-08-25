@@ -451,25 +451,73 @@
 
   <section class="roadmap" aria-label="Roadmap">
     <div class="kicker">What's next</div>
-    <h2>More equations, waiting their turn.</h2>
-    <p class="lede">The next batch is all kitchen-table science &mdash; grab something from around the house, take a real measurement, and check it against the equation.</p>
+    <h2>Built, but not the final word yet.</h2>
+    <p class="lede">Every page below is live and playable, but hasn&rsquo;t been through a last accuracy-and-polish pass &mdash; treat the numbers as a work in progress until it graduates to the catalogue above.</p>
 
     <h3 class="rm-cat">Everyday maths</h3>
     <ul>
-      <li><span><b>Why the spoon feels colder than the table</b> &mdash; both are room temperature, but touch metal and wood and your hand disagrees</span><span class="eq">e = &radic;(k&rho;c)</span><span class="status">idea</span></li>
+      <li><span><a href="visualizations/lightning-distance.html"><b>How far away was that lightning?</b></a> &mdash; Time the gap between the flash and the boom, multiply by the speed of sound, and measure a storm without any instrument.</span><span class="eq">d = v &times; &Delta;t</span></li>
+      <li><span><a href="visualizations/bike-gears.html"><b>Same legs, different gear</b></a> &mdash; Pick a chainring and a sprocket, hold your cadence steady, and watch one pedal stroke buy either speed or a hill you can actually climb.</span><span class="eq">v = &pi;D &middot; (N<sub>c</sub>/N<sub>s</sub>) &middot; f</span></li>
+      <li><span><a href="visualizations/compound-interest.html"><b>The last decade earns more</b></a> &mdash; Watch a fixed interest rate compound year after year, until the dollars added in the final decade outweigh the first three decades combined.</span><span class="eq">A = P(1 + r/n)<sup>nt</sup></span></li>
+      <li><span><a href="visualizations/mpg-trap.html"><b>Miles per gallon is a trap</b></a> &mdash; Drag two mpg values and see how much fuel each gain actually saves &mdash; the same 5&nbsp;mpg jump can save six times more gas depending on where you start.</span><span class="eq">&Delta;F = D(1/mpg&#8321; &minus; 1/mpg&#8322;)</span></li>
+      <li><span><a href="visualizations/binary-hex.html"><b>Why computers count in sixteens</b></a> &mdash; Flip eight bit switches and watch a decimal number, a two-digit hex code, and sometimes a letter appear together.</span><span class="eq">n = &Sigma;b<sub>i</sub>&middot;2<sup>i</sup></span></li>
+      <li><span><a href="visualizations/birthday-paradox.html"><b>23 people, a coin flip</b></a> &mdash; Slide the size of a room and watch the odds that two people share a birthday cross fifty-fifty at just 23.</span><span class="eq">P(n) = 1 &minus; &prod;(365&minus;k)/365</span></li>
+      <li><span><a href="visualizations/roast-time.html"><b>Why the big roast takes so long</b></a> &mdash; Resize a cube from a chicken breast to an elephant and watch the ratio of surface to volume decide both cooking time and body heat.</span><span class="eq">A/V = 6/L</span></li>
+      <li><span><a href="visualizations/decibels.html"><b>Decibels don't add up</b></a> &mdash; Drag the decibel slider and watch actual sound intensity and perceived loudness pull apart onto two very different curves.</span><span class="eq">dB = 10&middot;log<sub>10</sub>(I/I&#8320;)</span></li>
+    </ul>
+
+    <h3 class="rm-cat">Discoveries</h3>
+    <ul>
+      <li><span><a href="visualizations/materials-arrangement.html"><b>Why materials are not all arranged alike</b></a> &mdash; Copper, brass, steel, ceramic, plastic and glass may all look solid &mdash; but their atoms organise in fundamentally different ways.</span></li>
+      <li><span><a href="visualizations/double-slit.html"><b>One particle, two slits</b></a> &mdash; Change a double-slit experiment and see wave fringes, individual detection events, and why making the path measurable removes the interference pattern.</span><span class="eq">d sin&theta; = m&lambda;</span></li>
+      <li><span><a href="visualizations/hot-car-flush.html"><b>Flush the hot air from a parked car</b></a> &mdash; Open one rear window and swing the opposite front door to see why a pressure pulse clears cabin air faster than one opening alone.</span></li>
+      <li><span><a href="visualizations/dew-point-window.html"><b>Why this window is fogging up</b></a> &mdash; Set room temperature, humidity and the glass surface temperature to see exactly when invisible vapour turns into droplets.</span><span class="eq">T<sub>d</sub> = b&gamma;/(a &minus; &gamma;)</span></li>
+      <li><span><a href="visualizations/night-sky-ice.html"><b>How a desert night can make ice</b></a> &mdash; Change air temperature, humidity and cloud cover to see a shallow pool radiate enough heat to freeze while the air stays above 0&deg;C.</span><span class="eq">q<sub>rad</sub> = &epsilon;<sub>w</sub>&sigma;(T<sub>w</sub><sup>4</sup> &minus; &epsilon;<sub>sky</sub>T<sub>a</sub><sup>4</sup>)</span></li>
+      <li><span><a href="visualizations/fan-laws.html"><b>A little slower saves a lot of fan power</b></a> &mdash; Turn one speed control and watch airflow fall linearly, pressure by the square, and ideal shaft power by the cube.</span><span class="eq">P&#8322;/P&#8321; = (N&#8322;/N&#8321;)<sup>3</sup></span></li>
+      <li><span><a href="visualizations/thermal-comfort-pmv.html"><b>The room feels colder than the thermostat says</b></a> &mdash; Drag a person around a room box and watch comfort shift with a cold window's radiant pull &mdash; even when the air temperature never moves.</span><span class="eq">PMV = [0.303e<sup>&minus;0.036M</sup> + 0.028] &times; (M &minus; L)</span></li>
+      <li><span><a href="visualizations/planet-light-delay.html"><b>You are seeing the past</b></a> &mdash; Choose a planet and compare where its light began with where that planet is now.</span><span class="eq">s = vd/c</span></li>
+      <li><span><a href="visualizations/gravity-lab.html"><b>The pull between worlds</b></a> &mdash; Change mass and distance to feel Newton&rsquo;s inverse-square law take effect.</span><span class="eq">F = Gm&#8321;m&#8322;/r<sup>2</sup></span></li>
+      <li><span><a href="visualizations/snells-law.html"><b>Why the straw looks bent</b></a> &mdash; Bend a ray of light across the boundary into water or glass, then reverse it and watch the same equation cut the light off entirely.</span><span class="eq">n&#8321; sin&theta;&#8321; = n&#8322; sin&theta;&#8322;</span></li>
+      <li><span><a href="visualizations/rocket-equation.html"><b>Why one more passenger costs so much fuel</b></a> &mdash; See why required propellant grows exponentially, not linearly, with the speed change a rocket needs.</span><span class="eq">&Delta;v = v<sub>e</sub>&middot;ln(R)</span></li>
+      <li><span><a href="visualizations/keplers-third-law.html"><b>Why Mercury's year is 88 days</b></a> &mdash; Slide a planet's distance from the Sun outward and watch its orbital period grow even faster than its distance.</span><span class="eq">T = 2&pi;&radic;(a<sup>3</sup>/(G(M+m)))</span></li>
+      <li><span><a href="visualizations/grid-voltage.html"><b>Why the grid runs at 400,000 volts</b></a> &mdash; Slide the transmission voltage up through real grid standards and watch resistive loss fall with the square of the increase.</span><span class="eq">P<sub>loss</sub> = I<sup>2</sup>R</span></li>
+      <li><span><a href="visualizations/earth-temperature.html"><b>Sunlight in, heat out</b></a> &mdash; Tune Earth's reflectivity and watch the balance settle on a temperature &mdash; then see how far the real 33&deg; greenhouse gap sits above it.</span><span class="eq">T = &#8308;&radic;(S(1&minus;&alpha;)/(4&sigma;))</span></li>
+      <li><span><a href="visualizations/earth-black-hole.html"><b>Squeeze the Earth into a black hole</b></a> &mdash; Pick a real mass, from a mountain to the Sun, and see how small you'd need to crush it before it became a black hole.</span><span class="eq">r<sub>s</sub> = 2GM/c<sup>2</sup></span></li>
+      <li><span><a href="visualizations/bayes-theorem.html"><b>Why a 99%-accurate test can still be wrong</b></a> &mdash; Set a disease's rarity and a test's accuracy, then watch a grid of a hundred people show how many positive results are actually real.</span><span class="eq">P(D|+) = P(+|D)P(D)/P(+)</span></li>
+      <li><span><a href="visualizations/square-wave.html"><b>The overshoot that refuses to leave</b></a> &mdash; Add sine waves one harmonic at a time and watch a square wave emerge &mdash; with an overshoot that never quite goes away.</span><span class="eq">f(t) = (4/&pi;)&Sigma;sin(k&omega;t)/k</span></li>
+      <li><span><a href="visualizations/escape-velocity.html"><b>Why the Moon lost its atmosphere</b></a> &mdash; Launch something from a real world's surface and see whether your speed clears its escape velocity or falls back down.</span><span class="eq">v<sub>esc</sub> = &radic;(2GM/r)</span></li>
+      <li><span><a href="visualizations/half-life.html"><b>Reading a bone's age off its isotopes</b></a> &mdash; Pick a real isotope and slide elapsed time in half-lives to see how carbon dating reads a bone's remaining atoms.</span><span class="eq">N = N&#8320;e<sup>&minus;&lambda;t</sup></span></li>
+      <li><span><a href="visualizations/doppler-shift.html"><b>Why a passing siren drops in pitch</b></a> &mdash; Steer a car's speed past a fixed listener and watch the pitch drop the instant it passes.</span><span class="eq">f&prime; = f &times; v/(v&#8723;v<sub>s</sub>)</span></li>
+      <li><span><a href="visualizations/starlight-spectrum.html"><b>Starlight has a barcode</b></a> &mdash; Drag a hydrogen electron's jump to emit one exact colour, then pick a real star and see which elements' dark lines show up in its light.</span><span class="eq">1/&lambda; = R(1/2<sup>2</sup> &minus; 1/n<sup>2</sup>)</span></li>
+      <li><span><a href="visualizations/newtons-cannonball.html"><b>Orbit isn't up. It's sideways.</b></a> &mdash; Fire Newton's cannonball harder and harder from a mountain and watch it go from crashing, to orbiting, to leaving Earth for good.</span><span class="eq">v<sub>circ</sub> = &radic;(GM/r)</span></li>
+      <li><span><a href="visualizations/coriolis-effect.html"><b>Straight lines that don't stay straight</b></a> &mdash; Watch a ball roll dead straight across a spinning disc and still look like it curves &mdash; then see why it's real for artillery but invisible in your bathtub.</span><span class="eq">y = &Omega; sin&phi; &middot; d<sup>2</sup>/v</span></li>
     </ul>
 
     <h3 class="rm-cat">Fun physics</h3>
     <ul>
-      <li><span><b>Can you hear the size of a bottle?</b> &mdash; change a bottle&rsquo;s air volume or neck opening and hear its Helmholtz resonance move in pitch</span><span class="eq">f = c/(2&pi;)&radic;(A/VL<sub>eff</sub>)</span><span class="status">idea</span></li>
-      <li><span><b>Melting ice doesn't raise the glass</b> &mdash; float an ice cube in a full glass, mark the waterline, and watch it not move</span><span class="eq">&rho;<sub>ice</sub>V<sub>ice</sub> = &rho;<sub>water</sub>V<sub>disp</sub></span><span class="status">idea</span></li>
+      <li><span><a href="visualizations/capillary-rise.html"><b>How water climbs</b></a> &mdash; Change a liquid and an ideal glass-tube radius to see what sets capillary height and speed, then test the limits with a simple glass-gap experiment at home.</span><span class="eq">h = 2&gamma;cos&theta;/(&rho;gr)</span></li>
+      <li><span><a href="visualizations/pendulum-period.html"><b>A swing keeps its own time</b></a> &mdash; Pull a pendulum back further and watch its rhythm barely change &mdash; until you push past the angle where that stops being true.</span><span class="eq">T = 2&pi;&radic;(L/g)</span></li>
+      <li><span><a href="visualizations/terminal-velocity.html"><b>Falling as fast as the air allows</b></a> &mdash; Change body position and mass and watch a skydiver's fixed top speed shift &mdash; then open a canopy and watch the same equation slow it to a walk.</span><span class="eq">v = &radic;(2mg/(&rho;AC<sub>d</sub>))</span></li>
+      <li><span><a href="visualizations/ocean-salt.html"><b>All the salt in the sea</b></a> &mdash; Evaporate every ocean, spread the leftover salt over dry land, and see how deep the pile gets.</span><span class="eq">h = m/(&rho;A)</span></li>
+      <li><span><a href="visualizations/ten-metre-ceiling.html"><b>The ten-metre ceiling</b></a> &mdash; However hard a pump pulls, no vacuum on Earth can lift water past one fixed, unbeatable height.</span><span class="eq">h = P&#8320;/(&rho;g)</span></li>
+      <li><span><a href="visualizations/coffee-cooling.html"><b>Milk now, or milk later?</b></a> &mdash; Add cold milk right away or wait until you're ready to drink &mdash; the same physics gives a different final temperature either way.</span><span class="eq">T(t) = T<sub>a</sub> + (T&#8320; &minus; T<sub>a</sub>)e<sup>&minus;kt</sup></span></li>
+      <li><span><a href="visualizations/resonance.html"><b>A small push, badly timed</b></a> &mdash; Sweep a driving frequency past a system's own, and watch a small push turn into a dangerously large swing.</span><span class="eq">Q = 1/&radic;((1&minus;x<sup>2</sup>)<sup>2</sup> + (b&#770;x)<sup>2</sup>)</span></li>
+      <li><span><a href="visualizations/guitar-string.html"><b>A string you can actually hear</b></a> &mdash; Change a string's length, tension, and thickness, then press play and actually hear the pitch move.</span><span class="eq">f = 1/(2L) &middot; &radic;(T/&mu;)</span></li>
+      <li><span><a href="visualizations/slinky-drop.html"><b>The bottom hasn't heard yet</b></a> &mdash; Let go of a stretched slinky's top and watch the bottom hang motionless until the news of the drop reaches it.</span><span class="eq">v = &radic;(kL<sup>2</sup>/m)</span></li>
+      <li><span><a href="visualizations/sky-blue.html"><b>Why the sky is blue</b></a> &mdash; Slide through the visible spectrum and see why short wavelengths paint the sky blue and long ones paint sunsets red.</span><span class="eq">I &prop; 1/&lambda;<sup>4</sup></span></li>
+      <li><span><a href="visualizations/ship-buoyancy.html"><b>Why ships float</b></a> &mdash; Load cargo onto a steel hull and watch it settle lower in the water, until it finally floods and sinks.</span><span class="eq">F<sub>b</sub> = &rho;Vg</span></li>
+      <li><span><a href="visualizations/animal-biomass.html"><b>All animal life, by weight</b></a> &mdash; Stack humans, livestock, and every wild mammal on Earth by total weight, not headcount.</span><span class="eq">M = &Sigma;n&middot;m</span></li>
+      <li><span><a href="visualizations/bounce-restitution.html"><b>Count the bounces</b></a> &mdash; Drop a real ball onto a real surface and watch each rebound keep the same fraction of the last one's height &mdash; then turn on a balloon drum and keep counting after your eyes give up.</span><span class="eq">h<sub>n</sub> = h&#8320;e<sup>2n</sup></span></li>
+      <li><span><a href="visualizations/what-is-vacuum.html"><b>What is a vacuum?</b></a> &mdash; Lower the pressure on one side of a liquid and see why the surrounding air pushes it across &mdash; then see why gravity keeps most of Earth's atmosphere from escaping into space.</span><span class="eq">F = &Delta;P &times; A</span></li>
     </ul>
+
   </section>
+
 
   <p class="note">Every visual is self-contained, approximate only where stated, and designed to be played with. Each page is a single HTML file with no build step and no external dependencies &mdash; open one directly in a browser and it works.</p>
 
   <div class="site-footer">
-    <span>Designed and maintained by Simon using AI-assisted development. Sources and approximations are stated on each page. <a href="about.html">Why this site exists</a>. <a href="unreviewed.html">Pages not yet reviewed</a>.</span>
+    <span>Designed and maintained by Simon using AI-assisted development. Sources and approximations are stated on each page. <a href="about.html">Why this site exists</a>.</span>
     <span>Spot a mistake or have an idea? Write to <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.</span>
   </div>
 
@@ -479,7 +527,7 @@
 (function(){
   // Theme toggle: overrides prefers-color-scheme, remembers the choice. Same pattern as every
   // visualization page (STYLE_GUIDE.md), with its own storage key.
-  var STORAGE_KEY = 'index-theme';
+  var STORAGE_KEY = 'madeclear-theme';
   var themeToggle = document.getElementById('themeToggle');
   function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
   function currentTheme(){

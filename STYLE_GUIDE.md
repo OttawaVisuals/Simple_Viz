@@ -257,8 +257,10 @@ place in the visualization. Apply this to every external `<a href="https://…">
 
 **Theme toggle** — plain text button, not an icon or switch, matching the topbar's
 monospace/uppercase style. Labels itself with the mode it will switch *to* ("Dark mode" /
-"Light mode"), not the current mode. Persist the explicit choice in `localStorage` so it
-survives reloads, and let the initial state still follow `prefers-color-scheme` until the
+"Light mode"), not the current mode. Persist the explicit choice in `localStorage` under the
+shared key `'madeclear-theme'` — **the same literal string on every page**, not a per-page key
+— so that choosing a theme on one page applies across the whole site (all pages share one
+origin on madeclear.ca). Let the initial state still follow `prefers-color-scheme` until the
 user overrides it.
 
 **`currentTheme()` must read the applied DOM attribute before it reads storage.** The obvious
@@ -271,7 +273,7 @@ live `data-theme` attribute first makes the control work with storage entirely u
 storage then only carries the choice across reloads, which is all it was ever for.
 
 ```js
-var STORAGE_KEY = 'PAGE-NAME-theme'; // unique per page
+var STORAGE_KEY = 'madeclear-theme'; // shared across every page, not per-page
 function systemPrefersDark(){ return matchMedia('(prefers-color-scheme: dark)').matches; }
 function currentTheme(){
   var applied = document.documentElement.getAttribute('data-theme');

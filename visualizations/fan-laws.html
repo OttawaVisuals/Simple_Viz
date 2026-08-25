@@ -237,7 +237,7 @@
     </div>
     <form class="feedback-form" hidden><label for="feedbackComment">What could be clearer? <span>Optional, 1,200 characters maximum.</span></label><textarea id="feedbackComment" name="comment" maxlength="1200" placeholder="A confusing step, a possible mistake, or an idea..."></textarea><label class="feedback-trap" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label><div class="feedback-actions"><button class="feedback-send" type="submit">Send private feedback</button><span class="feedback-status" role="status" aria-live="polite"></span></div></form>
   </section>
-  <div class="footer"><span>Designed and maintained by Simon using AI-assisted development. Sources and approximations are stated on each page.</span><span>Spot a mistake or have an idea? Write to <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.</span></div>
+  <div class="footer"><span>Designed and maintained by Simon using AI-assisted development. Sources and approximations are stated on each page. <a href="../about.html">Why this site exists</a>.</span><span>Spot a mistake or have an idea? Write to <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.</span></div>
 </div>
 </main>
 <script>
@@ -311,7 +311,7 @@
   })();
   document.querySelectorAll('.preset').forEach(function(b){b.addEventListener('click',function(){state.speed=Number(b.dataset.speed);state.active=null;render();});});
 
-  var STORAGE_KEY='fan-laws-theme',themeToggle=$('themeToggle');
+  var STORAGE_KEY='madeclear-theme',themeToggle=$('themeToggle');
   function systemPrefersDark(){return matchMedia('(prefers-color-scheme: dark)').matches;}
   function currentTheme(){var applied=document.documentElement.getAttribute('data-theme');if(applied)return applied;var stored=null;try{stored=localStorage.getItem(STORAGE_KEY);}catch(e){}return stored||(systemPrefersDark()?'dark':'light');}
   function applyTheme(t){document.documentElement.setAttribute('data-theme',t);themeToggle.textContent=t==='dark'?'Light mode':'Dark mode';try{localStorage.setItem(STORAGE_KEY,t);}catch(e){}}

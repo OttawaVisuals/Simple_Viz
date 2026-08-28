@@ -51,19 +51,18 @@
   h1 em{font-style:italic;font-weight:300}
   .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:54ch;margin:10px 0 0;text-wrap:pretty}
   .eqnbox{display:flex;align-items:center;justify-content:center;text-align:center;min-height:100%}
-  .eqn{display:flex;align-items:center;gap:clamp(7px,1vw,12px);font-size:clamp(23px,3.2vw,38px);line-height:1;font-weight:300}
-  .eqn .eq{color:var(--muted)}
-  .eqn .frac{display:inline-flex;flex-direction:column;align-items:center}
-  .eqn .frac span{padding:.05em .22em}
-  .eqn .frac .bar{height:1.5px;background:var(--fg);width:100%;padding:0}
-  .eqn sup,.eqn sub{font-size:.55em}
-  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .eqn-list{display:grid;gap:10px;font-size:clamp(15px,1.45vw,19px);line-height:1.15;font-weight:300}
+  .eqn-list .eq{color:var(--muted);padding:0 .14em}
+  .eqn-list .law-n{transition:color .2s;white-space:nowrap}
+  .eqnbox.is-active .law-n{color:var(--accent)}
+  .eqn-list sub,.eqn-list sup{font-size:.6em}
   .legendbox{padding-top:2px;align-self:center}
   .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
   .legend .row{display:grid;grid-template-columns:2.4em 1fr auto;gap:9px;align-items:baseline;background:var(--bg);padding:8px 2px}
   .legend .sym{font-size:15px;font-weight:300}
   .legend .name{font-size:12.5px;color:var(--muted2)}
   .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+  @media (max-width:820px){.eqnbox{justify-content:flex-start;text-align:left}.legendbox{max-width:390px}}
 
   .hero{display:grid;grid-template-columns:minmax(240px,.72fr) minmax(0,1.55fr);gap:clamp(20px,3vw,46px);align-items:center;margin-top:clamp(24px,3.5vw,42px)}
   @media (max-width:820px){.hero{grid-template-columns:1fr}.fan-figure{max-width:480px;margin:0 auto;width:100%}}
@@ -73,7 +72,7 @@
   .fan-shell{fill:none;stroke:var(--line2);stroke-width:2}
   .fan-hub{fill:var(--bg);stroke:var(--fg);stroke-width:2}
   .fan-blade{fill:color-mix(in srgb,var(--accent) 20%,var(--bg));stroke:var(--accent);stroke-width:1.5}
-  .airline{stroke:var(--flow);stroke-width:2;stroke-linecap:round;stroke-dasharray:10 14;opacity:.82}
+  .airline{stroke:var(--flow);stroke-width:2;stroke-linecap:round;stroke-dasharray:10 16;opacity:.58}
   .fan-label{fill:var(--muted);font:11px ui-monospace,monospace}
   .chart-frame{fill:none;stroke:var(--line2);stroke-width:1}
   .gridline{stroke:var(--line);stroke-width:1}
@@ -164,17 +163,21 @@
   <div class="topgrid">
     <div class="headleft">
       <h1>A little slower saves <em>a lot</em> of fan power</h1>
-      <p class="sub">Slow a fan by 20% and airflow falls by 20% &mdash; but the ideal shaft power falls by almost half. The difference is the cube hiding in the fan laws.</p>
+      <p class="sub">For the same fan at a corresponding operating point, 20% less speed means 20% less airflow &mdash; but 48.8% less predicted shaft power. The difference is the cube hiding in the fan laws.</p>
     </div>
-    <div class="eqnbox">
-      <div class="eqn"><span class="frac"><span>P<sub>2</sub></span><span class="bar"></span><span>P<sub>1</sub></span></span><span class="eq">=</span><span class="frac"><span><em id="nTerm">N<sub>2</sub></em></span><span class="bar"></span><span>N<sub>1</sub></span></span><sup>3</sup></div>
+    <div class="eqnbox" id="eqnBox" aria-label="Fan affinity equations">
+      <div class="eqn-list">
+        <div>Q<sub>2</sub>/Q<sub>1</sub> <span class="eq">=</span> <span class="law-n">N<sub>2</sub>/N<sub>1</sub></span></div>
+        <div>&Delta;p<sub>2</sub>/&Delta;p<sub>1</sub> <span class="eq">=</span> (<span class="law-n">N<sub>2</sub>/N<sub>1</sub></span>)<sup>2</sup></div>
+        <div>P<sub>2</sub>/P<sub>1</sub> <span class="eq">=</span> (<span class="law-n">N<sub>2</sub>/N<sub>1</sub></span>)<sup>3</sup></div>
+      </div>
     </div>
     <div class="legendbox"><div class="legend" id="legend"></div></div>
   </div>
 
   <div class="hero">
     <figure class="fan-figure">
-      <p class="figure-title">Same fan, different speed</p>
+      <p class="figure-title">Same fan, corresponding operating points</p>
       <svg id="fanSvg" viewBox="0 0 420 300" role="img" aria-label="A variable-speed fan moving air through a short duct">
         <rect x="24" y="46" width="372" height="208" rx="12" fill="none" stroke="var(--line)"/>
         <g id="airLines">
@@ -213,7 +216,7 @@
       <div class="track-range"><span>30%</span><span class="mid">slower &larr; speed &rarr; faster</span><span>120%</span></div>
     </div>
     <div class="result">
-      <div class="result-label">Ideal shaft power</div>
+      <div class="result-label">Predicted fan shaft power</div>
       <div class="result-value"><span class="num mono" id="savingValue"></span><span class="unit mono" id="savingUnit"></span><span class="verdict" id="verdict"></span></div>
       <div class="verdict-sub" id="verdictSub"></div>
       <div class="lawbars" id="lawbars"></div>
@@ -226,10 +229,10 @@
     <button class="preset" data-speed="100">design speed</button>
     <button class="preset" data-speed="80">20% slower</button>
     <button class="preset" data-speed="50">half speed</button>
-    <button class="preset" data-speed="120">20% faster</button>
+    <button class="preset" data-speed="120">theoretical 20% faster</button>
   </div>
 
-  <p class="note"><strong>These are the fan affinity laws for changing the speed of the same fan:</strong> Q<sub>2</sub>/Q<sub>1</sub>&nbsp;=&nbsp;N<sub>2</sub>/N<sub>1</sub>, &Delta;p<sub>2</sub>/&Delta;p<sub>1</sub>&nbsp;=&nbsp;(N<sub>2</sub>/N<sub>1</sub>)&sup2;, and P<sub>2</sub>/P<sub>1</sub>&nbsp;=&nbsp;(N<sub>2</sub>/N<sub>1</sub>)&sup3;. The page holds fan diameter, air density and efficiency constant and reports shaft power, not exact electrical input. Real motors, drives, filters, dampers and systems depart from the ideal &mdash; especially at very low speed &mdash; so measured manufacturer curves remain the authority. The cube-law result is still why variable-speed control can save so much energy: the <a href="https://www.energy.gov/sites/prod/files/2014/04/f15/motor_tip_sheet11.pdf" target="_blank" rel="noopener">U.S. Department of Energy</a> gives the same 20%-speed-reduction example, while <a href="https://www.amca.org/assets/resources/public/pdf/Education%20Modules/AMCA%20210-16.pdf" target="_blank" rel="noopener">ANSI/AMCA 210</a> defines the underlying similarity relationships.</p>
+  <p class="note"><strong>These are the fan affinity laws for changing the speed of the same fan at corresponding operating points:</strong> Q<sub>2</sub>/Q<sub>1</sub>&nbsp;=&nbsp;N<sub>2</sub>/N<sub>1</sub>, &Delta;p<sub>2</sub>/&Delta;p<sub>1</sub>&nbsp;=&nbsp;(N<sub>2</sub>/N<sub>1</sub>)&sup2;, and P<sub>2</sub>/P<sub>1</sub>&nbsp;=&nbsp;(N<sub>2</sub>/N<sub>1</sub>)&sup3;. The page holds fan diameter, air density and efficiency constant. It predicts power delivered at the fan shaft, not electrical input: motor, variable-speed drive, bearing and transmission losses do not follow the cube law. A system with a significant fixed static-pressure requirement may not produce airflow in direct proportion to speed. Similarity also becomes less reliable at very low speed. Never exceed a fan or motor&rsquo;s manufacturer-rated speed; the 120% setting is a mathematical comparison, not an operating recommendation. Measured fan and system curves remain the authority. The <a href="https://www.energy.gov/sites/prod/files/2014/04/f15/motor_tip_sheet11.pdf" target="_blank" rel="noopener">U.S. Department of Energy</a> gives the same 20%-speed-reduction example; <a href="https://en.wikipedia.org/wiki/Affinity_laws" target="_blank" rel="noopener">Wikipedia&rsquo;s affinity-laws article</a> gives an accessible derivation; and <a href="https://www.amca.org/assets/resources/public/pdf/Publications/amca-210-25-downloadable.pdf" target="_blank" rel="noopener">ANSI/AMCA 210-25, Annex E</a> defines the similarity relationships and their limits.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head"><div><p class="feedback-kicker">Private feedback</p><h2 id="feedbackHeading">Was this clear?</h2><p class="feedback-copy">Your response is private and helps improve this page.</p></div>
@@ -267,7 +270,7 @@
     speedFill.style.width=p+'%';speedThumb.style.left=p+'%';$('baseline').style.left=base+'%';$('baselineLabel').style.left=base+'%';
     $('speedReadout').textContent=state.speed+'% of design speed';
     speedTrack.setAttribute('aria-valuemin',MIN);speedTrack.setAttribute('aria-valuemax',MAX);speedTrack.setAttribute('aria-valuenow',state.speed);speedTrack.setAttribute('aria-valuetext',state.speed+' percent of design speed');
-    $('nTerm').style.color=state.active==='speed'?'var(--accent)':'var(--fg)';$('speedLabel').style.color=state.active==='speed'?'var(--accent)':'var(--muted)';
+    $('eqnBox').classList.toggle('is-active',state.active==='speed');$('speedLabel').style.color=state.active==='speed'?'var(--accent)':'var(--muted)';
   }
 
   function drawResult(){
@@ -285,31 +288,32 @@
   function drawChart(){
     var w=chartW||chartWrap.clientWidth||700,h=300,m={l:w<440?45:54,r:w<440?12:76,t:12,b:44},pw=w-m.l-m.r,ph=h-m.t-m.b;
     chartSvg.setAttribute('viewBox','0 0 '+w+' '+h);chartSvg.innerHTML='';
-    function x(s){return m.l+(s/120)*pw;}function y(v){return m.t+ph-(v/180)*ph;}
+    function x(s){return m.l+((s-MIN)/(MAX-MIN))*pw;}function y(v){return m.t+ph-(v/180)*ph;}
     [0,50,100,150].forEach(function(t){chartSvg.appendChild(svgEl('line',{x1:m.l,y1:y(t),x2:m.l+pw,y2:y(t),class:'gridline'}));var tx=svgEl('text',{x:m.l-8,y:y(t)+4,'text-anchor':'end',class:'axis-text'});tx.textContent=t+'%';chartSvg.appendChild(tx);});
-    [0,40,80,120].forEach(function(t){var tx=svgEl('text',{x:x(t),y:h-19,'text-anchor':t===0?'start':t===120?'end':'middle',class:'axis-text'});tx.textContent=t+'%';chartSvg.appendChild(tx);});
+    [30,60,100,120].forEach(function(t){var tx=svgEl('text',{x:x(t),y:h-19,'text-anchor':t===MIN?'start':t===MAX?'end':'middle',class:'axis-text'});tx.textContent=t+'%';chartSvg.appendChild(tx);});
     chartSvg.appendChild(svgEl('rect',{x:m.l,y:m.t,width:pw,height:ph,class:'chart-frame'}));
     var xt=svgEl('text',{x:m.l+pw/2,y:h-2,'text-anchor':'middle',class:'axis-title'});xt.textContent='fan speed N';chartSvg.appendChild(xt);
     var series=[{k:'flow',fn:function(r){return 100*r;}},{k:'pressure',fn:function(r){return 100*r*r;}},{k:'power',fn:function(r){return 100*r*r*r;}}];
-    series.forEach(function(s){var d='';for(var n=0;n<=120;n+=2){var yy=clamp(s.fn(n/100),0,180);d+=(n?'L':'M')+x(n).toFixed(1)+' '+y(yy).toFixed(1)+' ';}chartSvg.appendChild(svgEl('path',{d:d,class:'curve',stroke:colorFor(s.k)}));});
+    series.forEach(function(s){var d='';for(var n=MIN;n<=MAX;n+=2){var yy=clamp(s.fn(n/100),0,180);d+=(n>MIN?'L':'M')+x(n).toFixed(1)+' '+y(yy).toFixed(1)+' ';}chartSvg.appendChild(svgEl('path',{d:d,class:'curve',stroke:colorFor(s.k)}));});
     chartSvg.appendChild(svgEl('line',{x1:x(state.speed),y1:m.t,x2:x(state.speed),y2:m.t+ph,class:'current-line'}));
     var v=values();series.forEach(function(s){chartSvg.appendChild(svgEl('circle',{cx:x(state.speed),cy:y(v[s.k]),r:5,fill:colorFor(s.k),class:'current-dot'}));});
     var tag=svgEl('text',{x:clamp(x(state.speed),m.l+22,m.l+pw-22),y:m.t+14,'text-anchor':'middle',class:'axis-text'});tag.textContent=state.speed+'%';chartSvg.appendChild(tag);
   }
 
-  var rotor=$('fanRotor'), airLines=$('airLines'), angle=0,offset=0,last=0,reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function animate(ts){var dt=last?Math.min((ts-last)/1000,.05):0;last=ts;angle=(angle+state.speed*1.25*dt)%360;offset=(offset-state.speed*.32*dt)%24;rotor.setAttribute('transform','rotate('+angle.toFixed(2)+' 132 150)');airLines.style.strokeDashoffset=offset.toFixed(2)+'px';requestAnimationFrame(animate);}
+  var rotor=$('fanRotor'),airLines=$('airLines'),angle=0,airOffset=0,last=0,reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function resetMotion(){angle=0;airOffset=0;last=0;rotor.setAttribute('transform','rotate(0 132 150)');airLines.style.strokeDashoffset='0';}
+  function animate(ts){var dt=last?Math.min((ts-last)/1000,.05):0;last=ts;angle=(angle+state.speed*1.25*dt)%360;airOffset=(airOffset-state.speed*.22*dt)%26;rotor.setAttribute('transform','rotate('+angle.toFixed(2)+' 132 150)');airLines.style.strokeDashoffset=airOffset.toFixed(2)+'px';requestAnimationFrame(animate);}
   function drawFan(){$('fanSpeedLabel').textContent=state.speed+'% speed · '+fmt(values().flow)+'% airflow';}
 
   function render(){drawLegend();drawSlider();drawResult();drawChart();drawFan();}
-  (function(){var dragging=false;function setX(clientX){var r=speedTrack.getBoundingClientRect(),f=clamp((clientX-r.left)/r.width,0,1);state.speed=clamp(Math.round(MIN+f*(MAX-MIN)),MIN,MAX);render();}
+  (function(){var dragging=false;function setX(clientX){var r=speedTrack.getBoundingClientRect(),f=clamp((clientX-r.left)/r.width,0,1),next=clamp(Math.round(MIN+f*(MAX-MIN)),MIN,MAX);if(next!==state.speed){state.speed=next;resetMotion();}render();}
     speedTrack.addEventListener('pointerdown',function(e){dragging=true;state.active='speed';if(speedTrack.setPointerCapture)speedTrack.setPointerCapture(e.pointerId);setX(e.clientX);});
     speedTrack.addEventListener('pointermove',function(e){if(dragging)setX(e.clientX);});
     function end(){dragging=false;state.active=null;render();}speedTrack.addEventListener('pointerup',end);speedTrack.addEventListener('pointercancel',end);
     speedTrack.addEventListener('pointerenter',function(){state.active='speed';render();});$('speedCtrl').addEventListener('pointerleave',function(){if(!dragging){state.active=null;render();}});
-    speedTrack.addEventListener('keydown',function(e){var step=e.shiftKey?5:1,n=null;if(e.key==='ArrowLeft'||e.key==='ArrowDown')n=state.speed-step;else if(e.key==='ArrowRight'||e.key==='ArrowUp')n=state.speed+step;else if(e.key==='Home')n=MIN;else if(e.key==='End')n=MAX;if(n!==null){e.preventDefault();state.speed=clamp(n,MIN,MAX);state.active='speed';render();}});
+    speedTrack.addEventListener('keydown',function(e){var step=e.shiftKey?5:1,n=null;if(e.key==='ArrowLeft'||e.key==='ArrowDown')n=state.speed-step;else if(e.key==='ArrowRight'||e.key==='ArrowUp')n=state.speed+step;else if(e.key==='Home')n=MIN;else if(e.key==='End')n=MAX;if(n!==null){e.preventDefault();n=clamp(n,MIN,MAX);if(n!==state.speed){state.speed=n;resetMotion();}state.active='speed';render();}});
   })();
-  document.querySelectorAll('.preset').forEach(function(b){b.addEventListener('click',function(){state.speed=Number(b.dataset.speed);state.active=null;render();});});
+  document.querySelectorAll('.preset').forEach(function(b){b.addEventListener('click',function(){state.speed=Number(b.dataset.speed);state.active=null;resetMotion();render();});});
 
   var STORAGE_KEY='madeclear-theme',themeToggle=$('themeToggle');
   function systemPrefersDark(){return matchMedia('(prefers-color-scheme: dark)').matches;}

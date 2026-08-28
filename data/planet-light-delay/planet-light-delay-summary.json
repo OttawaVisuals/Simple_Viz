@@ -1,0 +1,243 @@
+{
+  "source": "NASA/JPL Horizons",
+  "sourceUrl": "https://ssd.jpl.nasa.gov/horizons/",
+  "apiDocumentation": "https://ssd-api.jpl.nasa.gov/doc/horizons.html",
+  "generatedAt": "2026-08-28T18:28:34.693Z",
+  "interval": {
+    "start": "2000-01-01 00:00 UT",
+    "end": "2050-12-31 00:00 UT"
+  },
+  "method": {
+    "dailySampling": "Geometric Earth-centered vectors sampled every 1 day; arithmetic mean of daily ranges.",
+    "extrema": "Minimum and maximum daily candidates refined over a ±2 day window at 1-hour intervals.",
+    "averagePreset": "Arithmetic mean daily range; movement uses the observation nearest that mean and the mean-range light delay.",
+    "movement": "Magnitude of the change in the geometric Earth-to-object vector between emission and observation times.",
+    "speedOfLightKmS": 299792.458
+  },
+  "objects": {
+    "Sun": {
+      "horizonsId": "10",
+      "sampleCount": 18628,
+      "meanDailyDistanceKm": 149618799.78723526,
+      "presets": {
+        "minimum": {
+          "date": "2020-Jan-05 08:00:00.0000",
+          "julianDateUt": 2458853.833333333,
+          "distanceKm": 147091143.6523275,
+          "lightSeconds": 490.64324244050033,
+          "relativePositionChangeKm": 14857.95784049626
+        },
+        "average": {
+          "date": "2048-Oct-05 00:00:00.0000",
+          "julianDateUt": 2469354.5,
+          "distanceKm": 149618799.78723526,
+          "lightSeconds": 499.07459575662597,
+          "relativePositionChangeKm": 14868.26815480261
+        },
+        "maximum": {
+          "date": "2019-Jul-04 22:00:00.0000",
+          "julianDateUt": 2458669.416666667,
+          "distanceKm": 152104285.0769616,
+          "lightSeconds": 507.36528227458484,
+          "relativePositionChangeKm": 14866.850211301653
+        }
+      }
+    },
+    "Mercury": {
+      "horizonsId": "199",
+      "sampleCount": 18628,
+      "meanDailyDistanceKm": 155393659.47359747,
+      "presets": {
+        "minimum": {
+          "date": "2015-May-31 03:00:00.0000",
+          "julianDateUt": 2457173.625,
+          "distanceKm": 82132844.82294649,
+          "lightSeconds": 273.9656806941637,
+          "relativePositionChangeKm": 2837.321392789886
+        },
+        "average": {
+          "date": "2007-Mar-31 00:00:00.0000",
+          "julianDateUt": 2454190.5,
+          "distanceKm": 155393659.47359747,
+          "lightSeconds": 518.3374542184029,
+          "relativePositionChangeKm": 24827.9379560543
+        },
+        "maximum": {
+          "date": "2034-Dec-03 14:00:00.0000",
+          "julianDateUt": 2464300.083333333,
+          "distanceKm": 217149249.7266805,
+          "lightSeconds": 724.3319300803774,
+          "relativePositionChangeKm": 49984.786397978765
+        }
+      }
+    },
+    "Venus": {
+      "horizonsId": "299",
+      "sampleCount": 18628,
+      "meanDailyDistanceKm": 170047542.9053628,
+      "presets": {
+        "minimum": {
+          "date": "2046-Jan-01 00:00:00.0000",
+          "julianDateUt": 2468346.5,
+          "distanceKm": 39637081.80788573,
+          "lightSeconds": 132.21507329542536,
+          "relativePositionChangeKm": 693.3742970028723
+        },
+        "average": {
+          "date": "2028-Oct-08 00:00:00.0000",
+          "julianDateUt": 2462052.5,
+          "distanceKm": 170047542.9053628,
+          "lightSeconds": 567.217547898963,
+          "relativePositionChangeKm": 23920.221811826174
+        },
+        "maximum": {
+          "date": "2000-Jun-11 07:00:00.0000",
+          "julianDateUt": 2451706.791666667,
+          "distanceKm": 259650457.0314768,
+          "lightSeconds": 866.1006976749122,
+          "relativePositionChangeKm": 55833.49086086012
+        }
+      }
+    },
+    "Mars": {
+      "horizonsId": "499",
+      "sampleCount": 18628,
+      "meanDailyDistanceKm": 253684796.34242308,
+      "presets": {
+        "minimum": {
+          "date": "2003-Aug-27 10:00:00.0000",
+          "julianDateUt": 2452878.916666667,
+          "distanceKm": 55758006.11206363,
+          "lightSeconds": 185.9886885882354,
+          "relativePositionChangeKm": 557.4483445567397
+        },
+        "average": {
+          "date": "2009-Aug-15 00:00:00.0000",
+          "julianDateUt": 2455058.5,
+          "distanceKm": 253684796.34242308,
+          "lightSeconds": 846.2013955748783,
+          "relativePositionChangeKm": 29414.8770751659
+        },
+        "maximum": {
+          "date": "2019-Aug-28 20:00:00.0000",
+          "julianDateUt": 2458724.333333333,
+          "distanceKm": 400223836.1647068,
+          "lightSeconds": 1335.0030178701388,
+          "relativePositionChangeKm": 68699.12345974227
+        }
+      }
+    },
+    "Jupiter": {
+      "horizonsId": "599",
+      "sampleCount": 18628,
+      "meanDailyDistanceKm": 786908091.8361957,
+      "presets": {
+        "minimum": {
+          "date": "2022-Sep-26 02:00:00.0000",
+          "julianDateUt": 2459848.583333333,
+          "distanceKm": 591295040.8430802,
+          "lightSeconds": 1972.3479529397641,
+          "relativePositionChangeKm": 31583.79647544492
+        },
+        "average": {
+          "date": "2025-Oct-06 00:00:00.0000",
+          "julianDateUt": 2460954.5,
+          "distanceKm": 786908091.8361957,
+          "lightSeconds": 2624.84285657445,
+          "relativePositionChangeKm": 82836.93674035533
+        },
+        "maximum": {
+          "date": "2016-Sep-25 08:00:00.0000",
+          "julianDateUt": 2457656.833333333,
+          "distanceKm": 965486142.8257887,
+          "lightSeconds": 3220.5151165803804,
+          "relativePositionChangeKm": 135774.98520243508
+        }
+      }
+    },
+    "Saturn": {
+      "horizonsId": "699",
+      "sampleCount": 18628,
+      "meanDailyDistanceKm": 1433037948.7455862,
+      "presets": {
+        "minimum": {
+          "date": "2032-Dec-24 19:00:00.0000",
+          "julianDateUt": 2463591.291666667,
+          "distanceKm": 1201509979.392167,
+          "lightSeconds": 4007.8058914749854,
+          "relativePositionChangeKm": 80590.63521581012
+        },
+        "average": {
+          "date": "2037-Jun-09 00:00:00.0000",
+          "julianDateUt": 2465218.5,
+          "distanceKm": 1433037948.7455862,
+          "lightSeconds": 4780.100067579373,
+          "relativePositionChangeKm": 160943.00375208486
+        },
+        "maximum": {
+          "date": "2017-Dec-21 17:00:00.0000",
+          "julianDateUt": 2458109.208333333,
+          "distanceKm": 1652783980.370223,
+          "lightSeconds": 5513.093929701938,
+          "relativePositionChangeKm": 217345.14731281158
+        }
+      }
+    },
+    "Uranus": {
+      "horizonsId": "799",
+      "sampleCount": 18628,
+      "meanDailyDistanceKm": 2898899294.8529706,
+      "presets": {
+        "minimum": {
+          "date": "2050-Mar-09 23:00:00.0000",
+          "julianDateUt": 2469875.458333333,
+          "distanceKm": 2586673490.747605,
+          "lightSeconds": 8628.214025142704,
+          "relativePositionChangeKm": 197109.14421151124
+        },
+        "average": {
+          "date": "2029-Mar-08 00:00:00.0000",
+          "julianDateUt": 2462203.5,
+          "distanceKm": 2898899294.8529706,
+          "lightSeconds": 9669.687203581921,
+          "relativePositionChangeKm": 298253.7150427778
+        },
+        "maximum": {
+          "date": "2009-Mar-14 01:00:00.0000",
+          "julianDateUt": 2454904.541666667,
+          "distanceKm": 3155432381.131184,
+          "lightSeconds": 10525.38947170974,
+          "relativePositionChangeKm": 383596.473321166
+        }
+      }
+    },
+    "Neptune": {
+      "horizonsId": "899",
+      "sampleCount": 18628,
+      "meanDailyDistanceKm": 4475568309.600178,
+      "presets": {
+        "minimum": {
+          "date": "2041-Oct-28 21:00:00.0000",
+          "julianDateUt": 2466821.375,
+          "distanceKm": 4310539982.496131,
+          "lightSeconds": 14378.413690767802,
+          "relativePositionChangeKm": 352568.1216341951
+        },
+        "average": {
+          "date": "2021-Dec-13 00:00:00.0000",
+          "julianDateUt": 2459561.5,
+          "distanceKm": 4475568309.600178,
+          "lightSeconds": 14928.888936893061,
+          "relativePositionChangeKm": 457141.2678724555
+        },
+        "maximum": {
+          "date": "2000-Jan-25 00:00:00.0000",
+          "julianDateUt": 2451568.5,
+          "distanceKm": 4653111225.346995,
+          "lightSeconds": 15521.108357392352,
+          "relativePositionChangeKm": 553576.3901740697
+        }
+      }
+    }
+  }
+}

@@ -68,13 +68,19 @@
   .legend .val{font:400 11px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
 
   .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0}
-  .hero svg{width:100%;height:auto;display:block}
-  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s,color .2s}
+  .hero svg{position:relative;z-index:1;width:100%;height:auto;display:block}
+  .hero .lbl{position:absolute;z-index:2;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s,color .2s}
+  #lblInset,#insetBox,#insetSeen,#insetLine,#insetNow,#distLine2,#squiggle{display:none}
+  #distLine1{stroke-dasharray:2 9;stroke-linecap:round;transform-box:fill-box;transform-origin:left center}
+  #distLine1.animate-signal{animation:signal-reveal .9s cubic-bezier(.22,.8,.28,1) both}
+  @keyframes signal-reveal{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  @media (prefers-reduced-motion:reduce){#distLine1.animate-signal{animation:none}}
 
   .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
   @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
 
   .ctrls{display:grid;gap:clamp(18px,2.2vw,28px)}
+  #dCtrl{display:none}
   .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
   .ctrl-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
   .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;transition:color .2s}
@@ -87,9 +93,9 @@
   .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
   .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
 
-  .object-buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
-  .object-buttons button{cursor:pointer;font-family:Georgia,serif;font-style:italic;font-size:15px;padding:6px 13px 7px;border-radius:999px;transition:all .18s ease;border:1px solid var(--border);background:transparent;color:var(--muted)}
-  .object-buttons button:hover{color:var(--fg)}
+  .object-buttons,.range-buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .object-buttons button,.range-buttons button{cursor:pointer;font-family:Georgia,serif;font-style:italic;font-size:15px;padding:6px 13px 7px;border-radius:999px;transition:all .18s ease;border:1px solid var(--border);background:transparent;color:var(--muted)}
+  .object-buttons button:hover,.range-buttons button:hover{color:var(--fg)}
 
   .result{text-align:left}
   .result-label{font:500 11px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
@@ -98,8 +104,9 @@
   .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
   .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
   .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:2.8em}
+  .movement-result{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
 
-  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets{display:none}
   .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
   .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
   .preset:hover{border-color:var(--accent);color:var(--accent)}
@@ -153,15 +160,15 @@
   <div class="topgrid">
     <div class="headleft">
       <h1>You are seeing <em>the past</em>.</h1>
-      <p class="sub">The filled object is the image reaching Earth now. While its light crossed space, the real object kept moving &mdash; the dotted outline shows where it actually is, drawn to the same scale as its own diameter.</p>
+      <p class="sub">Light does not arrive instantly. Compare the shortest, average and longest Earth distance, then watch how far the object moves while its light travels.</p>
     </div>
 
     <div class="eqnbox">
       <div class="eqn">
-        <em>s</em>
+        <em>t</em>
         <span class="eq">=</span>
         <span class="frac">
-          <span class="row num"><em id="vTerm">v</em><em id="dTerm">d</em></span>
+          <span class="row num"><em id="dTerm">d</em></span>
           <span class="bar"></span>
           <span class="row den"><em>c</em></span>
         </span>
@@ -180,7 +187,7 @@
     <div class="lbl" id="lblNow" style="transform:translateX(-50%);color:var(--accent)">ACTUAL POSITION NOW</div>
     <div class="lbl" id="lblScale" style="transform:translateX(-50%);text-align:center"></div>
     <div class="lbl" id="lblInset" style="color:var(--accent)"></div>
-    <svg id="heroSvg" role="img" aria-label="Earth on the left and a selected object on the right. The filled object is its observed past position; a dotted outline shows its current position after moving while its light travelled to Earth.">
+    <svg id="heroSvg" role="img" aria-label="Earth on the left and a selected object on the right, connected across the distance its light travelled.">
       <defs><clipPath id="earthClip"><circle id="earthClipCircle"></circle></clipPath></defs>
       <circle id="earthCircle" fill="#3f7dc4"></circle>
       <g id="earthLand" clip-path="url(#earthClip)" fill="#4f8f5b"></g>
@@ -203,9 +210,16 @@
     <div class="ctrls">
       <div class="ctrl" id="objCtrl">
         <div class="ctrl-head">
-          <span class="ctrl-title">Object</span>
+          <span class="ctrl-title">Choose an object</span>
         </div>
         <div class="object-buttons" id="objectButtons"></div>
+      </div>
+
+      <div class="ctrl" id="rangeCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Choose a distance</span>
+        </div>
+        <div class="range-buttons" id="rangeButtons"></div>
       </div>
 
       <div class="ctrl" id="dCtrl">
@@ -224,10 +238,15 @@
     </div>
 
     <div class="result">
-      <div class="result-label">Moved while the light travelled</div>
+      <div class="result-label">How far into the past</div>
       <div class="result-value"><span class="num mono" id="sValue"></span><span class="unit mono" id="sUnit"></span></div>
       <div class="verdict-sub" id="verdictSub"></div>
       <div class="effort-line" id="effortLine"></div>
+      <div class="movement-result">
+        <div class="result-label">Relative position changed</div>
+        <div class="result-value"><span class="num mono" id="moveValue"></span><span class="unit mono" id="moveUnit"></span></div>
+        <div class="verdict-sub" id="moveSub"></div>
+      </div>
     </div>
   </div>
 
@@ -238,7 +257,7 @@
     <button class="preset" data-p="andromeda">Andromeda galaxy</button>
   </div>
 
-  <p class="note" id="note">Light takes time t = d/c to cross the distance d; during that time, an object moving at speed v drifts s = vt from where its light shows it. The slider spans a representative near-to-far distance range for each object. Every speed here is a speed <em style="font-style:italic">relative to Earth</em>, which is what determines how far an object appears to have shifted &mdash; motion Earth shares doesn't count. That's why the Sun uses Earth's own 29.8&nbsp;km/s orbital speed rather than the Sun's 220&nbsp;km/s orbit around the galactic centre, which Earth is carried along with; for the planets, their orbital speed is a close enough stand-in for the full relative velocity. Distance in the diagram is compressed so both bodies fit on screen, but the drift offset is drawn to the object's own diameter, honestly &mdash; when that offset is too small to see (Andromeda's proper motion barely moves it during ~2.5 million years of light-travel time relative to its own vast size), a magnified inset makes it legible.</p>
+  <p class="note" id="note">Distances come from <a href="https://ssd.jpl.nasa.gov/horizons/">NASA/JPL Horizons</a> geometric Earth-centred vectors sampled daily from 2000 through 2050. Shortest and longest dates were refined hourly; average is the arithmetic mean of the daily distances, represented by the nearest sampled date. “Relative position changed” compares the Earth-to-object vector when the light left with the vector when it arrived &mdash; it is not the object's path length. The upward movement uses <a href="https://ssd.jpl.nasa.gov/planets/phys_par.html">JPL mean diameters</a>; sub-pixel changes are enlarged and very large changes are compressed, with either adjustment labelled. <a href="../data/planet-light-delay/jpl-daily-2000-2050.csv" download>Download the 149,024-row dataset</a> or <a href="../data/planet-light-delay/planet-light-delay-summary.json">view the calculated summary</a>. Horizontal distances are compressed.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -273,33 +292,67 @@
 </main>
 <script>
 (function(){
-  var AU=149597870, LY=9.4607e12, C=299792.458;
+  var AU=149597870.7, C=299792.458;
   var DATA = {
-    Moon:{min:356400, max:406700, speed:1.022, diameter:3474, icon:'moon'},
-    Mars:{min:.524*AU, max:2.524*AU, speed:24.08, diameter:6779, icon:'mars'},
-    Jupiter:{min:4.203*AU, max:6.203*AU, speed:13.07, diameter:139820, icon:'jupiter'},
-    Saturn:{min:8.537*AU, max:10.537*AU, speed:9.69, diameter:116460, icon:'saturn'},
-    Neptune:{min:29.07*AU, max:31.07*AU, speed:5.43, diameter:49244, icon:'neptune'},
-    // The Sun's 220 km/s orbit around the galactic centre is NOT usable here: Earth carries that
-    // motion too, so it cancels. Relative to Earth the Sun moves at Earth's own orbital speed.
-    Sun:{min:147.1e6, max:152.1e6, speed:29.78, diameter:1392700, icon:'sun'},
-    Andromeda:{min:2.49e6*LY, max:2.55e6*LY, speed:110, diameter:220000*LY, icon:'galaxy'}
+    Sun:{diameter:1391400,icon:'sun',presets:{
+      minimum:{date:'2020-Jan-05 08:00 UT',distanceKm:147091143.6523275,lightSeconds:490.64324244050033,moveKm:14857.95784049626},
+      average:{date:'2048-Oct-05 00:00 UT',distanceKm:149618799.78723526,lightSeconds:499.07459575662597,moveKm:14868.26815480261},
+      maximum:{date:'2019-Jul-04 22:00 UT',distanceKm:152104285.0769616,lightSeconds:507.36528227458484,moveKm:14866.850211301653}
+    }},
+    Mercury:{diameter:4878.8,icon:'mercury',presets:{
+      minimum:{date:'2015-May-31 03:00 UT',distanceKm:82132844.82294649,lightSeconds:273.9656806941637,moveKm:2837.321392789886},
+      average:{date:'2007-Mar-31 00:00 UT',distanceKm:155393659.47359747,lightSeconds:518.3374542184029,moveKm:24827.9379560543},
+      maximum:{date:'2034-Dec-03 14:00 UT',distanceKm:217149249.7266805,lightSeconds:724.3319300803774,moveKm:49984.786397978765}
+    }},
+    Venus:{diameter:12103.6,icon:'venus',presets:{
+      minimum:{date:'2046-Jan-01 00:00 UT',distanceKm:39637081.80788573,lightSeconds:132.21507329542536,moveKm:693.3742970028723},
+      average:{date:'2028-Oct-08 00:00 UT',distanceKm:170047542.9053628,lightSeconds:567.217547898963,moveKm:23920.221811826174},
+      maximum:{date:'2000-Jun-11 07:00 UT',distanceKm:259650457.0314768,lightSeconds:866.1006976749122,moveKm:55833.49086086012}
+    }},
+    Mars:{diameter:6779,icon:'mars',presets:{
+      minimum:{date:'2003-Aug-27 10:00 UT',distanceKm:55758006.11206363,lightSeconds:185.9886885882354,moveKm:557.4483445567397},
+      average:{date:'2009-Aug-15 00:00 UT',distanceKm:253684796.34242308,lightSeconds:846.2013955748783,moveKm:29414.8770751659},
+      maximum:{date:'2019-Aug-28 20:00 UT',distanceKm:400223836.1647068,lightSeconds:1335.0030178701388,moveKm:68699.12345974227}
+    }},
+    Jupiter:{diameter:139822,icon:'jupiter',presets:{
+      minimum:{date:'2022-Sep-26 02:00 UT',distanceKm:591295040.8430802,lightSeconds:1972.3479529397641,moveKm:31583.79647544492},
+      average:{date:'2025-Oct-06 00:00 UT',distanceKm:786908091.8361957,lightSeconds:2624.84285657445,moveKm:82836.93674035533},
+      maximum:{date:'2016-Sep-25 08:00 UT',distanceKm:965486142.8257887,lightSeconds:3220.5151165803804,moveKm:135774.98520243508}
+    }},
+    Saturn:{diameter:116464,icon:'saturn',presets:{
+      minimum:{date:'2032-Dec-24 19:00 UT',distanceKm:1201509979.392167,lightSeconds:4007.8058914749854,moveKm:80590.63521581012},
+      average:{date:'2037-Jun-09 00:00 UT',distanceKm:1433037948.7455862,lightSeconds:4780.100067579373,moveKm:160943.00375208486},
+      maximum:{date:'2017-Dec-21 17:00 UT',distanceKm:1652783980.370223,lightSeconds:5513.093929701938,moveKm:217345.14731281158}
+    }},
+    Uranus:{diameter:50724,icon:'uranus',presets:{
+      minimum:{date:'2050-Mar-09 23:00 UT',distanceKm:2586673490.747605,lightSeconds:8628.214025142704,moveKm:197109.14421151124},
+      average:{date:'2029-Mar-08 00:00 UT',distanceKm:2898899294.8529706,lightSeconds:9669.687203581921,moveKm:298253.7150427778},
+      maximum:{date:'2009-Mar-14 01:00 UT',distanceKm:3155432381.131184,lightSeconds:10525.38947170974,moveKm:383596.473321166}
+    }},
+    Neptune:{diameter:49244,icon:'neptune',presets:{
+      minimum:{date:'2041-Oct-28 21:00 UT',distanceKm:4310539982.496131,lightSeconds:14378.413690767802,moveKm:352568.1216341951},
+      average:{date:'2021-Dec-13 00:00 UT',distanceKm:4475568309.600178,lightSeconds:14928.888936893061,moveKm:457141.2678724555},
+      maximum:{date:'2000-Jan-25 00:00 UT',distanceKm:4653111225.346995,lightSeconds:15521.108357392352,moveKm:553576.3901740697}
+    }}
   };
-  var ORDER = ['Moon','Mars','Jupiter','Saturn','Neptune','Sun','Andromeda'];
+  var ORDER = ['Sun','Mercury','Venus','Mars','Jupiter','Saturn','Uranus','Neptune'];
+  var RANGE_ORDER = [
+    {key:'minimum',label:'Shortest'},
+    {key:'average',label:'Average'},
+    {key:'maximum',label:'Longest'}
+  ];
 
   function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
   function fmtNum(n){ return n<1000 ? n.toFixed(3) : n.toLocaleString(undefined,{maximumFractionDigits:0}); }
   function fmtDist(km){
-    if(km>=LY) return fmtNum(km/LY)+' ly';
     if(km>=AU) return fmtNum(km/AU)+' AU';
     return km.toLocaleString(undefined,{maximumFractionDigits:0})+' km';
   }
   function fmtDistUnit(km, unit){
-    if(unit==='ly') return fmtNum(km/LY)+' ly';
     if(unit==='AU') return fmtNum(km/AU)+' AU';
     return km.toLocaleString(undefined,{maximumFractionDigits:0})+' km';
   }
-  function commonUnit(km){ return km>=LY ? 'ly' : km>=AU ? 'AU' : 'km'; }
+  function commonUnit(km){ return km>=AU ? 'AU' : 'km'; }
   function fmtTime(s){
     if(s<60) return s.toFixed(1)+' s';
     if(s<3600) return (s/60).toFixed(1)+' min';
@@ -312,7 +365,7 @@
   var NS='http://www.w3.org/2000/svg';
   function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
 
-  var state = { obj:'Mars', dist:null, active:null, drag:null };
+  var state = { obj:'Sun', preset:'average', active:null, drag:null };
   var heroW = 0;
 
   var $ = function(id){ return document.getElementById(id); };
@@ -324,9 +377,10 @@
   var lblEarth=$('lblEarth'), lblDist=$('lblDist'), lblSeen=$('lblSeen'), lblNow=$('lblNow'), lblScale=$('lblScale'), lblInset=$('lblInset');
 
   function d(){ return DATA[state.obj]; }
-  function distKm(){ return state.dist; }
-  function lightTime(){ return distKm()/C; }
-  function driftKm(){ return d().speed*lightTime(); }
+  function selected(){ return d().presets[state.preset]; }
+  function distKm(){ return selected().distanceKm; }
+  function lightTime(){ return selected().lightSeconds; }
+  function driftKm(){ return selected().moveKm; }
   function driftDiameters(){ return driftKm()/d().diameter; }
 
   // ---- icon builder: returns an array of SVG child elements for the given object ----
@@ -338,7 +392,14 @@
     if(kind==='jupiter'){
       els.push(el('ellipse',Object.assign({rx:r,ry:r*0.78,fill:outline?'none':'#c98e62'},strokeAttrs)));
       if(!outline){
-        [-8,2,10].forEach(function(y){ els.push(el('line',{x1:-r,x2:r,y1:y,y2:y,stroke:'#8b543f','stroke-width':3,opacity:.75})); });
+        [
+          {y:-r*.34,x:r*.88,w:r*.18},
+          {y:r*.04,x:r*.97,w:r*.15},
+          {y:r*.42,x:r*.83,w:r*.18}
+        ].forEach(function(band){
+          els.push(el('line',{x1:-band.x,x2:band.x,y1:band.y,y2:band.y,stroke:'#8b543f','stroke-width':band.w,'stroke-linecap':'round',opacity:.72}));
+        });
+        els.push(el('ellipse',{cx:r*.42,cy:r*.22,rx:r*.16,ry:r*.09,fill:'#9d5140',opacity:.9}));
       }
     } else if(kind==='saturn'){
       els.push(el('ellipse',Object.assign({rx:r*1.55,ry:r*0.52,fill:'none'},strokeAttrs)));
@@ -354,7 +415,7 @@
       g2.appendChild(el('path',{d:'M0 -'+(r+8)+'V-'+(r+2)+'M0 '+(r+2)+'V'+(r+8)+'M-'+(r+8)+' 0H-'+(r+2)+'M'+(r+2)+' 0H'+(r+8),stroke:'var(--accent)','stroke-width':2}));
       els.push(g2);
     } else {
-      var fill = kind==='mars' ? '#c76d4e' : kind==='neptune' ? '#4f7fbf' : kind==='moon' ? '#a7a299' : 'var(--accent)';
+      var fill = kind==='mercury' ? '#8d8982' : kind==='venus' ? '#d7a451' : kind==='mars' ? '#c76d4e' : kind==='uranus' ? '#72b7bd' : kind==='neptune' ? '#4f7fbf' : kind==='moon' ? '#a7a299' : 'var(--accent)';
       els.push(el('circle',Object.assign({r:r,fill:outline?'none':fill},strokeAttrs)));
       if(kind==='moon' && !outline){
         els.push(el('circle',{cx:-7,cy:-5,r:3,fill:'#777'}));
@@ -372,94 +433,115 @@
 
   function geom(w){
     var narrow = w < 620;
-    var vbH = narrow ? 300 : 240;
-    var cy = narrow ? 130 : 110;
-    var earthX = narrow ? 50 : 76, earthR = narrow ? 20 : 26;
-    var seenX = narrow ? (w*0.62) : (w*0.68);
-    var maxOffset = narrow ? 90 : 130;
-    return { w:w, vbH:vbH, cy:cy, earthX:earthX, earthR:earthR, seenX:seenX, maxOffset:maxOffset, narrow:narrow };
+    var vbH = narrow ? 330 : 310;
+    var cy = narrow ? 270 : 255;
+    var earthX = narrow ? 52 : 82, earthR = narrow ? 30 : 39;
+    var seenX = narrow ? w*.72 : w*.78;
+    return {w:w,vbH:vbH,cy:cy,earthX:earthX,earthR:earthR,seenX:seenX,narrow:narrow};
+  }
+
+  var heroTimers = [], heroRaf = 0;
+  function stopHeroAnimations(){
+    heroTimers.forEach(function(timer){ clearTimeout(timer); });
+    heroTimers=[];
+    if(heroRaf) cancelAnimationFrame(heroRaf);
+    heroRaf=0;
+  }
+  function fmtDiameters(value){
+    if(value<.01) return value.toFixed(4);
+    if(value<1) return value.toFixed(2);
+    if(value<10) return value.toFixed(2);
+    return value.toFixed(1);
+  }
+  function animateHero(x,startY,endY,reducedMotion){
+    stopHeroAnimations();
+    distLine1.classList.remove('animate-signal');
+    void distLine1.getBoundingClientRect();
+    if(!reducedMotion) distLine1.classList.add('animate-signal');
+    if(reducedMotion){
+      nowIcon.setAttribute('transform','translate('+x+' '+endY+')');
+      [seenIcon,nowIcon,travelLine,travelTip].forEach(function(node){ node.style.opacity=1; });
+      [lblSeen,lblNow,lblScale].forEach(function(node){ node.style.opacity=1; });
+      return;
+    }
+    nowIcon.setAttribute('transform','translate('+x+' '+startY+')');
+    heroTimers.push(setTimeout(function(){ nowIcon.style.opacity=1; },900));
+    heroTimers.push(setTimeout(function(){
+      [seenIcon,travelLine,travelTip,lblSeen,lblNow,lblScale].forEach(function(node){node.style.opacity=1;});
+      var began=performance.now(), duration=900;
+      function step(now){
+        var p=clamp((now-began)/duration,0,1);
+        var eased=1-Math.pow(1-p,3);
+        var y=startY+(endY-startY)*eased;
+        nowIcon.setAttribute('transform','translate('+x+' '+y+')');
+        if(p<1) heroRaf=requestAnimationFrame(step);
+        else heroRaf=0;
+      }
+      heroRaf=requestAnimationFrame(step);
+    },1350));
   }
 
   function drawHero(){
     var w = heroW || heroWrap.clientWidth || 1100;
     var g = geom(w);
+    var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     heroSvg.setAttribute('viewBox','0 0 '+w+' '+g.vbH);
     heroSvg.setAttribute('preserveAspectRatio','none');
 
-    earthCircle.setAttribute('cx', g.earthX); earthCircle.setAttribute('cy', g.cy); earthCircle.setAttribute('r', g.earthR);
-    earthClipCircle.setAttribute('cx', g.earthX); earthClipCircle.setAttribute('cy', g.cy); earthClipCircle.setAttribute('r', g.earthR);
-    earthRing.setAttribute('cx', g.earthX); earthRing.setAttribute('cy', g.cy); earthRing.setAttribute('r', g.earthR);
-    earthRing.setAttribute('stroke-width', 2.5);
-    var s = g.earthR/24;
-    earthLand.innerHTML = '<path transform="translate('+g.earthX+' '+g.cy+') scale('+s+')" d="M-20 -14c8-11 16-7 17 1l-4 10-13 4z"/><path transform="translate('+g.earthX+' '+g.cy+') scale('+s+')" d="M8 -24c12 0 17 8 11 15l-10 3-8-9z"/><path transform="translate('+g.earthX+' '+g.cy+') scale('+s+')" d="M5 5c9-4 20 3 14 14l-12 4-7-11z"/><path transform="translate('+g.earthX+' '+g.cy+') scale('+s+')" d="M-14 9c7-2 12 6 6 13l-10-1z"/>';
+    earthCircle.setAttribute('cx',g.earthX); earthCircle.setAttribute('cy',g.cy); earthCircle.setAttribute('r',g.earthR);
+    earthClipCircle.setAttribute('cx',g.earthX); earthClipCircle.setAttribute('cy',g.cy); earthClipCircle.setAttribute('r',g.earthR);
+    earthRing.setAttribute('cx',g.earthX); earthRing.setAttribute('cy',g.cy); earthRing.setAttribute('r',g.earthR);
+    earthRing.setAttribute('stroke-width',2.5);
+    var s=g.earthR/24;
+    earthLand.innerHTML='<path transform="translate('+g.earthX+' '+g.cy+') scale('+s+')" d="M-20 -14c8-11 16-7 17 1l-4 10-13 4z"/><path transform="translate('+g.earthX+' '+g.cy+') scale('+s+')" d="M8 -24c12 0 17 8 11 15l-10 3-8-9z"/><path transform="translate('+g.earthX+' '+g.cy+') scale('+s+')" d="M5 5c9-4 20 3 14 14l-12 4-7-11z"/><path transform="translate('+g.earthX+' '+g.cy+') scale('+s+')" d="M-14 9c7-2 12 6 6 13l-10-1z"/>';
 
-    var lineStartX = g.earthX+g.earthR+18, lineEndX = g.seenX-24;
-    var midX = (lineStartX+lineEndX)/2;
-    distLine1.setAttribute('x1', lineStartX); distLine1.setAttribute('y1', g.cy);
-    distLine1.setAttribute('x2', midX-30); distLine1.setAttribute('y2', g.cy);
-    distLine2.setAttribute('x1', midX+30); distLine2.setAttribute('y1', g.cy);
-    distLine2.setAttribute('x2', lineEndX); distLine2.setAttribute('y2', g.cy);
-    var sq = [];
-    for(var i=0;i<5;i++){ sq.push((midX-30+i*15)+','+(g.cy+(i%2===0?-12:12))); }
-    squiggle.setAttribute('points', sq.join(' '));
-    squiggle.setAttribute('stroke-width', 2);
+    var iconR=g.narrow?11:13;
+    var diameters=driftDiameters();
+    var literalOffset=diameters*(iconR*2);
+    var minOffset=g.narrow?16:18;
+    var maxOffset=g.cy-40;
+    var offset=clamp(literalOffset,minOffset,maxOffset);
+    var finalY=g.cy-offset;
 
-    var iconR = g.narrow ? 15 : 22;
+    var lineStartX=g.earthX+g.earthR+14, lineEndX=g.seenX-iconR-9;
+    var midX=(lineStartX+lineEndX)/2;
+    distLine1.setAttribute('x1',lineStartX); distLine1.setAttribute('y1',g.cy);
+    distLine1.setAttribute('x2',lineEndX); distLine1.setAttribute('y2',g.cy);
+    distLine1.setAttribute('stroke-width',2.2);
+    distLine1.setAttribute('stroke-opacity',.4);
+
     seenIcon.setAttribute('transform','translate('+g.seenX+' '+g.cy+')');
-    fillIcon(seenIcon, d().icon, false, iconR);
+    fillIcon(seenIcon,d().icon,true,iconR);
+    nowIcon.setAttribute('transform','translate('+g.seenX+' '+finalY+')');
+    fillIcon(nowIcon,d().icon,false,iconR);
 
-    var diameters = driftDiameters();
-    var offset = clamp(diameters*48, 0, g.maxOffset*1.4);
-    var showInset = offset < 26;
-    var nowX = g.seenX + offset;
-    nowIcon.setAttribute('transform','translate('+nowX+' '+g.cy+')');
-    fillIcon(nowIcon, d().icon, true, iconR);
+    var arrowX=g.seenX+iconR+15;
+    travelLine.setAttribute('x1',arrowX); travelLine.setAttribute('y1',g.cy-2);
+    travelLine.setAttribute('x2',arrowX); travelLine.setAttribute('y2',finalY+2);
+    travelLine.setAttribute('stroke-width',1.8);
+    travelTip.setAttribute('points',arrowX+','+(finalY-5)+' '+(arrowX-5)+','+(finalY+4)+' '+(arrowX+5)+','+(finalY+4));
 
-    var travelX1 = g.seenX+iconR+6, travelX2 = Math.max(travelX1, nowX-iconR-10);
-    travelLine.setAttribute('x1', travelX1); travelLine.setAttribute('y1', g.cy);
-    travelLine.setAttribute('x2', travelX2); travelLine.setAttribute('y2', g.cy);
-    travelLine.setAttribute('stroke-width', 2);
-    travelTip.setAttribute('points', travelX2+','+g.cy+' '+(travelX2-11)+','+(g.cy-7)+' '+(travelX2-11)+','+(g.cy+7));
-    travelLine.setAttribute('opacity', showInset ? 0 : 1);
-    travelTip.setAttribute('opacity', showInset ? 0 : 1);
+    var px=function(x){return (x/w*100)+'%';};
+    var py=function(y){return (y/g.vbH*100)+'%';};
+    lblEarth.style.left=px(g.earthX); lblEarth.style.top=py(g.cy+g.earthR+13);
+    lblDist.style.left=px(midX); lblDist.style.top=py(g.cy-24);
+    lblDist.textContent=fmtDist(distKm())+' · '+fmtTime(lightTime())+' of light travel';
+    lblSeen.style.left=px(g.seenX); lblSeen.style.top=py(g.cy+iconR+13);
+    lblSeen.textContent=state.obj.toUpperCase()+' WHEN LIGHT LEFT';
+    lblNow.style.left=px(g.seenX); lblNow.style.top=py(Math.max(4,finalY-iconR-22));
+    lblNow.textContent=state.obj.toUpperCase()+' NOW';
+    lblScale.style.left=px(g.narrow?arrowX-10:arrowX+10); lblScale.style.top=py((g.cy+finalY)/2);
+    lblScale.style.transform=g.narrow?'translate(-100%,-50%)':'translateY(-50%)';
+    var scaleNote=literalOffset<minOffset?' · ENLARGED TO SHOW':literalOffset>maxOffset?' · COMPRESSED TO FIT':' · DIAMETER SCALE';
+    lblScale.textContent=fmtDiameters(diameters)+'× '+state.obj.toUpperCase()+' DIAMETER'+scaleNote;
 
-    var insetY = g.cy + iconR + (g.narrow?54:64);
-    var insetX = g.seenX - 60, insetW = 220, insetH = 64;
-    insetBox.setAttribute('x', insetX); insetBox.setAttribute('y', insetY);
-    insetBox.setAttribute('width', insetW); insetBox.setAttribute('height', insetH);
-    var iCy = insetY+insetH/2, iSeenX = insetX+40, iNowX = insetX+insetW-40;
-    insetSeen.setAttribute('transform','translate('+iSeenX+' '+iCy+')');
-    fillIcon(insetSeen, d().icon, false, 13);
-    insetNow.setAttribute('transform','translate('+iNowX+' '+iCy+')');
-    fillIcon(insetNow, d().icon, true, 13);
-    insetLine.setAttribute('x1', iSeenX+16); insetLine.setAttribute('y1', iCy);
-    insetLine.setAttribute('x2', iNowX-16); insetLine.setAttribute('y2', iCy);
-    insetLine.setAttribute('stroke-width', 2);
-    insetBox.setAttribute('opacity', showInset ? 1 : 0);
-    insetSeen.setAttribute('opacity', showInset ? 1 : 0);
-    insetNow.setAttribute('opacity', showInset ? 1 : 0);
-    insetLine.setAttribute('opacity', showInset ? 1 : 0);
-
-    var px = function(x){ return (x/w*100)+'%'; };
-    var py = function(y){ return (y/g.vbH*100)+'%'; };
-    lblEarth.style.left = px(g.earthX); lblEarth.style.top = py(g.cy+g.earthR+14);
-    lblDist.style.left = px(midX); lblDist.style.top = py(g.cy-24);
-    lblDist.textContent = fmtDist(distKm())+' (compressed)';
-    lblSeen.style.left = px(g.seenX); lblSeen.style.top = py(g.cy+iconR+14);
-    lblSeen.textContent = state.obj.toUpperCase()+' WHEN WE SAW IT';
-    lblNow.style.left = px(nowX); lblNow.style.top = py(g.cy+iconR+14+(g.narrow?16:0));
-    lblNow.style.opacity = showInset ? 0 : 1;
-    lblScale.style.left = px(g.seenX); lblScale.style.top = py(g.vbH-30);
-    lblScale.textContent = diameters.toFixed(3)+' '+state.obj+' diameters moved';
-    lblInset.style.left = px(insetX+insetW-6); lblInset.style.top = py(insetY-16);
-    lblInset.style.transform = 'translateX(-100%)';
-    lblInset.style.opacity = showInset ? 1 : 0;
-    lblInset.textContent = showInset ? ('×'+Math.ceil(26/Math.max(offset,.001))+' view') : '';
+    [seenIcon,nowIcon,travelLine,travelTip,lblSeen,lblNow,lblScale].forEach(function(node){node.style.opacity=0;});
+    animateHero(g.seenX,g.cy,finalY,reducedMotion);
   }
 
   // ---- equation + legend colouring ----
   var accent = 'var(--accent)';
-  var vTerm=$('vTerm'), dTerm=$('dTerm'), dLabel=$('dLabel');
+  var dTerm=$('dTerm'), dLabel=$('dLabel');
   var legendEl = $('legend');
 
   function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
@@ -469,11 +551,9 @@
     dLabel.style.color = activeColor('d');
 
     var rows = [
-      {sym:'d', name:'distance to '+state.obj.toLowerCase(), val: fmtDist(distKm()), key:'d'},
-      {sym:'v', name:state.obj+"'s speed relative to Earth", val: d().speed.toFixed(2)+' km/s', key:null},
+      {sym:'d', name:'selected distance', val: fmtDist(distKm()), key:'d'},
       {sym:'c', name:'speed of light', val:'299,792 km/s', key:null},
-      {sym:'t', name:'light travel time (computed)', val: fmtTime(lightTime()), key:null},
-      {sym:'s', name:'distance moved (computed)', val: fmtDist(driftKm()), key:null}
+      {sym:'t', name:'light travel time', val: fmtTime(lightTime()), key:null}
     ];
     legendEl.innerHTML = '';
     rows.forEach(function(row){
@@ -506,9 +586,25 @@
   }
   function selectObject(name){
     state.obj = name;
-    var dd = DATA[name];
-    state.dist = (dd.min+dd.max)/2;
     render();
+  }
+
+  // ---- fixed distance cases calculated from the 2000–2050 JPL dataset ----
+  var rangeButtons = $('rangeButtons');
+  RANGE_ORDER.forEach(function(item){
+    var b = document.createElement('button');
+    b.textContent = item.label;
+    b.dataset.preset = item.key;
+    b.addEventListener('click', function(){ state.preset = item.key; render(); });
+    rangeButtons.appendChild(b);
+  });
+  function drawRangeButtons(){
+    Array.prototype.forEach.call(rangeButtons.children, function(b){
+      var active = b.dataset.preset === state.preset;
+      b.style.background = active ? 'color-mix(in srgb, var(--accent) 22%, var(--bg))' : 'transparent';
+      b.style.borderColor = active ? 'var(--accent)' : 'var(--border)';
+      b.style.color = active ? 'var(--fg)' : 'var(--muted)';
+    });
   }
 
   // ---- distance slider (range depends on selected object) ----
@@ -558,16 +654,16 @@
 
   // ---- result box ----
   var sValueEl=$('sValue'), sUnitEl=$('sUnit'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+  var moveValueEl=$('moveValue'), moveUnitEl=$('moveUnit'), moveSubEl=$('moveSub');
   function drawResult(){
-    var diameters = driftDiameters();
-    sValueEl.textContent = diameters.toFixed(3);
-    sUnitEl.textContent = state.obj+' diameter'+(diameters===1?'':'s');
-    verdictSubEl.textContent = 'the real '+state.obj+' moved '+fmtDist(driftKm())+' during the '+fmtTime(lightTime())+' its light spent crossing to Earth.';
-    effortLineEl.textContent = state.obj==='Andromeda'
-      ? 'Andromeda’s proper motion is simplified here as 110 km/s; its diameter is so vast that this offset stays tiny even across ~2.5 million years of light-travel time.'
-      : state.obj==='Sun'
-      ? 'every speed here is measured relative to Earth — the Sun’s 220 km/s orbit around the galaxy doesn’t count, since Earth is carried along with it.'
-      : 'the object and its drift are drawn to consistent scale against each other; only the Earth–object gap is compressed to fit.';
+    sValueEl.textContent = fmtTime(lightTime());
+    sUnitEl.textContent = 'ago';
+    verdictSubEl.textContent = 'The light reaching Earth now left '+state.obj+' about '+fmtTime(lightTime())+' ago.';
+    effortLineEl.textContent = 'Distance: '+fmtDist(distKm())+' on '+selected().date+'.';
+    var moved = selected().moveKm;
+    moveValueEl.textContent = moved < 10 ? moved.toFixed(2) : moved.toLocaleString(undefined,{maximumFractionDigits:0});
+    moveUnitEl.textContent = 'km';
+    moveSubEl.textContent = 'That is '+fmtDiameters(driftDiameters())+'× the diameter of '+state.obj+'.';
   }
 
   // ---- presets ----
@@ -619,12 +715,11 @@
     drawHero();
     drawEquationAndLegend();
     drawObjectButtons();
-    drawDSlider();
-    $('dReadout').textContent = fmtDist(distKm());
+    drawRangeButtons();
     drawResult();
   }
 
-  selectObject('Mars');
+  selectObject('Sun');
   new ResizeObserver(measure).observe(heroWrap);
   window.addEventListener('resize', measure);
   [60,250,900].forEach(function(t){ setTimeout(measure, t); });

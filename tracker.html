@@ -153,7 +153,7 @@ function save(data){
 var data = load();
 
 function rowFor(file, cat){
-  var entry = data[file] || (['basic-functions.html','constant-acceleration.html','reynolds-number.html'].indexOf(file) !== -1 ? {status:'checked', notes:'Reviewed and complete', updated:''} : {status:'to-start', notes:'', updated:''});
+  var entry = data[file] || (['basic-functions.html','constant-acceleration.html','reynolds-number.html','fan-laws.html','planet-light-delay.html'].indexOf(file) !== -1 ? {status:'checked', notes:'Reviewed and complete', updated:''} : {status:'to-start', notes:'', updated:''});
   var tr = document.createElement('tr');
 
   var tdName = document.createElement('td');

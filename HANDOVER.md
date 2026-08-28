@@ -401,21 +401,29 @@ conform, per Simon's explicit call.
   links. Both are pushed to `main`. The next optional enhancement is adding more advanced
   functions (for example logistic, general power or step), but no follow-up work is pending.
 
-## Fan laws page — new draft, 2026-08-20
+## Fan laws page — reviewed and complete, 2026-08-28
 
-- **`visualizations/fan-laws.html`** ("A little slower saves a lot of fan power") is new
-  page 52 and is listed under Discoveries in `unreviewed.html` and `tracker.html`; it has
-  not been reviewed and should not move to `index.html` yet.
-- Scope is deliberately fixed-speed scaling for the same fan: one 30–120% speed control
-  drives airflow `Q ∝ N`, pressure `Δp ∝ N²`, and ideal shaft power `P ∝ N³`. The default
-  is the DOE's useful 80%-speed example (80% flow, 64% pressure, 51.2% power).
-- The hero pairs a speed-responsive fan/airflow animation with the three affinity curves;
-  the result column repeats the current values as three bars against the 100% reference.
+- **`visualizations/fan-laws.html`** ("A little slower saves a lot of fan power") is page 52,
+  reviewed and complete. It is listed under Discoveries on `index.html`, removed from
+  `unreviewed.html`, and defaults to Checked in `tracker.html`.
+- Scope is deliberately speed scaling for the same fan at corresponding operating points:
+  one 30–120% speed control drives airflow `Q ∝ N`, pressure `Δp ∝ N²`, and predicted
+  shaft power `P ∝ N³`. The default is the DOE's useful 80%-speed example (80% flow,
+  64% pressure, 51.2% power). The chart now begins at the slider's 30% lower bound rather
+  than implying that similarity remains valid down to zero speed.
+- The header follows the site's standard three-column pattern: title and subtitle, a separate
+  vertical block containing the three equations, then a separate live variable legend for
+  `N`, `Q`, `Δp` and `P`. The hero pairs a deliberately simple speed-linked fan and drifting
+  airflow-line animation with the three affinity curves; more elaborate comparison dots,
+  highlighted blades, fixed ticks and particles were tested and removed as distracting. The
+  result column repeats the current values as three bars against the 100% reference.
 - Assumptions are explicit: fixed diameter, density and efficiency; shaft power rather than
-  exact electrical input; manufacturer curves remain authoritative for a real installation.
-- Sources are the DOE variable-speed-drive tip sheet and ANSI/AMCA 210. No absolute CFM,
-  pressure or motor-power baseline is invented; every output is relative to a known design
-  point.
+  exact electrical input; fixed static-pressure requirements can break the proportional-flow
+  result; low-speed similarity is limited; and 120% is a mathematical comparison, not a safe
+  operating recommendation. Manufacturer curves and rated-speed limits remain authoritative.
+- Sources are the DOE variable-speed-drive tip sheet, Wikipedia's accessible affinity-laws
+  derivation, and ANSI/AMCA 210-25 Annex E. No absolute CFM, pressure or motor-power
+  baseline is invented; every output is relative to a known design point.
 
 ## Night-sky ice page — new draft, 2026-08-20
 
@@ -2126,6 +2134,38 @@ reported as `D = C/π`. Here `d` is the distance between two sticks on the same 
   and times.
 
 ### Style migration sweep (2026-08-14): `gravity-lab.html`, `mass-energy.html`, `planet-light-delay.html`
+
+**`planet-light-delay.html` JPL dataset pass (2026-08-28):** a reproducible script at
+`scripts/build-planet-light-delay-data.mjs` downloads geometric Earth-centred vectors from
+NASA/JPL Horizons for the Sun, Mercury, Venus, Mars, Jupiter, Saturn, Uranus, and Neptune.
+The Moon was removed from the page because its roughly 1.31 km relative-position change is
+far below a useful object-diameter animation scale. The stored CSV contains 149,024 daily
+samples from 2000-01-01 through 2050-12-31; the JSON summary contains the arithmetic mean
+daily distance, the nearest real observation to that mean, and hourly-refined shortest and
+longest observations. Each preset also stores the magnitude of the change in the
+Earth-to-object vector over the light delay. The page exposes Shortest / Average / Longest
+buttons, the observation date, light age, and relative-position change. The hero now runs a
+three-stage animation: a dotted signal travels from a 1.5× larger Earth, the selected object
+appears, then moves upward from a dotted starting position. The perpendicular displacement is
+labelled in object diameters. Literal diameter scaling is used where it fits; sub-pixel motion
+is visibly enlarged and very large motion compressed, with the exception labelled. Diameter
+conversion uses JPL mean planetary radii (`planets/phys_par.html`), doubled; the Sun uses its
+corresponding JPL mean radius. Andromeda was removed
+from this comparison because Horizons is a Solar System ephemeris and its distance uncertainty
+must not be presented as orbital min/max variation. Source/method/download links are in-page.
+
+**Reviewed and complete (2026-08-28).** `planet-light-delay.html` was promoted to the
+reviewed homepage under Discoveries and removed from the unreviewed queue and roadmap. The
+homepage now lists 19 pages / 19 equations. The unreviewed queue now lists 43 pages total and
+21 under Discoveries. `tracker.html` now defaults this page to Checked / Reviewed and complete.
+
+**`planet-light-delay.html` simplification (2026-08-28):** the visible lesson now focuses only
+on `t = d/c`. The drift equation, moving-current-position comparison, magnified inset,
+distance slider and preset row were removed from the interface. Five object choices use one
+representative example distance each and answer one question: how old is the image reaching
+Earth now? Planetary distances are explicitly described as variable and the diagram gap as
+compressed. This intermediate state was superseded later the same day by the JPL dataset pass
+above. The older implementation history below is retained for context.
 
 All three were rewritten from their original sparse dark-first look to the
 [STYLE_GUIDE.md](STYLE_GUIDE.md) skeleton in one pass, at the user's request ("update all

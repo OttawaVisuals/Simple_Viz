@@ -2159,6 +2159,14 @@ reviewed homepage under Discoveries and removed from the unreviewed queue and ro
 homepage now lists 19 pages / 19 equations. The unreviewed queue now lists 43 pages total and
 21 under Discoveries. `tracker.html` now defaults this page to Checked / Reviewed and complete.
 
+**Reviewed and complete (2026-08-28).** `keplers-third-law.html` was promoted to the reviewed
+homepage under Discoveries and removed from the unreviewed queue and roadmap. The page now uses
+eight planets (Pluto removed), a 0.2–35 AU distance range, and a central-star pill picker
+(TRAPPIST-1, Proxima Centauri, Sun, Sirius A). Its paired scale diagrams place the main and
+inner systems on a shared horizontal axis, with a boxed/dotted zoom callout. The inner map is
+scaled so Mars’s displayed orbit is 0.8× Neptune’s displayed orbit. The tracker now defaults
+this page to Checked / Reviewed and complete. The reviewed homepage now lists 20 pages; the
+unreviewed queue lists 42 pages, including 20 Discoveries drafts.
 **`planet-light-delay.html` simplification (2026-08-28):** the visible lesson now focuses only
 on `t = d/c`. The drift equation, moving-current-position comparison, magnified inset,
 distance slider and preset row were removed from the interface. Five object choices use one

@@ -1,5 +1,11 @@
 # Handover
 
+## Egg boiling and lightning promoted — 2026-09-01
+
+- **`visualizations/egg-boiling-time.html`** and **`visualizations/lightning-distance.html`**
+  are now reviewed and complete. Both are in the main catalogue, removed from
+  `unreviewed.html`, and default to Checked / Reviewed and complete in `tracker.html`.
+
 ## Roast-time page repurposed into egg-boiling physics — 2026-08-29
 
 - **`visualizations/roast-time.html` is retired; `visualizations/egg-boiling-time.html`
@@ -8,8 +14,8 @@
   listed in `unreviewed.html` and the unlinked roadmap list in `index.html`, never in the
   reviewed catalogue), so this was a straight content replacement rather than a rewrite of
   live/reviewed material. References updated in `index.html` (roadmap `<li>` + icon symbol),
-  `unreviewed.html` (tile + icon symbol), and `tracker.html` (`PAGES` array). Not yet reviewed
-  or promoted to `index.html`'s catalogue.
+  `unreviewed.html` (tile + icon symbol), and `tracker.html` (`PAGES` array). Promoted to
+  `index.html`'s catalogue on 2026-09-01.
 - **Boil time** uses the real published Charles D. H. Williams (University of Exeter) egg
   formula, `t = M^(2/3)cρ^(1/3) / (Kπ²(4π/3)^(2/3)) · ln[0.76(T₀−Tw)/(Ty−Tw)]`, with
   c = 3.7 J/g°C, ρ = 1.038 g/cm³, K = 0.005 W/cm°C. Verified by hand: a 57 g fridge-cold egg

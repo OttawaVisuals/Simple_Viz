@@ -74,6 +74,7 @@
   @media (max-width:700px){.heropanels{grid-template-columns:1fr}}
   .levelpanel svg{width:100%;height:auto;display:block}
   .levelpanel text{font:400 9.5px ui-monospace,monospace}
+  .panel-label{margin:0 0 9px;font:500 10px/1.3 ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
 
   .emitpanel{min-width:0}
   .specbar{position:relative;height:46px;border-radius:3px;border:1px solid var(--border)}
@@ -115,7 +116,19 @@
   .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
   .preset:hover{border-color:var(--accent);color:var(--accent)}
 
+  .light-story{margin-top:clamp(24px,3vw,36px);padding-top:clamp(20px,2.4vw,30px);border-top:1px solid var(--line)}
+  .light-story h2{font-weight:300;font-size:clamp(1.3rem,2vw,1.7rem);letter-spacing:-.02em;margin:0}
+  .light-story .sub{margin:8px 0 0;max-width:none}
+  .story-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(16px,2.8vw,36px);margin-top:clamp(18px,2.6vw,28px)}
+  .story-step{padding-top:10px;border-top:1px solid var(--line2)}
+  .story-num{display:block;font:500 10px/1.2 ui-monospace,monospace;letter-spacing:.13em;color:var(--accent)}
+  .story-step h3{margin:6px 0 0;font-size:17px;font-weight:400;letter-spacing:-.01em}
+  .story-step p{margin:5px 0 0;font-size:13.5px;line-height:1.55;color:var(--muted2)}
+  .story-next{margin-top:clamp(24px,3vw,34px)!important}
+  @media (max-width:700px){.story-steps{grid-template-columns:1fr;gap:16px}}
+
   .starsection{margin-top:clamp(30px,3.4vw,46px);padding-top:clamp(20px,2.4vw,30px);border-top:1px solid var(--line)}
+  .starsection.lead{margin-top:clamp(24px,3vw,36px)}
   .starsection h2{font-weight:300;font-size:clamp(1.3rem,2vw,1.7rem);letter-spacing:-.02em;margin:0}
   .starsection .sub{margin:8px 0 0;max-width:none}
   .star-buttons{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
@@ -124,7 +137,18 @@
   .starmeta{margin-top:12px;font-size:13.5px;line-height:1.5;color:var(--muted2)}
   .starmeta .big{font-family:ui-monospace,monospace;color:var(--fg)}
 
-  .specbar.absorption{margin-top:16px;height:54px}
+  .flux-figure{position:relative;margin-top:18px;padding:4px 0 0}
+  .flux-figure svg{display:block;width:100%;height:auto;overflow:visible}
+  .flux-grid{stroke:var(--line);stroke-width:1}
+  .flux-axis{stroke:var(--line2);stroke-width:1}
+  .flux-curve{fill:none;stroke:var(--fg);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+  .flux-figure text{font:10px ui-monospace,monospace;fill:var(--muted)}
+  .flux-figure .flux-title{fill:var(--muted2);letter-spacing:.1em}
+  .flux-caption{margin:4px 0 0;font:11px/1.55 ui-monospace,monospace;color:var(--muted)}
+  .flux-caption strong{font-weight:500;color:var(--muted2)}
+
+  .colour-reference{margin:14px 0 0;font:500 10px/1.3 ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .specbar.absorption{margin-top:6px;height:36px}
   .specbar .absline{position:absolute;top:1px;bottom:1px;background:#0a0a10;transform:translateX(-50%);transition:opacity .15s}
   .spectix{display:flex;justify-content:space-between;font:400 9.5px ui-monospace,monospace;color:var(--muted);margin-top:5px}
 
@@ -134,6 +158,25 @@
   .elem-dot{width:10px;height:10px;border-radius:50%}
   .elem-name{font-size:12.5px;color:var(--muted2)}
   .elem-strength{font:400 10px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+  .spectrum-caveat{margin:14px 0 0;max-width:84ch;font:13px/1.6 ui-monospace,monospace;color:var(--muted)}
+  .spectrum-caveat strong{font-weight:500;color:var(--fg)}
+  .spectrum-caveat a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .spectrum-caveat a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  .abundance{display:grid;grid-template-columns:minmax(160px,.75fr) 2fr;gap:10px clamp(18px,3vw,36px);align-items:start;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+  .abundance-label{font:500 10px/1.45 ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .abundance-values{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:baseline}
+  .abundance-values strong{display:block;font:400 clamp(22px,2.4vw,30px)/1 ui-monospace,monospace;color:var(--fg);letter-spacing:-.04em}
+  .abundance-values span{font:12px/1.35 Georgia,serif;color:var(--muted2)}
+  .abundance-note{grid-column:2;margin:0;font:11px/1.55 ui-monospace,monospace;color:var(--muted)}
+  .abundance-note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .abundance-note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  @media (max-width:700px){.abundance{grid-template-columns:1fr}.abundance-note{grid-column:auto}}
+
+  .explainsection{margin-top:clamp(30px,3.4vw,46px);padding-top:clamp(20px,2.4vw,30px);border-top:1px solid var(--line)}
+  .explainsection h2{font-weight:300;font-size:clamp(1.3rem,2vw,1.7rem);letter-spacing:-.02em;margin:0}
+  .explainsection > .sub{margin:8px 0 0;max-width:none}
+  .transition-explain{margin:clamp(14px,2vw,22px) 0 0;padding-left:12px;border-left:2px solid var(--accent);font-size:14px;line-height:1.55;color:var(--muted2);max-width:78ch}
+  .transition-explain .mono{color:var(--fg)}
 
   .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
   .note a{color:var(--muted2);text-decoration-color:var(--line2)}
@@ -185,7 +228,7 @@
   <div class="topgrid">
     <div class="headleft">
       <h1>Starlight has a <em>barcode</em>.</h1>
-      <p class="sub">Every element absorbs or emits light at its own exact wavelengths. Drag the electron's jump below to see one hydrogen line appear &mdash; then look at real starlight, where dozens of these lines together spell out what a star is made of.</p>
+      <p class="sub">A star&rsquo;s outer gas removes a few exact colours from its rainbow. Follow one missing line back to an electron transition, then see what the full pattern can tell us about the Sun.</p>
     </div>
 
     <div class="eqnbox">
@@ -206,9 +249,55 @@
     </div>
   </div>
 
+  <section class="starsection lead" aria-labelledby="starHeading">
+    <h2 id="starHeading">1. Read a stellar spectrum.</h2>
+    <p class="sub">Like Gaia, this view plots light received &mdash; flux &mdash; against wavelength. A downward dip marks a colour removed by gas in the star&rsquo;s outer atmosphere; many dips together let astronomers estimate which elements are present.</p>
+    <div class="star-buttons" id="starButtons"></div>
+    <div class="starmeta" id="starMeta"></div>
+
+    <div class="flux-figure">
+      <svg id="fluxSvg" viewBox="0 0 1000 146" role="img" aria-label="Illustrative stellar spectrum showing relative flux falling at absorption wavelengths.">
+        <text class="flux-title" x="0" y="12">RELATIVE FLUX</text>
+        <line class="flux-grid" x1="72" y1="30" x2="1000" y2="30"></line>
+        <line class="flux-grid" x1="72" y1="73" x2="1000" y2="73"></line>
+        <line class="flux-axis" x1="72" y1="116" x2="1000" y2="116"></line>
+        <text x="0" y="34">more</text>
+        <text x="0" y="115">less</text>
+        <path class="flux-curve" id="fluxPath"></path>
+        <text x="72" y="138">380 nm</text><text x="506" y="138" text-anchor="middle">wavelength &rarr;</text><text x="1000" y="138" text-anchor="end">750 nm</text>
+      </svg>
+      <p class="flux-caption"><strong>How to read it:</strong> the curve&rsquo;s dips sit at known wavelengths; the element names below identify the features in this illustration. Flux tells you how much light remains. This is an illustrative curve, not Gaia data.</p>
+    </div>
+
+    <div class="colour-reference">Colour reference</div>
+    <div class="specbar absorption" id="absBar"></div>
+    <div class="spectix"><span>380 nm</span><span>violet &rarr; red</span><span>750 nm</span></div>
+
+    <div class="elem-legend" id="elemLegend"></div>
+    <p class="spectrum-caveat" id="heliumCaveat"><strong>Why helium is “not shown” for the Sun:</strong> it does not mean the Sun lacks helium. At the Sun&rsquo;s ~5,778&nbsp;K photosphere, very few helium atoms occupy the excited states that make strong visible lines. The hydrogen diagram below predicts only hydrogen; every element has its own <a href="https://physics.nist.gov/PhysRefData/Handbook/Tables/heliumtable5_a.htm" target="_blank" rel="noopener">energy-level map</a> and barcode.</p>
+    <div class="abundance" id="abundancePanel" aria-live="polite"></div>
+  </section>
+
+  <section class="light-story" aria-labelledby="storyHeading">
+    <h2 id="storyHeading">2. Why do electrons change state in a star?</h2>
+    <p class="sub">A star&rsquo;s hot, dense interior makes a broad rainbow of light. On the way out, that light meets cooler gas, where atoms can absorb only the photon energies that match one of their own electron gaps.</p>
+    <div class="story-steps">
+      <div class="story-step"><span class="story-num">HOT INTERIOR</span><h3>Electrons get excited.</h3><p>Collisions and energetic light can lift an electron into a higher allowed energy state.</p></div>
+      <div class="story-step"><span class="story-num">COOLER OUTER GAS</span><h3>Only matching photons are taken.</h3><p>An atom absorbs a photon only when its energy exactly matches a gap between two states.</p></div>
+      <div class="story-step"><span class="story-num">OUR TELESCOPE</span><h3>That colour is missing.</h3><p>The absorbed photon is later re-emitted in a random direction, leaving a dark line in the light that reaches us.</p></div>
+    </div>
+    <h2 class="story-next">3. One energy gap makes one colour.</h2>
+    <p class="sub">The photon&rsquo;s colour is set by the gap: a larger gap means a bluer photon. Each kind of atom has its own allowed gaps, so each leaves its own set of lines.</p>
+  </section>
+
+  <section class="explainsection" aria-labelledby="mechanismHeading">
+    <h2 id="mechanismHeading">4. Hydrogen is the solvable example.</h2>
+    <p class="sub">Hydrogen has one electron, so the Rydberg formula calculates its energy gaps from the level number n. Atoms with more electrons need more complex quantum calculations and laboratory measurements, but the same rule holds: each allowed gap has one wavelength.</p>
+
   <div class="hero" id="heroWrap">
     <div class="heropanels">
       <div class="levelpanel">
+        <p class="panel-label">Electron falls and emits</p>
         <svg id="levelSvg" viewBox="0 0 320 260" role="img" aria-label="Energy-level diagram of a hydrogen atom, showing an electron dropping from the selected level down to level 2 and emitting a photon.">
           <line id="limitLine" x1="70" y1="20" x2="290" y2="20" stroke="var(--line2)" stroke-width="1" stroke-dasharray="2 4"></line>
           <text x="60" y="24" text-anchor="end" fill="var(--muted)">n&rarr;&infin;</text>
@@ -220,6 +309,7 @@
         </svg>
       </div>
       <div class="emitpanel">
+        <p class="panel-label">One energy gap, one colour</p>
         <div class="specbar emission" id="emitBar">
           <div class="linemark" id="emitMark"></div>
         </div>
@@ -227,6 +317,8 @@
       </div>
     </div>
   </div>
+
+  <p class="transition-explain" id="transitionExplain" aria-live="polite"></p>
 
   <div class="resultrow">
     <div class="ctrls">
@@ -265,20 +357,9 @@
     <button class="preset" data-n="6">H&delta;, n=6</button>
     <button class="preset" data-n="7">H&epsilon;, n=7</button>
   </div>
+  </section>
 
-  <div class="starsection">
-    <h2>Now look at real starlight.</h2>
-    <p class="sub">A star's own light passes through its cooler outer gas on the way out, and each element there removes &mdash; absorbs &mdash; its own exact wavelengths, leaving dark gaps in an otherwise full rainbow. Pick a star to see which elements' fingerprints show up in its spectrum.</p>
-    <div class="star-buttons" id="starButtons"></div>
-    <div class="starmeta" id="starMeta"></div>
-
-    <div class="specbar absorption" id="absBar"></div>
-    <div class="spectix"><span>380 nm</span><span>violet &rarr; red</span><span>750 nm</span></div>
-
-    <div class="elem-legend" id="elemLegend"></div>
-  </div>
-
-  <p class="note">The <a href="https://en.wikipedia.org/wiki/Rydberg_formula" target="_blank" rel="noopener">Rydberg formula</a> above predicts the exact wavelengths of the hydrogen atom's <a href="https://en.wikipedia.org/wiki/Balmer_series" target="_blank" rel="noopener">Balmer series</a> (transitions that land on n=2), using R&nbsp;=&nbsp;1.097&nbsp;&times;&nbsp;10<sup>7</sup>&nbsp;m<sup>&minus;1</sup>. As n climbs toward infinity the lines crowd together and converge on the series limit at 364.6&nbsp;nm &mdash; the slider stops at n=9 (383.7&nbsp;nm) because lines much past that sit right at the edge of what the eye can see. The hero panel on the right shows an <strong>emission</strong> line: a single bright color against black, the way a gas-discharge tube (like a neon sign) actually looks. Real starlight instead shows <strong>absorption</strong>: a continuous rainbow with narrow dark gaps where each element on the way out removed its own wavelengths &mdash; that's what the bar below the star picker shows, and hydrogen's own dark gaps sit at these same four Balmer wavelengths. The relative darkness of each element's lines per star is an honest but qualitative illustration of a well-established real pattern in stellar spectral classification (the <a href="https://en.wikipedia.org/wiki/Stellar_classification" target="_blank" rel="noopener">Morgan&ndash;Keenan OBAFGKM sequence</a>), not a precise measured equivalent width. Effective temperatures used: Rigel ~12,100&nbsp;K, Sirius&nbsp;A ~9,940&nbsp;K, the Sun 5,778&nbsp;K, Betelgeuse ~3,600&nbsp;K. Titanium oxide's absorption is shown at its two strongest real band heads (615.9&nbsp;nm and 705.8&nbsp;nm) rather than as a sharp line, since a molecule's absorption spans a band of wavelengths, not one exact point the way a single atom's does.</p>
+  <p class="note">Atoms absorb and emit at the same wavelength because both directions use the same energy gap. The <a href="https://en.wikipedia.org/wiki/Rydberg_formula" target="_blank" rel="noopener">Rydberg formula</a> calculates hydrogen&rsquo;s Balmer wavelengths (transitions ending at n=2), using R&nbsp;=&nbsp;1.097&nbsp;&times;&nbsp;10<sup>7</sup>&nbsp;m<sup>&minus;1</sup>. The displayed line positions and temperatures are real, while their relative darkness is a qualitative guide to the <a href="https://en.wikipedia.org/wiki/Stellar_classification" target="_blank" rel="noopener">Morgan&ndash;Keenan OBAFGKM sequence</a>, not measured equivalent widths. The Sun&rsquo;s abundance example uses NASA&rsquo;s photospheric atom counts; it is a reference result from detailed spectral modelling, not calculated by this simplified bar.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -438,8 +519,8 @@
     var active = 'var(--accent)';
     nTerm.style.color = active; nLabel.style.color = active;
     var rows = [
-      {sym:'R', name:'Rydberg constant (fixed)', val:'1.097 × 10⁷ m⁻¹'},
-      {sym:'n', name:'starting energy level', val:'n = '+state.n},
+      {sym:'R', name:'hydrogen Rydberg constant', val:'1.097 × 10⁷ m⁻¹'},
+      {sym:'n', name:'upper energy level', val:'n = '+state.n},
       {sym:'λ', name:'wavelength emitted', val:lam.toFixed(1)+' nm'}
     ];
     legendEl.innerHTML='';
@@ -506,13 +587,24 @@
     visMarkLabel.style.color = col;
   }
 
+  // ---- plain-language bridge from emission to stellar absorption ----
+  var transitionExplain=$('transitionExplain');
+  function ordinal(n){
+    return n===3?'third':n===4?'fourth':n===5?'fifth':n===6?'sixth':n===7?'seventh':n===8?'eighth':'ninth';
+  }
+  function drawTransitionExplain(){
+    var lam = balmerNm(state.n);
+    var colour = colorName(lam).toLowerCase();
+    transitionExplain.innerHTML = '<span class="mono">n='+state.n+' &rarr; 2</span> means the electron starts on hydrogen&rsquo;s '+ordinal(state.n)+' allowed energy level and falls to the second. That energy difference leaves as one '+colour+' photon. Reverse the trip &mdash; <span class="mono">n=2 &rarr; '+state.n+'</span> &mdash; and the atom absorbs that same colour from starlight, leaving a dark line.';
+  }
+
   // ---- presets ----
   document.querySelectorAll('.preset').forEach(function(b){
     b.addEventListener('click', function(){ setN(+b.dataset.n); });
   });
 
   // ---- star buttons ----
-  var starButtons=$('starButtons'), starMeta=$('starMeta');
+  var starButtons=$('starButtons'), starMeta=$('starMeta'), heliumCaveat=$('heliumCaveat'), abundancePanel=$('abundancePanel');
   STARS.forEach(function(s){
     var b=document.createElement('button');
     b.textContent = s.name;
@@ -529,11 +621,38 @@
     });
     var s = currentStar();
     starMeta.innerHTML = '<span class="big">'+s.name+'</span> &middot; spectral type <span class="big">'+s.type+'</span> &middot; surface temperature <span class="big">'+s.teff.toLocaleString()+' K</span><br>'+s.why;
+    heliumCaveat.hidden = s.key !== 'sun';
+  }
+  function drawAbundance(){
+    var s = currentStar();
+    if(s.key === 'sun'){
+      abundancePanel.innerHTML = '<div class="abundance-label">Sun&rsquo;s photosphere<br>per 1,000 atoms</div><div class="abundance-values"><span><strong>910</strong>hydrogen</span><span><strong>89</strong>helium</span><span><strong>1</strong>all heavier elements</span></div><p class="abundance-note">Reference composition by number of atoms. It is estimated from detailed spectroscopy and solar-atmosphere models, not from the illustrative line darkness above. <a href="https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html" target="_blank" rel="noopener">NASA source</a></p>';
+    } else {
+      abundancePanel.innerHTML = '<div class="abundance-label">What this view tells us</div><p class="abundance-note">These line positions identify species that are visible in '+s.name+'&rsquo;s outer gas. The illustrated line darkness is qualitative, so it does not provide a measured atom count for this star.</p>';
+    }
   }
 
   // ---- absorption spectrum bar ----
   var absBar=$('absBar');
   absBar.style.background = specGradient();
+  var fluxPath=$('fluxPath');
+  function drawFluxChart(){
+    var s = currentStar(), points=[], samples=460, x0=72, x1=1000, y0=30;
+    for(var i=0;i<=samples;i++){
+      var wl=VMIN+(VMAX-VMIN)*i/samples, dip=0;
+      ELEMENTS.forEach(function(el){
+        var strength=s.strength[el.key]||0, width=el.band?10:1.35, depth=el.band?0.22:0.14;
+        el.lines.forEach(function(line){
+          var z=(wl-line)/width;
+          dip += strength*depth*Math.exp(-0.5*z*z);
+        });
+      });
+      var x=x0+(x1-x0)*i/samples;
+      var y=y0+Math.min(.88,dip*4)*94;
+      points.push((i?'L':'M')+x.toFixed(2)+' '+y.toFixed(2));
+    }
+    fluxPath.setAttribute('d',points.join(' '));
+  }
   var absLineEls = {};
   ELEMENTS.forEach(function(el){
     absLineEls[el.key] = el.lines.map(function(wl){
@@ -571,7 +690,7 @@
     el._strengthEl = strengthEl;
   });
   function strengthLabel(v){
-    if(v===0) return 'absent';
+    if(v===0) return 'not shown';
     if(v<0.2) return 'trace';
     if(v<0.45) return 'weak';
     if(v<0.7) return 'moderate';
@@ -611,9 +730,12 @@
     drawEqnLegend();
     drawNSlider();
     drawResult();
+    drawTransitionExplain();
     drawStarButtons();
     drawAbsBar();
+    drawFluxChart();
     updateElemLegendText();
+    drawAbundance();
   }
   render();
 })();

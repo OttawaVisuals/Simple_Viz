@@ -115,6 +115,7 @@
   .preset:hover{border-color:var(--accent);color:var(--accent)}
 
   .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note .mono{white-space:normal;overflow-wrap:anywhere}
   .note a{color:var(--muted2);text-decoration-color:var(--line2)}
   .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
   .feedback{margin-top:clamp(40px,4.6vw,64px);padding-top:20px;border-top:1px solid var(--line)}
@@ -221,17 +222,15 @@
 
     <div class="spectrum">
       <div class="result-label">Frequency spectrum</div>
-      <svg id="specSvg" viewBox="0 0 300 182" role="img" aria-label="A mirrored chart showing an illustrative thunder frequency spectrum above the axis, and the same spectrum attenuated by distance below it, both against a log-scale frequency axis from 10 Hz to 4 kHz.">
+      <svg id="specSvg" viewBox="0 0 300 202" role="img" aria-label="A mirrored band chart showing a constructed representative thunder-frequency distribution above the axis and the same bands after ISO atmospheric absorption at the selected distance below it, from 25 to 500 hertz.">
         <line id="specBaseline" x1="14" x2="290" stroke="var(--line2)" stroke-width="1"></line>
-        <line id="specRef200" y1="10" y2="168" stroke="var(--line2)" stroke-width="1" stroke-dasharray="2 3"></line>
-        <path id="specTop" fill="color-mix(in srgb, var(--fg) 16%, transparent)" stroke="var(--fg)" stroke-width="1.25"></path>
-        <path id="specBottom" fill="color-mix(in srgb, var(--accent) 20%, transparent)" stroke="var(--accent)" stroke-width="1.25"></path>
-        <text id="specTopLabel" x="16" y="22" class="mono" font-size="9" fill="var(--muted)">at the strike</text>
-        <text id="specBottomLabel" x="16" y="166" class="mono" font-size="9" fill="var(--accent)"></text>
-        <text id="specRef200Label" text-anchor="middle" y="9" class="mono" font-size="8" fill="var(--muted)">200 Hz</text>
+        <g id="specTopBars"></g>
+        <g id="specBottomBars"></g>
+        <text id="specTopLabel" x="16" y="13" class="mono" font-size="9" fill="var(--muted)">constructed reference</text>
+        <text id="specBottomLabel" x="16" y="184" class="mono" font-size="9" fill="var(--accent)"></text>
         <g id="specTicks" class="mono" font-size="8" fill="var(--muted)"></g>
       </svg>
-      <p class="spectrum-caption">Illustrative source spectrum (peaked ~200&nbsp;Hz, <a href="https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1029/JZ072i024p06149" target="_blank" rel="noopener">Few 1967</a>) vs. the same spectrum after distance-dependent absorption (see note for sourcing).</p>
+      <p class="spectrum-caption">A constructed, equally weighted composite of measured peal (75&nbsp;&plusmn;&nbsp;22&nbsp;Hz), clap (102&nbsp;&plusmn;&nbsp;36&nbsp;Hz) and rumble (63&nbsp;&plusmn;&nbsp;27&nbsp;Hz) dominant-frequency distributions, compared with the same bands after ISO&nbsp;9613-1 absorption. It is a representative model, not a measured average energy spectrum.</p>
     </div>
 
     <div class="result">
@@ -265,7 +264,7 @@
 
   <p class="note">Sound travels at roughly 343&nbsp;m/s in dry air at 20&deg;C &mdash; a touch faster in warmer or more humid air, a touch slower in cold or dry air, but 343&nbsp;m/s is the standard reference figure used here. That's close enough to the folk rule &mdash; "5 seconds per mile" (343&nbsp;m/s &times; 5&nbsp;s &asymp; 1715&nbsp;m, against a mile's 1609&nbsp;m) or "3 seconds per kilometre" (343&nbsp;m/s &times; 3&nbsp;s &asymp; 1029&nbsp;m) &mdash; that either is a fine way to estimate a storm's distance while counting on your fingers. Treating the flash as instantaneous isn't a shortcut here, it's honest: light covers a kilometre in about 3.3&nbsp;microseconds, genuinely negligible next to the seconds thunder takes. The one real approximation is the gauge below &mdash; the d&nbsp;=&nbsp;v&middot;&Delta;t formula keeps climbing past what you can actually hear, since atmospheric absorption and upward refraction usually mute thunder beyond roughly 15&ndash;20&nbsp;km, well short of what a 60-second delay would imply. See <a href="https://en.wikipedia.org/wiki/Thunder" target="_blank" rel="noopener">Thunder</a> and <a href="https://en.wikipedia.org/wiki/Speed_of_sound" target="_blank" rel="noopener">Speed of sound</a> on Wikipedia.</p>
 
-  <p class="note">How loud thunder gets isn't a linear relationship with distance. Two separate losses shrink it: <em style="font-style:italic">geometric spreading</em>, where the sound pressure level falls off with the inverse square of distance &mdash; a drop of 6&nbsp;dB every time the distance doubles, the same rule that governs any point source (<a href="https://phys.libretexts.org/Bookshelves/Waves_and_Acoustics/Understanding_Sound_(Abbot)/06:_Loudness_perception/6.06:_Intensity_and_Distance" target="_blank" rel="noopener">Physics LibreTexts</a>) &mdash; and <em style="font-style:italic">atmospheric absorption</em>, a separate loss that's roughly linear in dB per kilometre but strongly frequency-dependent: higher frequencies are absorbed much faster than low ones. That second effect is also why a nearby strike cracks sharply while the same stroke rumbles by the time it travels several kilometres &mdash; the crack's higher frequencies get stripped out along the way, leaving mostly the low rumble (<a href="https://en.wikibooks.org/wiki/Engineering_Acoustics/Thunder_acoustics" target="_blank" rel="noopener">Engineering Acoustics: Thunder acoustics</a>). Peak loudness right at the lightning channel is commonly cited around 120&ndash;130&nbsp;dB, among the loudest natural sounds on Earth (<a href="https://www.britannica.com/topic/Why-Is-Thunder-So-Loud" target="_blank" rel="noopener">Britannica</a>) &mdash; and it isn't the same for every strike: a longer or more energetic discharge channel radiates more acoustic energy, so some claps are genuinely louder than others before distance even enters the picture. The estimated loudness figure above uses geometric spreading alone from an assumed 120&nbsp;dB at 10&nbsp;m; it leaves out the extra, frequency-dependent loss from atmospheric absorption, so real thunder at longer range usually runs a bit quieter than that number suggests. Put together, the full expression is <span class="mono">L(r)&nbsp;=&nbsp;L(r&#8320;)&nbsp;&minus;&nbsp;20&middot;log&#8321;&#8320;(r/r&#8320;)&nbsp;&minus;&nbsp;&alpha;(f)&middot;(r&nbsp;&minus;&nbsp;r&#8320;)</span>, where &alpha;(f) &mdash; the atmospheric absorption coefficient, in dB per unit distance &mdash; itself depends on frequency, temperature, humidity and pressure, formalized in the <a href="https://www.iso.org/standard/17426.html" target="_blank" rel="noopener">ISO 9613-1</a> standard as a sum of a classical (viscosity and heat conduction) term plus separate oxygen and nitrogen molecular-relaxation terms; it's this &alpha;(f) that decides, at any given distance, how much of each frequency survives &mdash; which is why the pitch of thunder itself shifts with distance, not just its loudness (the "pitch" line above reflects that). Measured thunder does have a "standard" pitch: a classic study found a dominant peak around 200&nbsp;Hz averaged across many recordings (<a href="https://agupubs.onlinelibrary.wiley.com/doi/abs/10.1029/JZ072i024p06149" target="_blank" rel="noopener">Few, 1967</a>), though a strike's initial crack carries real energy well above that, and by several kilometres out only the lowest rumble, well under 200&nbsp;Hz, usually survives. The spectrum chart between the delay slider and the distance result illustrates this: the top curve is a schematic source spectrum shaped around that 200&nbsp;Hz peak (a stand-in for "typical" thunder, not a specific recording &mdash; no single equation describes every strike's real spectrum), and the mirrored curve below applies frequency-dependent absorption at the current distance, using three published &alpha;(f) figures at 1, 2, and 4&nbsp;kHz &mdash; 3.7, 9.7, and 32.8&nbsp;dB/km at 10&nbsp;&deg;C and 70% relative humidity (<a href="https://www.sciencedirect.com/science/article/abs/pii/S0003682X13002119" target="_blank" rel="noopener">Applied Acoustics</a>) &mdash; interpolated and extrapolated between those three sourced points on a log&ndash;log (power-law) curve, the simplest curve consistent with them, rather than the full ISO&nbsp;9613-1 model.</p>
+  <p class="note">How loud thunder gets isn't linear with distance. The model combines two physical losses: frequency-independent <em style="font-style:italic">geometric spreading</em>, <span class="mono">20&middot;log&#8321;&#8320;(r/r&#8320;)</span>, and frequency-dependent atmospheric absorption, <span class="mono">&alpha;(f)&middot;(r&minus;r&#8320;)</span>. The complete band-level relationship is <span class="mono">L(f,r)&nbsp;=&nbsp;L(f,r&#8320;)&nbsp;&minus;&nbsp;20&middot;log&#8321;&#8320;(r/r&#8320;)&nbsp;&minus;&nbsp;&alpha;(f)&middot;(r&minus;r&#8320;)</span>. Here &alpha;(f) is calculated from the <a href="https://www.iso.org/standard/17426.html" target="_blank" rel="noopener">ISO&nbsp;9613-1</a> equations at 20&nbsp;&deg;C, 70% relative humidity and 101.325&nbsp;kPa: classical viscous/thermal loss plus the oxygen and nitrogen molecular-relaxation terms. This frequency dependence is why high-frequency content disappears faster than low rumble; the underlying mechanisms and the separation from geometric spreading are summarized by the UK's <a href="https://resource.npl.co.uk/acoustics/techguides/envnoiseassessment/appendix_a.pdf" target="_blank" rel="noopener">National Physical Laboratory</a> and in <a href="https://ntrs.nasa.gov/api/citations/19850003481/downloads/19850003481.pdf" target="_blank" rel="noopener">NASA measurements</a>. The starting distribution is constructed from the peal, clap and rumble dominant-frequency statistics reported by <a href="https://archive.cmb.ac.lk/items/2d490745-be2f-49f6-8521-ae3dcefa1628" target="_blank" rel="noopener">Abegunawardana et&nbsp;al. (2016)</a>. Each category contributes equally; a normal distribution based on its reported mean and standard deviation is integrated into logarithmic bands from 25 to 500&nbsp;Hz. This converts observed dominant-frequency statistics into an explicit representative band model&mdash;it is not a measured average energy spectrum. The chart applies only the frequency-dependent atmospheric term so its shape remains readable; the loudness readout energy-sums those bands after both atmospheric loss and geometric spreading, anchored to an illustrative 120&nbsp;dB at 10&nbsp;m. Refraction, terrain, reflections, wind, rain and strike geometry are omitted, so the result is a propagation model, not a prediction for a specific storm.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -306,8 +305,6 @@
   var AUDIBLE_LIMIT_M = 17500; // typical real-world audibility ceiling, ~15-20 km
   var GAUGE_MAX_M = 22000;
   var SPL_REF = 120, R_REF = 10; // assumed reference: ~120 dB at 10 m from the channel
-
-  function estLoudnessDb(m){ return SPL_REF - 20*Math.log10(Math.max(m,R_REF)/R_REF); }
 
   function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
 
@@ -576,79 +573,157 @@
     playRafId = requestAnimationFrame(frame);
   });
 
+  // A brief, decorative opening flash establishes the lightning before the user interacts.
+  // It runs once, does not alter the timing model, and is skipped for reduced-motion users.
+  function playIntroLightning(){
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var length=boltLine.getTotalLength ? boltLine.getTotalLength() : 90;
+    boltLine.style.strokeDasharray=length;
+    boltLine.style.strokeDashoffset=length;
+    var boltAnim=boltLine.animate([
+      {strokeDashoffset:length,opacity:0},
+      {strokeDashoffset:0,opacity:1,offset:.36},
+      {strokeDashoffset:0,opacity:.25,offset:.52},
+      {strokeDashoffset:0,opacity:1,offset:.68},
+      {strokeDashoffset:0,opacity:1}
+    ],{duration:720,easing:'ease-out'});
+    flashDot.animate([
+      {opacity:0,transform:'scale(.5)'},
+      {opacity:1,transform:'scale(2.1)',offset:.38},
+      {opacity:.15,transform:'scale(1)',offset:.53},
+      {opacity:1,transform:'scale(1.65)',offset:.67},
+      {opacity:.35,transform:'scale(1)'}
+    ],{duration:720,easing:'ease-out'});
+    boltAnim.onfinish=function(){
+      boltLine.style.opacity='';
+      boltLine.style.strokeDasharray='';
+      boltLine.style.strokeDashoffset='';
+      flashDot.style.opacity='';
+    };
+  }
+
   // ---- result + gauge ----
   var distValueEl=$('distValue'), distUnitEl=$('distUnit'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine'), lightTimeLineEl=$('lightTimeLine'), loudnessLineEl=$('loudnessLine'), freqLineEl=$('freqLine');
 
-  // Thunder's dominant pitch shifts down with distance because atmospheric absorption removes
-  // higher frequencies faster than low ones (see the note). The ~200 Hz figure is the classic
-  // measured average peak (Few 1967); the zone boundaries below are deliberately fuzzy, since
-  // the real cutoffs depend on humidity, the discharge itself, and aren't a single sharp line.
-  function freqDescription(m){
-    if(m < 1000) return 'this close, expect a sharp crack — real energy well above the ~200 Hz "thunder" pitch, into the kHz range';
-    if(m < 5000) return 'around here thunder settles into its classic rumble, dominant energy near 200 Hz';
-    return 'by this range, higher frequencies have mostly been absorbed away — what carries is a low rumble, well under 200 Hz';
-  }
   var gReach=$('gReach'), gLimit=$('gLimit'), gMark=$('gMark'), gMarkLabel=$('gMarkLabel');
   var gTicksEl=$('gTicks'), gLabelsEl=$('gLabels');
 
   // ---- frequency spectrum chart ----
-  // The 1/2/4 kHz absorption figures are published values (10°C, 70% RH), not derived here —
-  // Applied Acoustics, "The effects of air temperature and humidity on the acoustic design of
-  // voice alarm systems on underground stations" (sciencedirect.com/science/article/abs/pii/S0003682X13002119).
-  // Between and beyond those three points, this uses log–log (piecewise power-law)
-  // interpolation/extrapolation — the simplest curve consistent with them, not an independently
-  // invented model. The source spectrum shape itself (peaked ~200 Hz) is illustrative, per Few 1967.
-  var ATTEN_PTS = [[1000,3.7],[2000,9.7],[4000,32.8]]; // Hz, dB/km
+  // ISO 9613-1 atmospheric absorption in dB/km. The model holds the atmosphere at
+  // 20°C, 70% RH and standard pressure, consistent with the page's 343 m/s sound speed.
+  // h is water-vapour molar concentration in percent; frO/frN are the oxygen/nitrogen
+  // relaxation frequencies. Source spectrum shape is illustrative, per Few (1967).
+  var AIR_TEMP_K=293.15, AIR_RH_PCT=70, AIR_PRESSURE_KPA=101.325, REF_PRESSURE_KPA=101.325;
   function alphaDbKm(f){
-    var pts = ATTEN_PTS, i;
-    if(f <= pts[0][0]) i = 0;
-    else if(f >= pts[pts.length-1][0]) i = pts.length-2;
-    else { i = 0; while(f > pts[i+1][0]) i++; }
-    var f0=pts[i][0], a0=pts[i][1], f1=pts[i+1][0], a1=pts[i+1][1];
-    var n = Math.log(a1/a0)/Math.log(f1/f0); // local power-law exponent between the two anchors
-    return a0*Math.pow(f/f0, n);
+    var T=AIR_TEMP_K, p=AIR_PRESSURE_KPA, p0=REF_PRESSURE_KPA;
+    var tr=T/293.15;
+    var psat=p0*Math.pow(10, -6.8346*Math.pow(273.16/T,1.261)+4.6151);
+    var h=AIR_RH_PCT*psat/p;
+    var frO=(p/p0)*(24+4.04e4*h*(0.02+h)/(0.391+h));
+    var frN=(p/p0)*Math.pow(tr,-0.5)*(9+280*h*Math.exp(-4.17*(Math.pow(tr,-1/3)-1)));
+    var classical=1.84e-11*(p0/p)*Math.sqrt(tr);
+    var oxygen=0.01275*Math.exp(-2239.1/T)/(frO+f*f/frO);
+    var nitrogen=0.1068*Math.exp(-3352/T)/(frN+f*f/frN);
+    return 8.686*f*f*(classical+Math.pow(tr,-2.5)*(oxygen+nitrogen))*1000;
   }
-  function sourceDb(f){ var x = Math.log10(f/200); return -20*x*x; }
+  // Constructed representative distribution from Abegunawardana et al. (2016).
+  // These are distributions of observed dominant frequencies, not measured band-energy
+  // spectra. Equal type weights avoid treating the study's selected feature counts as
+  // estimates of how common peals, claps and rumbles are in nature.
+  var THUNDER_TYPES=[
+    {name:'peal',mean:75,sd:22},
+    {name:'clap',mean:102,sd:36},
+    {name:'rumble',mean:63,sd:27}
+  ];
+  var SPEC_BANDS=[25,31.5,40,50,63,80,100,125,160,200,250,315,400,500];
+  var BAND_RATIO=Math.pow(2,1/6);
+  function normalDensity(f,mean,sd){
+    var z=(f-mean)/sd;
+    return Math.exp(-0.5*z*z)/sd;
+  }
+  function representativeBandWeight(f){
+    var bandWidth=f*(BAND_RATIO-1/BAND_RATIO), sum=0;
+    THUNDER_TYPES.forEach(function(type){ sum+=normalDensity(f,type.mean,type.sd)*bandWidth; });
+    return sum/THUNDER_TYPES.length;
+  }
+  var SOURCE_BAND_POWER=SPEC_BANDS.map(representativeBandWeight);
+  var SOURCE_POWER_MAX=Math.max.apply(null,SOURCE_BAND_POWER);
+  var SOURCE_BAND_DB=SOURCE_BAND_POWER.map(function(power){ return 10*Math.log10(power/SOURCE_POWER_MAX); });
 
-  var SPEC_FMIN=10, SPEC_FMAX=4000, SPEC_FLOOR=-40, SPEC_X0=14, SPEC_X1=290;
+  function atmosphericLossDb(f,m){ return alphaDbKm(f)*Math.max(0,m-R_REF)/1000; }
+  function broadbandAtmosphericChangeDb(m){
+    var sourcePower=0, receivedPower=0;
+    SPEC_BANDS.forEach(function(f,i){
+      var power=SOURCE_BAND_POWER[i];
+      sourcePower+=power;
+      receivedPower+=power*Math.pow(10,-atmosphericLossDb(f,m)/10);
+    });
+    return 10*Math.log10(receivedPower/sourcePower);
+  }
+  function estLoudnessDb(m){
+    var range=Math.max(m,R_REF);
+    return SPL_REF-20*Math.log10(range/R_REF)+broadbandAtmosphericChangeDb(range);
+  }
+  function dominantFrequency(m){
+    var bestIndex=0, bestDb=-Infinity;
+    SPEC_BANDS.forEach(function(f,i){
+      var level=SOURCE_BAND_DB[i]-atmosphericLossDb(f,m);
+      if(level>bestDb){ bestDb=level; bestIndex=i; }
+    });
+    return SPEC_BANDS[bestIndex];
+  }
+  function freqDescription(m){
+    var f=dominantFrequency(Math.max(m,R_REF));
+    return 'strongest model band: '+f+' Hz (constructed reference after ISO atmospheric absorption)';
+  }
+
+  var SPEC_FMIN=25/BAND_RATIO, SPEC_FMAX=500*BAND_RATIO, SPEC_FLOOR=-42, SPEC_X0=14, SPEC_X1=290;
   function specX(f){ return SPEC_X0 + (Math.log10(f)-Math.log10(SPEC_FMIN))/(Math.log10(SPEC_FMAX)-Math.log10(SPEC_FMIN))*(SPEC_X1-SPEC_X0); }
 
-  var specBaselineEl=$('specBaseline'), specTopEl=$('specTop'), specBottomEl=$('specBottom');
-  var specBottomLabelEl=$('specBottomLabel'), specTicksEl=$('specTicks'), specRef200El=$('specRef200'), specRef200LabelEl=$('specRef200Label');
+  var specBaselineEl=$('specBaseline'), specTopBarsEl=$('specTopBars'), specBottomBarsEl=$('specBottomBars');
+  var specBottomLabelEl=$('specBottomLabel'), specTicksEl=$('specTicks');
+  var specTopBars=[], specBottomBars=[];
+
+  function buildSpectrumBars(){
+    if(specTopBars.length===SPEC_BANDS.length) return;
+    specTopBarsEl.innerHTML=''; specBottomBarsEl.innerHTML='';
+    SPEC_BANDS.forEach(function(){
+      var top=document.createElementNS(NS,'rect'), bottom=document.createElementNS(NS,'rect');
+      top.setAttribute('fill','var(--muted2)'); top.setAttribute('opacity','.38');
+      bottom.setAttribute('fill','var(--accent)'); bottom.setAttribute('opacity','.52');
+      specTopBarsEl.appendChild(top); specBottomBarsEl.appendChild(bottom);
+      specTopBars.push(top); specBottomBars.push(bottom);
+    });
+  }
 
   function drawSpectrum(){
-    var distKm = distanceM()/1000;
-    var N = 60, baseY = 89, maxPx = 76;
-    var topPts=[], botPts=[];
-    for(var i=0;i<=N;i++){
-      var frac = i/N;
-      var f = SPEC_FMIN*Math.pow(SPEC_FMAX/SPEC_FMIN, frac);
-      var x = specX(f);
-      var lvl = sourceDb(f);
-      var nTop = clamp((lvl-SPEC_FLOOR)/(0-SPEC_FLOOR),0,1);
-      topPts.push(x.toFixed(1)+','+(baseY-nTop*maxPx).toFixed(1));
-
-      var attLvl = lvl - alphaDbKm(f)*distKm;
-      var nBot = clamp((attLvl-SPEC_FLOOR)/(0-SPEC_FLOOR),0,1);
-      botPts.push(x.toFixed(1)+','+(baseY+nBot*maxPx).toFixed(1));
-    }
-    var x0 = specX(SPEC_FMIN).toFixed(1), x1 = specX(SPEC_FMAX).toFixed(1);
-    specTopEl.setAttribute('d', 'M'+x0+','+baseY+' L'+topPts.join(' L')+' L'+x1+','+baseY+' Z');
-    specBottomEl.setAttribute('d', 'M'+x0+','+baseY+' L'+botPts.join(' L')+' L'+x1+','+baseY+' Z');
+    var m=distanceM(), baseY=92, maxPx=70;
+    buildSpectrumBars();
+    SPEC_BANDS.forEach(function(f,i){
+      var left=specX(f/BAND_RATIO), right=specX(f*BAND_RATIO), width=Math.max(1,right-left-1);
+      var topLevel=SOURCE_BAND_DB[i];
+      var receivedLevel=topLevel-atmosphericLossDb(f,m);
+      var topHeight=clamp((topLevel-SPEC_FLOOR)/(0-SPEC_FLOOR),0,1)*maxPx;
+      var bottomHeight=clamp((receivedLevel-SPEC_FLOOR)/(0-SPEC_FLOOR),0,1)*maxPx;
+      specTopBars[i].setAttribute('x',(left+.5).toFixed(1));
+      specTopBars[i].setAttribute('y',(baseY-topHeight).toFixed(1));
+      specTopBars[i].setAttribute('width',width.toFixed(1));
+      specTopBars[i].setAttribute('height',topHeight.toFixed(1));
+      specBottomBars[i].setAttribute('x',(left+.5).toFixed(1));
+      specBottomBars[i].setAttribute('y',baseY);
+      specBottomBars[i].setAttribute('width',width.toFixed(1));
+      specBottomBars[i].setAttribute('height',bottomHeight.toFixed(1));
+    });
     specBaselineEl.setAttribute('y1', baseY); specBaselineEl.setAttribute('y2', baseY);
 
-    var refX = specX(200);
-    specRef200El.setAttribute('x1', refX); specRef200El.setAttribute('x2', refX);
-    specRef200LabelEl.setAttribute('x', refX);
-
-    var fd = fmtDist(Math.max(distKm*1000, 1));
-    specBottomLabelEl.textContent = 'at '+fd[0]+' '+fd[1];
+    var fd=fmtDist(Math.max(m,1));
+    specBottomLabelEl.textContent=m<1?'at the strike':'after air absorption at '+fd[0]+' '+fd[1];
 
     if(!specTicksEl.dataset.built){
       var ticksHtml='';
-      [10,100,1000].forEach(function(f){
+      [25,50,100,200,500].forEach(function(f){
         var tx = specX(f);
-        ticksHtml += '<text x="'+tx.toFixed(1)+'" y="180" text-anchor="middle">'+(f>=1000?(f/1000)+'k':f)+'</text>';
+        ticksHtml += '<text x="'+tx.toFixed(1)+'" y="200" text-anchor="middle">'+f+'</text>';
       });
       specTicksEl.innerHTML = ticksHtml;
       specTicksEl.dataset.built='1';
@@ -678,9 +753,9 @@
 
     loudnessLineEl.textContent = m < 1
       ? ''
-      : 'estimated loudness here: ~' + Math.round(estLoudnessDb(m)) + ' dB, from geometric spreading alone (assumes ~120 dB at 10 m — see note)';
+      : 'modelled broadband level: ~' + Math.round(estLoudnessDb(m)) + ' dB, including spreading + ISO atmospheric absorption (120 dB at 10 m)';
 
-    freqLineEl.textContent = m < 1 ? '' : ('pitch: ' + freqDescription(m));
+    freqLineEl.textContent = m < 1 ? '' : freqDescription(m);
 
     var markPct = pos(m), limitPct = pos(AUDIBLE_LIMIT_M);
     gReach.style.width = Math.min(markPct,limitPct).toFixed(2)+'%';
@@ -753,7 +828,10 @@
   [60,250,900].forEach(function(t){ setTimeout(measure, t); });
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
 
+  var reduceIntro=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!reduceIntro){ boltLine.style.opacity='0'; flashDot.style.opacity='0'; }
   render();
+  if(!reduceIntro) setTimeout(playIntroLightning,120);
 })();
 </script>
 <script>

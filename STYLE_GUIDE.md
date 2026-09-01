@@ -219,6 +219,12 @@ tighter section spacing and compact controls over hiding information. When contr
 results carry equal weight, use a 50/50 `.resultrow`; put each live number beside or at the
 end of the slider/gauge it explains rather than spending a separate vertical row on it.
 
+**First-screen composition.** When a page has a title, subtitle, equation, symbol table,
+hero visual, selectors and live result, keep all of them visible within that same ~768 px
+first screen where the concept permits. Paired visuals should be shallow and aligned rather
+than stacked; reduce their height before pushing selectors or results below the fold. Do not
+add more explanatory content until this first-screen causal story is compact and complete.
+
 **Preferred animated scale reveal.** [`constant-acceleration.html`](visualizations/constant-acceleration.html)
 is the reference for the kind of explanatory animation Simon likes. Begin at a familiar,
 readable scale with only the objects needed for that opening beat; reveal later objects as
@@ -252,6 +258,26 @@ remain an outlined/text control.
 contextual cross-links) open in the same tab. External links to sources, papers and other
 websites open in a new tab (`target="_blank"` with `rel="noopener"`), so readers keep their
 place in the visualization. Apply this to every external `<a href="https://…">` source link.
+
+## Causal story before controls
+
+Every page must make the idea understandable as a causal sequence, not merely expose a
+working control. Before asking the reader to move a slider, establish: **what causes the
+change; what physically changes; what the reader can observe; and what can honestly be
+inferred from that observation.** A compact cause &rarr; mechanism &rarr; outcome &rarr;
+real-world-inference sequence is the default for concepts that are not self-evident from a
+single diagram.
+
+- State what the model does **not** establish. A visible spectral line can identify a
+  species, but its darkness alone is not an atom count; a page should say when a displayed
+  value is a reference result or a qualitative illustration rather than an output of its
+  interactive model.
+- Use the simplest solvable case to teach the rule, then name the boundary of that
+  simplification. Hydrogen can demonstrate one-electron energy levels; it does not derive
+  helium or iron lines.
+- Prefer a short, labelled sequence or a small explanatory visual over shifting this causal
+  burden into a closing note. The note remains for sources and approximations, not the first
+  place a reader learns the mechanism.
 
 ## Component patterns
 
@@ -296,6 +322,12 @@ Terms that correspond to an interactive control (`<em>`) get `transition:color .
 recolored to `--accent` on hover/drag of that control — this hover-linkage between control
 and equation term is one of the style's signature details, carry it into every new page that
 has both an equation and matching sliders.
+
+**Fractions inside equations** — render every meaningful division as a stacked HTML/CSS
+fraction, including nested terms such as `RH/100` or `aT/(b+T)`. Reuse the same
+`.frac`/`.bar` pattern at a compact size for inner fractions; do not mix slash notation with
+stacked fractions in the same displayed equation unless a slash is part of a literal unit or
+identifier.
 
 **Legend table** — one row per symbol, all on one line (`grid-template-columns:1.6em 1fr
 auto`): symbol (colored, linked to its control same as the equation term) · plain-language
@@ -347,6 +379,11 @@ position, not the real-world value, since the two can't both anchor the same min
 that purpose, so it's the one that should carry the honest real-world value and unit — reuse
 whatever `fmt*()` function the readout already calls, don't write a second formatter.
 
+**Multiple-selector density.** For three or more sliders in one control block, put the label
+on the left and the live value on the right of the same header row. Place the compact track
+immediately below, with quiet minimum/maximum labels beneath it. Do not spend a separate
+large readout row on each selector unless the number itself needs to be the page's main visual.
+
 **Result readout** — big mono number + smaller muted unit, with the verdict text
 (e.g. "Possible." / "Impossible") inline immediately after on the same line, not on its own
 line below. A secondary explanatory line follows underneath in `--muted2`. Below that, an
@@ -354,6 +391,11 @@ optional gauge: a thin horizontal track with a "reach" fill, tick marks, a label
 line, and a colored marker for the current value — built from plain absolutely-positioned
 `<div>`s with percentage `left`/`width`, not SVG (percentage positioning means it never needs
 a resize observer).
+
+**Controls/results balance.** In a side-by-side `.resultrow`, selectors and results should
+share a visual baseline and approximately the same height. Choose `50/50`, `2/3 | 1/3`, or
+`1/3 | 2/3` from information density rather than habit; use `50/50` when controls and results
+carry equal explanatory weight.
 
 **Put scale comparisons below the gauge/axis they explain.** A recurring layout mistake has
 been placing real-world comparisons (pools, pitches, landmarks, limits) above the bar, where

@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dew-point icon options</title>
+<style>
+  :root{--bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--line:#E2DDD2;--accent:#2F6BD8}
+  @media(prefers-color-scheme:dark){:root{--bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--line:#28304A;--accent:#6FA0F2}}
+  *{box-sizing:border-box}body{margin:0;padding:28px;background:var(--bg);color:var(--fg);font-family:Georgia,serif}.wrap{max-width:980px;margin:auto}h1{font-weight:400;margin:0 0 6px}.sub{color:var(--muted);margin:0 0 24px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}.option{border-top:1px solid var(--line);padding-top:12px}.label{font:12px ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}.icon{width:100%;aspect-ratio:120/64;display:block}@media(max-width:620px){body{padding:18px}.grid{grid-template-columns:1fr}}
+</style>
+<main class="wrap">
+  <h1>Dew-point tile icon options</h1>
+  <p class="sub">Each is an SVG built to the site's 120 × 64, two-stroke-weight icon system.</p>
+  <section class="grid">
+    <article class="option"><div class="label">1 · Windscreen threshold</div><img class="icon" src="01-windscreen-threshold.svg" alt="Windscreen with droplets and a central condensation threshold"></article>
+    <article class="option"><div class="label">2 · Car roof at night</div><img class="icon" src="02-car-roof-night-sky.svg" alt="Car roof with dew droplets and night-sky marks"></article>
+    <article class="option"><div class="label">3 · Curve and surface</div><img class="icon" src="03-curve-and-car-surface.svg" alt="Rising dew-point curve crossing a car surface threshold"></article>
+    <article class="option"><div class="label">4 · Clear to dewy</div><img class="icon" src="04-clear-to-dewy-windscreen.svg" alt="Split windscreen changing from clear to dewy"></article>
+  </section>
+</main>

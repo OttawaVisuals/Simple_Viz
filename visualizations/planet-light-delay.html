@@ -104,6 +104,10 @@
   .result-value .unit{font-family:ui-monospace,monospace;font-size:14px;color:var(--muted)}
   .verdict-sub{font-size:14px;line-height:1.45;margin-top:6px;color:var(--muted2)}
   .effort-line{font-size:12.5px;color:var(--muted);margin-top:3px;min-height:2.8em}
+  .signal-timeline{display:flex;align-items:stretch;gap:10px;margin-top:12px;font:10.5px/1.45 ui-monospace,monospace;color:var(--muted)}
+  .signal-timeline .timepoint{flex:1;min-width:0;padding-top:7px;border-top:1px solid var(--line2)}
+  .signal-timeline b{display:block;font-size:10px;letter-spacing:.09em;color:var(--muted2)}
+  .signal-timeline .arrow{align-self:center;color:var(--accent);font-size:16px}
   .movement-result{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
 
   .presets{display:none}
@@ -160,7 +164,7 @@
   <div class="topgrid">
     <div class="headleft">
       <h1>You are seeing <em>the past</em>.</h1>
-      <p class="sub">Light does not arrive instantly. Compare the shortest, average and longest Earth distance, then watch how far the object moves while its light travels.</p>
+      <p class="sub">Light does not arrive instantly. Choose a real Earth&ndash;object snapshot, then compare where the object was when its light left with where it was when that light arrived.</p>
     </div>
 
     <div class="eqnbox">
@@ -181,7 +185,7 @@
   </div>
 
   <div class="hero" id="heroWrap">
-    <div class="lbl" id="lblEarth" style="transform:translateX(-50%)">EARTH / NOW</div>
+    <div class="lbl" id="lblEarth" style="transform:translateX(-50%)">EARTH / LIGHT ARRIVES</div>
     <div class="lbl" id="lblDist" style="transform:translateX(-50%)"></div>
     <div class="lbl" id="lblSeen" style="transform:translateX(-50%);color:var(--fg)"></div>
     <div class="lbl" id="lblNow" style="transform:translateX(-50%);color:var(--accent)">ACTUAL POSITION NOW</div>
@@ -242,6 +246,7 @@
       <div class="result-value"><span class="num mono" id="sValue"></span><span class="unit mono" id="sUnit"></span></div>
       <div class="verdict-sub" id="verdictSub"></div>
       <div class="effort-line" id="effortLine"></div>
+      <div class="signal-timeline" id="signalTimeline" aria-label="Light departure and arrival times"></div>
       <div class="movement-result">
         <div class="result-label">Relative position changed</div>
         <div class="result-value"><span class="num mono" id="moveValue"></span><span class="unit mono" id="moveUnit"></span></div>
@@ -257,7 +262,7 @@
     <button class="preset" data-p="andromeda">Andromeda galaxy</button>
   </div>
 
-  <p class="note" id="note">Distances come from <a href="https://ssd.jpl.nasa.gov/horizons/">NASA/JPL Horizons</a> geometric Earth-centred vectors sampled daily from 2000 through 2050. Shortest and longest dates were refined hourly; average is the arithmetic mean of the daily distances, represented by the nearest sampled date. “Relative position changed” compares the Earth-to-object vector when the light left with the vector when it arrived &mdash; it is not the object's path length. The upward movement uses <a href="https://ssd.jpl.nasa.gov/planets/phys_par.html">JPL mean diameters</a>; sub-pixel changes are enlarged and very large changes are compressed, with either adjustment labelled. <a href="../data/planet-light-delay/jpl-daily-2000-2050.csv" download>Download the 149,024-row dataset</a> or <a href="../data/planet-light-delay/planet-light-delay-summary.json">view the calculated summary</a>. Horizontal distances are compressed.</p>
+  <p class="note" id="note">Distances come from <a href="https://ssd.jpl.nasa.gov/horizons/">NASA/JPL Horizons</a> geometric Earth-centred vectors sampled daily from 2000 through 2050. The selected date is the moment the light arrives at Earth; the page calculates when it left the object. Shortest and longest dates were refined hourly; average is the arithmetic mean of the daily distances, represented by the nearest sampled date. “Relative position changed” compares the Earth-to-object vector at those two moments &mdash; it is not the object's path length. The upward movement uses <a href="https://ssd.jpl.nasa.gov/planets/phys_par.html">JPL mean diameters</a>; sub-pixel changes are enlarged and very large changes are compressed, with either adjustment labelled. <a href="../data/planet-light-delay/jpl-daily-2000-2050.csv" download>Download the 149,024-row dataset</a> or <a href="../data/planet-light-delay/planet-light-delay-summary.json">view the calculated summary</a>. Horizontal distances are compressed.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -360,6 +365,15 @@
     if(s<31557600) return (s/86400).toFixed(1)+' days';
     var yr = s/31557600;
     return yr<1000 ? yr.toFixed(2)+' yr' : yr.toLocaleString(undefined,{maximumFractionDigits:0})+' yr';
+  }
+  function snapshotDate(text){
+    var m = text.match(/^(\d{4})-([A-Za-z]{3})-(\d{2})\s+(\d{2}):(\d{2})\s+UT$/);
+    if(!m) return null;
+    var months={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+    return new Date(Date.UTC(Number(m[1]),months[m[2]],Number(m[3]),Number(m[4]),Number(m[5])));
+  }
+  function fmtMoment(date){
+    return date.toLocaleString(undefined,{timeZone:'UTC',year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false})+' UT';
   }
 
   var NS='http://www.w3.org/2000/svg';
@@ -529,7 +543,7 @@
     lblSeen.style.left=px(g.seenX); lblSeen.style.top=py(g.cy+iconR+13);
     lblSeen.textContent=state.obj.toUpperCase()+' WHEN LIGHT LEFT';
     lblNow.style.left=px(g.seenX); lblNow.style.top=py(Math.max(4,finalY-iconR-22));
-    lblNow.textContent=state.obj.toUpperCase()+' NOW';
+    lblNow.textContent=state.obj.toUpperCase()+' WHEN LIGHT ARRIVES';
     lblScale.style.left=px(g.narrow?arrowX-10:arrowX+10); lblScale.style.top=py((g.cy+finalY)/2);
     lblScale.style.transform=g.narrow?'translate(-100%,-50%)':'translateY(-50%)';
     var scaleNote=literalOffset<minOffset?' · ENLARGED TO SHOW':literalOffset>maxOffset?' · COMPRESSED TO FIT':' · DIAMETER SCALE';
@@ -653,13 +667,15 @@
   }
 
   // ---- result box ----
-  var sValueEl=$('sValue'), sUnitEl=$('sUnit'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine');
+  var sValueEl=$('sValue'), sUnitEl=$('sUnit'), verdictSubEl=$('verdictSub'), effortLineEl=$('effortLine'), signalTimelineEl=$('signalTimeline');
   var moveValueEl=$('moveValue'), moveUnitEl=$('moveUnit'), moveSubEl=$('moveSub');
   function drawResult(){
     sValueEl.textContent = fmtTime(lightTime());
     sUnitEl.textContent = 'ago';
-    verdictSubEl.textContent = 'The light reaching Earth now left '+state.obj+' about '+fmtTime(lightTime())+' ago.';
-    effortLineEl.textContent = 'Distance: '+fmtDist(distKm())+' on '+selected().date+'.';
+    verdictSubEl.textContent = 'At this snapshot, the arriving light left '+state.obj+' '+fmtTime(lightTime())+' earlier.';
+    effortLineEl.textContent = 'Distance: '+fmtDist(distKm())+' when it arrived at Earth on '+selected().date+'.';
+    var arrival=snapshotDate(selected().date), emission=arrival ? new Date(arrival.getTime()-lightTime()*1000) : null;
+    signalTimelineEl.innerHTML = emission ? '<span class="timepoint"><b>LIGHT LEFT '+state.obj.toUpperCase()+'</b>'+fmtMoment(emission)+'</span><span class="arrow" aria-hidden="true">→</span><span class="timepoint"><b>LIGHT ARRIVED AT EARTH</b>'+fmtMoment(arrival)+'</span>' : '';
     var moved = selected().moveKm;
     moveValueEl.textContent = moved < 10 ? moved.toFixed(2) : moved.toLocaleString(undefined,{maximumFractionDigits:0});
     moveUnitEl.textContent = 'km';

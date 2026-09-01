@@ -1,5 +1,38 @@
 # Handover
 
+## Roast-time page repurposed into egg-boiling physics — 2026-08-29
+
+- **`visualizations/roast-time.html` is retired; `visualizations/egg-boiling-time.html`
+  ("Why the yolk stays hot after the shell goes cold") is new**, per Simon's request to turn
+  the roast/square&ndash;cube-law page into egg physics. It was an unreviewed draft (only
+  listed in `unreviewed.html` and the unlinked roadmap list in `index.html`, never in the
+  reviewed catalogue), so this was a straight content replacement rather than a rewrite of
+  live/reviewed material. References updated in `index.html` (roadmap `<li>` + icon symbol),
+  `unreviewed.html` (tile + icon symbol), and `tracker.html` (`PAGES` array). Not yet reviewed
+  or promoted to `index.html`'s catalogue.
+- **Boil time** uses the real published Charles D. H. Williams (University of Exeter) egg
+  formula, `t = M^(2/3)cρ^(1/3) / (Kπ²(4π/3)^(2/3)) · ln[0.76(T₀−Tw)/(Ty−Tw)]`, with
+  c = 3.7 J/g°C, ρ = 1.038 g/cm³, K = 0.005 W/cm°C. Verified by hand: a 57 g fridge-cold egg
+  to 70°C in sea-level boiling water gives 6:25 (matches the shipped default), an ostrich egg
+  (1,400 g) gives about 54 minutes. Controls: egg mass (log slider, 9 g quail to 1.4 kg
+  ostrich), doneness (soft/medium/hard target yolk temp), starting temperature (fridge/room),
+  and boiling-water temperature (sea level/high altitude, a boiling-point-depression aside).
+- **Cooling** reuses the same constants for a second, real phenomenon: the standard one-term
+  transient-conduction solution for a sphere with its surface clamped to bath temperature,
+  θ* = 2·exp(−π²αt/r²) with α = K/(ρc) — the same diffusivity, run in reverse. This is the
+  actual physics behind a well-known cooking fact (the shell feels cool under the tap long
+  before the yolk does) rather than an invented number. Default settings show the centre of a
+  hard-boiled 57 g egg staying above a 45°C "ouch" threshold for 8:53 and above a 35°C
+  "safe to peel" threshold for 11:19 under a 10°C tap. The note is explicit that the one-term
+  approximation overstates surface temperature in the first 20&ndash;30 seconds and that a
+  static bowl (rather than running water) would cool the centre more slowly than shown.
+- Both sections share the egg's equivalent-sphere radius and the boiling section's chosen
+  doneness temperature, so the cooling curve always starts from the same yolk target the user
+  picked above. Verified in-browser: no console errors, no horizontal overflow at 375px or
+  desktop widths, all six presets (quail/small/large/duck/goose/ostrich) update every panel
+  correctly, dark/light CSS matches the site's standard token pattern (copied verbatim from
+  `straw-hose-flow.html`'s skeleton). Not yet visually reviewed by a human.
+
 ## Style-guide conformance pass across the live pages — 2026-08-23
 
 Second half of the live-page review (the physics/runtime half is the entry below). All nine
@@ -485,13 +518,17 @@ conform, per Simon's explicit call.
 - Scope is explicit: vacuum free fall and constant gravity; stone drag, echoes, reaction
   time, wind and humidity are omitted. Deep/light-stone cases can overestimate real depth.
 
-## Dew-point window page — new draft, 2026-08-20
+## Dew-point page — reviewed and complete, 2026-08-31
 
-- **`visualizations/dew-point-window.html`** ("Why this window is fogging up") is page 56,
-  under Discoveries in `unreviewed.html` and `tracker.html`; it is unreviewed.
-- Uses the Magnus approximation over liquid water with indoor air temperature, relative
-  humidity and inside glass temperature. Condensation appears when the glass is at or below
-  the calculated dew point; fog/droplets are qualitative.
+- **`visualizations/dew-point-window.html`** ("Why droplets appear on your car overnight")
+  is reviewed and complete. It was promoted to the Discoveries catalogue in `index.html`,
+  removed from `unreviewed.html`, and defaults to Checked / Reviewed and complete in
+  `tracker.html`.
+- Uses the Magnus approximation over liquid water with air temperature, relative humidity and
+  car-surface temperature. The page pairs a qualitative surface-droplet visual with an RH vs.
+  dew-point chart; droplets appear when the surface is at or below the calculated dew point.
+- The approved homepage icon is the object-in-diagram curve: a dew-point curve crossing the
+  car-surface threshold, with an accent droplet at the crossing.
 
 ## Backlog — pitched ideas not yet built (added 2026-08-19)
 
@@ -2164,15 +2201,30 @@ homepage under Discoveries and removed from the unreviewed queue and roadmap. Th
 eight planets (Pluto removed), a 0.2–35 AU distance range, and a central-star pill picker
 (TRAPPIST-1, Proxima Centauri, Sun, Sirius A). Its paired scale diagrams place the main and
 inner systems on a shared horizontal axis, with a boxed/dotted zoom callout. The inner map is
-scaled so Mars’s displayed orbit is 0.8× Neptune’s displayed orbit. The tracker now defaults
+scaled so Mars&rsquo;s displayed orbit is 0.8× Neptune&rsquo;s displayed orbit. The tracker now defaults
 this page to Checked / Reviewed and complete. The reviewed homepage now lists 20 pages; the
-unreviewed queue lists 42 pages, including 20 Discoveries drafts.
+unreviewed queue lists 43 pages, including 21 Discoveries drafts.
+
 **`planet-light-delay.html` simplification (2026-08-28):** the visible lesson now focuses only
 on `t = d/c`. The drift equation, moving-current-position comparison, magnified inset,
 distance slider and preset row were removed from the interface. Five object choices use one
 representative example distance each and answer one question: how old is the image reaching
 Earth now? Planetary distances are explicitly described as variable and the diagram gap as
-compressed. This intermediate state was superseded later the same day by the JPL dataset pass
+compressed. This intermediate state was superseded later the same day by the JPL dataset pass.
+
+**JPL mission trajectories (2026-08-28):** `visualizations/mission-trajectories.html` is a new
+interactive top-down ecliptic map for Voyager 1, Voyager 2, New Horizons, Juno, Parker Solar
+Probe, Cassini, and Dawn. It uses local JPL Horizons data, built by
+`scripts/build-mission-trajectory-data.ps1` into
+`data/mission-trajectories/jpl-mission-trajectories.json` (and a file-safe JavaScript copy). The
+first 120 days of every mission are sampled daily; later samples are 30 days apart. Earth, Moon,
+and Mercury through Neptune positions are also included. The map camera begins at lunar scale,
+widens smoothly with the Earth&ndash;probe separation during playback, and reveals the Sun and real
+planet locations as they enter the frame. The plot preserves heliocentric x/y scale while the
+distance and radio-delay readouts use full 3-D Earth-relative vectors. Future positions are
+explicitly labelled predictions; the page is linked from `unreviewed.html` pending site review.
+The existing light-delay page now labels its two positions as light departure and arrival, with a
+UTC timestamp pair, rather than describing the historical/future sample as live "now".
 above. The older implementation history below is retained for context.
 
 All three were rewritten from their original sparse dark-first look to the

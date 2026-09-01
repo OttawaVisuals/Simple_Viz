@@ -216,8 +216,8 @@
       <symbol id="icon-birthday-paradox" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <g fill="currentColor" stroke="none"><circle cx="18" cy="18" r="2"/><circle cx="34" cy="18" r="2"/><circle cx="50" cy="18" r="2"/><circle cx="66" cy="18" r="2"/><circle cx="82" cy="18" r="2"/><circle cx="98" cy="18" r="2"/><circle cx="18" cy="32" r="2"/><circle cx="34" cy="32" r="2"/><circle cx="66" cy="32" r="2"/><circle cx="82" cy="32" r="2"/><circle cx="98" cy="32" r="2"/><circle cx="18" cy="46" r="2"/><circle cx="34" cy="46" r="2"/><circle cx="50" cy="46" r="2"/><circle cx="66" cy="46" r="2"/><circle cx="82" cy="46" r="2"/><circle cx="98" cy="46" r="2"/></g><circle cx="50" cy="30" r="6" fill="var(--accent)" stroke="var(--accent)"/><circle cx="54" cy="34" r="6" fill="var(--accent)" stroke="var(--bg)"/>
       </symbol>
-      <symbol id="icon-roast-time" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M15 31l15-8 15 8v18l-15 8-15-8zM15 31l15 8 15-8M30 39v18"/><path d="M61 20l21-11 21 11v26L82 57 61 46zM61 20l21 11 21-11M82 31v26"/><path d="M21 17c-4-5 4-7 0-12M31 17c-4-5 4-7 0-12M76 6c-4-3 2-5 0-7M88 6c-4-3 2-5 0-7" stroke="var(--accent)"/>
+      <symbol id="icon-egg-boiling-time" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M60 6c14 0 24 20 24 33 0 14-11 21-24 21S36 53 36 39c0-13 10-33 24-33z"/><ellipse cx="60" cy="42" rx="10" ry="7" stroke="var(--accent)"/><path d="M44 10c-3-3 1-6-2-9M52 4c-3-3 1-6-2-9M68 4c3-3-1-6 2-9M76 10c3-3-1-6 2-9" stroke="var(--accent)"/>
       </symbol>
       <symbol id="icon-decibels" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M15 26h13l15-12v36L28 38H15z" fill="var(--accent)" stroke="var(--accent)"/><path d="M54 25q10 7 0 14M65 18q22 14 0 28M78 11q34 21 0 42"/><path d="M94 52V33h7v19M106 52V20h7v32" stroke="var(--accent)"/>
@@ -253,6 +253,15 @@
         <circle cx="35" cy="32" r="25"/><circle cx="35" cy="32" r="5" fill="var(--accent)" stroke="var(--accent)"/>
         <path d="M35 27c3-12 13-19 19-15 3 8-4 17-15 21M40 32c12 3 19 13 15 19-8 3-17-4-21-15M35 37c-3 12-13 19-19 15-3-8 4-17 15-21M30 32c-12-3-19-13-15-19 8-3 17 4 21 15" stroke="var(--accent)"/>
         <path d="M68 19h13M68 32h24M68 45h38M77 15l4 4-4 4M88 28l4 4-4 4M102 41l4 4-4 4"/>
+      </symbol>
+      <symbol id="icon-dew-point-window" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 53V10M15 53h91" stroke-width="1.3"/>
+        <path d="M21 45Q49 43 67 31T103 13" stroke="var(--accent)"/>
+        <path d="M20 32h82" stroke-width="1.3"/>
+        <path d="M81 39h17l-5-7H86l-5 7Z"/>
+        <path d="M66 24c-4 6-6 9-6 12a6 6 0 0 0 12 0c0-3-2-6-6-12Z" fill="var(--accent)" stroke="var(--accent)"/>
+        <circle cx="66" cy="31" r="2" fill="currentColor" stroke="none"/>
+        <path d="M27 49h4M42 49h4M57 49h4M72 49h4M87 49h4" stroke-width="1.3"/>
       </symbol>
       <!-- Provisional: user approved this simplified direction but may revisit it. -->
       <symbol id="icon-eratosthenes-shadow" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -414,7 +423,7 @@
   <section class="catalogue" aria-labelledby="cat-all">
     <div class="section-head">
       <h2 id="cat-all">All pages</h2>
-      <span class="cat-count">Twenty pages</span>
+      <span class="cat-count">Twenty-one pages</span>
     </div>
     <p class="cat-sub">Everything built so far, coloured by category. Shuffle the order if you would rather stumble into something than go looking for it.</p>
 
@@ -428,7 +437,7 @@
       </select>
       <button class="text-btn" id="shuffleBtn" type="button">Shuffle</button>
       <button class="text-btn" id="resetOrderBtn" type="button" hidden>Reset order</button>
-      <span class="results-count" id="resultsCount" aria-live="polite">20 pages</span>
+      <span class="results-count" id="resultsCount" aria-live="polite">21 pages</span>
     </div>
 
     <div class="tile-grid" id="catalogueGrid">
@@ -447,6 +456,7 @@
       <a class="tile" data-cat="Discoveries" data-desc="Hold a rocket at 1 g, 2 g or more and see the onboard time, Earth time and distance needed to approach &mdash; never reach &mdash; light speed." href="visualizations/constant-acceleration.html"><span class="meta">Discoveries</span><h3>How long to almost reach light speed?</h3></a>
       <a class="tile" data-cat="Discoveries" data-desc="Drag the outside temperature down and watch a heat pump keep delivering more heat than the electricity it uses &mdash; then compare it against an electric heater and a gas furnace." href="visualizations/heat-pump-magic.html"><span class="meta">Discoveries</span><h3>Heat Pump <del>magic</del> <em>Science</em></h3></a>
       <a class="tile" data-cat="Discoveries" data-desc="Turn one speed control and watch airflow fall linearly, pressure by the square, and predicted shaft power by the cube." href="visualizations/fan-laws.html"><span class="meta">Discoveries</span><h3>A little slower saves a lot of fan power</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="Set air temperature, relative humidity and car-surface temperature to see when a warm, humid night leaves visible dew." href="visualizations/dew-point-window.html"><span class="meta">Discoveries</span><h3>Why droplets appear on your car overnight</h3></a>
       <a class="tile" data-cat="Fun physics" data-desc="See why a long drink straw becomes impossible to sip through while a much longer garden hose stays effortless." href="visualizations/straw-hose-flow.html"><span class="meta">Fun physics</span><h3>Why the straw gives up</h3></a>
       <a class="tile" data-cat="Fun physics" data-desc="Inject a dye stream into a pipe, then change the fluid, flow and diameter to watch orderly layers break into turbulent mixing." href="visualizations/reynolds-number.html"><span class="meta">Fun physics</span><h3>When smooth flow breaks into turbulence</h3></a>
       <a class="tile" data-cat="Fun physics" data-desc="Use melted spots and a microwave&rsquo;s frequency to estimate light speed, with compatible units and a standing-wave side view." href="visualizations/microwave-chocolate.html"><span class="meta">Fun physics</span><h3>Measuring light speed with chocolate</h3></a>
@@ -470,7 +480,7 @@
       <li><span><b>Miles per gallon is a trap</b> &mdash; Drag two mpg values and see how much fuel each gain actually saves &mdash; the same 5&nbsp;mpg jump can save six times more gas depending on where you start.</span><span class="eq">&Delta;F = D(1/mpg&#8321; &minus; 1/mpg&#8322;)</span></li>
       <li><span><b>Why computers count in sixteens</b> &mdash; Flip eight bit switches and watch a decimal number, a two-digit hex code, and sometimes a letter appear together.</span><span class="eq">n = &Sigma;b<sub>i</sub>&middot;2<sup>i</sup></span></li>
       <li><span><b>23 people, a coin flip</b> &mdash; Slide the size of a room and watch the odds that two people share a birthday cross fifty-fifty at just 23.</span><span class="eq">P(n) = 1 &minus; &prod;(365&minus;k)/365</span></li>
-      <li><span><b>Why the big roast takes so long</b> &mdash; Resize a cube from a chicken breast to an elephant and watch the ratio of surface to volume decide both cooking time and body heat.</span><span class="eq">A/V = 6/L</span></li>
+      <li><span><b>Why the yolk stays hot after the shell goes cold</b> &mdash; Resize an egg from quail to ostrich and watch the same surface-to-volume geometry decide both how long it takes to hard-boil and how long the yolk stays hot after the shell feels cool.</span><span class="eq">t &prop; M<sup>2/3</sup></span></li>
       <li><span><b>Decibels don't add up</b> &mdash; Drag the decibel slider and watch actual sound intensity and perceived loudness pull apart onto two very different curves.</span><span class="eq">dB = 10&middot;log<sub>10</sub>(I/I&#8320;)</span></li>
     </ul>
 

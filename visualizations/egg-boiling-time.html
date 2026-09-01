@@ -1,0 +1,972 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why the yolk stays hot after the shell goes cold</title>
+<meta name="description" content="One diagram of an egg's internal temperature from fridge to boiling pot to cold tap, using the real heat-diffusion physics of the square&ndash;cube law &mdash; and why the yolk can still burn your finger minutes after the shell feels cool.">
+<link rel="canonical" href="https://madeclear.ca/visualizations/egg-boiling-time.html">
+<meta property="og:title" content="Why the yolk stays hot after the shell goes cold">
+<meta property="og:description" content="One diagram of an egg's internal temperature from fridge to boiling pot to cold tap &mdash; and why the yolk can still burn your finger minutes after the shell feels cool.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://madeclear.ca/visualizations/egg-boiling-time.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Why the yolk stays hot after the shell goes cold">
+<meta name="twitter:description" content="One diagram of an egg's internal temperature from fridge to boiling pot to cold tap &mdash; and why the yolk can still burn your finger minutes after the shell feels cool.">
+<style>
+  :root{
+    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
+    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--track:#E2DDD2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
+    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--track:#28304A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--fg);-webkit-font-smoothing:antialiased;font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  a{color:inherit;text-decoration-color:rgba(127,127,127,.35);text-underline-offset:3px}
+  a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  ::selection{background:color-mix(in srgb, var(--accent) 20%, transparent)}
+  .mono{font-family:ui-monospace,"Cascadia Code","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+  main{min-height:100vh;padding:clamp(14px,2vw,26px) clamp(16px,4vw,56px) 80px}
+  .wrap{max-width:1320px;margin:0 auto}
+
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:20px;font:11px/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .topbar a{text-decoration:none}
+  .brand{display:flex;align-items:center;gap:8px;color:var(--fg);text-transform:none;letter-spacing:0}
+  .brand:hover{color:var(--accent)}
+  .brand-icon{display:block;width:42px;height:20px;overflow:visible}
+  .brand-icon text{fill:currentColor;font:italic 16px Georgia,"Iowan Old Style","Palatino Linotype",serif}
+  .brand-icon path{fill:none;stroke:var(--accent);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .brand-word{display:flex;align-items:baseline;font:italic 18px/1 Georgia,"Iowan Old Style","Palatino Linotype",serif;white-space:nowrap}
+  .brand-word .sub{font-size:.54em;line-height:1;transform:translateY(.38em);margin-right:.18em;color:inherit}
+  .topbar-right{display:flex;align-items:baseline;gap:16px}
+  .theme-toggle{cursor:pointer;border:0;background:none;padding:0;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--muted);border-bottom:1px solid transparent}
+  .theme-toggle:hover{color:var(--accent);border-color:var(--accent)}
+
+  .topgrid{display:grid;grid-template-columns:1.7fr 1.3fr 1fr;gap:clamp(24px,3vw,48px);align-items:stretch;margin-top:clamp(10px,1.6vw,20px)}
+  @media (max-width:820px){.topgrid{grid-template-columns:1fr}}
+
+  .headleft{min-width:0}
+  h1{font-weight:300;font-size:clamp(1.7rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.02em;margin:0}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{font-size:clamp(.94rem,1.1vw,1.04rem);line-height:1.55;color:var(--muted2);max-width:54ch;margin:10px 0 0;text-wrap:pretty}
+
+  .eqnbox{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:100%;gap:6px}
+  .eqn{display:flex;align-items:center;flex-wrap:wrap;justify-content:center;gap:clamp(5px,.8vw,9px);font-size:clamp(15px,1.7vw,20px);line-height:1.3;font-weight:300}
+  .eqn .eq{color:var(--muted)}
+  .eqn em{font-style:italic;font-weight:300;transition:color .2s}
+  .eqn sup{font-size:.6em;position:relative;top:-.5em}
+  .eqn-note{font:400 11px ui-monospace,monospace;color:var(--muted);max-width:32ch}
+
+  .legendbox{padding-top:2px;align-self:center}
+  .legend{display:grid;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .legend .row{display:grid;grid-template-columns:1.7em 1fr auto;gap:10px;align-items:baseline;background:var(--bg);padding:7px 2px}
+  .legend .sym{font-size:16px;font-weight:300;transition:color .2s}
+  .legend .name{font-size:12px;color:var(--muted2)}
+  .legend .val{font:400 10.5px ui-monospace,monospace;color:var(--muted);white-space:nowrap}
+
+  .hero{position:relative;width:100%;margin:clamp(20px,3vw,36px) 0 0;display:grid;grid-template-columns:3fr 5fr 4fr;gap:clamp(16px,2.4vw,32px)}
+  @media (max-width:900px){.hero{grid-template-columns:1fr}}
+  .heropanel{position:relative;width:100%;min-width:0}
+  .heropanel svg{width:100%;height:auto;display:block}
+  .heropanel-title{font:500 10.5px ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+  .hero .lbl{position:absolute;font:500 11px ui-monospace,monospace;letter-spacing:.05em;color:var(--muted);white-space:nowrap;transition:opacity .2s}
+  .chart-key{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:6px;font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .chart-key span{display:inline-flex;align-items:center;gap:5px}
+  .chart-key i{display:inline-block;width:12px;height:2px;border-radius:1px}
+
+  .resultrow{display:grid;grid-template-columns:2.3fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
+  @media (max-width:900px){.resultrow{grid-template-columns:1fr}}
+
+  .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:clamp(16px,2vw,26px) clamp(18px,2.2vw,28px)}
+  .ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .ctrl-title{font:500 10.5px ui-monospace,monospace;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+  .ctrl-title em{font-family:Georgia,serif;font-size:15px;letter-spacing:0;font-style:italic;font-weight:300;text-transform:none;transition:color .2s}
+  .ctrl-rel{font:400 10.5px ui-monospace,monospace;color:var(--muted)}
+  .readout{font-family:ui-monospace,monospace;font-size:clamp(22px,2.4vw,28px);font-weight:400;letter-spacing:-.02em;margin:5px 0 2px}
+  .track{position:relative;height:32px;cursor:ew-resize;touch-action:none;outline:none;display:flex;align-items:center;margin-top:4px}
+  .track .rail{position:absolute;left:0;right:0;height:3px;background:var(--track);border-radius:2px}
+  .track .fill{position:absolute;left:0;height:3px;border-radius:2px;background:var(--accent)}
+  .track .thumb{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;background:var(--bg);border:1.5px solid var(--accent);box-shadow:0 1px 3px rgba(0,0,0,.18);transform:translate(-50%,-50%)}
+  .track-range{display:flex;flex-wrap:wrap-reverse;justify-content:space-between;gap:2px 12px;font:400 10px ui-monospace,monospace;color:var(--muted)}
+  .track-range .mid{flex:1 1 auto;text-align:center;min-width:0}
+
+  .opt-buttons{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .opt-buttons button{cursor:pointer;font-family:Georgia,serif;font-style:italic;font-size:13px;padding:5px 11px 6px;border-radius:999px;transition:all .18s ease;border:1px solid var(--border);background:transparent;color:var(--muted)}
+  .opt-buttons button:hover{color:var(--fg)}
+  .opt-buttons button[aria-pressed="true"]{border-color:var(--accent);color:var(--fg);background:color-mix(in srgb, var(--accent) 22%, var(--bg))}
+  .opt-note{margin-top:9px;font-size:12px;line-height:1.4;color:var(--muted)}
+
+  .result{text-align:left}
+  .result-label{font:500 10.5px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .result-value{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .result-value .num{font-family:ui-monospace,monospace;font-size:clamp(26px,2.8vw,36px);line-height:1;letter-spacing:-.03em}
+  .result-value .unit{font-family:ui-monospace,monospace;font-size:13px;color:var(--muted)}
+  .verdict-sub{font-size:13px;line-height:1.4;margin-top:5px;color:var(--muted2)}
+  .stats{display:grid;grid-template-columns:1fr;gap:clamp(16px,2vw,22px)}
+
+  .presets{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 16px;margin-top:clamp(24px,2.6vw,34px);padding-top:clamp(20px,2.2vw,28px);border-top:1px solid var(--line);font-size:15px;color:var(--muted)}
+  .presets-title{font:500 11px ui-monospace,monospace;letter-spacing:.13em;text-transform:uppercase}
+  .preset{cursor:pointer;border:0;background:none;padding:0 0 2px;font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--fg);border-bottom:1px solid var(--line2)}
+  .preset:hover{border-color:var(--accent);color:var(--accent)}
+
+  .note{margin:clamp(30px,3.4vw,46px) 0 0;font-size:13.5px;line-height:1.7;color:var(--muted);text-wrap:pretty;font-family:ui-monospace,monospace}
+  .note a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .note a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  .note + .note{margin-top:14px}
+
+  .feedback{margin-top:clamp(40px,4.6vw,64px);padding-top:20px;border-top:1px solid var(--line)}
+  .feedback-head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:20px}
+  .feedback-kicker{margin:0 0 5px;font:10px/1.3 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .feedback h2{margin:0;font-size:clamp(21px,2.2vw,28px);font-weight:400;letter-spacing:-.02em}
+  .feedback-copy{margin:5px 0 0;font:12px/1.6 ui-monospace,monospace;color:var(--muted)}
+  .feedback-choices{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+  .feedback-choice{appearance:none;border:1px solid var(--line2);border-radius:999px;background:transparent;color:var(--muted2);padding:7px 12px;font:12px/1 ui-monospace,monospace;cursor:pointer}
+  .feedback-choice:hover,.feedback-choice:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
+  .feedback-choice[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--bg))}
+  .feedback-form{margin-top:18px;max-width:760px}
+  .feedback-form[hidden]{display:none}
+  .feedback-form label{display:block;margin-bottom:7px;font:12px/1.5 ui-monospace,monospace;color:var(--muted2)}
+  .feedback-form label span{color:var(--muted)}
+  .feedback-form textarea{box-sizing:border-box;width:100%;min-height:84px;resize:vertical;border:1px solid var(--line2);border-radius:3px;background:transparent;color:var(--fg);padding:10px 11px;font:14px/1.5 Georgia,serif}
+  .feedback-form textarea:focus{border-color:var(--accent);outline:1px solid var(--accent);outline-offset:2px}
+  .feedback-actions{display:flex;align-items:baseline;gap:14px;margin-top:9px}
+  .feedback-send{appearance:none;border:0;border-bottom:1px solid var(--line2);background:transparent;color:var(--muted2);padding:2px 0;font:12px/1.4 ui-monospace,monospace;cursor:pointer}
+  .feedback-send:hover,.feedback-send:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+  .feedback-send:disabled{cursor:wait;opacity:.55}
+  .feedback-status{font:11px/1.5 ui-monospace,monospace;color:var(--muted)}
+  .feedback-trap{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}
+  .footer{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,40px);font:11.5px/1.7 ui-monospace,monospace;color:var(--muted)}
+  .footer a{color:var(--muted2);text-decoration-color:var(--line2)}
+  .footer a:hover{color:var(--accent);text-decoration-color:var(--accent)}
+  @media (max-width:700px){.feedback-head{grid-template-columns:1fr}.feedback-choices{justify-content:flex-start}.footer{grid-template-columns:1fr;gap:10px}}
+</style>
+<main>
+<div class="wrap">
+
+  <div class="topbar">
+    <a class="brand" href="../index.html" aria-label="Made clear — home">
+      <svg class="brand-icon" viewBox="0 0 58 28" aria-hidden="true">
+        <text x="22" y="16">mc</text>
+        <path d="M1 22 C3 22 3 16 5 16 S7 26 9 26 S11 13 13 13 S15 23 17 23 S19 18 21 18 L57 18"/>
+      </svg>
+      <span class="brand-word" aria-hidden="true"><span>m</span><span class="sub">ade</span><span>c</span><span class="sub">lear</span></span>
+    </a>
+    <div class="topbar-right">
+      <span>Heat diffusion</span>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
+
+  <div class="topgrid">
+    <div class="headleft">
+      <h1>Why the yolk stays hot <em>after the shell goes cold</em>.</h1>
+      <p class="sub">A 57&nbsp;g egg dropped into boiling water needs about 5&frac34; minutes for the yolk to reach 69&deg;C &mdash; and once you run it under a 10&deg;C tap, the shell feels cool in under a minute while the yolk can still sting your finger for another one and a half, and isn't safe to peel for almost four. One diagram, one equation, both directions.</p>
+    </div>
+
+    <div class="eqnbox">
+      <div class="eqn">
+        <span class="eq">t =</span>
+        <em class="term" data-key="M">M</em><sup>2&#8260;3</sup><span class="eq">c&rho;</span><sup>1&#8260;3</sup>
+        <span class="eq">&#8260;</span>
+        <span class="eq">&kappa;&pi;&sup2;(4&pi;&#8260;3)</span><sup>2&#8260;3</sup>
+        <span class="eq">&middot;ln</span>
+        <span class="eq">[0.76(</span><em class="term" data-key="T0">T<sub>0</sub></em><span class="eq">&minus;</span><em class="term" data-key="Tw">T<sub>w</sub></em><span class="eq">)&#8260;(</span><em class="term" data-key="Ty">T<sub>y</sub></em><span class="eq">&minus;</span><em class="term" data-key="Tw">T<sub>w</sub></em><span class="eq">)]</span>
+      </div>
+      <p class="eqn-note">Williams' own formula, unchanged &mdash; c, &rho;, &kappa; are egg-white's specific heat, density and thermal conductivity. The "ouch"/"peel" times below solve this same equation for the cooling phase: T<sub>y</sub> becomes the starting temperature, running-water temperature takes the place of T<sub>w</sub>, and 45&deg;C or 35&deg;C becomes the new target.</p>
+    </div>
+
+    <div class="legendbox">
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <div class="hero" id="heroWrap">
+    <div class="heropanel" id="eggWrap">
+      <p class="heropanel-title">Egg, true relative scale</p>
+      <div class="lbl" id="lblSize"></div>
+      <svg id="eggSvg" role="img" aria-label="An egg of the currently selected mass, drawn at true relative scale, with its yolk marked at the centre.">
+        <line id="groundLine" stroke="var(--line)" stroke-width="1"></line>
+        <path id="eggOutline" fill="var(--accent)" opacity="0.32" stroke="var(--fg)" stroke-width="1"></path>
+        <ellipse id="yolkMark" fill="var(--accent)" opacity="0.85" stroke="var(--fg)" stroke-width="1"></ellipse>
+      </svg>
+    </div>
+
+    <div class="heropanel" id="tempWrap">
+      <p class="heropanel-title">Internal temperature, pot to tap</p>
+      <div class="lbl" id="lblPhaseBoil"></div>
+      <div class="lbl" id="lblPhaseCool"></div>
+      <svg id="tempSvg" role="img" aria-label="A chart of the egg's yolk and shell temperature over time, first rising in boiling water then falling under running tap water, with ouch and safe-to-peel thresholds marked during cooling.">
+        <line id="tAxisX" stroke="var(--line2)" stroke-width="1"></line>
+        <line id="tAxisY" stroke="var(--line2)" stroke-width="1"></line>
+        <g id="txTicks"></g>
+        <g id="tyTicks"></g>
+        <line id="phaseDivider" stroke="var(--line2)" stroke-width="1" stroke-dasharray="2 3"></line>
+        <line id="ouchLine" stroke="var(--bad)" stroke-width="1" stroke-dasharray="2 3"></line>
+        <line id="coolLine" stroke="var(--accent)" stroke-width="1" stroke-dasharray="2 3"></line>
+        <path id="shellPath" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="1 3"></path>
+        <path id="yolkPath" fill="none" stroke="var(--fg)" stroke-width="1.9"></path>
+        <circle id="boilMark" r="4" fill="var(--fg)"></circle>
+        <circle id="ouchMark" r="4" fill="var(--bad)"></circle>
+        <circle id="coolMark" r="4" fill="var(--accent)"></circle>
+      </svg>
+      <div class="chart-key">
+        <span><i style="background:var(--fg)"></i>yolk&ndash;white boundary</span>
+        <span><i style="background:var(--muted);opacity:.7"></i>shell (illustrative)</span>
+        <span><i style="background:var(--bad)"></i>45&deg;C ouch</span>
+        <span><i style="background:var(--accent)"></i>35&deg;C safe to peel</span>
+      </div>
+    </div>
+
+    <div class="heropanel" id="curveWrap">
+      <p class="heropanel-title">Boil time vs. egg mass</p>
+      <svg id="curveSvg" role="img" aria-label="A curve of boil time against egg mass, rising steeply, with the current mass marked.">
+        <line id="axisX" stroke="var(--line2)" stroke-width="1"></line>
+        <line id="axisY" stroke="var(--line2)" stroke-width="1"></line>
+        <g id="xTicks"></g>
+        <g id="yTicks"></g>
+        <path id="curvePath" fill="none" stroke="var(--accent)" stroke-width="1.75"></path>
+        <line id="curveDropX" stroke="var(--line2)" stroke-width="1" stroke-dasharray="2 3"></line>
+        <line id="curveDropY" stroke="var(--line2)" stroke-width="1" stroke-dasharray="2 3"></line>
+        <circle id="curveMark" r="4.5" fill="var(--accent)"></circle>
+      </svg>
+    </div>
+  </div>
+
+  <div class="resultrow">
+    <div class="ctrls">
+      <div class="ctrl" id="massCtrl">
+        <div class="ctrl-head">
+          <span class="ctrl-title">Egg mass <em id="MLabel">M</em></span>
+          <span class="ctrl-rel">t &prop; r&sup2; &prop; M&#8260;&#178;&#8260;&#179;</span>
+        </div>
+        <div class="readout mono" id="massReadout"></div>
+        <div class="track" id="massTrack" tabindex="0" role="slider" aria-label="Egg mass">
+          <div class="rail"></div>
+          <div class="fill" id="massFill"></div>
+          <div class="thumb" id="massThumb"></div>
+        </div>
+        <div class="track-range"><span>9 g quail</span><span class="mid">double the mass, only 1.6&times; the time</span><span>1.4 kg ostrich</span></div>
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-head"><span class="ctrl-title">Doneness &mdash; target yolk <em>T<sub>y</sub></em></span></div>
+        <div class="opt-buttons" id="donenessButtons"></div>
+        <div class="opt-note" id="donenessNote"></div>
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-head"><span class="ctrl-title">Starting temp &mdash; <em>T<sub>0</sub></em></span></div>
+        <div class="opt-buttons" id="startButtons"></div>
+        <div class="opt-note" id="startNote"></div>
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-head"><span class="ctrl-title">Boiling water &mdash; <em>T<sub>w</sub></em>, sets altitude</span></div>
+        <div class="opt-buttons" id="altButtons"></div>
+        <div class="opt-note" id="altNote"></div>
+      </div>
+
+      <div class="ctrl">
+        <div class="ctrl-head"><span class="ctrl-title">Running-water temp</span></div>
+        <div class="readout mono" id="waterReadout"></div>
+        <div class="track" id="waterTrack" tabindex="0" role="slider" aria-label="Running water temperature">
+          <div class="rail"></div>
+          <div class="fill" id="waterFill"></div>
+          <div class="thumb" id="waterThumb"></div>
+        </div>
+        <div class="track-range"><span>0&deg;C ice water</span><span class="mid"></span><span>25&deg;C cool tap</span></div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="result">
+        <div class="result-label">Time to boil (yolk hits target)</div>
+        <div class="result-value"><span class="num mono" id="boilValue"></span><span class="unit mono">min:sec</span></div>
+        <div class="verdict-sub" id="verdictSub"></div>
+      </div>
+      <div class="result">
+        <div class="result-label">Then: yolk still above 45&deg;C ("ouch") for</div>
+        <div class="result-value"><span class="num mono" id="ouchValue"></span><span class="unit mono">min:sec</span></div>
+      </div>
+      <div class="result">
+        <div class="result-label">Yolk below 35&deg;C (safe to peel) after</div>
+        <div class="result-value"><span class="num mono" id="coolValue"></span><span class="unit mono">min:sec</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="presets">
+    <span class="presets-title">Try</span>
+    <button class="preset" data-p="quail">quail egg</button>
+    <button class="preset" data-p="small">small hen's egg</button>
+    <button class="preset" data-p="large">large hen's egg</button>
+    <button class="preset" data-p="duck">duck egg</button>
+    <button class="preset" data-p="goose">goose egg</button>
+    <button class="preset" data-p="ostrich">ostrich egg</button>
+  </div>
+
+  <p class="note">Two heat-transfer mechanisms are at work, not three: from water to shell, heat moves by <b>convection</b> &mdash; boiling water and running tap water are both turbulent enough that the shell's surface sits within a degree of the water temperature within moments, in this model treated as instant. From the shell inward to the yolk, there is no fluid motion to carry heat, so it moves by <b>conduction</b> alone through egg white and yolk &mdash; far slower, and the process this whole page actually models. Radiation is negligible here: at these temperatures and this size, radiative heat exchange is orders of magnitude smaller than either of the other two and is left out entirely. That two-step picture (fast convection outside, slow conduction inside) is exactly why it's reasonable to treat the shell as clamped to the bath temperature and solve only for how long conduction takes to catch up at the yolk.</p>
+
+  <p class="note">The equation above is physicist Charles D. H. Williams' <a href="https://www.exeter.ac.uk/research-centres/theoretical-physics/boiling-an-egg/" target="_blank" rel="noopener">published egg-boiling formula</a> (University of Exeter), reproduced as written rather than rearranged. It comes from the standard one-term solution for transient conduction in a sphere whose surface is held at a fixed bath temperature, evaluated at about 69% of the way from the centre to the shell &mdash; not the exact geometric centre, but where a real egg's yolk&ndash;white boundary sits &mdash; and simplifies to the form above once the sphere's radius is rewritten in terms of mass, r&nbsp;=&nbsp;(3M&#8260;4&pi;&rho;)<sup>1&#8260;3</sup>. Internally, this page draws its temperature-vs-time chart from the equivalent temperature form T(t)&nbsp;=&nbsp;T<sub>w</sub>&nbsp;+&nbsp;0.76(T<sub>0</sub>&minus;T<sub>w</sub>)&middot;exp(&minus;&pi;&sup2;&alpha;t&#8260;r&sup2;), with &alpha;&nbsp;=&nbsp;K&#8260;(&rho;c) &mdash; the same equation, just solved for temperature at any moment instead of for the moment a target temperature is reached. Exeter's own page doesn't publish numeric values for c, &rho; and K, but a table of Williams' constants &mdash; c&nbsp;=&nbsp;3.7&nbsp;J&#8260;g&deg;C, &rho;&nbsp;=&nbsp;1.038&nbsp;g&#8260;cm&sup3;, K&nbsp;=&nbsp;0.0054&nbsp;W&#8260;cm&deg;C, and separately c&nbsp;=&nbsp;2.7, &rho;&nbsp;=&nbsp;1.032, K&nbsp;=&nbsp;0.0034 for the yolk itself &mdash; is published, with a citation back to him, at <a href="https://sites.google.com/site/calculatinghistory/home/egg-slide-rule" target="_blank" rel="noopener">calculatinghistory.com's egg slide rule</a>. This page uses the egg-white (albumen) values, since it's the white the heat actually has to cross to reach the yolk boundary being tracked, not the yolk's own properties. That same source gives Williams' own target yolk-boundary temperatures &mdash; 62&deg;C soft, 65&deg;C intermediate, 69&deg;C hard-boiled &mdash; which this page's doneness picker uses directly; with those numbers, this formula reproduces three of Exeter's own four worked fridge-egg examples (57&nbsp;g: 4.4&nbsp;min vs. his stated 4.5; 47&nbsp;g: 3.8 vs. 4; 67&nbsp;g: 4.9 vs. 5) to within a few percent, though his one room-temperature example runs about 13% off &mdash; consistent with his figures being rounded to the nearest half-minute in a popular-science write-up rather than stated to full precision. The exact same equation, with the water and starting temperatures swapped, runs the cooling phase &mdash; the "ouch" and "safe to peel" readouts are the same t solved for T<sub>y</sub>&rarr;45&deg;C and T<sub>y</sub>&rarr;35&deg;C instead of T<sub>0</sub>&rarr;T<sub>y</sub>. The plotted yolk curve sums the first three terms of the full Fourier series rather than just one, so it starts smoothly at the true initial temperature instead of jumping straight to 76% of the way there; the closed-form readouts still use the one-term version, which is accurate everywhere except the first few seconds. Since M&nbsp;&prop;&nbsp;r&sup3; at fixed density, M<sup>2&#8260;3</sup>&nbsp;&prop;&nbsp;r&sup2; &mdash; doubling the egg's radius itself, not just its mass, would quadruple every time on this page.</p>
+
+  <p class="note">The altitude picker changes T<sub>w</sub> because that is the physical mechanism: lower atmospheric pressure at altitude (about 80&nbsp;kPa at 2,000&nbsp;m versus 101&nbsp;kPa at sea level) lowers the temperature at which water boils, via the Clausius&ndash;Clapeyron relation &mdash; there is no separate pressure variable here because pressure's only effect on this model is that one temperature. The shell line on the chart is deliberately drawn as a simple fast exponential (12-second time constant) toward the bath temperature, illustrating the convective assumption rather than a separately measured or derived surface response &mdash; it is qualitative, unlike the yolk curve. The model also treats the egg as a uniform sphere dropped straight into water already at a full boil (or a tap already at its set temperature): it ignores the egg's true ellipsoidal shape, the insulating shell and air pocket, and the slower cold-start method of bringing water up to temperature with the egg already in the pot, all of which push real cooking times a little higher, especially for very large eggs like an ostrich's. A still bowl of cooling water (rather than running water) would also cool the yolk more slowly than shown, since the bath itself would warm as it absorbs the egg's heat instead of staying clamped at the set temperature.</p>
+
+  <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
+    <div class="feedback-head">
+      <div>
+        <p class="feedback-kicker">Private feedback</p>
+        <h2 id="feedbackHeading">Was this clear?</h2>
+        <p class="feedback-copy">Your response is private and helps improve this page.</p>
+      </div>
+      <div class="feedback-choices" role="group" aria-label="Clarity rating">
+        <button class="feedback-choice" type="button" data-rating="clear" aria-pressed="false">Yes</button>
+        <button class="feedback-choice" type="button" data-rating="almost" aria-pressed="false">Almost</button>
+        <button class="feedback-choice" type="button" data-rating="not-yet" aria-pressed="false">Not yet</button>
+      </div>
+    </div>
+    <form class="feedback-form" hidden>
+      <label for="feedbackComment">What could be clearer? <span>Optional, 1,200 characters maximum.</span></label>
+      <textarea id="feedbackComment" name="comment" maxlength="1200" placeholder="A confusing step, a possible mistake, or an idea..."></textarea>
+      <label class="feedback-trap" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
+      <div class="feedback-actions">
+        <button class="feedback-send" type="submit">Send private feedback</button>
+        <span class="feedback-status" role="status" aria-live="polite"></span>
+      </div>
+    </form>
+  </section>
+
+  <div class="footer">
+    <span>Designed and maintained by Simon using AI-assisted development. Sources and approximations are stated on each page. <a href="../about.html">Why this site exists</a>.</span>
+    <span>Spot a mistake or have an idea? Write to <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.</span>
+  </div>
+
+</div>
+</main>
+<script>
+(function(){
+  var MMIN=9, MMAX=1400; // grams: quail egg to ostrich egg
+  var LOGMIN=Math.log10(MMIN), LOGMAX=Math.log10(MMAX);
+
+  // physical constants for egg white (albumen) — what heat actually crosses to reach the
+  // yolk-white boundary this page tracks — published in a table of Williams' own constants:
+  // https://sites.google.com/site/calculatinghistory/home/egg-slide-rule (citing Exeter).
+  // Egg yolk's constants are lower (c=2.7, kappa=3.4e-3, rho=1.032) but aren't the ones that
+  // govern this diffusion path.
+  var C_SPEC=3.7;      // J / (g * degC), specific heat capacity of albumen
+  var RHO=1.038;       // g / cm^3, density of albumen
+  var K_COND=0.0054;   // W / (cm * degC), thermal conductivity of albumen
+  var ALPHA = K_COND/(RHO*C_SPEC); // cm^2/s, thermal diffusivity
+
+  var PROBE_X = 0.691;   // fraction of radius where the yolk-white boundary sits in this model
+  var PROBE_COEF = 0.76; // one-term prefactor at that point (matches Williams' published constant)
+  var SHELL_TAU = 12;    // seconds, illustrative fast time-constant for the shell line only
+
+  var OUCH=45, COOL_T=35; // degC thresholds
+
+  // Target yolk-boundary temperatures are Williams' own, from the same source table:
+  // 62°C soft, 65°C intermediate, 69°C hard-boiled.
+  var DONENESS = {
+    soft:   {label:'Soft',   T:62, note:'Yolk just starts to set — a soft, flowing centre.'},
+    medium: {label:'Medium', T:65, note:'Yolk mostly set with a slightly creamy core.'},
+    hard:   {label:'Hard',   T:69, note:'Yolk fully set all the way through.'}
+  };
+  var STARTTEMP = {
+    fridge: {label:'Fridge cold', T:4,  note:'Straight from the fridge, about 4°C.'},
+    room:   {label:'Room temp',   T:21, note:'Left out to warm up first, about 21°C.'}
+  };
+  var ALT = {
+    sea:  {label:'Sea level',            T:100, note:'~101 kPa air pressure — water boils at 100°C.'},
+    high: {label:'High altitude (~2,000 m)', T:93,  note:'~80 kPa air pressure drops the boiling point to about 93°C.'}
+  };
+
+  function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+
+  function radiusCm(M){ var V=M/RHO; return Math.pow(3*V/(4*Math.PI),1/3); }
+  function diamCm(M){ return 2*radiusCm(M); }
+
+  // closed-form, one-term solution: exact match to Williams' published boiling formula
+  function timeForProbe(r, Tinit, Tbath, Ttarget){
+    var theta = (Ttarget-Tbath)/(Tinit-Tbath);
+    if(theta<=0) return Infinity;
+    var ratio = theta/PROBE_COEF;
+    if(ratio>=1) return 0;
+    var Fo = -Math.log(ratio)/(Math.PI*Math.PI);
+    return Fo*r*r/ALPHA;
+  }
+  // three-term Fourier series for smooth plotting (matches timeForProbe closely once Fo isn't tiny)
+  function probeThetaSeries(t, r){
+    var Fo = ALPHA*t/(r*r);
+    var sum=0;
+    for(var n=1;n<=3;n++){
+      var sign = (n%2===1)?1:-1;
+      var arg = n*Math.PI*PROBE_X;
+      var sinc = Math.sin(arg)/arg;
+      sum += sign*(2/n)*sinc*Math.exp(-(n*n)*Math.PI*Math.PI*Fo);
+    }
+    return sum;
+  }
+  function shellTheta(t){ return Math.exp(-t/SHELL_TAU); }
+
+  function fmtMass(g){
+    if(g>=1000) return (g/1000).toFixed(2)+' kg';
+    if(g<10) return g.toFixed(1)+' g';
+    return Math.round(g)+' g';
+  }
+  function fmtClock(s){
+    if(!isFinite(s)) return '—';
+    if(s<0) s=0;
+    var m=Math.floor(s/60), sec=Math.round(s%60);
+    if(sec===60){ m+=1; sec=0; }
+    return m+':'+(sec<10?'0':'')+sec;
+  }
+  function fmtMult(x){
+    if(x<10) return x.toFixed(2)+'×';
+    return Math.round(x)+'×';
+  }
+
+  var NS='http://www.w3.org/2000/svg';
+  function el(tag,attrs){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
+
+  var state = { Mexp: Math.log10(57), doneness:'hard', start:'fridge', alt:'sea', waterT: 10, active:null, drag:null };
+  var heroW = 0;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var heroWrap=$('heroWrap'), eggWrap=$('eggWrap'), tempWrap=$('tempWrap'), curveWrap=$('curveWrap');
+  var eggSvg=$('eggSvg'), tempSvg=$('tempSvg'), curveSvg=$('curveSvg');
+
+  function M(){ return Math.pow(10, state.Mexp); }
+  function Tegg(){ return STARTTEMP[state.start].T; }
+  function Twater(){ return ALT[state.alt].T; }
+  function Tyolk(){ return DONENESS[state.doneness].T; }
+
+  // ---- egg panel: true relative scale ----
+  function eggPathD(x0,y0,w,h){
+    var ax=x0+0.5*w, ay=y0;
+    var rwx=x0+w, rwy=y0+0.54*h;
+    var bx=x0+0.5*w, by=y0+h;
+    var lwx=x0, lwy=y0+0.54*h;
+    return 'M'+ax+','+ay+
+      ' C'+(x0+0.85*w)+','+y0+' '+(x0+w)+','+(y0+0.27*h)+' '+rwx+','+rwy+
+      ' C'+(x0+w)+','+(y0+0.81*h)+' '+(x0+0.78*w)+','+(y0+h)+' '+bx+','+by+
+      ' C'+(x0+0.22*w)+','+(y0+h)+' '+x0+','+(y0+0.81*h)+' '+lwx+','+lwy+
+      ' C'+x0+','+(y0+0.27*h)+' '+(x0+0.15*w)+','+y0+' '+ax+','+ay+
+      ' Z';
+  }
+
+  function eggGeom(w){
+    var h = Math.max(190, Math.min(w*1.05, 320));
+    var groundY = h*0.9;
+    var usable = w*0.66;
+    var DMAX = diamCm(MMAX);
+    var pxPerCm = usable/DMAX;
+    var Mg = M();
+    var D = Math.max(diamCm(Mg)*pxPerCm, 8);
+    var Wpx = D, Hpx = D*1.3;
+    var cx = w*0.5;
+    var x0 = cx-Wpx/2, y0 = groundY-Hpx;
+    return { w:w, h:h, groundY:groundY, x0:x0, y0:y0, Wpx:Wpx, Hpx:Hpx, cx:cx };
+  }
+
+  function drawEgg(){
+    var w = eggWrap.clientWidth || 220;
+    var g = eggGeom(w);
+    eggSvg.setAttribute('viewBox','0 0 '+g.w+' '+g.h);
+    eggSvg.setAttribute('preserveAspectRatio','none');
+
+    $('groundLine').setAttribute('x1',0); $('groundLine').setAttribute('x2',g.w);
+    $('groundLine').setAttribute('y1',g.groundY); $('groundLine').setAttribute('y2',g.groundY);
+
+    $('eggOutline').setAttribute('d', eggPathD(g.x0,g.y0,g.Wpx,g.Hpx));
+
+    var yolkCx = g.x0+g.Wpx*0.5, yolkCy = g.y0+g.Hpx*0.62;
+    $('yolkMark').setAttribute('cx', yolkCx); $('yolkMark').setAttribute('cy', yolkCy);
+    $('yolkMark').setAttribute('rx', g.Wpx*0.30); $('yolkMark').setAttribute('ry', g.Hpx*0.20);
+
+    var px = function(x){ return (x/g.w*100)+'%'; };
+    var py = function(y){ return (y/g.h*100)+'%'; };
+    var lblSize=$('lblSize');
+    lblSize.style.left = px(g.cx); lblSize.style.top = py(g.groundY+8);
+    lblSize.style.transform = 'translateX(-50%)';
+    lblSize.textContent = fmtMass(M())+', ⌀ '+diamCm(M()).toFixed(1)+' cm';
+  }
+
+  // ---- combined temperature-vs-time panel: boiling then cooling ----
+  function tempGeom(w){
+    var h = Math.max(190, Math.min(w*0.62, 320));
+    var padL=38, padR=14, padT=16, padB=26;
+    var plotW = w-padL-padR, plotH = h-padT-padB;
+    var r = radiusCm(M());
+    var T0=Tegg(), Tw=Twater(), Ty=Tyolk(), Twc=state.waterT;
+
+    var tBoil = timeForProbe(r, T0, Tw, Ty);
+    var tOuch = timeForProbe(r, Ty, Twc, OUCH);
+    var tCool = timeForProbe(r, Ty, Twc, COOL_T);
+    var tCoolDisplay = (isFinite(tCool) ? tCool : (isFinite(tOuch) ? tOuch*2 : 600)) * 1.15;
+    var tTotal = tBoil + tCoolDisplay;
+
+    var yLo = Math.min(T0, Twc) - 3;
+    var yHi = Math.max(Tw, Ty) + 3;
+    function xFor(t){ return padL + clamp(t/tTotal,0,1)*plotW; }
+    function yFor(temp){ return padT + (1-((temp-yLo)/(yHi-yLo)))*plotH; }
+
+    var yolkPts=[], shellPts=[], N=100, i, t, theta, temp;
+    for(i=0;i<=N;i++){
+      t = tBoil*i/N;
+      theta = probeThetaSeries(t, r);
+      temp = Tw + theta*(T0-Tw);
+      yolkPts.push(xFor(t).toFixed(2)+','+yFor(temp).toFixed(2));
+      temp = Tw + shellTheta(t)*(T0-Tw);
+      shellPts.push(xFor(t).toFixed(2)+','+yFor(temp).toFixed(2));
+    }
+    for(i=0;i<=N;i++){
+      var t2 = tCoolDisplay*i/N;
+      theta = probeThetaSeries(t2, r);
+      temp = Twc + theta*(Ty-Twc);
+      yolkPts.push(xFor(tBoil+t2).toFixed(2)+','+yFor(temp).toFixed(2));
+      temp = Twc + shellTheta(t2)*(Ty-Twc);
+      shellPts.push(xFor(tBoil+t2).toFixed(2)+','+yFor(temp).toFixed(2));
+    }
+
+    return { w:w, h:h, padL:padL, padT:padT, plotW:plotW, plotH:plotH, axisY:padT+plotH,
+      xFor:xFor, yFor:yFor, yolkPath:'M'+yolkPts.join(' L'), shellPath:'M'+shellPts.join(' L'),
+      tBoil:tBoil, tOuch:tOuch, tCool:tCool, tCoolDisplay:tCoolDisplay, tTotal:tTotal,
+      yLo:yLo, yHi:yHi, Ty:Ty };
+  }
+
+  function drawTemp(){
+    var w = tempWrap.clientWidth || 320;
+    var g = tempGeom(w);
+    tempSvg.setAttribute('viewBox','0 0 '+g.w+' '+g.h);
+    tempSvg.setAttribute('preserveAspectRatio','none');
+
+    $('tAxisX').setAttribute('x1',g.padL); $('tAxisX').setAttribute('x2',g.padL+g.plotW);
+    $('tAxisX').setAttribute('y1',g.axisY); $('tAxisX').setAttribute('y2',g.axisY);
+    $('tAxisY').setAttribute('x1',g.padL); $('tAxisY').setAttribute('x2',g.padL);
+    $('tAxisY').setAttribute('y1',g.padT); $('tAxisY').setAttribute('y2',g.axisY);
+
+    $('yolkPath').setAttribute('d', g.yolkPath);
+    $('shellPath').setAttribute('d', g.shellPath);
+
+    var txTicksG=$('txTicks'), tyTicksG=$('tyTicks');
+    txTicksG.innerHTML=''; tyTicksG.innerHTML='';
+    [0, g.tBoil, g.tTotal].forEach(function(t){
+      var x = g.xFor(t);
+      var line = el('line',{x1:x,x2:x,y1:g.axisY,y2:g.axisY+4,stroke:'var(--line2)','stroke-width':1});
+      txTicksG.appendChild(line);
+      var lab = el('text',{x:x,y:g.axisY+15,'text-anchor': t===0?'start':(t===g.tTotal?'end':'middle')});
+      lab.setAttribute('font-size','9'); lab.setAttribute('fill','var(--muted)'); lab.setAttribute('font-family','ui-monospace,monospace');
+      lab.textContent = fmtClock(t);
+      txTicksG.appendChild(lab);
+    });
+    [g.yLo, (g.yLo+g.yHi)/2, g.yHi].forEach(function(temp){
+      var y = g.yFor(temp);
+      var line = el('line',{x1:g.padL-4,x2:g.padL,y1:y,y2:y,stroke:'var(--line2)','stroke-width':1});
+      tyTicksG.appendChild(line);
+      var lab = el('text',{x:g.padL-7,y:y+3,'text-anchor':'end'});
+      lab.setAttribute('font-size','9'); lab.setAttribute('fill','var(--muted)'); lab.setAttribute('font-family','ui-monospace,monospace');
+      lab.textContent = Math.round(temp)+'°';
+      tyTicksG.appendChild(lab);
+    });
+
+    $('phaseDivider').setAttribute('x1',g.xFor(g.tBoil)); $('phaseDivider').setAttribute('x2',g.xFor(g.tBoil));
+    $('phaseDivider').setAttribute('y1',g.padT); $('phaseDivider').setAttribute('y2',g.axisY);
+
+    var ouchY = g.yFor(OUCH), coolY = g.yFor(COOL_T);
+    var coolX1 = g.xFor(g.tBoil), coolX2 = g.xFor(g.tTotal);
+    $('ouchLine').setAttribute('x1',coolX1); $('ouchLine').setAttribute('x2',coolX2);
+    $('ouchLine').setAttribute('y1',ouchY); $('ouchLine').setAttribute('y2',ouchY);
+    $('coolLine').setAttribute('x1',coolX1); $('coolLine').setAttribute('x2',coolX2);
+    $('coolLine').setAttribute('y1',coolY); $('coolLine').setAttribute('y2',coolY);
+
+    $('boilMark').setAttribute('cx', g.xFor(g.tBoil)); $('boilMark').setAttribute('cy', g.yFor(g.Ty));
+
+    var ouchMark=$('ouchMark'), coolMark=$('coolMark');
+    if(isFinite(g.tOuch) && g.tOuch<=g.tCoolDisplay){
+      ouchMark.setAttribute('opacity',1);
+      ouchMark.setAttribute('cx', g.xFor(g.tBoil+g.tOuch)); ouchMark.setAttribute('cy', ouchY);
+    } else { ouchMark.setAttribute('opacity',0); }
+    if(isFinite(g.tCool) && g.tCool<=g.tCoolDisplay){
+      coolMark.setAttribute('opacity',1);
+      coolMark.setAttribute('cx', g.xFor(g.tBoil+g.tCool)); coolMark.setAttribute('cy', coolY);
+    } else { coolMark.setAttribute('opacity',0); }
+
+    var px = function(x){ return (x/g.w*100)+'%'; };
+    var py = function(y){ return (y/g.h*100)+'%'; };
+    var lblBoil=$('lblPhaseBoil'), lblCool=$('lblPhaseCool');
+    lblBoil.style.left = px(g.xFor(g.tBoil/2)); lblBoil.style.top = py(g.padT-2);
+    lblBoil.style.transform = 'translateX(-50%)'; lblBoil.textContent = 'boiling';
+    lblCool.style.left = px(g.xFor(g.tBoil+g.tCoolDisplay/2)); lblCool.style.top = py(g.padT-2);
+    lblCool.style.transform = 'translateX(-50%)'; lblCool.textContent = 'cooling under the tap';
+
+    $('ouchValue').textContent = fmtClock(g.tOuch);
+    $('coolValue').textContent = fmtClock(g.tCool);
+  }
+
+  // ---- curve panel: boil time vs mass ----
+  function boilCurveGeom(w){
+    var h = Math.max(190, Math.min(w*0.62, 320));
+    var padL=40, padR=14, padT=14, padB=26;
+    var plotW = w-padL-padR, plotH = h-padT-padB;
+    var te=Tegg(), tw=Twater(), ty=Tyolk();
+    function tOf(mg){ return timeForProbe(radiusCm(mg), te, tw, ty); }
+    var yMax = tOf(MMAX)/60;
+    function xFor(mg){ return padL + (Math.log10(mg)-LOGMIN)/(LOGMAX-LOGMIN)*plotW; }
+    function yFor(min){ return padT + (1-(min/yMax))*plotH; }
+    var pts=[], N=80;
+    for(var i=0;i<=N;i++){
+      var mg = Math.pow(10, LOGMIN + (LOGMAX-LOGMIN)*i/N);
+      var minutes = tOf(mg)/60;
+      pts.push(xFor(mg).toFixed(2)+','+yFor(minutes).toFixed(2));
+    }
+    var curM = M(), curMin = tOf(curM)/60;
+    return { w:w, h:h, padL:padL, padT:padT, plotW:plotW, plotH:plotH, yMax:yMax,
+      xFor:xFor, yFor:yFor, path:'M'+pts.join(' L'), mx:xFor(curM), my:yFor(curMin),
+      axisY: padT+plotH, axisX: padL };
+  }
+
+  function drawCurve(){
+    var w = curveWrap.clientWidth || 260;
+    var g = boilCurveGeom(w);
+    curveSvg.setAttribute('viewBox','0 0 '+g.w+' '+g.h);
+    curveSvg.setAttribute('preserveAspectRatio','none');
+
+    $('axisX').setAttribute('x1',g.padL); $('axisX').setAttribute('x2',g.padL+g.plotW);
+    $('axisX').setAttribute('y1',g.axisY); $('axisX').setAttribute('y2',g.axisY);
+    $('axisY').setAttribute('x1',g.padL); $('axisY').setAttribute('x2',g.padL);
+    $('axisY').setAttribute('y1',g.padT); $('axisY').setAttribute('y2',g.axisY);
+
+    $('curvePath').setAttribute('d', g.path);
+
+    var xTicksG=$('xTicks'), yTicksG=$('yTicks');
+    xTicksG.innerHTML=''; yTicksG.innerHTML='';
+    [9,50,150,1400].forEach(function(mg){
+      var x = g.xFor(mg);
+      var line = el('line',{x1:x,x2:x,y1:g.axisY,y2:g.axisY+4,stroke:'var(--line2)','stroke-width':1});
+      xTicksG.appendChild(line);
+      var t = el('text',{x:x,y:g.axisY+15,'text-anchor':'middle'});
+      t.setAttribute('font-size','9'); t.setAttribute('fill','var(--muted)'); t.setAttribute('font-family','ui-monospace,monospace');
+      t.textContent = mg>=1000 ? (mg/1000)+'kg' : mg+'g';
+      xTicksG.appendChild(t);
+    });
+    var niceMax = Math.max(10, Math.ceil(g.yMax/10)*10);
+    [0, niceMax/2, niceMax].forEach(function(v){
+      var y = g.padT + (1-(v/g.yMax))*g.plotH;
+      var line = el('line',{x1:g.padL-4,x2:g.padL,y1:y,y2:y,stroke:'var(--line2)','stroke-width':1});
+      yTicksG.appendChild(line);
+      var t = el('text',{x:g.padL-7,y:y+3,'text-anchor':'end'});
+      t.setAttribute('font-size','9'); t.setAttribute('fill','var(--muted)'); t.setAttribute('font-family','ui-monospace,monospace');
+      t.textContent = Math.round(v)+(v===0?'':'m');
+      yTicksG.appendChild(t);
+    });
+
+    $('curveMark').setAttribute('cx', g.mx); $('curveMark').setAttribute('cy', g.my);
+    $('curveDropX').setAttribute('x1',g.mx); $('curveDropX').setAttribute('x2',g.mx);
+    $('curveDropX').setAttribute('y1',g.my); $('curveDropX').setAttribute('y2',g.axisY);
+    $('curveDropY').setAttribute('x1',g.padL); $('curveDropY').setAttribute('x2',g.mx);
+    $('curveDropY').setAttribute('y1',g.my); $('curveDropY').setAttribute('y2',g.my);
+  }
+
+  // ---- equation + legend ----
+  var accent = 'var(--accent)';
+  var termEls = Array.prototype.slice.call(document.querySelectorAll('.eqn .term, .eqn-note .term'));
+  var MLabel=$('MLabel');
+  var legendEl=$('legend');
+
+  function activeColor(key){ return state.active===key ? accent : 'var(--fg)'; }
+
+  function drawEquationAndLegend(){
+    termEls.forEach(function(t){ t.style.color = activeColor(t.dataset.key); });
+    MLabel.style.color = activeColor('M');
+
+    var Mg = M(), r = radiusCm(Mg);
+    var rows = [
+      {sym:'M', name:'egg mass', val: fmtMass(Mg), key:'M'},
+      {sym:'r', name:'equivalent sphere radius', val: r.toFixed(2)+' cm', key:'M'},
+      {sym:'T₀', name:'starting temperature', val: Tegg()+'°C', key:'T0'},
+      {sym:'Tw', name:'boiling-water temperature', val: Twater()+'°C', key:'Tw'},
+      {sym:'Ty', name:'target yolk temperature', val: Tyolk()+'°C', key:'Ty'}
+    ];
+    legendEl.innerHTML = '';
+    rows.forEach(function(row){
+      var div = document.createElement('div'); div.className='row';
+      var symEl = document.createElement('em'); symEl.className='sym'; symEl.textContent = row.sym;
+      symEl.style.color = row.key ? activeColor(row.key) : 'var(--fg)';
+      var name = document.createElement('span'); name.className='name'; name.textContent = row.name;
+      var val = document.createElement('span'); val.className='val mono'; val.textContent = row.val;
+      div.appendChild(symEl); div.appendChild(name); div.appendChild(val);
+      legendEl.appendChild(div);
+    });
+  }
+
+  // ---- log slider (mass) ----
+  function makeLogSlider(track, fill, thumb, getExp, setExp, key){
+    var dragging = false;
+    function setFromClientX(x){
+      var r = track.getBoundingClientRect();
+      var f = clamp((x-r.left)/r.width, 0, 1);
+      var v = LOGMIN + f*(LOGMAX-LOGMIN);
+      v = clamp(Math.round(v*1000)/1000, LOGMIN, LOGMAX);
+      setExp(v);
+      render();
+    }
+    track.addEventListener('pointerdown', function(e){
+      dragging = true;
+      if(track.setPointerCapture) track.setPointerCapture(e.pointerId);
+      state.drag = key; state.active = key;
+      setFromClientX(e.clientX);
+    });
+    track.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
+    function endDrag(){ if(dragging){ dragging=false; state.drag=null; render(); } }
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+    track.addEventListener('pointerenter', function(){ state.active=key; render(); });
+    track.addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+    track.addEventListener('keydown', function(e){
+      var step = (e.shiftKey ? 0.05 : 0.01)*(LOGMAX-LOGMIN);
+      var cur = getExp(), v=null;
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown') v = cur-step;
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp') v = cur+step;
+      else if(e.key==='Home') v = LOGMIN;
+      else if(e.key==='End') v = LOGMAX;
+      if(v!==null){ e.preventDefault(); setExp(clamp(Math.round(v*1000)/1000, LOGMIN, LOGMAX)); render(); }
+    });
+    return {
+      draw: function(){
+        var pct = ((getExp()-LOGMIN)/(LOGMAX-LOGMIN)*100).toFixed(2)+'%';
+        fill.style.width = pct; thumb.style.left = pct;
+        track.setAttribute('aria-valuemin', LOGMIN.toFixed(3));
+        track.setAttribute('aria-valuemax', LOGMAX.toFixed(3));
+        track.setAttribute('aria-valuenow', getExp().toFixed(3));
+        track.setAttribute('aria-valuetext', fmtMass(Math.pow(10,getExp())));
+      }
+    };
+  }
+  var massSlider = makeLogSlider($('massTrack'), $('massFill'), $('massThumb'),
+    function(){ return state.Mexp; }, function(v){ state.Mexp=v; }, 'M');
+
+  // ---- linear slider (water temp) ----
+  function makeLinSlider(track, fill, thumb, lo, hi, getVal, setVal, key){
+    var dragging=false;
+    function setFromClientX(x){
+      var r = track.getBoundingClientRect();
+      var f = clamp((x-r.left)/r.width, 0, 1);
+      var v = lo + f*(hi-lo);
+      v = clamp(Math.round(v*10)/10, lo, hi);
+      setVal(v); render();
+    }
+    track.addEventListener('pointerdown', function(e){
+      dragging=true; if(track.setPointerCapture) track.setPointerCapture(e.pointerId);
+      state.drag=key; state.active=key; setFromClientX(e.clientX);
+    });
+    track.addEventListener('pointermove', function(e){ if(dragging) setFromClientX(e.clientX); });
+    function endDrag(){ if(dragging){ dragging=false; state.drag=null; render(); } }
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+    track.addEventListener('pointerenter', function(){ state.active=key; render(); });
+    track.addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+    track.addEventListener('keydown', function(e){
+      var step = (e.shiftKey?1:0.5), cur=getVal(), v=null;
+      if(e.key==='ArrowLeft'||e.key==='ArrowDown') v=cur-step;
+      else if(e.key==='ArrowRight'||e.key==='ArrowUp') v=cur+step;
+      else if(e.key==='Home') v=lo;
+      else if(e.key==='End') v=hi;
+      if(v!==null){ e.preventDefault(); setVal(clamp(Math.round(v*10)/10,lo,hi)); render(); }
+    });
+    return {
+      draw: function(){
+        var pct = ((getVal()-lo)/(hi-lo)*100).toFixed(2)+'%';
+        fill.style.width=pct; thumb.style.left=pct;
+        track.setAttribute('aria-valuemin',lo); track.setAttribute('aria-valuemax',hi);
+        track.setAttribute('aria-valuenow', getVal());
+        track.setAttribute('aria-valuetext', getVal().toFixed(1)+'°C');
+      }
+    };
+  }
+  var waterSlider = makeLinSlider($('waterTrack'), $('waterFill'), $('waterThumb'), 0, 25,
+    function(){ return state.waterT; }, function(v){ state.waterT=v; }, 'water');
+
+  // ---- pill option groups ----
+  function buildOptions(containerId, noteId, map, stateKey, order, legendKey){
+    var container = $(containerId);
+    order.forEach(function(key){
+      var b = document.createElement('button');
+      b.type='button'; b.textContent = map[key].label;
+      b.dataset.key = key;
+      b.addEventListener('click', function(){ state[stateKey]=key; render(); });
+      container.appendChild(b);
+    });
+    container.addEventListener('pointerenter', function(){ state.active=legendKey; render(); });
+    container.addEventListener('pointerleave', function(){ if(!state.drag){ state.active=null; render(); } });
+    container.addEventListener('focusin', function(){ state.active=legendKey; render(); });
+    container.addEventListener('focusout', function(){ if(!state.drag){ state.active=null; render(); } });
+    return function(){
+      Array.prototype.forEach.call(container.children, function(b){
+        var active = b.dataset.key === state[stateKey];
+        b.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+      $(noteId).textContent = map[state[stateKey]].note;
+    };
+  }
+  var drawDoneness = buildOptions('donenessButtons','donenessNote', DONENESS, 'doneness', ['soft','medium','hard'], 'Ty');
+  var drawStart = buildOptions('startButtons','startNote', STARTTEMP, 'start', ['fridge','room'], 'T0');
+  var drawAlt = buildOptions('altButtons','altNote', ALT, 'alt', ['sea','high'], 'Tw');
+
+  // ---- result box ----
+  var boilValueEl=$('boilValue'), verdictSubEl=$('verdictSub');
+
+  function scaleNote(Mg){
+    if(Mg<=15) return 'Quail-egg scale — done in well under two minutes.';
+    if(Mg<=55) return 'Small hen’s egg — the size most timing charts assume.';
+    if(Mg<=75) return 'Large hen’s egg to duck egg — the everyday range.';
+    if(Mg<=200) return 'Goose-egg scale — noticeably longer than any hen’s egg.';
+    return 'Ostrich-egg scale — the shell alone takes a hammer, the yolk far longer to heat through.';
+  }
+
+  function drawResult(){
+    var Mg = M(), r = radiusCm(Mg);
+    var t = timeForProbe(r, Tegg(), Twater(), Tyolk());
+    boilValueEl.textContent = fmtClock(t);
+    verdictSubEl.textContent = scaleNote(Mg);
+  }
+
+  // ---- presets ----
+  var PRESETS = { quail:9, small:47, large:57, duck:70, goose:144, ostrich:1400 };
+  document.querySelectorAll('.preset').forEach(function(b){
+    b.addEventListener('click', function(){
+      var Mg = PRESETS[b.dataset.p];
+      state.Mexp = clamp(Math.log10(Mg), LOGMIN, LOGMAX);
+      state.active = 'M';
+      render();
+    });
+  });
+
+  // ---- theme toggle: overrides prefers-color-scheme, remembers choice ----
+  var STORAGE_KEY = 'madeclear-theme';
+  var themeToggle = $('themeToggle');
+  function systemPrefersDark(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches; }
+  function currentTheme(){
+    var applied = document.documentElement.getAttribute('data-theme');
+    if(applied) return applied;
+    var stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch(e){}
+    return stored || (systemPrefersDark() ? 'dark' : 'light');
+  }
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+    try { localStorage.setItem(STORAGE_KEY, t); } catch(e){}
+  }
+  themeToggle.addEventListener('click', function(){
+    applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+  });
+  applyTheme(currentTheme());
+
+  function render(){
+    drawEgg();
+    drawTemp();
+    drawCurve();
+    drawEquationAndLegend();
+    massSlider.draw();
+    waterSlider.draw();
+    drawDoneness(); drawStart(); drawAlt();
+    $('massReadout').textContent = fmtMass(M());
+    $('waterReadout').textContent = state.waterT.toFixed(1)+'°C';
+    drawResult();
+  }
+
+  function measure(){
+    var w = heroWrap.clientWidth;
+    if(w && w !== heroW){ heroW = w; render(); }
+  }
+
+  new ResizeObserver(measure).observe(heroWrap);
+  window.addEventListener('resize', measure);
+  [60,250,900].forEach(function(t){ setTimeout(measure, t); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+
+  render();
+  // No self-running animation on this page — every draw is a direct response to a slider
+  // drag, a pill click, a preset click, or a resize, so there is nothing to gate on
+  // prefers-reduced-motion.
+})();
+</script>
+<script>
+(function(){
+  var root = document.querySelector('[data-feedback]');
+  if(!root) return;
+  var form = root.querySelector('.feedback-form');
+  var choices = Array.prototype.slice.call(root.querySelectorAll('.feedback-choice'));
+  var textarea = root.querySelector('textarea');
+  var status = root.querySelector('.feedback-status');
+  var send = root.querySelector('.feedback-send');
+  var rating = '';
+
+  choices.forEach(function(choice){
+    choice.addEventListener('click', function(){
+      rating = choice.dataset.rating;
+      choices.forEach(function(item){ item.setAttribute('aria-pressed', item===choice ? 'true' : 'false'); });
+      form.hidden = false;
+      status.textContent = '';
+    });
+  });
+
+  function pageSlug(){
+    var file = location.pathname.split('/').pop() || '';
+    return file.replace(/\.html?$/i,'').toLowerCase() || 'visualization';
+  }
+
+  function currentContext(){
+    var values = [];
+    Array.prototype.forEach.call(document.querySelectorAll('[role="slider"]'), function(slider){
+      var label = slider.getAttribute('aria-label') || 'Control';
+      var value = slider.getAttribute('aria-valuetext') || slider.getAttribute('aria-valuenow');
+      if(value) values.push(label+': '+value);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('select'), function(select){
+      var label = select.getAttribute('aria-label') || select.name || 'Selection';
+      var option = select.options[select.selectedIndex];
+      if(option) values.push(label+': '+option.textContent.trim());
+    });
+    return values.slice(0,20);
+  }
+
+  form.addEventListener('submit', function(event){
+    event.preventDefault();
+    if(!rating) return;
+    if(location.protocol==='file:'){
+      status.textContent = 'Feedback can be sent from madeclear.ca.';
+      return;
+    }
+    send.disabled = true;
+    status.textContent = 'Sending…';
+    fetch('/api/feedback', {
+      method:'POST',
+      credentials:'same-origin',
+      headers:{'content-type':'application/json'},
+      body:JSON.stringify({
+        page:pageSlug(),
+        rating:rating,
+        comment:textarea.value,
+        website:form.elements.website.value,
+        context:currentContext()
+      })
+    }).then(function(response){
+      if(!response.ok) throw new Error('request failed');
+      status.textContent = 'Thank you — your feedback is private.';
+      textarea.value = '';
+    }).catch(function(){
+      status.innerHTML = 'Could not send. Try <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.';
+    }).then(function(){ send.disabled = false; });
+  });
+})();
+</script>
+</html>

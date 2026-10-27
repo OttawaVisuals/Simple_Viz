@@ -26,7 +26,7 @@ function normalizeContext(value) {
 }
 
 async function sendFeedbackAlert(env, { page, rating, comment, context }) {
-  if (!env.FEEDBACK_ALERT || !env.FEEDBACK_ALERT_TO) return false;
+  if (!env.RESEND_API_KEY || !env.FEEDBACK_ALERT_TO) return false;
   try {
     const lines = [
       `Page: ${page}`,
@@ -34,12 +34,20 @@ async function sendFeedbackAlert(env, { page, rating, comment, context }) {
       comment ? `Comment: ${comment}` : "Comment: (none)",
       context.length ? `Context: ${context.join(" | ")}` : "",
     ].filter(Boolean);
-    await env.FEEDBACK_ALERT.send({
-      from: "alerts@madeclear.ca",
-      to: env.FEEDBACK_ALERT_TO,
-      subject: `New feedback: ${page} (${rating})`,
-      text: lines.join("\n"),
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${env.RESEND_API_KEY}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "alerts@madeclear.ca",
+        to: [env.FEEDBACK_ALERT_TO],
+        subject: `New feedback: ${page} (${rating})`,
+        text: lines.join("\n"),
+      }),
     });
+    if (!response.ok) throw new Error(`Resend responded ${response.status}`);
     return true;
   } catch (err) {
     // Alerting is best-effort only — never let a notification failure block a feedback submission.

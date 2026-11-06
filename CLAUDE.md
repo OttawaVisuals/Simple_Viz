@@ -47,7 +47,8 @@ currently expressed in code.
   a browser or published as-is.
 - **Hand-authored inline SVG** for diagrams (native shapes: `circle`, `rect`, `line`,
   `polygon`, `path`), animated via vanilla JS (`requestAnimationFrame`, attribute updates).
-  No charting or animation libraries.
+  No charting libraries. Anime.js v4 (approved 2026-11-06) may be used for animation, but
+  must be vendored inline in the page (no CDN) so the file stays self-contained.
 - **File naming:** kebab-case, descriptive of the concept, e.g. `earth-moon-race.html`,
   `eratosthenes-shadow.html`.
 

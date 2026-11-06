@@ -2,13 +2,13 @@
 <html lang="en">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>How far can a string carry a whisper?</title>
-<meta name="description" content="See why a tin-can telephone beats shouting through open air out to about 17 metres, and why its own string damping eventually gives that lead back.">
+<title>How does a string carry a whisper 374 m?</title>
+<meta name="description" content="The Guinness record for a tin-can telephone is 374 metres. Open air fades a whisper out by about 32 m; see why a taut, low-loss string carries it ten times farther.">
 <link rel="canonical" href="https://madeclear.ca/visualizations/tin-can-phone">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Made clear">
-<meta property="og:title" content="How far can a string carry a whisper?">
-<meta property="og:description" content="See why a tin-can telephone beats shouting through open air out to about 17 metres, and why its own string damping eventually gives that lead back.">
+<meta property="og:title" content="How does a string carry a whisper 374 m?">
+<meta property="og:description" content="The Guinness record for a tin-can telephone is 374 metres. Open air fades a whisper out by about 32 m; see why a taut, low-loss string carries it ten times farther.">
 <meta property="og:url" content="https://madeclear.ca/visualizations/tin-can-phone">
 <meta property="og:image" content="https://madeclear.ca/assets/brand/madeclear-social-wide-1200x630.png">
 <meta property="og:image:secure_url" content="https://madeclear.ca/assets/brand/madeclear-social-wide-1200x630.png">
@@ -187,8 +187,8 @@
 
   <div class="topgrid">
     <div class="headleft">
-      <h1>How far can a string carry <em>a whisper</em>?</h1>
-      <p class="sub">Fed into a taut string, a voice travels as a confined wave that loses a steady amount of energy per metre. The same voice in open air spreads outward instead, fading 6&nbsp;dB with every doubling of distance. Drag the listener down the line and watch the string&rsquo;s lead evaporate right around 17&nbsp;m &mdash; the tin-can telephone&rsquo;s often-quoted range.</p>
+      <h1>How does a string carry <em>a whisper</em> 374&nbsp;m?</h1>
+      <p class="sub">The Guinness record for a tin-can telephone is 373.79&nbsp;m (Sidmouth, UK, 2022). In open air a voice spreads out and fades 6&nbsp;dB with every doubling of distance, so a whisper is lost into a quiet room&rsquo;s noise by about 32&nbsp;m. A taut string keeps the sound in one line and loses only a steady amount per metre &mdash; a cotton string barely helps, but a thin, tight, low-loss line carries it more than ten times farther.</p>
     </div>
 
     <div class="eqnbox">
@@ -227,7 +227,7 @@
     <svg id="waveSvg" role="img" aria-label="Two lanes showing a whisper pulse travelling along open air and along a taut string. The pulse height shrinks as the sound level falls with distance."></svg>
     <div class="wavebar">
       <button class="sendbtn" id="sendBtn" type="button">&#9654; Send a whisper</button>
-      <span class="wavenote" id="waveNote">Pulse height tracks sound level in dB, not raw pressure, so the fade stays visible.</span>
+      <span class="wavenote" id="waveNote">Pulse height = dB above the noise floor, so it shrinks to nothing where the sound is lost.</span>
     </div>
   </div>
 
@@ -248,7 +248,7 @@
           <div class="fill" id="distFill"></div>
           <div class="thumb" id="distThumb"></div>
         </div>
-        <div class="track-range"><span>1 m</span><span class="mid">drag to move the listener</span><span>40 m</span></div>
+        <div class="track-range"><span>1 m</span><span class="mid">drag to move the listener (log scale)</span><span>400 m</span></div>
       </div>
 
       <div class="ctrl" id="matCtrl">
@@ -265,6 +265,7 @@
       <div class="result-label">At this distance</div>
       <div class="readline"><span class="dot" style="background:var(--s1)"></span><span class="lbl">String</span><span class="v2 mono" id="stringVal"></span></div>
       <div class="readline"><span class="dot" style="background:var(--s3)"></span><span class="lbl">Open air</span><span class="v2 mono" id="airVal"></span></div>
+      <div class="readline"><span class="lbl">Reach before noise floor</span><span class="v2 mono" id="reachVal"></span></div>
       <div class="result-value"><span class="v" id="verdict"></span></div>
       <div class="verdict-sub" id="verdictSub"></div>
     </div>
@@ -272,12 +273,12 @@
 
   <div class="presets">
     <span class="presets-title">Try</span>
-    <button class="preset" data-p="record">the 17&nbsp;m record</button>
-    <button class="preset" data-p="wire">steel wire at 30&nbsp;m</button>
+    <button class="preset" data-p="record">the 374&nbsp;m record</button>
+    <button class="preset" data-p="wire">cotton at 17&nbsp;m</button>
     <button class="preset" data-p="closeup">right up close</button>
   </div>
 
-  <p class="note">This is an <strong>illustrative order-of-magnitude model</strong>, not a measured record: it sets a source level L&#8320;&nbsp;=&nbsp;55&nbsp;dB and a fixed 5&nbsp;dB diaphragm&ndash;string coupling loss C at each can, then follows the <a href="https://en.wikipedia.org/wiki/Inverse-square_law" target="_blank" rel="noopener">inverse-square law</a> for open air and simple linear-in-decibels <a href="https://en.wikipedia.org/wiki/Acoustic_attenuation" target="_blank" rel="noopener">acoustic attenuation</a> for the string, with loss rates k chosen so a taut cotton string crosses back below open air near 17&nbsp;m &mdash; a widely repeated claim for a tin-can telephone's range, not a figure from a verified record book. The dashed line marks a quiet-room noise floor (25&nbsp;dB); a level under that line is assumed to be masked by ordinary background noise rather than actually inaudible in a silent lab. Real string performance also depends on tension, sag, the size and stiffness of the cans, and how tightly the string is held against a wall or finger along its length &mdash; none of which are modelled here.</p>
+  <p class="note">This is an <strong>illustrative model</strong>, not a measurement. It sets a source level L&#8320;&nbsp;=&nbsp;55&nbsp;dB and a fixed 5&nbsp;dB diaphragm&ndash;string coupling loss C at each can, then follows the <a href="https://en.wikipedia.org/wiki/Inverse-square_law" target="_blank" rel="noopener">inverse-square law</a> for open air and a simple linear-in-decibels <a href="https://en.wikipedia.org/wiki/Acoustic_attenuation" target="_blank" rel="noopener">attenuation</a> for the string. The record line&rsquo;s loss rate (0.067&nbsp;dB/m) is <em>chosen</em> so it reaches the 25&nbsp;dB quiet-room noise floor at the <a href="https://www.guinnessworldrecords.com/world-records/98017-longest-functioning-tin-can-telephone" target="_blank" rel="noopener">Guinness-recognised 373.79&nbsp;m</a>. Guinness does not publish the record line&rsquo;s material or tension, and the cotton and waxed-twine rates are rough picks, not measured values. Distance is on a log axis, where open air&rsquo;s steady 6&nbsp;dB-per-doubling fade is a straight line. Real performance also depends on tension, sag, can size and how the string is held along its length, none of which is modelled here.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
     <div class="feedback-head">
@@ -323,13 +324,17 @@
 <script>
 (function(){
   var MAT = [
-    {key:'cotton', name:'Cotton string', k:1.15, color:'var(--s1)', note:'The classic kite-string phone — plenty of internal friction.'},
-    {key:'wax', name:'Waxed twine', k:0.55, color:'var(--s2)', note:'A stiffer, less lossy line — roughly double the reach.'},
-    {key:'wire', name:'Steel wire', k:0.08, color:'var(--s5)', note:'Barely damped at all — this is how longer-range attempts are actually made.'}
+    {key:'cotton', name:'Cotton string', k:1.15, color:'var(--s1)', note:'The classic kite-string phone: plenty of internal friction, so it fades fast.'},
+    {key:'wax', name:'Waxed twine', k:0.55, color:'var(--s2)', note:'Stiffer and less lossy: roughly double the reach of cotton.'},
+    {key:'record', name:'Record-style taut line', k:0.067, color:'var(--s5)', note:'A thin, tight, low-loss line. Loss rate chosen so it reaches the noise floor at the 374 m record; the real material is not published.'}
   ];
-  var RMIN=1, RMAX=40, L0=55, C=5, THRESH=25;
+  var RMIN=1, RMAX=400, L0=55, C=5, THRESH=25;
 
   function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+  var LG=Math.log(400);
+  function toU(r){ return Math.log(r/RMIN)/LG; }
+  function fromU(u){ return RMIN*Math.exp(u*LG); }
+  function fmtR(r){ return r<10 ? r.toFixed(1) : r.toFixed(0); }
   function lAir(r){ return L0 - 20*Math.log10(r); }
   function lString(r,k){ return L0 - C - k*r; }
   function mat(){ return MAT[state.mat]; }
@@ -350,16 +355,17 @@
     var mL = narrow?34:44, mR=14, mT=14, mB=28;
     var vbH = narrow?230:270;
     var x0=mL, x1=w-mR, y0=vbH-mB, y1=mT;
-    function xs(r){ return x0 + (r-RMIN)/(RMAX-RMIN)*(x1-x0); }
+    function xs(r){ return x0 + toU(r)*(x1-x0); }
     function ys(L){ return y0 + (L-YMIN)/(YMAX-YMIN)*(y1-y0); }
     return {w:w, vbH:vbH, x0:x0, x1:x1, y0:y0, y1:y1, xs:xs, ys:ys, narrow:narrow};
   }
 
   function pathFor(fn, g){
     var d = '';
-    for(var r=RMIN; r<=RMAX+0.001; r+=0.5){
-      var L = clamp(fn(Math.min(r,RMAX)), YMIN, YMAX);
-      d += (d?'L':'M') + g.xs(Math.min(r,RMAX)).toFixed(2) + ' ' + g.ys(L).toFixed(2) + ' ';
+    for(var i=0;i<=300;i++){
+      var r = fromU(i/300);
+      var L = clamp(fn(r), YMIN, YMAX);
+      d += (d?'L':'M') + g.xs(r).toFixed(2) + ' ' + g.ys(L).toFixed(2) + ' ';
     }
     return d;
   }
@@ -373,11 +379,10 @@
     // axes
     var axisX = el('line',{x1:g.x0,x2:g.x1,y1:g.y0,y2:g.y0,stroke:'var(--line)','stroke-width':1});
     heroSvg.appendChild(axisX);
-    [0,10,20,30,40].forEach(function(rt){
-      if(rt<RMIN) return;
+    [1,10,100,400].forEach(function(rt){
       var x = g.xs(rt);
       heroSvg.appendChild(el('line',{x1:x,x2:x,y1:g.y0,y2:g.y0+4,stroke:'var(--line2)','stroke-width':1}));
-      var t = el('text',{x:x,y:g.y0+16,'text-anchor': rt===0?'start':rt===40?'end':'middle',class:'axislabel'});
+      var t = el('text',{x:x,y:g.y0+16,'text-anchor': rt===1?'start':rt===400?'end':'middle',class:'axislabel'});
       t.textContent = rt+' m';
       heroSvg.appendChild(t);
     });
@@ -396,10 +401,10 @@
     heroSvg.appendChild(tlbl);
 
     // record marker at 17 m
-    var rx = g.xs(17);
+    var rx = g.xs(374);
     heroSvg.appendChild(el('line',{x1:rx,x2:rx,y1:g.y1,y2:g.y0,class:'recordline'}));
-    var rlbl = el('text',{x:rx,y:g.y1+10,'text-anchor':'middle',class:'chartlabel'});
-    rlbl.textContent = '17 m';
+    var rlbl = el('text',{x:rx-4,y:g.y1+10,'text-anchor':'end',class:'chartlabel'});
+    rlbl.textContent = '374 m record';
     heroSvg.appendChild(rlbl);
 
     // curves
@@ -407,6 +412,15 @@
     heroSvg.appendChild(airPath);
     var stringPath = el('path',{d:pathFor(function(r){ return lString(r, mat().k); },g),class:'chartline',stroke:mat().color});
     heroSvg.appendChild(stringPath);
+
+    // reach markers where each curve meets the noise floor
+    [{r:Math.pow(10,(L0-THRESH)/20),c:'var(--s3)'},{r:(L0-C-THRESH)/mat().k,c:mat().color}].forEach(function(o,i){
+      var over=o.r>RMAX, rr=Math.min(o.r,RMAX);
+      heroSvg.appendChild(el('circle',{cx:g.xs(rr),cy:ty,r:5,fill:'var(--bg)',stroke:o.c,'stroke-width':2}));
+      var t=el('text',{x:g.xs(rr)-((over||o.r>150)?8:0),y:ty+(i?20:-8),'text-anchor':(over||o.r>150)?'end':'middle',class:'chartlabel',fill:o.c});
+      t.textContent=(i?'string ':'air ')+'reach '+(over?'> 400 m':o.r.toFixed(0)+' m');
+      heroSvg.appendChild(t);
+    });
 
     // listener line + dots
     var lx = g.xs(state.r);
@@ -435,7 +449,7 @@
     kLabel.style.color = m.color;
 
     var rows = [
-      {sym:'r', name:'listener distance', val: state.r.toFixed(1)+' m'},
+      {sym:'r', name:'listener distance', val: fmtR(state.r)+' m'},
       {sym:'k', name:'string loss rate ('+m.name.toLowerCase()+')', val: m.k.toFixed(2)+' dB/m'},
       {sym:'C', name:'coupling loss (both cans)', val: C+' dB'},
       {sym:'L₀', name:'source level at 1 m', val: L0+' dB'}
@@ -475,8 +489,8 @@
   function setFromClientX(x){
     var r = distTrack.getBoundingClientRect();
     var f = clamp((x-r.left)/r.width, 0, 1);
-    var v = RMIN + f*(RMAX-RMIN);
-    v = clamp(Math.round(v*10)/10, RMIN, RMAX);
+    var v = fromU(f);
+    v = clamp(v<10?Math.round(v*10)/10:Math.round(v), RMIN, RMAX);
     state.r = v; render();
   }
   var dragging=false;
@@ -486,27 +500,29 @@
   distTrack.addEventListener('pointerup', endDrag);
   distTrack.addEventListener('pointercancel', endDrag);
   distTrack.addEventListener('keydown', function(e){
-    var step = e.shiftKey?5:1;
+    var step = e.shiftKey?1.5:1.08;
     var v=null;
-    if(e.key==='ArrowLeft'||e.key==='ArrowDown') v=state.r-step;
-    else if(e.key==='ArrowRight'||e.key==='ArrowUp') v=state.r+step;
+    if(e.key==='ArrowLeft'||e.key==='ArrowDown') v=state.r/step;
+    else if(e.key==='ArrowRight'||e.key==='ArrowUp') v=state.r*step;
     else if(e.key==='Home') v=RMIN;
     else if(e.key==='End') v=RMAX;
-    if(v!==null){ e.preventDefault(); state.r=clamp(Math.round(v*10)/10,RMIN,RMAX); render(); }
+    if(v!==null){ e.preventDefault(); state.r=clamp(v<10?Math.round(v*10)/10:Math.round(v),RMIN,RMAX); render(); }
   });
   function drawDistSlider(){
-    var pct = ((state.r-RMIN)/(RMAX-RMIN)*100).toFixed(2)+'%';
+    var pct = (toU(state.r)*100).toFixed(2)+'%';
     distFill.style.width=pct; distThumb.style.left=pct;
     distTrack.setAttribute('aria-valuemin', RMIN);
     distTrack.setAttribute('aria-valuemax', RMAX);
     distTrack.setAttribute('aria-valuenow', state.r);
-    distTrack.setAttribute('aria-valuetext', state.r.toFixed(1)+' metres');
+    distTrack.setAttribute('aria-valuetext', fmtR(state.r)+' metres');
   }
 
   // ---- result readout ----
   var stringValEl=$('stringVal'), airValEl=$('airVal'), verdictEl=$('verdict'), verdictSubEl=$('verdictSub');
   function fmtDb(x){ return (x>=0?'':'−') + Math.abs(x).toFixed(1) + ' dB'; }
+  function reachStr(r){ return r>RMAX ? '> 400 m' : r.toFixed(0)+' m'; }
   function drawResult(){
+    $('reachVal').textContent = 'string '+reachStr((L0-C-THRESH)/mat().k)+' · air '+reachStr(Math.pow(10,(L0-THRESH)/20));
     var m = mat();
     var ls = lString(state.r, m.k), la = lAir(state.r);
     stringValEl.textContent = fmtDb(ls) + (ls<THRESH ? '  (below noise floor)' : '');
@@ -542,7 +558,7 @@
     drawEquationAndLegend();
     drawMatButtons();
     drawDistSlider();
-    $('distReadout').textContent = state.r.toFixed(1)+' m';
+    $('distReadout').textContent = fmtR(state.r)+' m';
     drawResult();
   }
 
@@ -556,19 +572,19 @@
     var yAir=H*0.27, ySt=H*0.74, amp=narrow?18:22;
     waveSvg.setAttribute('viewBox','0 0 '+w+' '+H);
     waveSvg.innerHTML='';
-    function xs(r){ return x0+(r-RMIN)/(RMAX-RMIN)*(x1-x0); }
+    function xs(r){ return x0+toU(r)*(x1-x0); }
     var lanes=[{y:yAir,fn:lAir,color:'var(--s3)',name:'Open air'},{y:ySt,fn:function(r){return lString(r,mat().k);},color:mat().color,name:'String'}];
     lanes.forEach(function(ln){
       waveSvg.appendChild(el('line',{x1:x0,x2:x1,y1:ln.y,y2:ln.y,stroke:'var(--line2)','stroke-width':1}));
       var t=el('text',{x:x0,y:ln.y-amp-6,class:'axislabel'}); t.textContent=ln.name; waveSvg.appendChild(t);
       // pulse
-      var d='', c=wave.p*(RMAX-RMIN+8)-4+RMIN;
+      var d='', c=wave.p*1.2-0.1;
       if(wave.p>=0 && wave.p<=1){
         for(var i=0;i<=300;i++){
-          var m=RMIN+i/300*(RMAX-RMIN);
-          var env=Math.exp(-Math.pow((m-c)/2.4,2));
-          var a=clamp(ln.fn(m)/L0,0,1)*amp;
-          var y=ln.y - a*env*Math.sin(2*Math.PI*(m-c)/1.3);
+          var u=i/300, m=fromU(u);
+          var env=Math.exp(-Math.pow((u-c)/0.06,2));
+          var a=clamp((ln.fn(m)-THRESH)/(L0-THRESH),0,1)*amp;
+          var y=ln.y - a*env*Math.sin(2*Math.PI*(u-c)/0.022);
           d+=(i?'L':'M')+xs(m).toFixed(1)+' '+y.toFixed(1)+' ';
         }
         waveSvg.appendChild(el('path',{d:d,fill:'none',stroke:ln.color,'stroke-width':2,'stroke-linejoin':'round'}));
@@ -583,12 +599,12 @@
   var waveAnim=null;
   function sendWhisper(){
     if(wave.running) return;
-    if(reduceMotion || !window.anime){ wave.p=Math.max(0.5,(state.r-RMIN)/(RMAX-RMIN)); drawWave(); return; }
+    if(reduceMotion || !window.anime){ wave.p=Math.max(0.5,toU(state.r)); drawWave(); return; }
     wave.running=true; sendBtn.disabled=true; waveNote.textContent='Whisper in flight…';
     wave.p=0;
-    waveAnim=anime.animate(wave,{p:1,duration:3600,ease:'linear',
+    waveAnim=anime.animate(wave,{p:1,duration:4200,ease:'linear',
       onUpdate:drawWave,
-      onComplete:function(){ wave.running=false; wave.p=-1; sendBtn.disabled=false; waveNote.textContent='Pulse height tracks sound level in dB, not raw pressure, so the fade stays visible.'; drawWave(); }});
+      onComplete:function(){ wave.running=false; wave.p=-1; sendBtn.disabled=false; waveNote.textContent='Pulse height = dB above the noise floor, so it shrinks to nothing where the sound is lost.'; drawWave(); }});
   }
   sendBtn.addEventListener('click', sendWhisper);
   var _render = render;
@@ -596,11 +612,11 @@
 
   // ---- presets ----
   document.querySelectorAll('.preset').forEach(function(b){
-    var presets = { record:{mat:0,r:17}, wire:{mat:2,r:30}, closeup:{mat:0,r:2} };
+    var presets = { record:{mat:2,r:374}, wire:{mat:0,r:17}, closeup:{mat:0,r:2} };
     b.addEventListener('click', function(){
       var p = presets[b.dataset.p];
       state.mat=p.mat;
-      if(window.anime && !reduceMotion){ anime.animate(state,{r:p.r,duration:600,ease:'outQuad',onUpdate:render,onComplete:function(){state.r=p.r;render();}}); }
+      if(window.anime && !reduceMotion){ var tw={u:toU(state.r)}; anime.animate(tw,{u:toU(p.r),duration:700,ease:'outQuad',onUpdate:function(){state.r=fromU(tw.u);render();},onComplete:function(){state.r=p.r;render();}}); }
       else { state.r=p.r; render(); }
     });
   });

@@ -289,6 +289,10 @@
        document so currentColor and the shared --accent/--bad tokens work in both themes. -->
   <svg class="icon-sprite" aria-hidden="true">
     <defs>
+      <symbol id="icon-atlas-play" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="43" cy="32" r="25"/><ellipse cx="43" cy="32" rx="12" ry="25"/><path d="M18 32h50M23 18h40M23 46h40" stroke-width="1.3"/>
+        <path d="M81 20c0-10 20-10 20 0 0 7-10 7-10 15" stroke="var(--accent)" stroke-width="3"/><circle cx="91" cy="44" r="2" fill="var(--accent)" stroke="none"/>
+      </symbol>
       <symbol id="icon-horizon-distance" viewBox="0 0 120 64" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M5 62A80 80 0 0 1 115 62" stroke-width="1.3"/>
         <path d="M20 51L12.5 38" stroke="var(--accent)"/>
@@ -535,11 +539,11 @@
       <span class="cat-count">Five to start with</span>
     </div>
     <div class="feature-grid">
-      <a class="tile tile-lead" data-cat="Discoveries" href="visualizations/earth-moon-race.html"><span class="meta">Discoveries</span><h3>Earth to the Moon, at real speed</h3><p class="desc">Watch light cross the Earth&ndash;Moon gap, and magnify the tiny first part of the same journey for slower travellers.</p></a>
+      <a class="tile tile-lead" data-cat="Discoveries" href="visualizations/atlas-play.html"><span class="meta">Discoveries · Geography quiz</span><h3>Atlas Play: put your world in order</h3><p class="desc">Compare countries, rank world cities and find your place on the map. Nine ways to play, with real data behind every answer.</p></a>
+      <a class="tile" data-cat="Discoveries" href="visualizations/earth-moon-race.html"><span class="meta">Discoveries</span><h3>Earth to the Moon, at real speed</h3><p class="desc">Watch light cross the Earth&ndash;Moon gap, and magnify the tiny first part of the same journey for slower travellers.</p></a>
       <a class="tile" data-cat="Everyday maths" href="visualizations/pizza-area.html"><span class="meta">Everyday maths</span><h3>One big pizza, or two smaller ones?</h3><p class="desc">Compare true pizza areas with circles and area-equivalent shapes &mdash; the diameter that sounds smaller often wins.</p></a>
       <a class="tile" data-cat="Fun physics" href="visualizations/straw-hose-flow.html"><span class="meta">Fun physics</span><h3>Why the straw gives up</h3><p class="desc">See why a long drink straw becomes impossible to sip through while a much longer garden hose stays effortless.</p></a>
       <a class="tile" data-cat="Discoveries" href="visualizations/heat-pump-magic.html"><span class="meta">Discoveries</span><h3>Heat Pump <del>magic</del> <em>Science</em></h3><p class="desc">Drag the outside temperature down and watch a heat pump keep delivering more heat than the electricity it uses &mdash; then compare it against an electric heater and a gas furnace.</p></a>
-      <a class="tile" data-cat="Fun physics" href="visualizations/potato-trajectory.html"><span class="meta">Fun physics</span><h3>Throwing a potato into a hole</h3><p class="desc">Set a release height, launch angle, and speed, and see whether a 200&nbsp;g potato lands in a hole 3&nbsp;m away &mdash; and how two very different arcs can land in the same spot.</p></a>
     </div>
   </section>
 
@@ -549,7 +553,7 @@
   <section class="catalogue" aria-labelledby="cat-all">
     <div class="section-head">
       <h2 id="cat-all">All pages</h2>
-      <span class="cat-count">Twenty-three pages</span>
+      <span class="cat-count">Twenty-four pages</span>
     </div>
     <p class="cat-sub">Everything built so far, coloured by category. Shuffle the order if you would rather stumble into something than go looking for it.</p>
 
@@ -563,7 +567,7 @@
       </select>
       <button class="text-btn" id="shuffleBtn" type="button">Shuffle</button>
       <button class="text-btn" id="resetOrderBtn" type="button" hidden>Reset order</button>
-      <span class="results-count" id="resultsCount" aria-live="polite">23 pages</span>
+      <span class="results-count" id="resultsCount" aria-live="polite">24 pages</span>
     </div>
 
     <div class="tile-grid" id="catalogueGrid">
@@ -574,7 +578,7 @@
       <a class="tile" data-cat="Everyday maths" data-desc="Compare true pizza areas with circles and area-equivalent shapes &mdash; the diameter that sounds smaller often wins." href="visualizations/pizza-area.html"><span class="meta">Everyday maths</span><h3>One big pizza, or two smaller ones?</h3></a>
       <a class="tile" data-cat="Everyday maths" data-desc="Compare linear, quadratic, wave, exponential and logarithmic curves, then follow one moving input to see how the output changes." href="visualizations/basic-functions.html"><span class="meta">Everyday maths</span><h3>The curves behind most graphs</h3></a>
       <a class="tile" data-cat="Everyday maths" data-desc="Resize an egg from quail to ostrich and watch the same surface-to-volume geometry decide both how long it takes to hard-boil and how long the yolk stays hot after the shell feels cool." href="visualizations/egg-boiling-time.html"><span class="meta">Everyday maths</span><h3>Why the yolk stays hot after the shell goes cold</h3></a>
-      <a class="tile" data-cat="Discoveries" data-desc="Compare countries, rank worldwide cities and find your place on the map. Nine question styles, 21 measures and source notes for every answer." href="visualizations/atlas-play.html"><span class="meta">Discoveries</span><h3>Atlas Play: put your world in order</h3></a>
+      <a class="tile" data-cat="Discoveries" data-desc="A geography quiz: compare countries, rank worldwide cities and find your place on the map. Nine question styles, 21 measures and source notes for every answer." href="visualizations/atlas-play.html"><span class="meta">Discoveries</span><h3>Atlas Play: put your world in order</h3></a>
       <a class="tile" data-cat="Fun physics" data-desc="Drop a stone, time the splash, and separate the stone&rsquo;s fall from the sound&rsquo;s return journey to estimate the depth." href="visualizations/well-depth.html"><span class="meta">Fun physics</span><h3>How deep is the well?</h3></a>
       <a class="tile" data-cat="Discoveries" data-desc="Watch light cross the Earth&ndash;Moon gap, and magnify the tiny first part of the same journey for slower travellers." href="visualizations/earth-moon-race.html"><span class="meta">Discoveries</span><h3>Earth to the Moon, at real speed</h3></a>
       <a class="tile" data-cat="Discoveries" data-desc="Compare JPL-derived distances for the planets, then watch their relative movement during the light delay." href="visualizations/planet-light-delay.html"><span class="meta">Discoveries</span><h3>You are seeing the past</h3></a>

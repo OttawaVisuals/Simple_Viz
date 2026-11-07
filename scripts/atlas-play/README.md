@@ -92,3 +92,14 @@ Statistics cover 54 selected countries; the city pool is worldwide. Best score a
 - Renewable answer visuals support every question style and let players switch between countries in the question. Height estimates have the live figure; other height question results have the same world/animal scale with country tabs. Visuals expose source notes and a downloadable context JSON in the Data panel.
 
 Refresh from this directory with `python -X utf8 scripts/fetch-visual-context.py`, then `python -X utf8 scripts/prepare-visual-context.py`. The fetch script reuses files under ignored `data/raw/context-*`; remove a specific cache file when deliberately refreshing that series. Re-run `npm test` and `npm run build`; review source revisions and any new mismatches before committing normalized data and HTML together.
+
+
+## Result position scales and ratio layout
+
+Numeric results now include linear reference rulers with themed icons, exact values and a histogram showing counts of reference places per equal-width interval. The full range is the default; a labelled zoom option can isolate the question values without changing the underlying data. This is a value-position chart, not a percentile ranking.
+
+Country population uses 1 million to the highest available 2023 World Bank country/economy observation; smaller highlighted countries sit at the left edge with a below-range label. Life expectancy uses 0–100 years with the published 2023 WLD benchmark (not maximum lifespan). Both reference pools include 217 non-missing country/economy observations, filtering regional/income aggregates using World Bank country metadata. Quiz observations are validated against the reference snapshot. Refresh with `python -X utf8 scripts/fetch-reference-scales.py`; files cache under ignored `data/raw/scale-*`.
+
+City population uses the 2025 UN urban-area pool for the selected 1-million/100,000 threshold and keeps its UN source/period separate from country data. Other numeric measures use the available quiz-country pool, explicitly labelled as partial rather than worldwide. Electricity and human height retain their specialised visual contexts. Pin, border and history questions do not receive unrelated numeric-position charts. Download the global population/life reference JSON from the Data panel.
+
+Ratio rounds now use a `round-gap` container; insertion buttons are separately scoped as `.insert-gap`. This prevents the insertion button's fixed height/flex layout from collapsing the ratio question and overlapping the heading. Ratio headings explicitly show the numerator ÷ denominator.

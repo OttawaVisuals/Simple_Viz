@@ -1,3 +1,4 @@
+import {PositionScale} from "./position-scale";
 import {useEffect,useRef,useState} from 'react';
 import {animate} from 'animejs';
 import {visualContext,isHeightMetric,fuelKeys,percent,type FuelRow} from '../lib/visual-context';
@@ -47,6 +48,8 @@ export function HeightScale({value,metric,actual,motion=true}:{value:number;metr
 export function MetricVisualContext({round,motion}:{round:Round;motion:boolean}){
  const countries=[...round.countries,...(round.target?[round.target]:[])],isHeight=isHeightMetric(round.metric);
  const[selected,setSelected]=useState(countries[0]?.id),country=countries.find(c=>c.id===selected)??countries[0];
- if(!country||(round.metric!=='renewable'&&!isHeight)||(isHeight&&round.type==='estimate'))return null;
+ if(['pin','exception','history'].includes(round.type))return null;
+ if(round.metric!=='renewable'&&!isHeight)return <section className="metric-visual-context"><PositionScale round={round} motion={motion}/></section>;
+ if(!country||(isHeight&&round.type==='estimate'))return null;
  return <section className="metric-visual-context" aria-label="Visual answer context">{countries.length>1&&<div className="context-country-tabs" aria-label="Choose country for visual context">{countries.map(c=><button key={c.id} aria-pressed={c.id===country.id} onClick={()=>setSelected(c.id)}>{c.name}</button>)}</div>}{round.metric==='renewable'?<ElectricityContext country={country}/>:isHeightMetric(round.metric)&&<><div className="context-heading"><h3>{country.name} in perspective</h3><span>{Number(country[round.metric]).toFixed(1)} cm · source height</span></div><HeightScale value={Number(country[round.metric])} actual={Number(country[round.metric])} metric={round.metric} motion={motion}/></>}</section>
 }

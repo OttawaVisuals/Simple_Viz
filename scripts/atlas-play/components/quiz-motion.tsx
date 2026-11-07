@@ -38,7 +38,7 @@ export function useQuizMotion(root:RefObject<HTMLDivElement|null>,round:Round|nu
  },[round,finished,motion,root]);
  useEffect(()=>{
   if(!root.current||!motion||selection===null||answered)return;
-  const scope=createScope({root}).add(()=>{animate(".gap.selected,.country-choice.selected",{scale:[.97,1],duration:420,ease:"out(4)"})});
+  const scope=createScope({root}).add(()=>{animate(".insert-gap.selected,.country-choice.selected",{scale:[.97,1],duration:420,ease:"out(4)"})});
   return()=>scope.revert();
  },[selection,answered,motion,root]);
  useEffect(()=>{

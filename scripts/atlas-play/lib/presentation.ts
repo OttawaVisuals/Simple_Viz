@@ -20,7 +20,7 @@ export function questionTitle(r:Round):string{
  case 'pin':return `Where is ${r.city!.name}, ${r.city!.countryName}?`;
  case 'exception':return `Which country does NOT border ${r.target!.name}?`;
  case 'history':return 'Whose population grew more between 2000 and 2023?';
- case 'gap':return `How many times ${r.countries[1].name}’s ${subject} does ${name} have?`;
+ case 'gap':return `${subject[0].toUpperCase()+subject.slice(1)}: ${name} ÷ ${r.countries[1].name}?`;
  case 'insert':return `Where does ${r.target!.name} fit by ${subject}?`;
  case 'rank':return `Rank 3 countries by ${subject}.`;
  case 'compare':return `Which country has the higher ${subject}?`;

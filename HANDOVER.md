@@ -1,5 +1,12 @@
 # Handover
 
+## Atlas Play full-range result scales and ratio layout fix — 2026-11-07
+
+- Added linear result rulers with metric icons, country flags, exact values, reference distributions and optional zoom. Population country range starts at 1M and reaches the highest source-country value; life expectancy uses 0–100 years and the published WLD benchmark. Matching 2023 World Bank reference pools contain 217 countries/economies each, with aggregates excluded and quiz values validated against the snapshot.
+- City rulers use the selected 2025 UN urban-area pool and UN attribution; other numeric measures use clearly labelled partial quiz-country pools. Specialist electricity/height visuals are retained. Source definitions and reference JSON downloads are provided; no invented world statistics or percentile claims.
+- Fixed ratio questions: the old `play-area gap` container was inheriting insertion-button `.gap` styles (fixed ~30px height and flex centring), causing outlines to overlap headings and answer controls. Containers now use `round-*`; insertion targets use `.insert-gap`. Ratio headings show numerator ÷ denominator.
+- Validation: 2,175 round checks plus reference-scale tests for matched dates/values, aggregate exclusion, linear positions, bins, below-range handling, zoom and selector isolation. Browser verified ratio options are all hit-test clickable and submission works; country population/life scales and zoom work at desktop/390px, city scales preserve the correct 2025 source, and insertion selection still works.
+
 ## Atlas Play direct head-to-head feedback — 2026-11-07
 
 - Head-to-head country tiles now display Correct / Incorrect directly on the selected tile, marked “Your choice”, with the source value below. When the selection is wrong, the other tile says Correct answer. A losing selected tile remains fully opaque and has distinct colour and an X icon.

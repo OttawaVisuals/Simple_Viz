@@ -16,10 +16,10 @@ export function CityRanking({round,answer,onChange,answered,motion}:{round:Round
  return <div className={`city-game ${answered?'cities-checked':''}`}>
  <div className="inline-rank-result placement-status" role="status" aria-live="polite">{answered?<><strong>{right===5?'Perfect order!':`${right} of 5 in the right place`}</strong><span>Correct positions and populations are shown below.</span></>:<><strong>{selected.length} of 5 placed</strong><span>{next?`Place ${next.name} in the ranking.`:'All five placed. Move any city to adjust, or check your answer.'}</span></>}</div>
  <div className={`city-placement ${next&&!answered?'has-next':''}`}>
- {next&&!answered&&<section className="next-city-card" key={next.id} aria-label="City to place"><span className="placement-eyebrow">PLACE THIS CITY</span><CountryFlag code={next.country}/><strong>{next.name}</strong><span>{next.countryName}</span><small>Choose a gap in the ranking.</small></section>}
+ {next&&!answered&&<section className="next-city-card" key={next.id} aria-label="City to place"><span className="placement-eyebrow">PLACE THIS CITY</span><CountryFlag code={next.country}/><strong>{next.name}</strong><span>{next.countryName}</span><small>Tap a line to place this city.</small></section>}
  <div className="placement-ladder" aria-label="Your city ranking"><div className="ranking-instruction">LARGEST POPULATION <ArrowDown size={12}/></div>
  {Array.from({length:selected.length+1},(_,i)=><div key={i} className="placement-step">
- {next&&!answered&&<button className={`city-placement-gap ${!selected.length?'first-placement':''}`} onClick={()=>place(i)} aria-label={`Place ${next.name} ${!selected.length?'first in the ranking':i===0?'above '+selected[0].name:i===selected.length?'below '+selected[i-1].name:'between '+selected[i-1].name+' and '+selected[i].name}`}><span>＋</span>{!selected.length?'Start ranking here':'Place here'}</button>}
+ {next&&!answered&&<button className={`city-placement-gap ${!selected.length?'first-placement':''}`} onClick={()=>place(i)} aria-label={`Place ${next.name} ${!selected.length?'first in the ranking':i===0?'above '+selected[0].name:i===selected.length?'below '+selected[i-1].name:'between '+selected[i-1].name+' and '+selected[i].name}`}><span className="insertion-line" aria-hidden="true"/>{!selected.length&&<span className="start-ranking-label">Start your ranking</span>}</button>}
  {i<selected.length&&row(selected[i],i)}
  </div>)}
  <div className="ranking-instruction placement-bottom">SMALLEST POPULATION</div>

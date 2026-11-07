@@ -1,5 +1,11 @@
 # Handover
 
+## Atlas Play insertion lines — 2026-11-07
+
+- Replaced repeated city-placement boxes/labels with thin lines. Hover and keyboard focus highlight the line and show a small plus; adjacent rows separate slightly when motion is enabled. Only the empty ranking says “Start your ranking”.
+- Preserved descriptive accessible labels, native button keyboard activation, 44px mobile tap areas and reduced-motion behaviour. Existing placement snap animation and inline grading remain.
+- Production build passes. Browser verified keyboard activation/focus, borderless targets, mobile target size/no overflow, all five placements and five per-row feedback results.
+
 ## Atlas Play one-city-at-a-time ranking prototype — 2026-11-07
 
 - City rankings now begin empty, with one city, flag and country shown at a time. Tap any gap to insert it and advance to the next city. No correctness hints appear until submission.

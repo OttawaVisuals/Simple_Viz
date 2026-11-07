@@ -1,5 +1,11 @@
 # Handover
 
+## Atlas Play compact laptop layout — 2026-11-07
+
+- At desktop widths, replaced the tall hero with a small single-line intro and grouped difficulty, city pool, measure and question style into one row. Reduced card/row spacing and removed the repeated mode-icon grid from the sidebar.
+- Answer actions stick to the bottom of the viewport while exploring longer feedback. The question card uses overflow:clip so sticky positioning works without an inner scrolling container. Maps keep their 2:1 aspect ratio and fitting behaviour at a maximum 580px width.
+- Browser verified the complete initial city ranking and answer button fit at 1366×768, 1280×720 and 1024×768. Verified visible next-question actions after submission, compare/pin layouts, and all four controls with no horizontal overflow at 390px.
+
 ## Atlas Play direct ranking feedback and pointer dragging — 2026-11-07
 
 - City rankings start with five sortable rows. Submitting shows correct/wrong feedback, true rank and population directly on each row; a count above the list reports how many positions are correct. Submission brings the ranking into view.

@@ -252,3 +252,37 @@ body{background:#f2f1e8;color:#233d30}.app{position:relative;isolation:isolate;m
 .podium-outline{width:66px;height:40px;fill:#c3d498;stroke:#557a39;stroke-width:1.3;flex-shrink:0}
 .podium-bank-city .podium-outline,.podium-drag-ghost .podium-outline{display:none}
 @media(max-width:760px){.podium-outline{width:54px;height:33px}}
+/* Sourced visual context for electricity and human height. */
+.metric-visual-context{margin:0 28px 18px;padding:18px 20px;border:1px solid var(--line);border-radius:9px;background:var(--paper)}
+.context-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:15px}
+.context-heading h3{font-size:25px;line-height:1.15;margin:0}.context-heading>span{font-size:10px;color:var(--muted)}
+.context-country-tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px}
+.context-country-tabs button{padding:7px 12px;background:transparent;border:1px solid var(--line);border-radius:5px;color:var(--ink);font-size:11px}
+.context-country-tabs button[aria-pressed=true]{border-color:var(--green);background:#e6eddc}
+.electricity-bar-row{margin:10px 0}.electricity-bar-row>div:first-child{display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-size:12px;margin-bottom:6px}.electricity-bar-row>div:first-child>span{font-size:11px;color:var(--muted)}
+.electricity-share-bar{display:flex;width:100%;height:18px;border-radius:4px;overflow:hidden;background:#d3d5d4}.electricity-share-bar>span{background:#638d50}.electricity-share-bar>i{background:#b8bfc2}
+.electricity-bar-legend{display:flex;gap:18px;font-size:10px;color:var(--muted);margin:8px 0 15px}.electricity-bar-legend span{display:flex;align-items:center;gap:5px}.electricity-bar-legend i{display:inline-block;width:10px;height:10px;background:#638d50}.electricity-bar-legend span:last-child i{background:#b8bfc2}
+.context-key-fact{font-size:12px;line-height:1.6;margin:10px 0 18px}
+.fuel-table{width:100%;border-collapse:collapse;font-size:11px;text-align:left;font-variant-numeric:tabular-nums}
+.fuel-table caption{text-align:left;font-size:13px;margin-bottom:9px;font-weight:600;color:var(--ink)}
+.fuel-table th,.fuel-table td{padding:7px 8px;border-bottom:1px solid var(--line);font-weight:400}.fuel-table thead th{font-size:10px;color:var(--muted)}.fuel-table th:first-child{padding-left:0}.fuel-table td{text-align:right;white-space:nowrap}.fuel-table thead th:not(:first-child){text-align:right}
+.fuel-table .fuel-total th,.fuel-table .fuel-total td{font-size:10px;color:var(--muted);border:0;padding-top:10px}
+.fuel-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;background:#a8afad}.fuel-hydro{background:#4d8b9d}.fuel-otherRenewable{background:#638d50}.fuel-coal{background:#6d6c71}.fuel-gas{background:#ca9754}.fuel-oil{background:#a56b43}.fuel-nuclear{background:#8d7ea1}
+.context-footnote,.context-data-gap{font-size:10px;line-height:1.6;color:var(--muted);margin:12px 0 0}.context-data-gap{color:#a34532}
+.context-sources{margin-top:12px;font-size:10px;line-height:1.6;color:var(--muted)}.context-sources summary{cursor:pointer;color:var(--green);padding:5px 0}.context-sources>p{font-size:10px;line-height:1.6}.context-sources>a{display:inline-block;text-decoration:underline;margin:6px 12px 0 0}.context-sources p a{text-decoration:underline}
+.height-scale{width:100%;max-width:580px;margin:auto;text-align:left}
+.height-world-label{display:flex;align-items:center;justify-content:center;gap:7px;font-size:11px;color:var(--ink);line-height:1.5;flex-wrap:wrap;margin-bottom:4px}.height-world-label>i{display:inline-block;width:25px;border-top:2px dashed var(--green)}
+.height-scale>svg{display:block;width:100%;height:auto}.height-grid{stroke:var(--line);stroke-width:.6}.height-tick{fill:var(--muted);font-size:10px;font-family:system-ui,sans-serif}.height-world-line{stroke:var(--green);stroke-width:1.5;stroke-dasharray:6 5}.height-estimate-line{stroke:var(--orange);stroke-width:2;stroke-dasharray:3 2}.height-ground{stroke:var(--ink);stroke-width:1}
+.human-silhouette{fill:var(--orange)}.animal-silhouette{fill:var(--ink);opacity:.45}.animal-height-mark{stroke:var(--ink);stroke-width:1.2}
+.height-reference-labels{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;font-size:10px;color:var(--muted);text-align:center;line-height:1.5}
+.height-reference-labels b{display:block;color:var(--ink);font-weight:550}.height-reference-labels small{display:block;font-size:9px}.height-scale .context-footnote{margin-top:9px}
+.estimate-game:has(.height-scale){max-width:700px}.estimate-game:has(.height-scale) .estimate-value{font-size:28px;margin:9px 0 0}
+@media(min-width:761px){.metric-visual-context{margin:0 20px 14px;padding:15px 17px}.height-scale>svg{max-height:none}.height-scale .context-sources{margin-top:5px}}
+@media(max-width:760px){.metric-visual-context{margin:0 20px 16px;padding:14px 12px}.context-heading h3{font-size:23px}.context-heading{gap:6px}.context-country-tabs{gap:5px}.context-country-tabs button{padding:8px;font-size:10px}.electricity-bar-row>div:first-child{font-size:11px}.electricity-bar-row>div:first-child>span{font-size:10px}.fuel-table{font-size:10px}.fuel-table th,.fuel-table td{padding:7px 4px}.context-key-fact{font-size:11px}.height-world-label{font-size:10px;gap:5px}.height-reference-labels{font-size:9px;gap:3px}.height-reference-labels small{font-size:8px}}
+.answer-panel .metric-visual-context{margin:15px 0;padding:14px 16px}
+.answer-panel .metric-visual-context .context-footnote,.answer-panel .metric-visual-context .context-sources p{font-size:10px}
+@media(max-width:760px){.answer-panel .metric-visual-context{padding:12px 10px}}
+.fuel-value{position:relative;min-width:75px;padding:3px 0;text-align:right;isolation:isolate}
+.fuel-cell-bar{display:block;position:absolute;left:0;bottom:0;top:0;opacity:.2;z-index:-1;background:#a8afad;border-radius:2px}
+.fuel-cell-bar.fuel-hydro{background:#4d8b9d}.fuel-cell-bar.fuel-otherRenewable{background:#638d50}.fuel-cell-bar.fuel-coal{background:#6d6c71}.fuel-cell-bar.fuel-gas{background:#ca9754}.fuel-cell-bar.fuel-oil{background:#a56b43}.fuel-cell-bar.fuel-nuclear{background:#8d7ea1}
+@media(max-width:760px){.fuel-value{min-width:52px}}

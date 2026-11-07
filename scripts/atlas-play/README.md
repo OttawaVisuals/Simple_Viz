@@ -81,3 +81,14 @@ Expanded preparation: `fetch-core-new.py`, `fetch-lagged.py`, `fetch-food-hdi.py
 Verify snapshot years and source metadata together before upgrading. Re-fetchable research caches under `data/raw/core-*`, `new-*` and `unusual-*` remain local and ignored. Normalized datasets, source metadata and reproducible scripts are tracked.
 
 Statistics cover 54 selected countries; the city pool is worldwide. Best score and motion preference stay in the browser. Anime.js transitions respect reduced motion. No automatic refresh or cross-device persistence.
+
+
+## Visual answer context
+
+- **Electricity:** `public/data/visual-context.json` bundles 2021 World Bank WDI renewable, hydro, non-hydro renewable, coal, gas, oil and nuclear shares, including the published WLD aggregate. Country renewable values match the existing quiz snapshot. Country/world renewable bars use a genuine 0–100% scale; fuel rows are shown as reported. These are electricity output shares, not total energy use.
+- Some separately published component series do not reconcile to 100%. No rescaling is applied. Other/unallocated is a positive derived residual only when every component is usable. Negative or over-100 component shares are excluded from the chart and retained in `invalidSourceValues`; missing values remain null. No missing/invalid value is converted to zero, and an over-100 sum is explicitly flagged.
+- **Height:** the global means are the source's World observations for the same 1996 birth cohort and sex as the quiz (age 18 in 2014). They are not averages of the 54 quiz countries or current whole-population averages. The silhouette follows the estimate slider, then animates to the source height after answering; the world line stays fixed. Disabling motion updates it immediately.
+- Animal silhouettes are scale cues. Labrador 60 cm and elephant 310 cm are illustrative shoulder heights within cited ranges; emperor penguin 110 cm is an illustrative standing height; Thoroughbred 162.56 cm is the exact conversion of the source's 16-hand withers reference. Individual sizes vary, and shoulder/withers and standing measurements are distinguished. Each marker has a source link and definition in the chart.
+- Renewable answer visuals support every question style and let players switch between countries in the question. Height estimates have the live figure; other height question results have the same world/animal scale with country tabs. Visuals expose source notes and a downloadable context JSON in the Data panel.
+
+Refresh from this directory with `python -X utf8 scripts/fetch-visual-context.py`, then `python -X utf8 scripts/prepare-visual-context.py`. The fetch script reuses files under ignored `data/raw/context-*`; remove a specific cache file when deliberately refreshing that series. Re-run `npm test` and `npm run build`; review source revisions and any new mismatches before committing normalized data and HTML together.

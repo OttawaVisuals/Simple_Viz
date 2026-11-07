@@ -1,5 +1,14 @@
 # Handover
 
+## Atlas Play electricity context and live height scale — 2026-11-07
+
+- Renewable-electricity answers now compare country and world renewable shares, with matched 2021 World Bank data. Fuel-by-fuel percentages cover hydro, non-hydro renewables, coal, gas, oil and nuclear; a positive unallocated remainder is derived only with complete components. Country tabs support multi-country rounds.
+- Source components sometimes do not total 100%, and three selected countries have negative non-hydro renewable observations. Invalid values become unavailable, not zero; raw invalid values remain in the context JSON. Over-100 totals are flagged and valid shares are never rescaled. The existing quiz's renewable observations are unchanged.
+- Height estimate sliders animate a human silhouette on a zero-based centimetre scale with the same-sex World mean for the 1996 birth cohort (age 18 in 2014). Answering animates to the source height and retains a tick for the estimate. Other height results use this scale with country tabs. Reduced motion updates immediately.
+- Added sourced dog/penguin/horse/elephant silhouette references, clearly distinguishing illustrative sizes and shoulder/withers versus standing height. Chart source details and visual-context JSON are downloadable via the Data panel.
+- Editable UI: `components/metric-visuals.tsx`; normalized data: `public/data/visual-context.json`; refresh/prepare scripts and data tests are under `scripts/atlas-play/scripts`.
+- Validation: 2,175 generated-round checks plus visual-data checks for year/value consistency, totals/residuals, invalid-value exclusion, world-cohort means and marker sources. Browser checked male/female slider bounds, estimate-to-source reveal, electricity percentages/World reference, results-first ordering, and 390px layout without horizontal overflow.
+
 ## Atlas Play podiums for all country rankings — 2026-11-07
 
 - Extended the shared city podium to country rankings across all 21 measures. Each round now has three countries, with flags and outlines. Labels are Highest / Middle / Lowest so first place means the highest value, including for measures such as CO₂.

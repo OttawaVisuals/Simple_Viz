@@ -1,5 +1,12 @@
 # Handover
 
+## Atlas Play direct ranking feedback and pointer dragging — 2026-11-07
+
+- City rankings start with five sortable rows. Submitting shows correct/wrong feedback, true rank and population directly on each row; a count above the list reports how many positions are correct. Submission brings the ranking into view.
+- Shared city/country ranking interaction uses pointer capture, a lifted floating card, live reordering and 220ms repositioning, plus accessible up/down alternatives. Handles reserve touch dragging while the rest of the page can scroll. Reduced motion is respected.
+- Insertion uses a pointer-driven country preview and highlighted gap targets; tapping a gap remains available. Short staggered success/failure animations give feedback where the player acted.
+- Browser verified pointer reordering, arrow controls, country ranking, insertion drops, immediate city feedback and 390px layout; existing game and presentation checks pass.
+
 ## Atlas Play flags, maps and clearer questions — 2026-11-07
 
 - Added inline SVG country flags to city choices, selected rankings, results, map legends and city-location prompts. Country names remain written. Flags are from flag-icons (MIT); all city country/area codes must resolve at build time, with an explicit XKX → XK mapping.

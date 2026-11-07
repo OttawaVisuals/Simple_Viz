@@ -50,3 +50,50 @@ body{background:#f2f1e8;color:#233d30}.app{position:relative;isolation:isolate;m
 .podium-country{display:block;margin-top:4px;font:8px/1.3 system-ui,sans-serif;letter-spacing:0;overflow-wrap:anywhere}
 
 .city-option-name small,.city-result-country{font-size:10px!important;line-height:1.5;color:var(--ink)!important;opacity:.8}
+/* Direct manipulation: lifted cards, fast settling, and results at the point of play. */
+.sortable-ranking{display:grid;gap:8px}
+.sortable-row,.sort-ghost{display:flex;align-items:center;gap:10px;min-height:70px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--paper);position:relative}
+.sortable-row.is-lifted{opacity:.25;border:2px dashed var(--orange)}
+.sort-position{font:500 19px Georgia,serif;color:var(--green);min-width:20px;text-align:center}
+.sort-handle{display:grid;place-items:center;touch-action:none;cursor:grab;background:none;color:var(--muted);border:0;min-width:32px;min-height:44px;padding:0}
+.sort-handle:active{cursor:grabbing}
+.sort-content{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.sort-ghost{position:fixed;z-index:1000;pointer-events:none;box-shadow:0 12px 28px #243e3533;border:2px solid var(--orange);transform:rotate(-1deg) scale(1.025);background:var(--paper)}
+.sort-arrows{display:flex;flex-direction:column;gap:2px}
+.sort-arrows button{display:grid;place-items:center;width:32px;height:25px;border:0;border-radius:4px;background:transparent;color:var(--green)}
+.sort-arrows button:hover{background:var(--line)}
+.sort-arrows button:disabled{opacity:.25}
+.rank-city-name{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.rank-city-name strong{display:block;font-size:12px;font-weight:550;overflow-wrap:anywhere}
+.rank-city-name small{display:block;margin-top:3px;color:var(--muted);font-size:10px}
+.slot-feedback{display:flex;align-items:center;gap:5px;font-size:11px;line-height:1.5;font-weight:600}
+.slot-feedback small{display:block;font-weight:400;font-size:10px;font-variant-numeric:tabular-nums}
+.slot-right{color:#315c39}.slot-wrong{color:#a34532}
+.sortable-row:has(.slot-right){background:#edf4df;border-color:#73995f}
+.sortable-row:has(.slot-wrong){background:#fff0e6;border-color:#ca886c}
+.inline-rank-result{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:12px 0 15px;font-size:11px;line-height:1.5}
+.inline-rank-result strong{font-size:14px;color:var(--ink)}
+.inline-rank-result>span{color:var(--muted)}
+.ranking-instruction{font-size:9px;letter-spacing:1px;color:var(--muted);display:flex;gap:10px;align-items:center}
+.empty-city-slot{display:flex;align-items:center;gap:16px;border:1px dashed var(--line);border-radius:8px;min-height:48px;margin-top:8px;padding:10px 14px;color:var(--muted);font-size:11px}
+.empty-city-slot b{font:18px Georgia,serif}
+.city-pick-bank{margin-top:18px}.clear-ranking{margin-top:12px}
+.sort-content>.shape.small{width:42px;height:35px;flex-shrink:0}
+@media(max-width:760px){.sortable-row{gap:5px;padding:9px 7px}.sort-content{gap:6px;flex-wrap:wrap}.rank-city-name{min-width:120px}.slot-feedback{width:100%;font-size:10px;margin-left:34px}.slot-feedback small{display:inline;margin-left:6px}.inline-rank-result{display:block}.inline-rank-result>span{display:block;margin-top:3px}.sort-position{font-size:17px;min-width:16px}.sort-handle{min-width:26px}.sort-arrows button{width:30px}.sort-content>.rank-name{font-size:12px}.sort-ghost{padding:9px 7px}}
+@media(prefers-reduced-motion:reduce){.sort-ghost{transform:none}}
+.app[data-motion="off"] .sort-ghost{transform:none}
+.sortable-ranking{position:relative}
+.target-country{touch-action:none}
+.target-country.is-dragging-target>.target-outline{opacity:.35}
+.insert-drag-ghost{position:fixed;z-index:1000;pointer-events:none;display:flex;align-items:center;gap:10px;background:var(--paper);border:2px solid var(--orange);padding:9px 15px;border-radius:9px;box-shadow:0 10px 24px #243e3533;transform:rotate(-3deg);font-size:13px}
+.insert-drag-ghost .shape{width:48px;height:38px}
+.gap.drop-hover{background:#f9e0bb!important;border:2px solid var(--orange)!important;transform:scale(1.025);box-shadow:0 0 0 4px #d77c4820}
+@keyframes rank-right{0%{transform:scale(.98)}60%{transform:scale(1.018)}100%{transform:scale(1)}}
+@keyframes rank-wrong{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}65%{transform:translateX(4px)}}
+.app[data-motion="on"] .sortable-row.is-checked:has(.slot-right){animation:rank-right .32s ease-out both}
+.app[data-motion="on"] .sortable-row.is-checked:has(.slot-wrong){animation:rank-wrong .25s ease-out both}
+.app[data-motion="on"] .sortable-row.is-checked:nth-child(2){animation-delay:55ms}
+.app[data-motion="on"] .sortable-row.is-checked:nth-child(3){animation-delay:110ms}
+.app[data-motion="on"] .sortable-row.is-checked:nth-child(4){animation-delay:165ms}
+.app[data-motion="on"] .sortable-row.is-checked:nth-child(5){animation-delay:220ms}
+@media(prefers-reduced-motion:reduce){.app .sortable-row.is-checked{animation:none!important}.gap.drop-hover{transform:none}}

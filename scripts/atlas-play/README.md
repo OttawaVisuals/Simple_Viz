@@ -15,7 +15,7 @@ npm run build
 
 Commit source changes and the generated HTML together. Data download links use in-memory Blob URLs. Border-data license and bundled library notices are retained. The approved quiz design is retained as an exception to the physics-page template.
 
-Answer maps fit the actual country outlines or city points. City pinning supports up to 64× zoom, mouse wheel, touch pinch, dragging, a zoom slider and keyboard controls; these controls never reveal the correct location before submission. Full question headings include the measure and subject.
+Answer maps fit the actual country outlines or city points. City pinning supports up to 64× zoom, mouse wheel, touch pinch, dragging, a zoom slider and keyboard controls; these controls never reveal the correct location before submission. Full question headings include the measure and subject. City and country rankings use pointer-driven sortable rows with handle dragging, animated repositioning and arrow-button alternatives. City rankings start with all five cities in place. After submission, each row shows its correctness, true position and source value; the ranking scrolls back into view. Insertion rounds use a floating country card and highlighted gap targets.
 
 Country coverage is 54 selected countries; city coverage is worldwide. Difficulty is a numerical heuristic, not measured player performance. Dataset years and limitations remain in the in-game Data panel and documentation below.
 

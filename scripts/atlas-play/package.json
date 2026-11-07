@@ -4,13 +4,15 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "test": "node --experimental-strip-types scripts/check-game.mjs"
+    "test": "node --experimental-strip-types scripts/check-game.mjs && node --experimental-strip-types scripts/check-presentation.mjs"
   },
   "dependencies": {
-    "react": "19.2.6",
-    "react-dom": "19.2.6",
     "animejs": "4.5.0",
-    "lucide-react": "1.31.0"
+    "flag-icons": "7.6.0",
+    "i18n-iso-countries": "7.14.0",
+    "lucide-react": "1.31.0",
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
   },
   "devDependencies": {
     "esbuild": "0.27.4"

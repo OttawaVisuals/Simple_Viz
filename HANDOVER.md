@@ -1,5 +1,13 @@
 # Handover
 
+## Atlas Play flags, maps and clearer questions — 2026-11-07
+
+- Added inline SVG country flags to city choices, selected rankings, results, map legends and city-location prompts. Country names remain written. Flags are from flag-icons (MIT); all city country/area codes must resolve at build time, with an explicit XKX → XK mapping.
+- Answer maps now fit the actual country geometry/city markers with padding, instead of showing the whole world. Border answers number the countries and distinguish the target from the non-neighbour. Removed the old map height cap that made regions appear small even after fitting.
+- City location supports 64× zoom, 44px zoom buttons, a zoom slider, wheel/pinch zoom, drag panning, Find my pin and keyboard controls. Dragging does not place a pin. Reveals frame both the guess and correct centroid.
+- Main headings now state the measure and actual question, including explicit estimate wording (e.g. Norway’s renewable electricity share). Data/tolerances remain below.
+- Validation: existing 2,175 generated-round checks plus presentation checks for zoom anchoring/limits, regional bounds, edge points and estimate headings; browser checks on desktop and 390px mobile.
+
 ## Atlas Play migrated to Made clear — 2026-11-07
 
 - Added `visualizations/atlas-play.html` and a catalogue link. The geography quiz runs as one self-contained static page without Sites hosting, runtime API calls, external scripts or web fonts.

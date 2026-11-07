@@ -2,8 +2,17 @@ import {build} from 'esbuild';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
+import countryCodes from 'i18n-iso-countries';
 const dir=path.dirname(fileURLToPath(import.meta.url));
-const result=await build({absWorkingDir:dir,entryPoints:['entry.tsx'],bundle:true,minify:true,write:false,format:'iife',platform:'browser',target:['es2022'],jsx:'automatic',loader:{'.svg':'dataurl','.txt':'text'},define:{'process.env.NODE_ENV':'"production"'},legalComments:'inline'});
+const dataset=JSON.parse(await readFile(path.join(dir,'public/data/countries.json'),'utf8'));
+const flags={};
+for(const code of new Set(dataset.globalCities.map(c=>c.country))){
+ const alpha2=code==='XKX'?'XK':countryCodes.alpha3ToAlpha2(code);
+ if(!alpha2)throw new Error(`Missing ISO mapping for ${code}`);
+ flags[code]='data:image/svg+xml;base64,'+Buffer.from(await readFile(path.join(dir,'node_modules/flag-icons/flags/4x3',alpha2.toLowerCase()+'.svg'))).toString('base64');
+}
+const flagLicense=await readFile(path.join(dir,'node_modules/flag-icons/LICENSE'),'utf8');
+const result=await build({absWorkingDir:dir,entryPoints:['entry.tsx'],plugins:[{name:'inline-country-flags',setup(b){b.onResolve({filter:/^atlas-flags$/},()=>({path:'atlas-flags',namespace:'flags'}));b.onLoad({filter:/.*/,namespace:'flags'},()=>({contents:'export default '+JSON.stringify(flags),loader:'js'}));}}],bundle:true,minify:true,write:false,format:'iife',platform:'browser',target:['es2022'],jsx:'automatic',loader:{'.svg':'dataurl','.txt':'text'},define:{'process.env.NODE_ENV':'"production"'},legalComments:'inline'});
 let css=await readFile(path.join(dir,'app/globals.css'),'utf8');
 css=css.split('\n').filter(line=>!line.startsWith('@import')).join('\n').replaceAll("'DM Sans',Arial,sans-serif","system-ui,Arial,sans-serif").replaceAll("'Libre Caslon Display',Georgia,serif","Georgia,'Iowan Old Style',serif");
 // Preserve the approved light palette, and transform each literal colour for a dark blue theme.
@@ -31,7 +40,8 @@ const html=`<!doctype html>
 <style>${light}${night}${css}</style>
 <div id="root"></div>
 <noscript>Atlas Play needs JavaScript to run its interactive questions.</noscript>
-<script>${code}</script>
+<script>/*! Flag icons: ${flagLicense.replaceAll("*/","* /")} */
+${code}</script>
 </html>`;
 const output=path.resolve(dir,'../../visualizations/atlas-play.html');await mkdir(path.dirname(output),{recursive:true});await writeFile(output,html);
 console.log(`Built ${output} (${(Buffer.byteLength(html)/1024/1024).toFixed(2)} MB). No runtime dependencies or data requests.`);

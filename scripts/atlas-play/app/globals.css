@@ -25,3 +25,28 @@ body{background:#f2f1e8;color:#233d30}.app{position:relative;isolation:isolate;m
 @media(max-width:760px){.challenge-settings{gap:12px 9px;padding-bottom:18px}.challenge-settings label{font-size:7px;letter-spacing:1px;gap:6px}.challenge-settings select{padding:10px 8px;font-size:10px}.challenge-settings .measure-picker{grid-column:1/-1}.difficulty-badge{font-size:7px!important;padding:2px 5px;margin-right:6px}.city-option{min-height:66px;padding:11px 9px}.city-option .city-option-name{font-size:11px}.city-option-name small{font-size:8px}.podium span{font-size:8px}.city-result-country{font-size:8px}.world-pin{min-height:150px}.map-controls button{padding:8px 11px;min-height:36px}.map-controls>span{font-size:8px}.estimate-value{font-size:32px}.difficulty-method{padding:14px}.difficulty-method h3{font-size:25px}}
 .trail-overview{display:flex;align-items:center;gap:11px;font-size:10px;color:#809469}.trail-overview i{width:3px;height:3px;border-radius:50%;background:#c0b08b}.trail-overview>svg{color:#8fa56f}.toolbar{align-items:center;padding:12px 0 17px}
 .city-options>.city-option:last-child:nth-child(odd){grid-column:1/-1}
+/* Geography cues and direct questions. */
+.country-flag{display:inline-block;width:24px;height:18px;object-fit:cover;border-radius:2px;vertical-align:middle;flex-shrink:0;box-shadow:0 0 0 1px #243e3520}
+.city-option-name small,.city-result-country,.pin-map-label>span{display:flex;align-items:center;gap:7px}
+.podium button>span .country-flag{display:block;margin:0 auto 5px;width:20px;height:15px}
+.question-head h2{font-size:clamp(26px,3vw,35px);line-height:1.2;max-width:27ch;text-wrap:pretty}
+.question-head .metric-label{font-size:10px;line-height:1.5}
+.enhanced-map-controls{flex-wrap:wrap;gap:8px;margin-top:12px}
+.enhanced-map-controls button{min-width:44px;min-height:44px;padding:8px 12px;font-size:19px;display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.enhanced-map-controls button span,.enhanced-map-controls button:nth-child(n+3){font-size:11px}
+.map-zoom-slider{display:flex;align-items:center;gap:9px;width:100%;font-size:11px;color:var(--ink);margin:6px 0}
+.map-zoom-slider input{flex:1;min-width:80px;accent-color:var(--green);height:30px;cursor:pointer}
+.map-zoom-slider output{min-width:35px;text-align:right;font-variant-numeric:tabular-nums}
+.map-gesture-help{font-size:11px!important;line-height:1.5!important;color:var(--ink)!important;margin:8px 0 12px!important}
+.world-pin{display:block;width:100%;height:auto;aspect-ratio:2/1;min-height:0!important;touch-action:none;user-select:none;cursor:crosshair}
+.world-pin.is-panning{cursor:grabbing}
+.map-keyboard-help{display:block;margin:10px 0;font-size:10px;line-height:1.6;color:var(--muted)}
+.locator>svg{display:block;width:100%;aspect-ratio:2/1;height:auto;overflow:hidden}
+.locator .map-legend{gap:10px 16px;font-size:11px;line-height:1.6}
+.map-legend .country-flag{width:20px;height:15px}
+@media(max-width:760px){.enhanced-map-controls button{padding:8px 10px}.enhanced-map-controls{gap:6px}.question-head h2{font-size:27px}.map-keyboard-help{font-size:9px}}
+
+.locator>svg{max-height:none}
+.podium-country{display:block;margin-top:4px;font:8px/1.3 system-ui,sans-serif;letter-spacing:0;overflow-wrap:anywhere}
+
+.city-option-name small,.city-result-country{font-size:10px!important;line-height:1.5;color:var(--ink)!important;opacity:.8}

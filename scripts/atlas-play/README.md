@@ -2,7 +2,7 @@
 
 Published page: `visualizations/atlas-play.html` at https://madeclear.ca/visualizations/atlas-play.html
 
-The checked-in HTML bundles React, Anime.js, icons, country/city data and the map inline. Cloudflare Pages serves it directly with no deployment build step or Sites account. System fonts replace remote web fonts. Light/dark mode and reduced-motion controls are included.
+The checked-in HTML bundles React, Anime.js, icons, country/city data and the map inline. Cloudflare Pages serves it directly with no deployment build step or Sites account. System fonts replace remote web fonts. Country flags (flag-icons, MIT) are bundled as SVG images for reliable display on Windows; country names remain visible. Light/dark mode and reduced-motion controls are included.
 
 To edit/rebuild (Node 22.13+):
 
@@ -14,6 +14,8 @@ npm run build
 ```
 
 Commit source changes and the generated HTML together. Data download links use in-memory Blob URLs. Border-data license and bundled library notices are retained. The approved quiz design is retained as an exception to the physics-page template.
+
+Answer maps fit the actual country outlines or city points. City pinning supports up to 64× zoom, mouse wheel, touch pinch, dragging, a zoom slider and keyboard controls; these controls never reveal the correct location before submission. Full question headings include the measure and subject.
 
 Country coverage is 54 selected countries; city coverage is worldwide. Difficulty is a numerical heuristic, not measured player performance. Dataset years and limitations remain in the in-game Data panel and documentation below.
 

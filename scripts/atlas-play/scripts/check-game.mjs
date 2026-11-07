@@ -12,7 +12,7 @@ for(const metric of Object.keys(data.metrics))for(const type of availableTypes(m
   const all=[...r.countries,...(r.target?[r.target]:[])];assert.equal(new Set(all.map(c=>c.id)).size,all.length);for(let a=0;a<all.length;a++)for(let b=a+1;b<all.length;b++)assert.ok(separate(all[a],all[b],metric));
   let selection=null,a={},order=r.countries;
   if(type==='compare')selection=r.countries[0][metric]>r.countries[1][metric]?0:1;
-  if(type==='rank'){order=[...r.countries].sort((a,b)=>b[metric]-a[metric]);assert.equal(grade(r,null,[...order].reverse(),{}),false)}
+  if(type==='rank'){assert.equal(r.countries.length,3);order=[...r.countries].sort((a,b)=>b[metric]-a[metric]);a={ranking:order.map(c=>c.id)};assert.equal(canAnswer(r,null,{}),false);assert.equal(canAnswer(r,null,{ranking:[order[0].id,order[0].id,order[1].id]}),false);assert.equal(grade(r,null,order,{ranking:[...a.ranking].reverse()}),false)}
   if(type==='insert')selection=r.countries.filter(c=>c[metric]>r.target[metric]).length;
   if(type==='gap'){a={choice:r.answer};const ratio=r.countries[0][metric]/r.countries[1][metric];assert.equal(r.options[r.answer],r.options.reduce((a,b)=>Math.abs(a-ratio)<Math.abs(b-ratio)?a:b))}
   assert.ok(grade(r,selection,order,a));checked++;

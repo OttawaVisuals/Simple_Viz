@@ -1,5 +1,12 @@
 # Handover
 
+## Atlas Play podiums for all country rankings — 2026-11-07
+
+- Extended the shared city podium to country rankings across all 21 measures. Each round now has three countries, with flags and outlines. Labels are Highest / Middle / Lowest so first place means the highest value, including for measures such as CO₂.
+- Shared drag-and-drop, occupied-position swapping, tap/keyboard placement and direct feedback work for both entity types. Rank answer IDs are stored separately from city answer IDs; three unique eligible countries are required before submission.
+- Country ranking difficulty calibration now samples triples. Insertion puzzles retain their existing ordered-list format.
+- Validation: 2,175 generated-round checks across all measures/difficulties, including country triple size, correct/wrong ordering and empty/duplicate rejection; podium assignment tests pass. Browser verified country pointer swaps and correct grading for renewable electricity, mobile GDP units/feedback with no overflow, and city podium compatibility.
+
 ## Atlas Play three-city podium — 2026-11-07
 
 - Replaced sequential five-city placement with three visible cities and a 2nd / 1st / 3rd podium. Largest population goes in the raised centre position. Country flags and names remain visible.

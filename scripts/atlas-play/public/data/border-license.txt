@@ -1,0 +1,1 @@
+Border attributes are derived from mledoze/countries, available under the Open Database License (ODbL) 1.0. Attribution: https://github.com/mledoze/countries . License: https://opendatacommons.org/licenses/odbl/1-0/ . This downloadable dataset includes the derived border lists. Other data sources and licenses are described in the application sources panel.

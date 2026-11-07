@@ -1,5 +1,13 @@
 # Handover
 
+## Atlas Play migrated to Made clear — 2026-11-07
+
+- Added `visualizations/atlas-play.html` and a catalogue link. The geography quiz runs as one self-contained static page without Sites hosting, runtime API calls, external scripts or web fonts.
+- Editable source and reproducible bundler: `scripts/atlas-play/`. Run `npm ci`, `npm test`, then `npm run build`; commit the generated HTML too. React and Anime.js are bundled inline with license notices.
+- Preserves nine styles, 21 measures, 6,172 cities, relative-gap difficulty, source notes, downloads and reduced-motion setting. Added a light/dark toggle. The approved quiz design is retained as an exception to the physics template.
+- Missing values stay excluded. Heights are an older birth cohort; doctorate coverage is limited. Detailed methodology remains in the Data panel and source README.
+
+
 ## Egg boiling and lightning promoted — 2026-09-01
 
 - **`visualizations/egg-boiling-time.html`** and **`visualizations/lightning-distance.html`**

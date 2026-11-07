@@ -2,7 +2,7 @@
 
 Published page: `visualizations/atlas-play.html` at https://madeclear.ca/visualizations/atlas-play.html
 
-The checked-in HTML bundles React, Anime.js, icons, country/city data and the map inline. Cloudflare Pages serves it directly with no deployment build step or Sites account. System fonts replace remote web fonts. Country flags (flag-icons, MIT) are bundled as SVG images for reliable display on Windows; country names remain visible. Light/dark mode and reduced-motion controls are included.
+The checked-in HTML bundles React, Anime.js, icons, country/city data and the map inline. Cloudflare Pages serves it directly with no deployment build step or Sites account. System fonts replace remote web fonts. Country flags (flag-icons, MIT) are bundled as SVG images for reliable display on Windows; country names remain visible. Light/dark mode and reduced-motion controls are included. Private clarity ratings and optional comments use the existing same-origin `/api/feedback` endpoint; the quiz itself needs no runtime API requests. The feedback component lives in `components/page-feedback.tsx` and includes the current question and selected settings as context.
 
 To edit/rebuild (Node 22.13+):
 

@@ -45,4 +45,4 @@ const html=`<!doctype html>
 ${code}</script>
 </html>`;
 const output=path.resolve(dir,'../../visualizations/atlas-play.html');await mkdir(path.dirname(output),{recursive:true});await writeFile(output,html);
-console.log(`Built ${output} (${(Buffer.byteLength(html)/1024/1024).toFixed(2)} MB). No runtime dependencies or data requests.`);
+console.log(`Built ${output} (${(Buffer.byteLength(html)/1024/1024).toFixed(2)} MB). Self-contained quiz; optional feedback uses /api/feedback.`);

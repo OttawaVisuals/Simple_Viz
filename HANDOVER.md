@@ -1,5 +1,11 @@
 # Handover
 
+## Atlas Play private feedback — 2026-11-07
+
+- Added `components/page-feedback.tsx` above the quiz footer with the site's existing Yes / Almost / Not yet clarity ratings, optional 1,200-character comment, honeypot and private-feedback status. Uses the existing same-origin `/api/feedback` endpoint with `page: atlas-play`, current question and selected settings; no backend changes.
+- Flat parchment styling follows the quiz theme. Pending submissions disable editing; failed submissions preserve the comment and offer retry/email; successful submissions clear it. File-based viewing explains that submission needs the hosted site.
+- Validation: build and existing test suite pass. Browser verified form reveal/selection, simulated 503 then successful retry against a local mock that asserts the payload, light/dark styling and 390px layout without horizontal overflow. No production feedback was submitted during QA.
+
 ## Atlas Play printed-atlas design — 2026-11-07
 
 - Added `scripts/atlas-play/app/atlas-theme.css`: parchment background, warm ink, terracotta actions, sepia country outlines and fine rules. Removed the enclosing quiz panel, raised shadows, translucent modal blur, folded corner and green sidebar/map washes; answer choices retain flat boundaries and explicit selection/result states.

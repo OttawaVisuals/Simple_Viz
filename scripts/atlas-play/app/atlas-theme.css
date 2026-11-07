@@ -93,3 +93,24 @@ body{background:var(--paper);color:var(--ink)}
 .filter.active{background:var(--atlas-selected);border-color:var(--line);color:var(--ink);box-shadow:none}
 .sort-ghost,.insert-drag-ghost,.podium-drag-ghost{background:var(--atlas-sheet);border-radius:2px;box-shadow:none}
 @media(max-width:760px){.challenge-settings{margin-bottom:10px}.city-placement .next-city-card{box-shadow:none}.game-top{padding-top:8px}}
+/* Same private clarity feedback as the other Made clear pages. */
+.page-feedback{margin-top:32px;padding-top:20px;border-top:1px solid var(--line)}
+.feedback-head{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+.feedback-kicker{margin:0 0 6px;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted)}
+.page-feedback h2{margin:0;font-size:28px;line-height:1.2;letter-spacing:0}
+.feedback-copy{margin:6px 0 0;font-size:12px;line-height:1.6;color:var(--muted)}
+.feedback-choices{display:flex;flex-wrap:wrap;gap:8px}
+.feedback-choice{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:2px;padding:10px 14px;min-height:44px;font-size:12px}
+.feedback-choice:hover:not(:disabled),.feedback-choice[aria-pressed=true]{border-color:var(--green);background:var(--atlas-selected)}
+.feedback-choice:disabled,.feedback-send:disabled{opacity:.6;cursor:wait}
+.feedback-form{margin-top:18px;max-width:760px}
+.feedback-form>label{display:block;font-size:12px;line-height:1.6;margin-bottom:7px;color:var(--ink)}
+.feedback-form>label span{color:var(--muted)}
+.feedback-form textarea{width:100%;min-height:90px;resize:vertical;border:1px solid var(--line);border-radius:2px;background:transparent;color:var(--ink);font:16px/1.5 Georgia,serif;padding:10px 11px}
+.feedback-form textarea:focus-visible{outline:2px solid var(--orange);outline-offset:3px}
+.feedback-form>.feedback-trap{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.feedback-actions{display:flex;align-items:center;flex-wrap:wrap;gap:10px 16px;margin-top:8px}
+.feedback-send{background:transparent;color:var(--green);border:0;border-bottom:1px solid var(--line);border-radius:0;padding:8px 0;min-height:44px;font-size:12px}
+.feedback-send:hover:not(:disabled){border-color:var(--green)}
+.feedback-status{font-size:12px;line-height:1.6;color:var(--muted);overflow-wrap:anywhere}
+.feedback-status a{text-decoration:underline}

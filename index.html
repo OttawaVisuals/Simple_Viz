@@ -25,21 +25,21 @@
   /* Tokens, type and topbar are the shared set from STYLE_GUIDE.md — kept byte-identical to
      straw-hose-flow.html so the index reads as the same site as the pages it links to. */
   :root{
-    --bg:#F7F5F0;--fg:#1B1A17;--muted:#6E675D;--muted2:#4A463F;
-    --line:#E2DDD2;--line2:#C1BAAC;--border:#D7D1C4;--accent:#2F6BD8;--bad:#A83D2A;--sun:#B78316;--track:#E2DDD2;
-    --cat-everyday:#2F6BD8;--cat-discoveries:#8A5E0C;--cat-fun:#A83D2A;
+    --bg:#F6F2F6;--fg:#1F1724;--muted:#75687C;--muted2:#4D4254;
+    --line:#E4DCE6;--line2:#C7BBCB;--border:#D9CFDC;--accent:#3F4AA8;--bad:#A83D2A;--sun:#B78316;--track:#E4DCE6;
+    --cat-everyday:#1F6B55;--cat-discoveries:#9A5528;--cat-fun:#3F4AA8;--fill-everyday:#D5ECE3;--fill-discoveries:#F8E1D0;--fill-fun:#DDE0F6;
   }
   @media (prefers-color-scheme:dark){
     :root:not([data-theme="light"]){
-      --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
-      --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--sun:#E5B94B;--track:#28304A;
-    --cat-everyday:#6FA0F2;--cat-discoveries:#E5B94B;--cat-fun:#E68075;
+      --bg:#1C1424;--fg:#EEE8EF;--muted:#A094A8;--muted2:#CBC2CF;
+      --line:#2F2438;--line2:#46374F;--border:#3A2D45;--accent:#A3B1F7;--bad:#E68075;--sun:#E5B94B;--track:#2F2438;
+    --cat-everyday:#7FE0BE;--cat-discoveries:#F3B183;--cat-fun:#A3B1F7;--fill-everyday:#1F3A36;--fill-discoveries:#3A2A1E;--fill-fun:#2A2B55;
     }
   }
   :root[data-theme="dark"]{
-    --bg:#121A2C;--fg:#E9E6DB;--muted:#8B93A8;--muted2:#C6C1B1;
-    --line:#28304A;--line2:#3B4562;--border:#2E3854;--accent:#6FA0F2;--bad:#E68075;--sun:#E5B94B;--track:#28304A;
-    --cat-everyday:#6FA0F2;--cat-discoveries:#E5B94B;--cat-fun:#E68075;
+    --bg:#1C1424;--fg:#EEE8EF;--muted:#A094A8;--muted2:#CBC2CF;
+    --line:#2F2438;--line2:#46374F;--border:#3A2D45;--accent:#A3B1F7;--bad:#E68075;--sun:#E5B94B;--track:#2F2438;
+    --cat-everyday:#7FE0BE;--cat-discoveries:#F3B183;--cat-fun:#A3B1F7;--fill-everyday:#1F3A36;--fill-discoveries:#3A2A1E;--fill-fun:#2A2B55;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
@@ -68,8 +68,33 @@
 
   /* Title block: the site's one "title + one subtitle paragraph", sized a step larger than a
      visualization page's h1 since this is the cover rather than a figure caption. */
-  .head{margin:clamp(48px,9vw,104px) 0 clamp(40px,6vw,72px)}
-  h1{font-weight:300;font-size:clamp(2.2rem,5.4vw,3.6rem);line-height:1.02;letter-spacing:-.025em;margin:0}
+  .head{margin:clamp(32px,6vw,72px) 0 clamp(36px,5vw,60px)}
+  h1{font-weight:300;font-size:clamp(2.6rem,7.2vw,5.2rem);line-height:.98;letter-spacing:-.035em;margin:0}
+
+  /* The cover's one moving thing is a single line that plays real phenomena in turn: a damped
+     wave, a pulse reflecting off fixed ends, standing waves, beats, the Doppler shift, a sound
+     wave and heat diffusion. Each is the actual model for that phenomenon, drawn schematically
+     (time slowed, lengths not to scale). The pointer changes one parameter of whichever is
+     playing. It reads complete at rest; under prefers-reduced-motion it is drawn once per
+     phenomenon, steps only when you pick one, and still responds to the pointer. */
+  .settle{margin:clamp(22px,3vw,36px) 0 0}
+  .settle svg{display:block;width:100%;height:96px;overflow:visible;touch-action:pan-y;cursor:crosshair}
+  .settle .base{stroke:var(--line2);stroke-width:1;stroke-dasharray:2 5}
+  .settle .wave{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .settle .env{fill:none;stroke:var(--muted);stroke-width:1;stroke-dasharray:3 4}
+  .settle .node{fill:var(--bg);stroke:var(--muted2);stroke-width:1.3}
+  .settle .dot{fill:var(--accent)}
+  .settle .src{fill:var(--cat-discoveries)}
+  .settle figcaption{display:grid;grid-template-columns:1fr auto 1fr;align-items:baseline;gap:6px 16px;margin-top:12px}
+  .ph-name{font:11px ui-monospace,"Cascadia Code",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--fg)}
+  .ph-eq{font:13px ui-monospace,"Cascadia Code",monospace;color:var(--muted2);text-align:center}
+  .ph-val{font:11px ui-monospace,"Cascadia Code",monospace;letter-spacing:.08em;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+  .ph-nav{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:4px;font:11px ui-monospace,"Cascadia Code",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .pd-row{display:flex}
+  .pd{position:relative;width:22px;height:22px;padding:0;border:0;background:none;cursor:pointer}
+  .pd::before{content:"";position:absolute;inset:7px;border-radius:50%;border:1px solid var(--muted)}
+  .pd:hover::before{border-color:var(--accent)}
+  .pd[aria-current="true"]::before{background:var(--accent);border-color:var(--accent)}
   .sub{font-size:clamp(.94rem,1.1vw,1.06rem);line-height:1.6;color:var(--muted2);margin:18px 0 0;text-wrap:pretty}
   .browse-tools{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:0 0 24px}
   .browse-tools input,.browse-tools select{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:9px 11px}
@@ -87,9 +112,9 @@
      tree, so the accent strokes inside the shared icon sprite recolour to match the tile with
      no per-icon edits. The category name is printed on the tile too, so the colour is never
      the only thing carrying the meaning. */
-  .tile[data-cat="Everyday maths"]{--cat:var(--cat-everyday)}
-  .tile[data-cat="Discoveries"]{--cat:var(--cat-discoveries)}
-  .tile[data-cat="Fun physics"]{--cat:var(--cat-fun)}
+  .tile[data-cat="Everyday maths"]{--cat:var(--cat-everyday);--cat-bg:var(--fill-everyday)}
+  .tile[data-cat="Discoveries"]{--cat:var(--cat-discoveries);--cat-bg:var(--fill-discoveries)}
+  .tile[data-cat="Fun physics"]{--cat:var(--cat-fun);--cat-bg:var(--fill-fun)}
 
   .section-head{display:flex;justify-content:space-between;align-items:baseline;gap:20px}
   .section-head h2{font-weight:300;font-size:clamp(1.25rem,2.2vw,1.55rem);letter-spacing:-.02em;margin:0}
@@ -99,8 +124,10 @@
   /* grid-auto-rows:1fr keeps every tile in a grid the same height, so a two-line title and a
      four-line one still read as one even field of tiles. */
   .tile-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:1fr;gap:clamp(10px,1.3vw,16px)}
-  .tile{--accent:var(--cat);display:flex;flex-direction:column;gap:11px;padding:15px 14px 17px;border:1px solid color-mix(in srgb,var(--cat) 60%,transparent);border-radius:10px;background:color-mix(in srgb,var(--cat) 20%,transparent);color:inherit;text-decoration:none;transition:background .15s ease,border-color .15s ease}
-  .tile:hover{color:inherit;background:color-mix(in srgb,var(--cat) 30%,transparent);border-color:color-mix(in srgb,var(--cat) 75%,transparent)}
+  /* Tiles are flat colour fields with no outline: the category hue mixed into the page
+     background (opaque, so nothing shows through), plus a coloured label and icon strokes. */
+  .tile{--accent:var(--cat);display:flex;flex-direction:column;gap:11px;padding:15px 14px 20px;border-radius:8px;background:var(--cat-bg);color:inherit;text-decoration:none;transition:background .15s ease}
+  .tile:hover{color:inherit;background:color-mix(in oklab,var(--cat) 14%,var(--cat-bg))}
   .tile:hover h3{color:var(--cat)}
   .tile-icon{display:block;width:100%;height:64px;color:var(--fg);overflow:visible}
   .tile-icon use{pointer-events:none}
@@ -108,17 +135,97 @@
   .tile .meta{display:block;font:10.5px ui-monospace,"Cascadia Code",monospace;letter-spacing:.11em;text-transform:uppercase;color:var(--cat);margin:0}
   .tile h3{margin:0;font-size:.98rem;font-weight:400;line-height:1.3;letter-spacing:-.01em;text-wrap:pretty}
 
-  /* Dark mode keeps its quieter 6% category tint so navy remains the dominant surface. */
-  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tile{border-color:color-mix(in srgb,var(--cat) 30%,transparent);background:color-mix(in srgb,var(--cat) 6%,transparent)}:root:not([data-theme="light"]) .tile:hover{background:color-mix(in srgb,var(--cat) 13%,transparent);border-color:color-mix(in srgb,var(--cat) 60%,transparent)}}
-  :root[data-theme="dark"] .tile{border-color:color-mix(in srgb,var(--cat) 30%,transparent);background:color-mix(in srgb,var(--cat) 6%,transparent)}:root[data-theme="dark"] .tile:hover{background:color-mix(in srgb,var(--cat) 13%,transparent);border-color:color-mix(in srgb,var(--cat) 60%,transparent)}
 
-  /* Featured: the same tiles, one step larger, above the search and filter so a first-time
-     visitor lands on a hand-picked sample rather than whatever sorts first. */
-  .featured{margin:0 0 clamp(40px,5vw,64px)}
-  .featured .section-head{margin-bottom:16px}
-  .featured .tile{padding:19px 16px 21px}
-  .featured .tile-icon{height:84px}
-  .featured .tile h3{font-size:1.06rem}
+  /* Featured: one lead tile and four supporting ones. Their descriptions are printed on the
+     tile instead of waiting for a hover, because a touch screen never gets the tooltip and a
+     first-time visitor should be able to choose without probing. */
+  .featured{margin:0 0 clamp(48px,6vw,80px)}
+  .featured .section-head{margin-bottom:18px}
+  .feature-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(12px,1.6vw,22px)}
+  .feature-grid .tile-icon{height:72px}
+  .tile .desc{margin:0;font-size:.88rem;line-height:1.55;color:var(--muted2);text-wrap:pretty}
+  .tile-lead{grid-column:span 2;grid-row:span 2;padding:20px 18px 24px}
+  .tile-lead .tile-icon{height:104px}
+  .tile-lead .meta{margin-top:auto}
+  .tile-lead h3{font-size:clamp(1.5rem,2.7vw,2.2rem);font-weight:300;letter-spacing:-.02em;line-height:1.1}
+  .tile-lead .desc{font-size:1.02rem;max-width:46ch}
+
+  /* Animated icons (the featured five). Each icon is inline SVG so its parts can move; the other
+     tiles still use the static sprite. Hovering or keyboard-focusing the tile plays the icon's
+     mechanism on a loop with a short hold at the end; leaving returns it to its resting drawing,
+     which is also what shows with reduced motion, on touch, and in print. */
+  .race-trail{transform-box:fill-box;transform-origin:0 50%;transform:scaleX(var(--k))}
+  .race-dot{transform:translateX(calc(70px * var(--k)))}
+  .pz-big{transform-origin:31px 32px}.pz-s1{transform-origin:86px 18px}.pz-s2{transform-origin:99px 47px}
+  .st-drop{transform-box:fill-box;transform-origin:50% 100%}
+  .hp-fan{transform-origin:36px 47.5px}
+  .pt-ball{offset-path:path("M18 50C38 12 73 11 101 52");offset-rotate:0deg;opacity:0}
+  @media (prefers-reduced-motion:no-preference){
+    .tile:is(:hover,:focus-visible) .race-trail{animation:race-trail 3s cubic-bezier(.4,0,.2,1) infinite}
+    .tile:is(:hover,:focus-visible) .race-dot{animation:race-dot 3s cubic-bezier(.4,0,.2,1) infinite}
+    .tile:is(:hover,:focus-visible) .pz-big{animation:spin 9s linear infinite}
+    .tile:is(:hover,:focus-visible) .pz-s1,.tile:is(:hover,:focus-visible) .pz-s2{animation:spin 9s linear infinite reverse}
+    .tile:is(:hover,:focus-visible) .pz-arrow{animation:nudge 1.2s ease-in-out infinite}
+    .tile:is(:hover,:focus-visible) .st-straw{stroke-dasharray:4 5;animation:st-flow .7s linear infinite}
+    .tile:is(:hover,:focus-visible) .st-drop{animation:st-drop 1.4s ease-in-out infinite}
+    .tile:is(:hover,:focus-visible) .hp-fan{animation:spin .9s linear infinite}
+    .tile:is(:hover,:focus-visible) .hp-waves{animation:hp-rise 1.6s ease-in-out infinite}
+    .tile:is(:hover,:focus-visible) .hp-cold{animation:hp-fall 1.6s ease-in-out infinite}
+    .tile:is(:hover,:focus-visible) .hp-arrow{animation:nudge 1.2s ease-in-out infinite}
+    .tile:is(:hover,:focus-visible) .pt-arc{stroke-dasharray:1;animation:pt-draw 2.8s ease-in-out infinite}
+    .tile:is(:hover,:focus-visible) .pt-ball{animation:pt-fly 2.8s ease-in-out infinite}
+    .tile:is(:hover,:focus-visible) .pt-head{animation:pt-head 2.8s ease-in-out infinite}
+  }
+  @keyframes race-trail{0%{transform:scaleX(0)}70%,100%{transform:scaleX(var(--k))}}
+  @keyframes race-dot{0%{transform:translateX(0)}70%,100%{transform:translateX(calc(70px * var(--k)))}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
+  @keyframes st-flow{to{stroke-dashoffset:9}}
+  @keyframes st-drop{0%,100%{transform:scale(1)}50%{transform:scale(.8,1.18)}}
+  @keyframes hp-rise{0%,100%{transform:translateY(0);opacity:1}50%{transform:translateY(-3px);opacity:.45}}
+  @keyframes hp-fall{0%,100%{transform:translateY(0);opacity:1}50%{transform:translateY(3px);opacity:.4}}
+  @keyframes pt-draw{0%{stroke-dashoffset:1}80%,100%{stroke-dashoffset:0}}
+  @keyframes pt-fly{0%{offset-distance:0%;opacity:1}80%{offset-distance:100%;opacity:1}92%,100%{offset-distance:100%;opacity:0}}
+  @keyframes pt-head{0%,78%{opacity:0}86%,100%{opacity:1}}
+
+  /* Shared motion vocabulary for the rest of the icons. Each element names what it does with a
+     class and tunes it with custom properties: --d duration, --l delay, --dx/--dy travel, --sx/--sy
+     scale, --o low opacity, --da/--off dash pattern and shift. Elements marked a-still are the
+     resting drawing of something that moves on hover; a-move is the moving copy. */
+  .a-move{opacity:0;offset-rotate:0deg}
+  @media (prefers-reduced-motion:no-preference){
+    .tile:is(:hover,:focus-visible) .a-still{opacity:0}
+    .tile:is(:hover,:focus-visible) .a-move{opacity:1}
+    .tile:is(:hover,:focus-visible) .a-spin{animation:k-spin var(--d,3s) linear infinite}
+    .tile:is(:hover,:focus-visible) .a-slide{animation:k-slide var(--d,1.6s) ease-in-out var(--l,0s) infinite}
+    .tile:is(:hover,:focus-visible) .a-fade{animation:k-fade var(--d,1.6s) ease-in-out var(--l,0s) infinite}
+    .tile:is(:hover,:focus-visible) .a-scale{animation:k-scale var(--d,1.6s) ease-in-out var(--l,0s) infinite}
+    .tile:is(:hover,:focus-visible) .a-dash{stroke-dasharray:var(--da,4 5);animation:k-dash var(--d,1s) linear infinite}
+    .tile:is(:hover,:focus-visible) .a-draw{stroke-dasharray:1;animation:k-draw var(--d,3s) ease-in-out var(--l,0s) infinite}
+    .tile:is(:hover,:focus-visible) .a-rise{animation:k-rise var(--d,2s) ease-out var(--l,0s) infinite}
+    .tile:is(:hover,:focus-visible) .a-fall{animation:k-fall var(--d,2.4s) ease-in infinite}
+    .tile:is(:hover,:focus-visible) .a-ripple{animation:k-ripple var(--d,2.4s) ease-in-out infinite}
+    .tile:is(:hover,:focus-visible) .a-travel{animation:k-travel var(--d,2.4s) linear infinite}
+    .tile:is(:hover,:focus-visible) .a-flash{animation:k-flash var(--d,2.6s) linear infinite}
+    .tile:is(:hover,:focus-visible) .a-drip{animation:k-drip var(--d,2.4s) ease-in infinite}
+    .tile:is(:hover,:focus-visible) .a-orbit{animation:k-orbit var(--d,3s) linear infinite}
+    .tile:is(:hover,:focus-visible) .a-bounce{animation:k-orbit var(--d,.8s) linear infinite alternate}
+    .tile:is(:hover,:focus-visible) .a-fly{animation:k-fly var(--d,3s) ease-in infinite}
+  }
+  @keyframes k-spin{to{transform:rotate(360deg)}}
+  @keyframes k-slide{0%,100%{transform:translate(0,0)}50%{transform:translate(var(--dx,0px),var(--dy,0px))}}
+  @keyframes k-fade{0%,100%{opacity:1}50%{opacity:var(--o,.3)}}
+  @keyframes k-scale{0%,100%{transform:scale(1)}50%{transform:scale(var(--sx,1.2),var(--sy,var(--sx,1.2)))}}
+  @keyframes k-dash{to{stroke-dashoffset:var(--off,-13)}}
+  @keyframes k-draw{0%{stroke-dashoffset:1}60%,100%{stroke-dashoffset:0}}
+  @keyframes k-rise{0%{transform:translateY(0);opacity:0}30%{opacity:1}100%{transform:translateY(var(--dy,-5px));opacity:0}}
+  @keyframes k-fall{0%{transform:translateY(0)}60%,100%{transform:translateY(var(--dy,20px))}}
+  @keyframes k-ripple{0%,55%{opacity:.2}68%{opacity:1}100%{opacity:.2}}
+  @keyframes k-travel{0%{transform:translateX(0);opacity:1}85%{transform:translateX(var(--dx,40px));opacity:1}100%{transform:translateX(var(--dx,40px));opacity:0}}
+  @keyframes k-flash{0%,100%{opacity:1}8%{opacity:.15}16%{opacity:1}24%{opacity:.3}32%{opacity:1}}
+  @keyframes k-drip{0%{opacity:0;transform:translateY(-3px) scale(.7)}25%{opacity:1;transform:none}80%{opacity:1;transform:translateY(6px)}100%{opacity:0;transform:translateY(8px)}}
+  @keyframes k-orbit{0%{offset-distance:0%}100%{offset-distance:100%}}
+  @keyframes k-fly{0%{offset-distance:0%}80%,100%{offset-distance:100%}}
 
   /* Description tooltip. The blurbs no longer fit on a tile, so they surface on hover and on
      keyboard focus from the same data-desc attribute the search reads. One shared element,
@@ -132,6 +239,8 @@
   @media (max-width:1180px){.tile-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
   @media (max-width:920px){.tile-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
   @media (max-width:640px){.tile-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:920px){.feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tile-lead{grid-row:auto}}
+  @media (max-width:640px){.settle .hint{display:none}.settle figcaption{grid-template-columns:1fr auto}.settle .ph-eq{grid-column:1/-1;order:3;text-align:left}.feature-grid{grid-template-columns:minmax(0,1fr)}.tile-lead{grid-column:auto}}
 
   /* Roadmap: same hairline list, with the equation in mono so it reads as data, not prose.
      Grouped by the same three categories as the built grid. */
@@ -139,10 +248,19 @@
   .kicker{font:11px ui-monospace,"Cascadia Code",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
   .roadmap h2{font-weight:300;font-size:clamp(1.3rem,2.4vw,1.7rem);letter-spacing:-.02em;margin:0}
   .roadmap .lede{font-size:.98rem;line-height:1.6;color:var(--muted2);max-width:56ch;margin:12px 0 0;text-wrap:pretty}
-  .rm-cat{font:11px ui-monospace,"Cascadia Code",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:400;margin:clamp(30px,4vw,44px) 0 0}
-  .roadmap ul{list-style:none;margin:14px 0 0;padding:0}
+  .rm-group{margin-top:0;border-top:1px solid var(--line)}
+  .rm-group:first-of-type{margin-top:clamp(24px,3vw,36px)}
+  .rm-group:last-of-type{border-bottom:1px solid var(--line)}
+  .rm-group summary{list-style:none;cursor:pointer;display:flex;align-items:baseline;gap:16px;padding:16px 0;font:11px ui-monospace,"Cascadia Code",monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .rm-group summary::-webkit-details-marker{display:none}
+  .rm-group summary b{font-weight:400;color:var(--rm)}
+  .rm-group summary .rm-count{margin-left:auto}
+  .rm-group summary::after{content:"+";font-size:15px;line-height:1;width:1em;text-align:right}
+  .rm-group[open] summary::after{content:"\2212"}
+  .rm-group summary:hover{color:var(--fg)}
+  .roadmap ul{list-style:none;margin:0 0 12px;padding:0}
   .roadmap li{padding:14px 0;border-top:1px solid var(--line);color:var(--muted2);font-size:.95rem;line-height:1.55;display:flex;justify-content:space-between;align-items:baseline;gap:clamp(16px,3vw,40px)}
-  .roadmap li:last-child{border-bottom:1px solid var(--line)}
+  .roadmap li:last-child{border-bottom:0}
   .roadmap li b{color:var(--fg);font-weight:400}
   .roadmap .eq{font:12px ui-monospace,"Cascadia Code",monospace;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap;margin-left:auto}
   .roadmap .status{font:11px ui-monospace,"Cascadia Code",monospace;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);white-space:nowrap;min-width:4.2em;text-align:right}
@@ -401,6 +519,14 @@
   <div class="head">
     <h1>Physics you can see.</h1>
     <p class="sub">Small, honest experiments for concepts that are usually hidden inside numbers. Each page starts with one question, then lets you move the quantities yourself.</p>
+    <figure class="settle">
+      <svg id="settleSvg" viewBox="0 0 1200 96" role="img" aria-label="Animated line showing a series of wave phenomena">
+        <line id="settleBase" class="base" x1="0" x2="1200" y1="48" y2="48"/>
+        <path id="settleWave" class="wave" d=""/>
+      </svg>
+      <figcaption><span class="ph-name" id="phName"></span><span class="ph-eq" id="phEq"></span><span class="ph-val" id="phVal"></span></figcaption>
+      <div class="ph-nav"><span class="hint">Move along the line to change it</span><span class="pd-row" id="phNav"></span></div>
+    </figure>
   </div>
 
   <section class="featured" aria-labelledby="cat-featured">
@@ -408,12 +534,12 @@
       <h2 id="cat-featured">Featured</h2>
       <span class="cat-count">Five to start with</span>
     </div>
-    <div class="tile-grid">
-      <a class="tile" data-cat="Everyday maths" data-desc="Compare true pizza areas with circles and area-equivalent shapes &mdash; the diameter that sounds smaller often wins." href="visualizations/pizza-area.html"><span class="meta">Everyday maths</span><h3>One big pizza, or two smaller ones?</h3></a>
-      <a class="tile" data-cat="Discoveries" data-desc="Watch light cross the Earth&ndash;Moon gap, and magnify the tiny first part of the same journey for slower travellers." href="visualizations/earth-moon-race.html"><span class="meta">Discoveries</span><h3>Earth to the Moon, at real speed</h3></a>
-      <a class="tile" data-cat="Fun physics" data-desc="See why a long drink straw becomes impossible to sip through while a much longer garden hose stays effortless." href="visualizations/straw-hose-flow.html"><span class="meta">Fun physics</span><h3>Why the straw gives up</h3></a>
-      <a class="tile" data-cat="Discoveries" data-desc="Drag the outside temperature down and watch a heat pump keep delivering more heat than the electricity it uses &mdash; then compare it against an electric heater and a gas furnace." href="visualizations/heat-pump-magic.html"><span class="meta">Discoveries</span><h3>Heat Pump <del>magic</del> <em>Science</em></h3></a>
-      <a class="tile" data-cat="Fun physics" data-desc="Set a release height, launch angle, and speed, and see whether a 200&nbsp;g potato lands in a hole 3&nbsp;m away &mdash; and how two very different arcs can land in the same spot." href="visualizations/potato-trajectory.html"><span class="meta">Fun physics</span><h3>Throwing a potato into a hole</h3></a>
+    <div class="feature-grid">
+      <a class="tile tile-lead" data-cat="Discoveries" href="visualizations/earth-moon-race.html"><span class="meta">Discoveries</span><h3>Earth to the Moon, at real speed</h3><p class="desc">Watch light cross the Earth&ndash;Moon gap, and magnify the tiny first part of the same journey for slower travellers.</p></a>
+      <a class="tile" data-cat="Everyday maths" href="visualizations/pizza-area.html"><span class="meta">Everyday maths</span><h3>One big pizza, or two smaller ones?</h3><p class="desc">Compare true pizza areas with circles and area-equivalent shapes &mdash; the diameter that sounds smaller often wins.</p></a>
+      <a class="tile" data-cat="Fun physics" href="visualizations/straw-hose-flow.html"><span class="meta">Fun physics</span><h3>Why the straw gives up</h3><p class="desc">See why a long drink straw becomes impossible to sip through while a much longer garden hose stays effortless.</p></a>
+      <a class="tile" data-cat="Discoveries" href="visualizations/heat-pump-magic.html"><span class="meta">Discoveries</span><h3>Heat Pump <del>magic</del> <em>Science</em></h3><p class="desc">Drag the outside temperature down and watch a heat pump keep delivering more heat than the electricity it uses &mdash; then compare it against an electric heater and a gas furnace.</p></a>
+      <a class="tile" data-cat="Fun physics" href="visualizations/potato-trajectory.html"><span class="meta">Fun physics</span><h3>Throwing a potato into a hole</h3><p class="desc">Set a release height, launch angle, and speed, and see whether a 200&nbsp;g potato lands in a hole 3&nbsp;m away &mdash; and how two very different arcs can land in the same spot.</p></a>
     </div>
   </section>
 
@@ -474,7 +600,8 @@
     <h2>Work in progress, coming soon.</h2>
     <p class="lede">The next batch, already taking shape.</p>
 
-    <h3 class="rm-cat">Everyday maths</h3>
+    <details class="rm-group" style="--rm:var(--cat-everyday)">
+    <summary><b>Everyday maths</b><span class="rm-count">8 coming</span></summary>
     <ul>
       <li><span><b>How far away was that lightning?</b> &mdash; Time the gap between the flash and the boom, multiply by the speed of sound, and measure a storm without any instrument.</span><span class="eq">d = v &times; &Delta;t</span></li>
       <li><span><b>Same legs, different gear</b> &mdash; Pick a chainring and a sprocket, hold your cadence steady, and watch one pedal stroke buy either speed or a hill you can actually climb.</span><span class="eq">v = &pi;D &middot; (N<sub>c</sub>/N<sub>s</sub>) &middot; f</span></li>
@@ -485,8 +612,10 @@
       <li><span><b>Why the yolk stays hot after the shell goes cold</b> &mdash; Resize an egg from quail to ostrich and watch the same surface-to-volume geometry decide both how long it takes to hard-boil and how long the yolk stays hot after the shell feels cool.</span><span class="eq">t &prop; M<sup>2/3</sup></span></li>
       <li><span><b>Decibels don't add up</b> &mdash; Drag the decibel slider and watch actual sound intensity and perceived loudness pull apart onto two very different curves.</span><span class="eq">dB = 10&middot;log<sub>10</sub>(I/I&#8320;)</span></li>
     </ul>
+    </details>
 
-    <h3 class="rm-cat">Discoveries</h3>
+    <details class="rm-group" style="--rm:var(--cat-discoveries)">
+    <summary><b>Discoveries</b><span class="rm-count">20 coming</span></summary>
     <ul>
       <li><span><b>Why materials are not all arranged alike</b> &mdash; Copper, brass, steel, ceramic, plastic and glass may all look solid &mdash; but their atoms organise in fundamentally different ways.</span></li>
       <li><span><b>One particle, two slits</b> &mdash; Change a double-slit experiment and see wave fringes, individual detection events, and why making the path measurable removes the interference pattern.</span><span class="eq">d sin&theta; = m&lambda;</span></li>
@@ -509,8 +638,10 @@
       <li><span><b>Orbit isn't up. It's sideways.</b> &mdash; Fire Newton's cannonball harder and harder from a mountain and watch it go from crashing, to orbiting, to leaving Earth for good.</span><span class="eq">v<sub>circ</sub> = &radic;(GM/r)</span></li>
       <li><span><b>Straight lines that don't stay straight</b> &mdash; Watch a ball roll dead straight across a spinning disc and still look like it curves &mdash; then see why it's real for artillery but invisible in your bathtub.</span><span class="eq">y = &Omega; sin&phi; &middot; d<sup>2</sup>/v</span></li>
     </ul>
+    </details>
 
-    <h3 class="rm-cat">Fun physics</h3>
+    <details class="rm-group" style="--rm:var(--cat-fun)">
+    <summary><b>Fun physics</b><span class="rm-count">14 coming</span></summary>
     <ul>
       <li><span><b>How water climbs</b> &mdash; Change a liquid and an ideal glass-tube radius to see what sets capillary height and speed, then test the limits with a simple glass-gap experiment at home.</span><span class="eq">h = 2&gamma;cos&theta;/(&rho;gr)</span></li>
       <li><span><b>A swing keeps its own time</b> &mdash; Pull a pendulum back further and watch its rhythm barely change &mdash; until you push past the angle where that stops being true.</span><span class="eq">T = 2&pi;&radic;(L/g)</span></li>
@@ -527,6 +658,7 @@
       <li><span><b>Count the bounces</b> &mdash; Drop a real ball onto a real surface and watch each rebound keep the same fraction of the last one's height &mdash; then turn on a balloon drum and keep counting after your eyes give up.</span><span class="eq">h<sub>n</sub> = h&#8320;e<sup>2n</sup></span></li>
       <li><span><b>What is a vacuum?</b> &mdash; Lower the pressure on one side of a liquid and see why the surrounding air pushes it across &mdash; then see why gravity keeps most of Earth's atmosphere from escaping into space.</span><span class="eq">F = &Delta;P &times; A</span></li>
     </ul>
+    </details>
 
   </section>
 
@@ -567,6 +699,34 @@
   });
   applyTheme(currentTheme());
 
+  // Tile icons. Each is inline SVG so its parts can animate; a slug missing here would fall back to
+  // the static sprite symbol. Keys are the visualization filenames.
+  var ICONS = {
+  "earth-moon-race": "<circle cx=\"15\" cy=\"32\" r=\"13\"/><path d=\"M5 27l9 2 4-6 6 4-2 7 4 3M9 39l8-3 3 6\" stroke-width=\"1.3\"/><circle cx=\"107\" cy=\"32\" r=\"7\"/><path d=\"M29 19h70M29 32h70M29 45h70\" stroke-width=\"1.3\"/><g style=\"--k:1\"><path class=\"race-trail\" d=\"M29 19h70\" stroke=\"var(--accent)\"/><circle class=\"race-dot\" cx=\"29\" cy=\"19\" r=\"2.6\" fill=\"var(--accent)\" stroke=\"none\"/></g><g style=\"--k:.443\"><path class=\"race-trail\" d=\"M29 32h70\" stroke=\"var(--accent)\"/><path class=\"race-dot\" d=\"M26 29l4 3-4 3\" stroke=\"var(--accent)\" stroke-width=\"1.3\"/></g><g style=\"--k:.171\"><path class=\"race-trail\" d=\"M29 45h70\" stroke=\"var(--accent)\"/><circle class=\"race-dot\" cx=\"29\" cy=\"45\" r=\"2\" fill=\"var(--accent)\" stroke=\"none\"/></g>",
+  "pizza-area": "<g class=\"pz-big\"><circle cx=\"31\" cy=\"32\" r=\"25\" stroke=\"var(--accent)\"/><circle cx=\"31\" cy=\"32\" r=\"21\" stroke-width=\"1.3\"/><path d=\"M31 32V11M31 32L49 21M31 32L49 43M31 32V53M31 32L13 43M31 32L13 21\" stroke-width=\"1.3\"/><g fill=\"var(--accent)\" stroke=\"none\"><circle cx=\"23\" cy=\"20\" r=\"2\"/><circle cx=\"40\" cy=\"26\" r=\"2\"/><circle cx=\"38\" cy=\"43\" r=\"2\"/><circle cx=\"21\" cy=\"40\" r=\"2\"/></g></g><path class=\"pz-arrow\" d=\"M60 26l8 6-8 6\" stroke=\"var(--accent)\"/><g class=\"pz-s1\"><circle cx=\"86\" cy=\"18\" r=\"13\" stroke-width=\"1.3\"/><circle cx=\"86\" cy=\"18\" r=\"10\" stroke-width=\"1.3\"/><path d=\"M86 18V8M86 18l9 5M86 18l-9 5\" stroke-width=\"1.3\"/></g><g class=\"pz-s2\"><circle cx=\"99\" cy=\"47\" r=\"13\" stroke-width=\"1.3\"/><circle cx=\"99\" cy=\"47\" r=\"10\" stroke-width=\"1.3\"/><path d=\"M99 47V37M99 47l9 5M99 47l-9 5\" stroke-width=\"1.3\"/></g>",
+  "straw-hose-flow": "<circle cx=\"18\" cy=\"27\" r=\"10\"/><path d=\"M8 25c1-9 7-13 14-10 6 2 8 8 6 13M16 37v11M7 58v-9c0-7 5-11 11-11s11 4 11 11v9M27 29l7 1\"/><path class=\"st-straw\" d=\"M29 30c18 0 8 18 25 18 19 0 6-34 25-34 17 0 4 32 21 32h7\" stroke=\"var(--accent)\"/><path d=\"M107 39v16h9V39M105 39h13\"/><path class=\"st-drop\" d=\"M111 38c-4-5-2-9 0-12 3 4 5 8 0 12z\" fill=\"var(--accent)\" stroke=\"var(--accent)\"/>",
+  "heat-pump-magic": "<path d=\"M69 29l20-17 20 17M74 27v27h30V27\"/><path class=\"hp-waves\" d=\"M79 42c5-5 5 5 10 0s5 5 10 0\" stroke=\"var(--accent)\" stroke-width=\"1.3\"/><path d=\"M7 17c0-4 4-7 8-6 2-5 10-5 12 0 5-2 10 2 9 7H8\"/><path class=\"hp-cold\" d=\"M21 21c-4 3 4 5 0 8s4 4 0 7M18 32l3 4 3-4\" stroke=\"var(--accent)\" stroke-width=\"1.3\"/><rect x=\"8\" y=\"38\" width=\"38\" height=\"19\" rx=\"2\"/><path d=\"M13 44h11M13 49h11\" stroke-width=\"1.3\"/><circle cx=\"36\" cy=\"47.5\" r=\"6.5\" stroke-width=\"1.3\"/><circle cx=\"36\" cy=\"47.5\" r=\"1.5\" stroke-width=\"1.3\"/><path class=\"hp-fan\" d=\"M36 41c2 2.5 2.5 4 0 6.5M42.5 47.5c-2.5 2-4 2.5-6.5 0M36 54c-2-2.5-2.5-4 0-6.5M29.5 47.5c2.5-2 4-2.5 6.5 0\" stroke=\"var(--accent)\" stroke-width=\"1.3\"/><path class=\"hp-arrow\" d=\"M49 43h16M60 38l5 5-5 5\" stroke=\"var(--accent)\" stroke-width=\"1.3\"/>",
+  "potato-trajectory": "<path d=\"M7 55h87M109 55h4\" stroke-width=\"1.3\"/><ellipse cx=\"101\" cy=\"55\" rx=\"8\" ry=\"2.5\" stroke=\"var(--accent)\"/><path class=\"pt-arc\" pathLength=\"1\" d=\"M18 50C38 12 73 11 101 52\" stroke=\"var(--accent)\"/><path d=\"M18 50l15-16M18 50h20\" stroke-width=\"1.3\"/><path d=\"M27 49a10 10 0 014-7\" stroke=\"var(--accent)\" stroke-width=\"1.3\"/><path d=\"M13 48c1-4 6-6 10-4 4 3 2 9-3 10-4 1-8-2-7-6z\" fill=\"color-mix(in srgb, var(--accent) 22%, transparent)\" stroke=\"var(--accent)\" stroke-width=\"1.3\"/><path class=\"pt-head\" d=\"M95 47l6 5-7 1\" stroke=\"var(--accent)\" stroke-width=\"1.3\"/><circle class=\"pt-ball\" cx=\"0\" cy=\"0\" r=\"3.4\" fill=\"var(--accent)\" stroke=\"none\"/>",
+  "horizon-distance": "<path d=\"M5 62A80 80 0 0 1 115 62\" stroke-width=\"1.3\"/><path d=\"M20 51L12.5 38\" stroke=\"var(--accent)\"/><path class=\"a-dash\" style=\"--da:3 4;--off:-14;--d:1s\" d=\"M12.5 38L64 40\" stroke=\"var(--accent)\"/><circle cx=\"12.5\" cy=\"38\" r=\"2\" fill=\"var(--accent)\" stroke=\"none\"/><circle class=\"a-fade\" style=\"--d:1.2s;--o:.25\" cx=\"64\" cy=\"40\" r=\"2\" fill=\"var(--accent)\" stroke=\"none\"/>",
+  "lightning-distance": "<path d=\"M18 30c-7-8 4-17 12-12 4-10 21-7 21 4 10-2 15 12 6 17H21\"/><path class=\"a-flash\" style=\"--d:2.6s\" d=\"M39 34l-7 12h7l-5 11 16-17h-8l5-6\" fill=\"var(--accent)\" stroke=\"var(--accent)\"/><path class=\"a-fade\" style=\"--d:2.6s;--l:.5s;--o:.2\" d=\"M70 25q14 7 0 14\"/><path class=\"a-fade\" style=\"--d:2.6s;--l:.8s;--o:.2\" d=\"M79 19q24 13 0 27\"/><path class=\"a-fade\" style=\"--d:2.6s;--l:1.1s;--o:.2\" d=\"M89 13q34 19 0 39\"/>",
+  "braking-distance": "<path d=\"M8 23h34l-3-7-8-4H19l-6 4-5 2z\"/><circle cx=\"17\" cy=\"24\" r=\"3\"/><circle cx=\"34\" cy=\"24\" r=\"3\"/><path d=\"M8 49h34l-3-7-8-4H19l-6 4-5 2z\"/><circle cx=\"17\" cy=\"50\" r=\"3\"/><circle cx=\"34\" cy=\"50\" r=\"3\"/><path class=\"a-draw\" pathLength=\"1\" style=\"--d:2.4s\" d=\"M46 24h19\" stroke=\"var(--accent)\" stroke-width=\"1.3\"/><path class=\"a-draw\" pathLength=\"1\" style=\"--d:2.4s\" d=\"M46 50h65\" stroke=\"var(--accent)\" stroke-width=\"1.3\"/><path d=\"M46 20v8M65 20v8M46 46v8M111 46v8M50 13h8M50 39h8M62 39h8\" stroke-width=\"1.3\"/>",
+  "shelf-sag": "<path class=\"a-scale\" style=\"--sx:1;--sy:1.3;--d:2s;transform-origin:0 31px\" d=\"M10 31Q60 52 110 31\" stroke=\"var(--accent)\"/><path d=\"M10 31l-7 12h14zM110 31l-7 12h14z\" stroke-width=\"1.3\"/><g class=\"a-slide\" style=\"--dy:3.2px;--d:2s\"><rect x=\"52\" y=\"26\" width=\"16\" height=\"16\" stroke-width=\"1.3\"/><path d=\"M60 43v12M56 51l4 4 4-4\" stroke=\"var(--accent)\" stroke-width=\"1.3\"/></g><path d=\"M10 27h100\" stroke-dasharray=\"3 4\" stroke-width=\"1.3\"/>",
+  "basic-functions": "<path d=\"M14 34h92M60 12v44\" stroke-width=\"1.3\"/><path class=\"a-draw\" pathLength=\"1\" style=\"--d:3s\" d=\"M17 49L103 18\" stroke=\"var(--accent)\" opacity=\".35\"/><path class=\"a-draw\" pathLength=\"1\" style=\"--d:3s;--l:.4s\" d=\"M18 50Q60 8 102 50\" stroke=\"var(--accent)\" opacity=\".65\"/><path class=\"a-draw\" pathLength=\"1\" style=\"--d:3s;--l:.8s\" d=\"M16 45c12 0 12-22 24-22s12 22 24 22 12-22 24-22 12 22 20 22\" stroke=\"var(--accent)\"/>",
+  "egg-boiling-time": "<path d=\"M60 6c14 0 24 20 24 33 0 14-11 21-24 21S36 53 36 39c0-13 10-33 24-33z\"/><ellipse class=\"a-scale\" style=\"--sx:1.18;--d:1.6s;transform-origin:60px 42px\" cx=\"60\" cy=\"42\" rx=\"10\" ry=\"7\" stroke=\"var(--accent)\"/><path class=\"a-rise\" style=\"--dy:-6px;--d:2s\" d=\"M44 10c-3-3 1-6-2-9\" stroke=\"var(--accent)\"/><path class=\"a-rise\" style=\"--dy:-6px;--d:2s;--l:.5s\" d=\"M52 4c-3-3 1-6-2-9\" stroke=\"var(--accent)\"/><path class=\"a-rise\" style=\"--dy:-6px;--d:2s;--l:1s\" d=\"M68 4c3-3-1-6 2-9\" stroke=\"var(--accent)\"/><path class=\"a-rise\" style=\"--dy:-6px;--d:2s;--l:1.5s\" d=\"M76 10c3-3-1-6 2-9\" stroke=\"var(--accent)\"/>",
+  "well-depth": "<path d=\"M8 12h38M74 12h38M46 8v50M74 8v50M46 58h28\"/><path d=\"M60 20v22\" stroke=\"var(--accent)\" stroke-width=\"1.3\" stroke-dasharray=\"2 4\"/><circle class=\"a-fall\" style=\"--dy:24px;--d:2.4s\" cx=\"60\" cy=\"22\" r=\"4\" fill=\"var(--accent)\" stroke=\"var(--accent)\"/><path class=\"a-ripple\" style=\"--d:2.4s\" d=\"M50 52q10-7 20 0M48 56q12-8 24 0\" stroke=\"var(--accent)\"/><path d=\"M88 15v38M84 15h8M84 53h8M83 20l5-5 5 5M83 48l5 5 5-5\" stroke-width=\"1.3\"/>",
+  "planet-light-delay": "<circle class=\"a-scale\" style=\"--sx:1.15;--d:1.6s;transform-origin:18px 32px\" cx=\"18\" cy=\"32\" r=\"8\" fill=\"var(--accent)\" stroke=\"var(--accent)\"/><path d=\"M18 17v-6M18 53v-6M3 32h6M27 32h6M8 22l-4-4M28 42l4 4M8 42l-4 4M28 22l4-4\" stroke=\"var(--accent)\"/><path d=\"M34 32h42\"/><circle cx=\"83\" cy=\"32\" r=\"7\" stroke-dasharray=\"3 3\"/><circle cx=\"103\" cy=\"22\" r=\"7\"/><path d=\"M88 28l10-5M91 21l7 2-2 7\" stroke=\"var(--accent)\"/><circle class=\"a-travel\" style=\"--dx:46px;--d:2.4s\" cx=\"34\" cy=\"32\" r=\"2.6\" fill=\"var(--accent)\" stroke=\"none\"/>",
+  "keplers-third-law": "<circle cx=\"45\" cy=\"32\" r=\"7\" fill=\"var(--accent)\" stroke=\"var(--accent)\"/><ellipse cx=\"56\" cy=\"32\" rx=\"30\" ry=\"17\"/><ellipse cx=\"62\" cy=\"32\" rx=\"50\" ry=\"27\"/><g class=\"a-still\"><circle cx=\"83\" cy=\"24\" r=\"3\" fill=\"currentColor\"/><circle cx=\"106\" cy=\"40\" r=\"4\" fill=\"currentColor\"/><path d=\"M82 17l5 5-6 3M105 32l5 5-5 5\" stroke=\"var(--accent)\"/></g><circle class=\"a-move a-orbit\" style=\"--d:2.4s;offset-path:path('M86 32A30 17 0 1 1 26 32A30 17 0 1 1 86 32Z')\" r=\"3\" fill=\"currentColor\" stroke=\"none\"/><circle class=\"a-move a-orbit\" style=\"--d:5.2s;offset-path:path('M112 32A50 27 0 1 1 12 32A50 27 0 1 1 112 32Z')\" r=\"4\" fill=\"currentColor\" stroke=\"none\"/>",
+  "mass-energy": "<g class=\"a-scale\" style=\"--sx:.62;--d:2.4s;transform-origin:36px 35px\"><path d=\"M14 22l22-11 22 11v27L36 60 14 49zM14 22l22 11 22-11M36 33v27\"/></g><g class=\"a-scale\" style=\"--sx:1.25;--d:2.4s;transform-origin:82px 32px\"><circle cx=\"82\" cy=\"32\" r=\"8\" fill=\"var(--accent)\" stroke=\"var(--accent)\"/><path d=\"M82 13V5M82 59v-8M63 32h-9M110 32h-9M69 19l-7-7M102 52l-7-7M69 45l-7 7M102 12l-7 7\" stroke=\"var(--accent)\" stroke-width=\"1.3\"/></g>",
+  "eratosthenes-shadow": "<path d=\"M5 53A85 85 0 0 1 115 53M22 50l7 3 6-1 5 4 8-1M53 39l5 2 4-2 5 3M76 47l6 3 7-1 5 4\" stroke-width=\"1.3\"/><path d=\"M70 33.4L72.12 15.52M94 39.9L101.2 23.41\" stroke=\"var(--accent)\" stroke-width=\"2.2\"/><path class=\"a-dash\" style=\"--da:1.3 2.6;--off:-7.8;--d:1s\" d=\"M12 8L34 37.9M35 8L54 33.8M58 8L70.93 25.59M81 8L97.9 31\" stroke=\"var(--accent)\" stroke-width=\"1.3\" stroke-dasharray=\"1.3 2.6\"/>",
+  "time-dilation": "<path d=\"M12 12h36M12 52h36M72 12h36M72 52h36\" stroke-width=\"1.3\"/><path d=\"M30 14v36M76 50L88 14l16 36\" stroke=\"var(--accent)\" stroke-width=\"2.2\" stroke-dasharray=\"2 2.5\"/><g class=\"a-still\"><circle cx=\"30\" cy=\"32\" r=\"2\" fill=\"var(--accent)\" stroke=\"none\"/><circle cx=\"86\" cy=\"20\" r=\"2\" fill=\"var(--accent)\" stroke=\"none\"/></g><path d=\"M75 7h30M100 4l5 3-5 3\" stroke=\"var(--accent)\" stroke-width=\"1.3\"/><circle class=\"a-move a-bounce\" style=\"--d:.8s;offset-path:path('M30 50V14')\" r=\"2.6\" fill=\"var(--accent)\" stroke=\"none\"/><circle class=\"a-move a-orbit\" style=\"--d:1.72s;offset-path:path('M76 50L88 14L104 50')\" r=\"2.6\" fill=\"var(--accent)\" stroke=\"none\"/>",
+  "constant-acceleration": "<path d=\"M8 51h104\" stroke-width=\"1.3\"/><path d=\"M14 50C38 50 53 47 68 34S91 11 108 11\" stroke=\"var(--accent)\" stroke-width=\"1.3\" stroke-dasharray=\"3 4\"/><circle cx=\"14\" cy=\"50\" r=\"2.8\" fill=\"currentColor\" stroke=\"none\"/><g class=\"a-still\" transform=\"translate(94 15) rotate(-29)\"><path d=\"M-10 0C-4-6 4-6 10 0C4 6-4 6-10 0Z\" fill=\"var(--bg)\" stroke=\"var(--accent)\"/><circle cx=\"3\" cy=\"0\" r=\"1.8\" fill=\"var(--accent)\" stroke=\"none\"/><path d=\"M-7-4l-3-4M-7 4l-3 4\" stroke=\"var(--accent)\"/><path d=\"M-11 0h-6\" stroke=\"var(--accent)\" stroke-width=\"1.3\"/></g><g class=\"a-move a-fly\" style=\"--d:3s;offset-rotate:auto;offset-path:path('M14 50C38 50 53 47 68 34S91 11 108 11')\"><path d=\"M-10 0C-4-6 4-6 10 0C4 6-4 6-10 0Z\" fill=\"var(--bg)\" stroke=\"var(--accent)\"/><circle cx=\"3\" cy=\"0\" r=\"1.8\" fill=\"var(--accent)\" stroke=\"none\"/><path d=\"M-7-4l-3-4M-7 4l-3 4\" stroke=\"var(--accent)\"/><path d=\"M-11 0h-6\" stroke=\"var(--accent)\" stroke-width=\"1.3\"/></g>",
+  "fan-laws": "<circle cx=\"35\" cy=\"32\" r=\"25\"/><circle cx=\"35\" cy=\"32\" r=\"5\" fill=\"var(--accent)\" stroke=\"var(--accent)\"/><path class=\"a-spin\" style=\"--d:1.2s;transform-origin:35px 32px\" d=\"M35 27c3-12 13-19 19-15 3 8-4 17-15 21M40 32c12 3 19 13 15 19-8 3-17-4-21-15M35 37c-3 12-13 19-19 15-3-8 4-17 15-21M30 32c-12-3-19-13-15-19 8-3 17 4 21 15\" stroke=\"var(--accent)\"/><path class=\"a-slide\" style=\"--dx:3px;--d:1.4s\" d=\"M68 19h13M77 15l4 4-4 4\"/><path class=\"a-slide\" style=\"--dx:3px;--d:1.4s;--l:.15s\" d=\"M68 32h24M88 28l4 4-4 4\"/><path class=\"a-slide\" style=\"--dx:3px;--d:1.4s;--l:.3s\" d=\"M68 45h38M102 41l4 4-4 4\"/>",
+  "dew-point-window": "<path d=\"M15 53V10M15 53h91\" stroke-width=\"1.3\"/><path class=\"a-draw\" pathLength=\"1\" style=\"--d:3s\" d=\"M21 45Q49 43 67 31T103 13\" stroke=\"var(--accent)\"/><path d=\"M20 32h82\" stroke-width=\"1.3\"/><path d=\"M81 39h17l-5-7H86l-5 7Z\"/><path class=\"a-drip\" style=\"--d:2.4s;transform-origin:66px 36px\" d=\"M66 24c-4 6-6 9-6 12a6 6 0 0 0 12 0c0-3-2-6-6-12Z\" fill=\"var(--accent)\" stroke=\"var(--accent)\"/><circle cx=\"66\" cy=\"31\" r=\"2\" fill=\"currentColor\" stroke=\"none\"/><path d=\"M27 49h4M42 49h4M57 49h4M72 49h4M87 49h4\" stroke-width=\"1.3\"/>",
+  "reynolds-number": "<path d=\"M5 13h110v38H5z\"/><path d=\"M5 21h110M5 43h110\" opacity=\".45\"/><path class=\"a-dash\" style=\"--da:9 5;--off:-14;--d:.8s\" d=\"M8 32C30 32 43 32 58 32\" stroke=\"var(--accent)\" stroke-width=\"3\"/><path class=\"a-dash\" style=\"--da:9 5;--off:-14;--d:.8s\" d=\"M58 32c8-16 13 16 21 0s13 16 21 0 10 10 15 1\" stroke=\"var(--accent)\" stroke-width=\"3\"/><circle class=\"a-slide\" style=\"--dx:4px;--d:1.1s\" cx=\"31\" cy=\"26\" r=\"1.5\" fill=\"currentColor\" stroke=\"none\"/><circle class=\"a-slide\" style=\"--dx:4px;--d:1.1s;--l:.3s\" cx=\"39\" cy=\"39\" r=\"1.5\" fill=\"currentColor\" stroke=\"none\"/><circle class=\"a-slide\" style=\"--dx:3px;--dy:-4px;--d:.9s\" cx=\"89\" cy=\"23\" r=\"1.5\" fill=\"currentColor\" stroke=\"none\"/><circle class=\"a-slide\" style=\"--dx:-3px;--dy:4px;--d:.9s;--l:.2s\" cx=\"103\" cy=\"41\" r=\"1.5\" fill=\"currentColor\" stroke=\"none\"/>",
+  "microwave-chocolate": "<rect x=\"7\" y=\"14\" width=\"40\" height=\"36\" rx=\"2\"/><rect x=\"13\" y=\"20\" width=\"24\" height=\"22\" stroke-width=\"1.3\"/><circle cx=\"42\" cy=\"23\" r=\"2\"/><path d=\"M40 32h4M40 38h4\" stroke-width=\"1.3\"/><path class=\"a-dash\" style=\"--da:5 4;--off:-18;--d:.9s\" d=\"M52 23c7 0 7 18 14 18s7-18 14-18\" stroke=\"var(--accent)\"/><path d=\"M83 26h30v20H83zM98 26v20\"/><ellipse class=\"a-scale\" style=\"--sx:1.4;--d:1.8s;transform-origin:90px 36px\" cx=\"90\" cy=\"36\" rx=\"4\" ry=\"3\" stroke=\"var(--accent)\" stroke-width=\"1.3\"/><ellipse class=\"a-scale\" style=\"--sx:1.4;--d:1.8s;--l:.5s;transform-origin:106px 36px\" cx=\"106\" cy=\"36\" rx=\"4\" ry=\"3\" stroke=\"var(--accent)\" stroke-width=\"1.3\"/><path d=\"M90 21h16M90 24v-6M106 24v-6\" stroke-width=\"1.3\"/>",
+  "cosmic-scale": "<g class=\"a-scale\" style=\"--sx:1.12;--sy:1;--d:2.4s;transform-origin:60px 34px\"><path d=\"M10 34h100M15 27v14M29 29v10M45 27v14M64 29v10M84 27v14M105 29v10\"/></g><circle class=\"a-scale\" style=\"--sx:1.5;--d:2.4s;transform-origin:60px 34px\" cx=\"60\" cy=\"34\" r=\"5\" fill=\"var(--accent)\" stroke=\"var(--accent)\"/><path d=\"M14 18l4-4-4-4M106 18l-4-4 4-4\"/><circle cx=\"16\" cy=\"14\" r=\"1.5\" fill=\"currentColor\"/><circle cx=\"104\" cy=\"14\" r=\"8\"/><path d=\"M56 50h8M60 46v8\" stroke=\"var(--accent)\"/>"
+};
+
   // Icons are keyed to each visualization filename, keeping the card markup and catalogue
   // order independent from the artwork. They are decorative because the adjacent title
   // already names the concept.
@@ -579,8 +739,15 @@
     icon.setAttribute('viewBox', '0 0 120 64');
     icon.setAttribute('aria-hidden', 'true');
     icon.setAttribute('focusable', 'false');
-    use.setAttribute('href', '#icon-' + slug);
-    icon.appendChild(use);
+    icon.setAttribute('preserveAspectRatio', 'xMinYMid meet');   // left-align with the tile text
+    if(ICONS[slug]){
+      icon.setAttribute('fill', 'none'); icon.setAttribute('stroke', 'currentColor'); icon.setAttribute('stroke-width', '2.2');
+      icon.setAttribute('stroke-linecap', 'round'); icon.setAttribute('stroke-linejoin', 'round');
+      icon.innerHTML = ICONS[slug];
+    } else {
+      use.setAttribute('href', '#icon-' + slug);
+      icon.appendChild(use);
+    }
     card.insertBefore(icon, card.firstChild);
   });
 
@@ -714,5 +881,261 @@
   }, {passive: true});
   window.addEventListener('resize', hideTip);
   document.addEventListener('keydown', function(e){ if(e.key === 'Escape') hideTip(); });
+
+  // Cover figure: one line, several phenomena in turn. Each is the real model, drawn schematically:
+  //   damped wave         y = A e^(-x/L) sin(kx - wt)
+  //   pulse on a string   method of images, so it flips on reflection off a fixed end
+  //   standing waves      y = sin(n pi x / L) cos(n w1 t), nodes marked
+  //   beats               two close wavenumbers, the envelope is |cos| of half the difference
+  //   Doppler shift       exact 1-D retarded-time solution for a source moving at v < c
+  //   sound wave          particles displaced along the line, so compressions are visible
+  //   heat diffusion      Gaussian with sigma^2 = sigma0^2 + 2Dt, area conserved
+  // The pointer's horizontal position sets one parameter of the one playing. Phase and distance
+  // that depend on a parameter are integrated frame by frame so dragging never makes them jump.
+  var settleSvg = document.getElementById('settleSvg');
+  var waveEl = document.getElementById('settleWave');
+  var baseEl = document.getElementById('settleBase');
+  var nameEl = document.getElementById('phName');
+  var eqEl = document.getElementById('phEq');
+  var valEl = document.getElementById('phVal');
+  var navEl = document.getElementById('phNav');
+  var SH = 96, SMID = 48, AMP = 40, TWO_PI = Math.PI * 2, DOTMAX = 160;
+  var still = !!(reduceMotion && reduceMotion.matches);
+  var sw = 600, npts = 201, dx = 3, ndots = 40;
+  var yNew = [], yShow = [], yHold = [];
+  var S = {d: 0, ph1: 0, ph2: 0, w: [0, 1, 0, 0, 0, 0], n: 1, env: [], srcX: 0};
+  var idx = 0, lt = 0, gt = 0, blend = 1, pv = 0.28, pTarget = 0.28, pin = false, lastVal = '';
+  var ov = {env: 0, nodes: 0, src: 0, dots: 0};
+
+  function smooth(t){ t = t < 0 ? 0 : t > 1 ? 1 : t; return t * t * (3 - 2 * t); }
+  function resetS(){ S.d = 0; S.ph1 = 0; S.ph2 = 0; S.w = [0, 1, 0, 0, 0, 0]; S.n = 1; }
+  function mkEl(tag, cls, before){
+    var e = document.createElementNS(SVG_NS, tag);
+    if(cls) e.setAttribute('class', cls);
+    if(before) settleSvg.insertBefore(e, before); else settleSvg.appendChild(e);
+    return e;
+  }
+
+  // Overlay layers: beat envelope under the line, then node markers, sound particles, source dot.
+  var envEl = mkEl('path', 'env', waveEl);
+  var gNodes = mkEl('g'), gDots = mkEl('g'), nodeEls = [], dotEls = [], j;
+  for(j = 0; j < 4; j++){ var nd = document.createElementNS(SVG_NS, 'circle'); nd.setAttribute('class', 'node'); nd.setAttribute('r', '3.5'); nd.setAttribute('cy', SMID); gNodes.appendChild(nd); nodeEls.push(nd); }
+  for(j = 0; j < DOTMAX; j++){ var dt0 = document.createElementNS(SVG_NS, 'circle'); dt0.setAttribute('class', 'dot'); dt0.setAttribute('r', '2.4'); dt0.setAttribute('cy', SMID); gDots.appendChild(dt0); dotEls.push(dt0); }
+  var srcEl = mkEl('circle', 'src');
+  srcEl.setAttribute('r', '5'); srcEl.setAttribute('cy', SMID);
+  envEl.setAttribute('opacity', '0'); gNodes.setAttribute('opacity', '0'); gDots.setAttribute('opacity', '0'); srcEl.setAttribute('opacity', '0');
+
+  var PH = [
+    { name: 'Damped wave', eq: 'A(x) = A\u2080\u00b7e^(\u2212x/L)', p0: 0.28, dur: 9, rep: 2.5,
+      val: function(p){ return 'L = ' + (0.12 + 0.58 * p).toFixed(2) + ' \u00d7 line'; },
+      run: function(l, g, p, out){
+        var L = Math.max((0.12 + 0.58 * p) * sw, 1), K = TWO_PI / 120;
+        for(var i = 0; i < npts; i++){ var x = i * dx; out[i] = AMP * Math.exp(-x / L) * Math.sin(K * x - 2.4 * l); }
+      } },
+    { name: 'Pulse on a string', eq: 'v = \u221a(T/\u03bc)', p0: 0.35, dur: 9, rep: 3,
+      val: function(p){ return 'v = ' + ((180 + 380 * p) / 313).toFixed(1) + ' \u00d7'; },
+      adv: function(dt, p){ S.d += (180 + 380 * p) * dt; },
+      run: function(l, g, p, out){
+        // Right-moving pulse plus its images (inverted, mirrored) so both ends stay fixed.
+        var W = sw, s0 = 0.1 * W, sg = 36, A = 0.85 * AMP, den = 2 * sg * sg;
+        for(var i = 0; i < npts; i++){
+          var x = i * dx, y = 0;
+          for(var k = -3; k <= 1; k++){
+            var a = x - S.d - 2 * k * W - s0, b = -x - S.d - 2 * k * W - s0;
+            y += Math.exp(-a * a / den) - Math.exp(-b * b / den);
+          }
+          out[i] = A * y;
+        }
+      } },
+    { name: 'Standing waves', eq: 'f\u2099 = n\u00b7v/2L', p0: 0.5, dur: 9, rep: 0,
+      val: function(){ return 'n = ' + S.n; },
+      adv: function(dt, p, l, inside){
+        var n = inside ? 1 + Math.min(4, Math.floor(p * 5)) : 1 + (Math.floor(l / 2.25) % 4);
+        var k = 1 - Math.exp(-7 * dt);
+        S.n = n;
+        for(var i = 1; i <= 5; i++) S.w[i] += ((i === n ? 1 : 0) - S.w[i]) * k;
+      },
+      run: function(l, g, p, out){
+        for(var i = 0; i < npts; i++){
+          var u = Math.PI * i / (npts - 1), y = 0;
+          for(var n = 1; n <= 5; n++) if(S.w[n] > 0.002) y += S.w[n] * Math.sin(n * u) * Math.cos(n * 2.6 * g);
+          out[i] = AMP * y;
+        }
+      } },
+    { name: 'Beats', eq: 'f_beat = |f\u2081 \u2212 f\u2082|', p0: 0.45, dur: 9, rep: 3,
+      val: function(p){ return '\u0394f/f = ' + (0.04 + 0.12 * p).toFixed(2); },
+      adv: function(dt, p){
+        var k1 = TWO_PI / 70, k2 = k1 * (1 + 0.04 + 0.12 * p);
+        S.ph1 += k1 * 55 * dt; S.ph2 += k2 * 55 * dt;
+      },
+      run: function(l, g, p, out){
+        var k1 = TWO_PI / 70, k2 = k1 * (1 + 0.04 + 0.12 * p);
+        for(var i = 0; i < npts; i++){
+          var x = i * dx;
+          out[i] = AMP * 0.5 * (Math.sin(k1 * x - S.ph1) + Math.sin(k2 * x - S.ph2));
+          S.env[i] = AMP * Math.abs(Math.cos(((k2 - k1) * x - (S.ph2 - S.ph1)) / 2));
+        }
+      } },
+    { name: 'Doppler shift', eq: 'f\u2032 = f\u00b7c/(c \u2213 v)', p0: 0.5, dur: 9, rep: 5,
+      val: function(p){ return 'v = ' + (0.15 + 0.5 * p).toFixed(2) + ' c'; },
+      run: function(l, g, p, out){
+        // A source starts at x0 and moves right at v. Each point shows the wave emitted at the
+        // retarded time tr, so waves bunch up ahead of the source and stretch out behind it.
+        var c = 170, v = (0.15 + 0.5 * p) * c, x0 = 0.08 * sw, xs = x0 + v * l, we = TWO_PI;
+        for(var i = 0; i < npts; i++){
+          var x = i * dx;
+          var tr = x >= xs ? (c * l - (x - x0)) / (c - v) : (c * l + (x - x0)) / (c + v);
+          out[i] = tr > 0 ? 0.7 * AMP * Math.sin(we * tr) : 0;
+        }
+        S.srcX = xs;
+      } },
+    { name: 'Sound wave', eq: 'v = \u221a(B/\u03c1)', p0: 0.5, dur: 9, rep: 4,
+      val: function(p){ return 'amplitude ' + ((0.2 + 0.5 * p) / 0.45).toFixed(1) + ' \u00d7'; },
+      run: function(l, g, p, out){
+        // Air as particles on the line, shoved along it: dense where they bunch (compression).
+        var c = 190, w = TWO_PI * 0.9, k = w / c, a = (0.2 + 0.5 * p) / k, sp = sw / ndots;
+        for(var i = 0; i < npts; i++) out[i] = 0;
+        for(var q = 0; q < ndots; q++){
+          var xi = (q + 0.5) * sp, e = smooth((c * l - xi) / 60);
+          dotEls[q].setAttribute('cx', (xi + a * e * Math.sin(w * (l - xi / c))).toFixed(1));
+        }
+      } },
+    { name: 'Heat diffusion', eq: '\u03c3 = \u221a(2Dt)', p0: 0.4, dur: 9, rep: 3,
+      val: function(p){ return 'D = ' + ((60 + 240 * p) / 156).toFixed(1) + ' \u00d7'; },
+      run: function(l, g, p, out){
+        // A hot spot (up) and a cold spot (down) spread and cancel. Area is conserved, so the
+        // peak falls as sigma grows.
+        var D = 60 + 240 * p, s0 = 22, sg =Math.sqrt(s0 * s0 + 2 * D * l), h = AMP * 0.95 * s0 / sg;
+        var x1 = 0.3 * sw, x2 = 0.68 * sw, den = 2 * sg * sg;
+        for(var i = 0; i < npts; i++){
+          var x = i * dx;
+          out[i] = h * (Math.exp(-(x - x1) * (x - x1) / den) - Math.exp(-(x - x2) * (x - x2) / den));
+        }
+      } }
+  ];
+
+  function updateVal(){
+    var v = PH[idx].val(pv);
+    if(v !== lastVal){ valEl.textContent = v; lastVal = v; }
+  }
+
+  function render(dt){
+    var f = 1 - Math.exp(-9 * dt), i, d = '', up = '', dn = '', e, x;
+    for(i = 0; i < npts; i++) d += (i ? 'L' : 'M') + (i * dx).toFixed(1) + ',' + (SMID - yShow[i]).toFixed(1);
+    waveEl.setAttribute('d', d);
+    ov.env += ((idx === 3 ? 1 : 0) - ov.env) * f;
+    ov.nodes += ((idx === 2 ? 1 : 0) - ov.nodes) * f;
+    ov.src += ((idx === 4 ? 1 : 0) - ov.src) * f;
+    ov.dots += ((idx === 5 ? 1 : 0) - ov.dots) * f;
+    if(ov.env > 0.01){
+      for(i = 0; i < npts; i++){
+        x = (i * dx).toFixed(1); e = S.env[i] || 0;
+        up += (i ? 'L' : 'M') + x + ',' + (SMID - e).toFixed(1);
+        dn += (i ? 'L' : 'M') + x + ',' + (SMID + e).toFixed(1);
+      }
+      envEl.setAttribute('d', up + dn);
+    }
+    envEl.setAttribute('opacity', ov.env.toFixed(2));
+    gNodes.setAttribute('opacity', ov.nodes.toFixed(2));
+    for(i = 0; i < 4; i++){
+      nodeEls[i].setAttribute('cx', (sw * (i + 1) / S.n).toFixed(1));
+      nodeEls[i].setAttribute('visibility', i < S.n - 1 ? 'visible' : 'hidden');
+    }
+    gDots.setAttribute('opacity', ov.dots.toFixed(2));
+    srcEl.setAttribute('cx', S.srcX.toFixed(1));
+    srcEl.setAttribute('opacity', ov.src.toFixed(2));
+  }
+
+  function start(i, morph){
+    var k, ph = PH[i];
+    if(morph){ for(k = 0; k < npts; k++) yHold[k] = yShow[k]; blend = 0; } else blend = 1;
+    idx = i; lt = 0; resetS();
+    if(!pin){ pv = ph.p0; pTarget = ph.p0; }
+    nameEl.textContent = ph.name; eqEl.textContent = ph.eq;
+    if(!still && nameEl.animate){
+      nameEl.animate([{opacity: 0}, {opacity: 1}], {duration: 450, easing: 'ease-out'});
+      eqEl.animate([{opacity: 0}, {opacity: 1}], {duration: 450, easing: 'ease-out'});
+    }
+    settleSvg.setAttribute('aria-label', 'Animated line: ' + ph.name);
+    for(k = 0; k < navBtns.length; k++) navBtns[k].setAttribute('aria-current', k === i ? 'true' : 'false');
+  }
+
+  function frame(dt){
+    var ph = PH[idx], i, b;
+    gt += dt; lt += dt;
+    pv += (pTarget - pv) * (1 - Math.exp(-8 * dt));
+    if(ph.adv) ph.adv(dt, pv, lt, pin);
+    ph.run(lt, gt, pv, yNew);
+    if(blend < 1){
+      blend = Math.min(1, blend + dt / 0.8); b = smooth(blend);
+      for(i = 0; i < npts; i++) yShow[i] = yHold[i] * (1 - b) + yNew[i] * b;
+    } else {
+      for(i = 0; i < npts; i++) yShow[i] = yNew[i];
+    }
+    render(dt); updateVal();
+    if(lt >= ph.dur){ if(pin) start(idx, true); else start((idx + 1) % PH.length, true); }
+  }
+
+  // Reduced motion: one representative frame per phenomenon, redrawn when you pick one or move the pointer.
+  function drawStill(){
+    var ph = PH[idx], i;
+    resetS(); lt = ph.rep; gt = ph.rep;
+    if(idx === 2){ S.n = 3; S.w = [0, 0, 0, 1, 0, 0]; } else if(ph.adv) ph.adv(ph.rep, pv, ph.rep, false);
+    ph.run(lt, gt, pv, yNew);
+    for(i = 0; i < npts; i++) yShow[i] = yNew[i];
+    render(10); updateVal();
+  }
+
+  function sizeWave(){
+    var i;
+    sw = Math.round(settleSvg.getBoundingClientRect().width) || 600;
+    npts = Math.ceil(sw / 3) + 1; dx = sw / (npts - 1);
+    settleSvg.setAttribute('viewBox', '0 0 ' + sw + ' ' + SH);
+    baseEl.setAttribute('x2', sw);
+    ndots = Math.min(DOTMAX, Math.max(1, Math.floor(sw / 14)));
+    for(i = 0; i < DOTMAX; i++) dotEls[i].setAttribute('visibility', i < ndots ? 'visible' : 'hidden');
+    yNew.length = yShow.length = yHold.length = npts;
+    for(i = 0; i < npts; i++){ yNew[i] = yNew[i] || 0; yShow[i] = yShow[i] || 0; yHold[i] = yHold[i] || 0; S.env[i] = S.env[i] || 0; }
+  }
+
+  var navBtns = PH.map(function(ph, i){
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'pd'; b.title = ph.name;
+    b.setAttribute('aria-label', ph.name);
+    b.addEventListener('click', function(){ start(i, !still); if(still) drawStill(); });
+    navEl.appendChild(b);
+    return b;
+  });
+
+  settleSvg.addEventListener('pointermove', function(e){
+    var r = settleSvg.getBoundingClientRect();
+    var p = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+    pin = true; pTarget = p;
+    if(still){ pv = p; drawStill(); }
+  });
+  settleSvg.addEventListener('pointerleave', function(){
+    pin = false; pTarget = PH[idx].p0;
+    if(still){ pv = pTarget; drawStill(); }
+  });
+  window.addEventListener('resize', function(){ sizeWave(); if(still) drawStill(); });
+
+  var raf = 0, lastT = 0, visible = true;
+  function tick(t){
+    if(!visible){ raf = 0; return; }
+    var dt = Math.min((t - lastT) / 1000, 0.05);
+    lastT = t; frame(dt);
+    raf = requestAnimationFrame(tick);
+  }
+  function play(){
+    if(still || raf || !visible) return;
+    raf = requestAnimationFrame(function(t){ lastT = t; raf = requestAnimationFrame(tick); });
+  }
+  if(window.IntersectionObserver){
+    new IntersectionObserver(function(en){ visible = en[0].isIntersecting; if(visible) play(); }).observe(settleSvg);
+  }
+
+  sizeWave();
+  start(0, false);
+  if(still) drawStill(); else { frame(0); play(); }
 })();
 </script>

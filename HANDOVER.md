@@ -1,5 +1,12 @@
 # Handover
 
+## Atlas Play one-city-at-a-time ranking prototype — 2026-11-07
+
+- City rankings now begin empty, with one city, flag and country shown at a time. Tap any gap to insert it and advance to the next city. No correctness hints appear until submission.
+- Tap any placed city to pick it up and reinsert it, including after all five are placed. Check answer is enabled only with all five entries present. Existing in-row feedback, grading, source data and country ranking controls are retained.
+- Desktop uses the active city beside the growing list; mobile stacks them and keeps the active city sticky, with 44px gap targets. Reduced-motion preferences are respected.
+- Validation: 2,175 existing generated-round checks and presentation checks; browser tested top/middle/bottom insertions, reinsertion before/after completion, disabled/enabled submission and five feedback rows; 390px layout has no horizontal overflow.
+
 ## Atlas Play compact laptop layout — 2026-11-07
 
 - At desktop widths, replaced the tall hero with a small single-line intro and grouped difficulty, city pool, measure and question style into one row. Reduced card/row spacing and removed the repeated mode-icon grid from the sidebar.

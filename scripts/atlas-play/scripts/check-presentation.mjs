@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {clampView,zoomView,fitMapBounds,questionTitle} from '../lib/presentation.ts';
+import {clampView,zoomView,fitMapBounds,questionTitle,placeOnPodium} from '../lib/presentation.ts';
 const world=[0,0,720,360];
 assert.deepEqual(zoomView(world,.5),[180,90,360,180]);
 assert.deepEqual(zoomView([180,90,360,180],2),world);
@@ -14,3 +14,9 @@ const base={type:'estimate',metric:'renewable',countries:[{name:'Norway'}]};asse
 for(const metric of ['life','happiness','forest','renewable','internet','hdi','heightMale','heightFemale','doctorates','calories','alcohol']){const title=questionTitle({...base,metric});assert.ok(title.includes('Norway')&&title.endsWith('?'));assert.ok(!title.includes('Make an estimate'))}
 assert.equal(questionTitle({type:'exception',countries:[],target:{name:'Austria'}}),'Which country does NOT border Austria?');
 console.log('PASS presentation: zoom anchoring, limits, regional fit, edge points and explicit estimate questions.');
+
+assert.deepEqual(placeOnPodium([], 'A', 1), ['', 'A', '']);
+assert.deepEqual(placeOnPodium(['A','B','C'], 'A', 2), ['C','B','A']);
+assert.deepEqual(placeOnPodium(['A','','C'], 'B', 0), ['B','','C']);
+assert.deepEqual(placeOnPodium(['A','B','C'], 'B', 1), ['A','B','C']);
+console.log('PASS podium assignment: empty slots, swapping, replacement and same-position drops.');

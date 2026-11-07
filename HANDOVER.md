@@ -1,5 +1,12 @@
 # Handover
 
+## Atlas Play three-city podium — 2026-11-07
+
+- Replaced sequential five-city placement with three visible cities and a 2nd / 1st / 3rd podium. Largest population goes in the raised centre position. Country flags and names remain visible.
+- Pointer dragging supports bank-to-podium placement and swaps between filled positions. Tap/select plus tap-position works with mouse, touch and keyboard. Dropping a bank city onto an occupied position returns the previous occupant to the bank. No duplicate city can occupy multiple positions.
+- Generator and relative-gap calibration now sample three cities from different countries/areas. Submission validates three unique eligible IDs; grading/explanations and direct podium feedback use three cities. Historical internal mode key `topfive` is retained for compatibility.
+- Validation: 2,175 generated-round checks updated for three-city pools and duplicate/empty rejection; podium assignment checks cover swaps and replacement. Desktop browser verified pointer drops, occupied-slot swaps, tap/keyboard placement and all three feedback values.
+
 ## Atlas Play insertion lines — 2026-11-07
 
 - Replaced repeated city-placement boxes/labels with thin lines. Hover and keyboard focus highlight the line and show a small plus; adjacent rows separate slightly when motion is enabled. Only the empty ranking says “Start your ranking”.

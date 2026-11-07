@@ -20,7 +20,8 @@ for(const metric of Object.keys(data.metrics))for(const type of availableTypes(m
  assert.ok(Math.min(...scores.easy)>=Math.max(...scores.hard),metric+'/'+type);
 }
 for(const difficulty of ['easy','medium','hard'])for(const cityMinimum of [1e5,1e6])for(let i=0;i<30;i++){
- const r=generateRound(data,'all',undefined,false,'topfive',{difficulty,cityMinimum});assert.equal(r.cities.length,5);assert.equal(new Set(r.cities.map(c=>c.country)).size,5);assert.ok(r.cities.every(c=>c.population>=cityMinimum&&c.countryName));assert.equal(r.difficulty,difficulty);
+ const r=generateRound(data,'all',undefined,false,'topfive',{difficulty,cityMinimum});assert.equal(r.cities.length,3);assert.equal(new Set(r.cities.map(c=>c.country)).size,3);assert.ok(r.cities.every(c=>c.population>=cityMinimum&&c.countryName));assert.equal(r.difficulty,difficulty);
+ assert.equal(canAnswer(r,null,{cities:['','','']}),false);assert.equal(canAnswer(r,null,{cities:[r.cities[0].id,r.cities[0].id,r.cities[1].id]}),false);
  const ids=[...r.cities].sort((a,b)=>b.population-a.population).map(c=>c.id);assert.ok(grade(r,null,[],{cities:ids}));assert.equal(grade(r,null,[],{cities:[...ids].reverse()}),false);
  const pin=generateRound(data,'all',undefined,false,'pin',{difficulty,cityMinimum});assert.ok(pinDistance(pin,cityPoint(pin.city))<1e-8);assert.ok(grade(pin,null,[],{pin:cityPoint(pin.city)}));assert.equal(pin.tolerance,difficulty==='easy'?700:difficulty==='medium'?350:150);checked+=2;
 }
@@ -29,4 +30,4 @@ for(const m of Object.keys(data.metrics))if(availableTypes(m).includes('estimate
 }
 for(const difficulty of ['easy','medium','hard'])for(let i=0;i<10;i++){const r=generateRound(data,'population',undefined,false,'history',{difficulty});let choice=growth(r.countries[0])>growth(r.countries[1])?0:1;assert.ok(grade(r,null,r.countries,{choice}));checked++}
 assert.ok(data.countries.filter(c=>c.doctorates!=null).length===29);assert.equal(c('USA').doctorates,null);assert.ok(data.metrics.heightMale.year.includes('1996'));assert.ok(data.metrics.renewable.year==='2021');
-console.log('PASS',checked,'rounds: all21measures, all9styles,3difficultytiers,2citypools, correct5-countrycityrankings, pinprojection, grading and US/Finland vsFrance/Germany ordering.');console.log('Population pair cutoffs:',cuts.map(n=>(n*100).toFixed(1)+'%').join(', '));
+console.log('PASS',checked,'rounds: all21measures, all9styles,3difficultytiers,2citypools, correct3-countrycitypodiums, pinprojection, grading and US/Finland vsFrance/Germany ordering.');console.log('Population pair cutoffs:',cuts.map(n=>(n*100).toFixed(1)+'%').join(', '));

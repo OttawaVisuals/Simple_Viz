@@ -16,7 +16,7 @@ const subjects:Record<Metric,string>={population:'population',area:'land area',l
 export function questionTitle(r:Round):string{
  const subject=subjects[r.metric],name=r.countries[0]?.name;
  switch(r.type){
- case 'topfive':return 'Rank these five cities by population.';
+ case 'topfive':return 'Rank 3 cities by population.';
  case 'pin':return `Where is ${r.city!.name}, ${r.city!.countryName}?`;
  case 'exception':return `Which country does NOT border ${r.target!.name}?`;
  case 'history':return 'Whose population grew more between 2000 and 2023?';
@@ -29,4 +29,10 @@ export function questionTitle(r:Round):string{
  return questions[r.metric]??`What is ${name}’s ${subject}?`;
  }
  }
+}
+
+export function placeOnPodium(slots:string[],id:string,index:number):string[]{
+ const next=Array.from({length:3},(_,i)=>slots[i]??'');
+ const from=next.indexOf(id);if(from===index)return next;
+ if(from>=0)next[from]=next[index];next[index]=id;return next;
 }

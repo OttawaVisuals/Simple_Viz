@@ -286,3 +286,9 @@ body{background:#f2f1e8;color:#233d30}.app{position:relative;isolation:isolate;m
 .fuel-cell-bar{display:block;position:absolute;left:0;bottom:0;top:0;opacity:.2;z-index:-1;background:#a8afad;border-radius:2px}
 .fuel-cell-bar.fuel-hydro{background:#4d8b9d}.fuel-cell-bar.fuel-otherRenewable{background:#638d50}.fuel-cell-bar.fuel-coal{background:#6d6c71}.fuel-cell-bar.fuel-gas{background:#ca9754}.fuel-cell-bar.fuel-oil{background:#a56b43}.fuel-cell-bar.fuel-nuclear{background:#8d7ea1}
 @media(max-width:760px){.fuel-value{min-width:52px}}
+/* The selected head-to-head tile carries its own result. */
+.country-choice.incorrect{background:#fff0e6;border-color:#c97c62;box-shadow:0 0 0 1px #c97c62;opacity:1}
+.tile-verdict{display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap;margin:9px 0 2px;font-size:13px;font-weight:650;line-height:1.4}
+.tile-verdict small{width:100%;font-size:9px;font-weight:400;letter-spacing:.4px;color:var(--muted)}
+.verdict-right{color:#315c39}.verdict-wrong{color:#a34532}.verdict-other{color:var(--muted);font-size:11px;font-weight:400}
+@media(min-width:761px){.tile-verdict{margin-top:6px;font-size:12px}}

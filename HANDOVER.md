@@ -1,5 +1,10 @@
 # Handover
 
+## Atlas Play direct head-to-head feedback — 2026-11-07
+
+- Head-to-head country tiles now display Correct / Incorrect directly on the selected tile, marked “Your choice”, with the source value below. When the selection is wrong, the other tile says Correct answer. A losing selected tile remains fully opaque and has distinct colour and an X icon.
+- Validation: production build; browser verified both correct and incorrect selections, values on both tiles and no horizontal overflow at 390px. No scoring logic or data changed.
+
 ## Atlas Play electricity context and live height scale — 2026-11-07
 
 - Renewable-electricity answers now compare country and world renewable shares, with matched 2021 World Bank data. Fuel-by-fuel percentages cover hydro, non-hydro renewables, coal, gas, oil and nuclear; a positive unallocated remainder is derived only with complete components. Country tabs support multi-country rounds.

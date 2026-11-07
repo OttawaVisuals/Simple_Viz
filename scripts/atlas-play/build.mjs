@@ -13,9 +13,9 @@ for(const code of new Set(dataset.globalCities.map(c=>c.country))){
 }
 const flagLicense=await readFile(path.join(dir,'node_modules/flag-icons/LICENSE'),'utf8');
 const result=await build({absWorkingDir:dir,entryPoints:['entry.tsx'],plugins:[{name:'inline-country-flags',setup(b){b.onResolve({filter:/^atlas-flags$/},()=>({path:'atlas-flags',namespace:'flags'}));b.onLoad({filter:/.*/,namespace:'flags'},()=>({contents:'export default '+JSON.stringify(flags),loader:'js'}));}}],bundle:true,minify:true,write:false,format:'iife',platform:'browser',target:['es2022'],jsx:'automatic',loader:{'.svg':'dataurl','.txt':'text'},define:{'process.env.NODE_ENV':'"production"'},legalComments:'inline'});
-let css=await readFile(path.join(dir,'app/globals.css'),'utf8');
+let css=await readFile(path.join(dir,'app/globals.css'),'utf8')+'\n'+await readFile(path.join(dir,'app/atlas-theme.css'),'utf8');
 css=css.split('\n').filter(line=>!line.startsWith('@import')).join('\n').replaceAll("'DM Sans',Arial,sans-serif","system-ui,Arial,sans-serif").replaceAll("'Libre Caslon Display',Georgia,serif","Georgia,'Iowan Old Style',serif");
-// Preserve the approved light palette, and transform each literal colour for a dark blue theme.
+// Preserve the light palette, and transform literal colours for a dark blue theme.
 const colors=[...new Set(css.match(/#[0-9a-fA-F]{3,8}\b/g)||[])];
 function dark(hex){let v=hex.slice(1);if(v.length===3||v.length===4)v=[...v].map(c=>c+c).join('');const rgb=[0,2,4].map(i=>parseInt(v.slice(i,i+2),16)/255);const max=Math.max(...rgb),min=Math.min(...rgb),light=(max+min)/2;let h=0,s=0;if(max!==min){const d=max-min;s=d/(1-Math.abs(2*light-1));h=max===rgb[0]?((rgb[1]-rgb[2])/d+6)%6:max===rgb[1]?(rgb[2]-rgb[0])/d+2:(rgb[0]-rgb[1])/d+4;h*=60;}if(light>.8){h=220;s=.2;}const l=(.90-.78*light)*100;return `hsl(${h.toFixed(1)} ${(s*100).toFixed(1)}% ${l.toFixed(1)}%${v.length===8?' / '+(parseInt(v.slice(6),16)/255).toFixed(3):''})`;}
 const ids=new Map(colors.map((c,i)=>[c,`--atlas-color-${i}`]));
@@ -23,7 +23,8 @@ css=css.replace(/#[0-9a-fA-F]{3,8}\b/g,c=>`var(${ids.get(c)})`);
 const light=`:root{${colors.map(c=>`${ids.get(c)}:${c}`).join(';')}}`;
 const night=`:root[data-theme="dark"]{color-scheme:dark;${colors.map(c=>`${ids.get(c)}:${dark(c)}`).join(';')}}`;
 css=css.replaceAll("url('/world.svg')",`url("data:image/svg+xml;base64,${Buffer.from(await readFile(path.join(dir,'public/world.svg'))).toString('base64')}")`);
-css+=`:root[data-theme="dark"] .score-card{${colors.map(c=>`${ids.get(c)}:${c}`).join(';')}}:root[data-theme="dark"] .intro p,:root[data-theme="dark"] .question-head p,:root[data-theme="dark"] .field-notes p,:root[data-theme="dark"] .source-note{color:#b8c9bf}`;
+// Explicit night-atlas tokens keep paper, ink and feedback contrast predictable.
+css+=`:root[data-theme="dark"]{--paper:#192638;--ink:#eee3cd;--muted:#c4b99f;--line:#596271;--green:#e3ad84;--orange:#efa277;--atlas-sheet:#213044;--atlas-wash:#2c3c50;--atlas-selected:#493f3a;--atlas-map:#a99370;--atlas-map-ink:#dfca9f;--atlas-success:#b6cf9d;--atlas-success-wash:#293d39;--atlas-error:#efb09b;--atlas-error-wash:#483637}:root[data-theme="dark"] .primary{color:#192638}:root[data-theme="dark"] .primary:hover:not(:disabled){color:#192638}`;
 const code=result.outputFiles[0].text.replaceAll('</script','<\\/script');
 const html=`<!doctype html>
 <html lang="en">

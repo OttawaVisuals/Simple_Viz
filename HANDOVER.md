@@ -1,5 +1,11 @@
 # Handover
 
+## Atlas Play printed-atlas design — 2026-11-07
+
+- Added `scripts/atlas-play/app/atlas-theme.css`: parchment background, warm ink, terracotta actions, sepia country outlines and fine rules. Removed the enclosing quiz panel, raised shadows, translucent modal blur, folded corner and green sidebar/map washes; answer choices retain flat boundaries and explicit selection/result states.
+- `build.mjs` layers the theme after layout styles and provides explicit dark blue night-atlas tokens. Removed the former light-palette override on the dark score card. Rebuilt `visualizations/atlas-play.html`; no question, scoring, mechanics or data changes.
+- Validation: production build and all existing checks pass (2,175 generated rounds plus presentation, visual-data and reference-scale checks). Browser inspected light/dark themes, comparison selection and correct-answer feedback, city podium initial layout, and a 390px mobile viewport with no horizontal overflow. Local changes only; not deployed.
+
 ## Atlas Play full-range result scales and ratio layout fix — 2026-11-07
 
 - Added linear result rulers with metric icons, country flags, exact values, reference distributions and optional zoom. Population country range starts at 1M and reaches the highest source-country value; life expectancy uses 0–100 years and the published WLD benchmark. Matching 2023 World Bank reference pools contain 217 countries/economies each, with aggregates excluded and quiz values validated against the snapshot.

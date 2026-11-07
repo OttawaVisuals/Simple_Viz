@@ -1,0 +1,95 @@
+/* A printed-atlas treatment. Layout, interactions and data colours stay separate. */
+:root{--paper:#f5ecd9;--ink:#3f3528;--muted:#77664f;--line:#cdbd9e;--green:#885039;--orange:#b45a36;--atlas-sheet:#faf3e4;--atlas-wash:#e9d9b9;--atlas-selected:#eddbba;--atlas-map:#d8c397;--atlas-map-ink:#82683e;--atlas-success:#426345;--atlas-success-wash:#e7ecdb;--atlas-error:#a24432;--atlas-error-wash:#f5e2d4}
+body{background:var(--paper);color:var(--ink)}
+.app{background:none}
+.header{border-bottom:3px double var(--line)}
+.brand{font-family:Georgia,'Iowan Old Style',serif;font-weight:400;letter-spacing:-1px}
+.brand-icon{background:transparent;border-color:var(--atlas-map-ink);box-shadow:none;border-radius:50%;color:var(--atlas-map-ink)}
+.beta{border-color:var(--line);border-radius:0;color:var(--muted)}
+.header-note,.intro p,.edition,.edition span,.trail-overview,.trail-overview>svg{color:var(--muted)}
+.intro h1 em,.heading-star,.text-button,.restart{color:var(--green)}
+.intro .heading-star,.atlas-orb{display:none}
+.toolbar{border-color:var(--line)}
+.challenge-settings{border-bottom:1px solid var(--line);margin-bottom:16px}
+.challenge-settings label,.mode-picker>span{color:var(--muted)}
+.challenge-settings select,.challenge-settings .mode-picker select{background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;color:var(--ink);padding-left:0}
+.challenge-settings select:focus-visible{outline-color:var(--orange)}
+.game-card{background:transparent;border:0;border-radius:0;box-shadow:none;overflow:clip}
+.card-corner{display:none}
+.game-top{padding-top:12px;color:var(--ink)}
+.game-top>span:last-child,.metric-label,.metric-label span,.question-head p,.year-label{color:var(--muted)}
+.year-label{border:0;border-radius:0;padding-left:0}
+.game-card h2{color:var(--ink)}
+.progress span{background:var(--atlas-wash);border-radius:0}
+.progress .current{background:var(--orange);box-shadow:none}
+.progress .done{background:var(--atlas-map-ink)}
+.difficulty-badge,.difficulty-badge.medium,.difficulty-badge.hard,.difficulty-badge.geography{background:transparent;border:0;border-left:2px solid var(--atlas-map-ink);border-radius:0;color:var(--muted)!important}
+.difficulty-badge.hard{border-left-color:var(--orange)}
+.game-actions{background:var(--paper);border-color:var(--line);box-shadow:none}
+.game-actions>span{color:var(--muted)}
+.primary{background:var(--green);border-color:var(--green);color:var(--atlas-sheet);border-radius:2px;box-shadow:none}
+.primary:hover:not(:disabled){background:var(--ink);border-color:var(--ink);transform:none;box-shadow:none}
+.primary:active:not(:disabled){transform:none;box-shadow:none}
+.primary:disabled{background:var(--atlas-wash);color:var(--muted);border-color:var(--atlas-wash);box-shadow:none}
+.score-card{background:transparent;border:0;border-top:3px double var(--line);border-bottom:1px solid var(--line);border-radius:0;box-shadow:none;color:var(--ink)}
+.score-card:after,.score-map{display:none}
+.score-card .eyebrow,.score-main small,.score-main>svg,.score-bottom span{color:var(--muted)}
+.score-main>span,.score-bottom strong{color:var(--ink)}
+.score-bottom{border-color:var(--line)}
+.field-notes{border-color:var(--line);background:transparent;box-shadow:none;border-radius:0}
+.field-notes h3{color:var(--ink)}
+.field-notes p,.source-note{color:var(--muted)}
+.field-card,.source-card{background:none;border-color:var(--line)}
+.field-card h3,.source-card h4{color:var(--ink)}
+.field-card .eyebrow,.field-card p,.source-card .eyebrow,.source-card p,.source-card .definition{color:var(--muted)}
+.game-top>span:first-child svg{background:transparent;border-color:var(--line);border-radius:0;color:var(--atlas-map-ink)}
+.target-outline:before,.target-outline:after{border-color:var(--line)}
+.year-label{background:transparent}
+.country-choice{background:transparent;border:1px solid var(--line);border-radius:2px;box-shadow:none}
+.country-choice:before{border-color:var(--line)}
+.country-choice:hover:not(:disabled){background:var(--atlas-sheet);border-color:var(--atlas-map-ink);box-shadow:none;transform:none}
+.country-choice.selected{background:var(--atlas-selected);border-color:var(--green);box-shadow:inset 0 0 0 1px var(--green)}
+.country-choice .shape,.target-outline .shape,.ratio-countries .shape,.estimate-country .shape,.shape{fill:var(--atlas-map);stroke:var(--atlas-map-ink);filter:none}
+.country-choice:hover .shape,.target-outline .shape{transform:none}
+.country-name,.target-outline>span:not(.map-code),.ratio-countries strong{color:var(--ink);text-shadow:none}
+.choice-number,.choice-hint,.target-caption,.scale-note,.ladder-label,.map-code{color:var(--muted)}
+.versus{background:var(--paper);border-color:var(--line);color:var(--muted);box-shadow:none}
+.country-choice.correct{background:var(--atlas-success-wash);border-color:var(--atlas-success);box-shadow:none}
+.country-choice.incorrect{background:var(--atlas-error-wash);border-color:var(--atlas-error);box-shadow:inset 0 0 0 1px var(--atlas-error)}
+.country-choice.muted{background:transparent}
+.verdict-right{color:var(--atlas-success)}
+.verdict-wrong{color:var(--atlas-error)}
+.target-country{background:none}
+.target-outline{background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:44px 44px}
+.map-crosshair,.map-crosshair:after{background:var(--line)}
+.rank-row,.next-city-card,.city-option,.podium-bank-city,.podium-city{background:var(--atlas-sheet);border-color:var(--line);border-radius:2px;box-shadow:none;color:var(--ink)}
+.rank-row:hover,.city-option:hover:not(:disabled),.podium-bank-city:hover:not(:disabled){background:var(--atlas-wash)}
+.city-option .city-option-name,.city-option>span{color:var(--ink)}
+.city-option-name small,.city-result-country{color:var(--muted)!important}
+.city-option.chosen{background:var(--atlas-selected);border-color:var(--green)}
+.podium-plinth{border-color:var(--line);background:var(--atlas-wash);color:var(--ink);border-radius:0}
+.podium-outline{fill:var(--atlas-map);stroke:var(--atlas-map-ink)}
+.podium-right .podium-city{background:var(--atlas-success-wash);border-color:var(--atlas-success)}
+.podium-wrong .podium-city{background:var(--atlas-error-wash);border-color:var(--atlas-error)}
+.podium-feedback{color:var(--atlas-success)}
+.podium-wrong .podium-feedback{color:var(--atlas-error)}
+.podium-over .podium-city,.podium-picked .podium-city,.podium-bank-city.podium-picked{border-color:var(--orange);box-shadow:0 0 0 2px var(--orange)}
+.insert-gap:not(.city-placement-gap){background:transparent;border-color:var(--line);color:var(--muted);border-radius:0;box-shadow:none}
+.insert-gap:not(.city-placement-gap):hover:not(:disabled),.insert-gap:not(.city-placement-gap).selected{background:var(--atlas-selected);border-color:var(--green);color:var(--ink);box-shadow:none}
+.ratio-options .extra-option{background:transparent;border-color:var(--line);color:var(--ink);border-radius:2px;box-shadow:none}
+.ratio-options .extra-option.selected{background:var(--atlas-selected);border-color:var(--green);box-shadow:inset 0 0 0 1px var(--green)}
+.answer-panel,.answer-panel.try{background:transparent;border:0;border-top:1px solid var(--line);border-radius:0;padding-left:0;padding-right:0}
+.answer-panel p,.answer-panel>small{color:var(--muted)}
+.metric-visual-context,.answer-panel .metric-visual-context,.difficulty-method{background:transparent;border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none;padding-left:0;padding-right:0}
+.context-country-tabs button,.position-scale-tools button,.map-controls button{background:transparent;color:var(--ink);border-color:var(--line);border-radius:2px}
+.context-country-tabs button[aria-pressed=true]{background:var(--atlas-selected);border-color:var(--green)}
+.difficulty-method p,.map-legend span,.map-controls>span{color:var(--muted)}
+.summary>svg{background:transparent;border:1px solid var(--line);color:var(--atlas-map-ink);box-shadow:none}
+.modal-backdrop{backdrop-filter:none;background:#30291fc7}
+.modal{background:var(--atlas-sheet);border:1px solid var(--line);border-radius:2px;box-shadow:none}
+.modal h2{color:var(--ink)}
+.modal>p{color:var(--muted)}
+.filter{border-radius:2px;color:var(--muted)}
+.filter.active{background:var(--atlas-selected);border-color:var(--line);color:var(--ink);box-shadow:none}
+.sort-ghost,.insert-drag-ghost,.podium-drag-ghost{background:var(--atlas-sheet);border-radius:2px;box-shadow:none}
+@media(max-width:760px){.challenge-settings{margin-bottom:10px}.city-placement .next-city-card{box-shadow:none}.game-top{padding-top:8px}}

@@ -1,0 +1,1073 @@
+{
+  "source": {
+    "label": "Estimated functional language users",
+    "unit": "estimated people",
+    "source": "Unicode CLDR 49",
+    "year": "CLDR 49 snapshot · mixed source years",
+    "url": "https://unicode.org/reports/tr35/tr35-info.html#Territory_Language_Information",
+    "definition": "Approximate functional users, including first- and second-language users, as defined for CLDR locale support. Not native-speaker-only counts or a test of complete fluency. Derived from CLDR territory population × language population share; dates vary between source observations. Unlisted languages are missing, never zero. Questions use the covered quiz countries and entries with at least 100,000 estimated users; this is not worldwide coverage. Counts are displayed approximately and close comparisons are excluded.",
+    "dataUrl": "https://raw.githubusercontent.com/unicode-org/cldr-json/49.0.0/cldr-json/cldr-core/supplemental/territoryInfo.json",
+    "limitationsUrl": "https://cldr.unicode.org/index/requesting-additionsupdates-to-cldr-languagepopulation-data",
+    "snapshot": "2026-11-08",
+    "license": "Unicode-3.0",
+    "licenseText": "UNICODE LICENSE V3\n\nCOPYRIGHT AND PERMISSION NOTICE\n\nCopyright © 2015-2024 Unicode, Inc.\n\nNOTICE TO USER: Carefully read the following legal agreement. BY\nDOWNLOADING, INSTALLING, COPYING OR OTHERWISE USING DATA FILES, AND/OR\nSOFTWARE, YOU UNEQUIVOCALLY ACCEPT, AND AGREE TO BE BOUND BY, ALL OF THE\nTERMS AND CONDITIONS OF THIS AGREEMENT. IF YOU DO NOT AGREE, DO NOT\nDOWNLOAD, INSTALL, COPY, DISTRIBUTE OR USE THE DATA FILES OR SOFTWARE.\n\nPermission is hereby granted, free of charge, to any person obtaining a\ncopy of data files and any associated documentation (the \"Data Files\") or\nsoftware and any associated documentation (the \"Software\") to deal in the\nData Files or Software without restriction, including without limitation\nthe rights to use, copy, modify, merge, publish, distribute, and/or sell\ncopies of the Data Files or Software, and to permit persons to whom the\nData Files or Software are furnished to do so, provided that either (a)\nthis copyright and permission notice appear with all copies of the Data\nFiles or Software, or (b) this copyright and permission notice appear in\nassociated Documentation.\n\nTHE DATA FILES AND SOFTWARE ARE PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY\nKIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\nMERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF\nTHIRD PARTY RIGHTS.\n\nIN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS INCLUDED IN THIS NOTICE\nBE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES,\nOR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,\nWHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,\nARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE DATA\nFILES OR SOFTWARE.\n\nExcept as contained in this notice, the name of a copyright holder shall\nnot be used in advertising or otherwise to promote the sale, use or other\ndealings in these Data Files or Software without prior written\nauthorization of the copyright holder.\n\nSPDX-License-Identifier: Unicode-3.0\n"
+  },
+  "languages": [
+    {
+      "code": "en",
+      "name": "English",
+      "countries": [
+        {
+          "id": "LTU",
+          "population": 2628190,
+          "share": 38,
+          "speakers": 998712.2
+        },
+        {
+          "id": "FRA",
+          "population": 68374600,
+          "share": 39,
+          "speakers": 26666094
+        },
+        {
+          "id": "PRT",
+          "population": 10207200,
+          "share": 27,
+          "speakers": 2755944
+        },
+        {
+          "id": "BEL",
+          "population": 11977600,
+          "share": 59,
+          "speakers": 7066784
+        },
+        {
+          "id": "SVN",
+          "population": 2097890,
+          "share": 59,
+          "speakers": 1237755.1
+        },
+        {
+          "id": "DEU",
+          "population": 84119100,
+          "share": 64,
+          "speakers": 53836224
+        },
+        {
+          "id": "ESP",
+          "population": 47280400,
+          "share": 24,
+          "speakers": 11347296
+        },
+        {
+          "id": "ITA",
+          "population": 60964900,
+          "share": 34,
+          "speakers": 20728066
+        },
+        {
+          "id": "POL",
+          "population": 38746300,
+          "share": 33,
+          "speakers": 12786279
+        },
+        {
+          "id": "FIN",
+          "population": 5626410,
+          "share": 70,
+          "speakers": 3938487
+        },
+        {
+          "id": "SWE",
+          "population": 10589800,
+          "share": 86,
+          "speakers": 9107228
+        },
+        {
+          "id": "DNK",
+          "population": 5973140,
+          "share": 86,
+          "speakers": 5136900.4
+        },
+        {
+          "id": "IRL",
+          "population": 5233460,
+          "share": 98,
+          "speakers": 5128790.8
+        },
+        {
+          "id": "GBR",
+          "population": 68459100,
+          "share": 98,
+          "speakers": 67089918
+        },
+        {
+          "id": "NLD",
+          "population": 17772400,
+          "share": 90,
+          "speakers": 15995160
+        },
+        {
+          "id": "CHE",
+          "population": 8860570,
+          "share": 45,
+          "speakers": 3987256.5
+        },
+        {
+          "id": "AUT",
+          "population": 8967980,
+          "share": 73,
+          "speakers": 6546625.4
+        },
+        {
+          "id": "GRC",
+          "population": 10461100,
+          "share": 51,
+          "speakers": 5335161
+        },
+        {
+          "id": "ROU",
+          "population": 18148200,
+          "share": 31,
+          "speakers": 5625942
+        },
+        {
+          "id": "EST",
+          "population": 1193790,
+          "share": 50,
+          "speakers": 596895
+        },
+        {
+          "id": "LVA",
+          "population": 1801250,
+          "share": 46,
+          "speakers": 828575
+        },
+        {
+          "id": "CZE",
+          "population": 10837900,
+          "share": 27,
+          "speakers": 2926233
+        },
+        {
+          "id": "HRV",
+          "population": 4150120,
+          "share": 49,
+          "speakers": 2033558.8
+        },
+        {
+          "id": "USA",
+          "population": 341963000,
+          "share": 96,
+          "speakers": 328284480
+        },
+        {
+          "id": "CAN",
+          "population": 38794800,
+          "share": 87,
+          "speakers": 33751476
+        },
+        {
+          "id": "MEX",
+          "population": 130740000,
+          "share": 13,
+          "speakers": 16996200
+        },
+        {
+          "id": "BRA",
+          "population": 220052000,
+          "share": 8,
+          "speakers": 17604160
+        },
+        {
+          "id": "ARG",
+          "population": 46994400,
+          "share": 7,
+          "speakers": 3289608
+        },
+        {
+          "id": "CHL",
+          "population": 18664700,
+          "share": 9.5,
+          "speakers": 1773146.5
+        },
+        {
+          "id": "AUS",
+          "population": 26768600,
+          "share": 96,
+          "speakers": 25697856
+        },
+        {
+          "id": "NZL",
+          "population": 5161210,
+          "share": 98,
+          "speakers": 5057985.8
+        },
+        {
+          "id": "IND",
+          "population": 1409130000,
+          "share": 19,
+          "speakers": 267734700
+        },
+        {
+          "id": "THA",
+          "population": 69921000,
+          "share": 27,
+          "speakers": 18878670
+        },
+        {
+          "id": "PHL",
+          "population": 118277000,
+          "share": 64,
+          "speakers": 75697280
+        },
+        {
+          "id": "MYS",
+          "population": 34564800,
+          "share": 21,
+          "speakers": 7258608
+        },
+        {
+          "id": "ZAF",
+          "population": 60442600,
+          "share": 31,
+          "speakers": 18737206
+        },
+        {
+          "id": "EGY",
+          "population": 111247000,
+          "share": 35,
+          "speakers": 38936450
+        },
+        {
+          "id": "KEN",
+          "population": 58246400,
+          "share": 19,
+          "speakers": 11066816
+        },
+        {
+          "id": "NGA",
+          "population": 236747000,
+          "share": 53,
+          "speakers": 125475910
+        },
+        {
+          "id": "ETH",
+          "population": 118550000,
+          "share": 43,
+          "speakers": 50976500
+        },
+        {
+          "id": "MAR",
+          "population": 37387600,
+          "share": 14,
+          "speakers": 5234264
+        },
+        {
+          "id": "TUR",
+          "population": 84119500,
+          "share": 17,
+          "speakers": 14300315
+        }
+      ]
+    },
+    {
+      "code": "fr",
+      "name": "French",
+      "countries": [
+        {
+          "id": "FRA",
+          "population": 68374600,
+          "share": 97,
+          "speakers": 66323362
+        },
+        {
+          "id": "PRT",
+          "population": 10207200,
+          "share": 15,
+          "speakers": 1531080
+        },
+        {
+          "id": "BEL",
+          "population": 11977600,
+          "share": 38,
+          "speakers": 4551488
+        },
+        {
+          "id": "DEU",
+          "population": 84119100,
+          "share": 18,
+          "speakers": 15141438
+        },
+        {
+          "id": "ITA",
+          "population": 60964900,
+          "share": 20,
+          "speakers": 12192980
+        },
+        {
+          "id": "IRL",
+          "population": 5233460,
+          "share": 13,
+          "speakers": 680349.8
+        },
+        {
+          "id": "GBR",
+          "population": 68459100,
+          "share": 17,
+          "speakers": 11638047
+        },
+        {
+          "id": "NLD",
+          "population": 17772400,
+          "share": 19,
+          "speakers": 3376756
+        },
+        {
+          "id": "CHE",
+          "population": 8860570,
+          "share": 39,
+          "speakers": 3455622.3
+        },
+        {
+          "id": "AUT",
+          "population": 8967980,
+          "share": 13,
+          "speakers": 1165837.4
+        },
+        {
+          "id": "GRC",
+          "population": 10461100,
+          "share": 7.3,
+          "speakers": 763660.3
+        },
+        {
+          "id": "ROU",
+          "population": 18148200,
+          "share": 12,
+          "speakers": 2177784
+        },
+        {
+          "id": "USA",
+          "population": 341963000,
+          "share": 0.56,
+          "speakers": 1914992.8000000003
+        },
+        {
+          "id": "CAN",
+          "population": 38794800,
+          "share": 29,
+          "speakers": 11250492
+        },
+        {
+          "id": "MAR",
+          "population": 37387600,
+          "share": 36,
+          "speakers": 13459536
+        }
+      ]
+    },
+    {
+      "code": "es",
+      "name": "Spanish",
+      "countries": [
+        {
+          "id": "VEN",
+          "population": 31250300,
+          "share": 82,
+          "speakers": 25625246
+        },
+        {
+          "id": "FRA",
+          "population": 68374600,
+          "share": 13,
+          "speakers": 8888698
+        },
+        {
+          "id": "PRT",
+          "population": 10207200,
+          "share": 10,
+          "speakers": 1020720
+        },
+        {
+          "id": "DEU",
+          "population": 84119100,
+          "share": 6,
+          "speakers": 5047146
+        },
+        {
+          "id": "ESP",
+          "population": 47280400,
+          "share": 99,
+          "speakers": 46807596
+        },
+        {
+          "id": "GBR",
+          "population": 68459100,
+          "share": 8,
+          "speakers": 5476728
+        },
+        {
+          "id": "ROU",
+          "population": 18148200,
+          "share": 10,
+          "speakers": 1814820
+        },
+        {
+          "id": "USA",
+          "population": 341963000,
+          "share": 9.6,
+          "speakers": 32828448
+        },
+        {
+          "id": "CAN",
+          "population": 38794800,
+          "share": 3.2,
+          "speakers": 1241433.6
+        },
+        {
+          "id": "MEX",
+          "population": 130740000,
+          "share": 83,
+          "speakers": 108514200
+        },
+        {
+          "id": "ARG",
+          "population": 46994400,
+          "share": 100,
+          "speakers": 46994400
+        },
+        {
+          "id": "CHL",
+          "population": 18664700,
+          "share": 98,
+          "speakers": 18291406
+        },
+        {
+          "id": "COL",
+          "population": 49588400,
+          "share": 93,
+          "speakers": 46117212
+        },
+        {
+          "id": "PER",
+          "population": 32600200,
+          "share": 73,
+          "speakers": 23798146
+        },
+        {
+          "id": "CRI",
+          "population": 5265580,
+          "share": 95,
+          "speakers": 5002301
+        },
+        {
+          "id": "PHL",
+          "population": 118277000,
+          "share": 31,
+          "speakers": 36665870
+        }
+      ]
+    },
+    {
+      "code": "pt",
+      "name": "Portuguese",
+      "countries": [
+        {
+          "id": "FRA",
+          "population": 68374600,
+          "share": 1.3,
+          "speakers": 888869.8
+        },
+        {
+          "id": "PRT",
+          "population": 10207200,
+          "share": 96,
+          "speakers": 9798912
+        },
+        {
+          "id": "GBR",
+          "population": 68459100,
+          "share": 0.2,
+          "speakers": 136918.2
+        },
+        {
+          "id": "CHE",
+          "population": 8860570,
+          "share": 3.4,
+          "speakers": 301259.38
+        },
+        {
+          "id": "CAN",
+          "population": 38794800,
+          "share": 0.93,
+          "speakers": 360791.64
+        },
+        {
+          "id": "BRA",
+          "population": 220052000,
+          "share": 91,
+          "speakers": 200247320
+        }
+      ]
+    },
+    {
+      "code": "de",
+      "name": "German",
+      "countries": [
+        {
+          "id": "LTU",
+          "population": 2628190,
+          "share": 14,
+          "speakers": 367946.6
+        },
+        {
+          "id": "FRA",
+          "population": 68374600,
+          "share": 5,
+          "speakers": 3418730
+        },
+        {
+          "id": "BEL",
+          "population": 11977600,
+          "share": 22,
+          "speakers": 2635072
+        },
+        {
+          "id": "SVN",
+          "population": 2097890,
+          "share": 42,
+          "speakers": 881113.8
+        },
+        {
+          "id": "DEU",
+          "population": 84119100,
+          "share": 91,
+          "speakers": 76548381
+        },
+        {
+          "id": "ITA",
+          "population": 60964900,
+          "share": 1.6,
+          "speakers": 975438.4
+        },
+        {
+          "id": "POL",
+          "population": 38746300,
+          "share": 19,
+          "speakers": 7361797
+        },
+        {
+          "id": "FIN",
+          "population": 5626410,
+          "share": 18,
+          "speakers": 1012753.8
+        },
+        {
+          "id": "DNK",
+          "population": 5973140,
+          "share": 47,
+          "speakers": 2807375.8
+        },
+        {
+          "id": "GBR",
+          "population": 68459100,
+          "share": 9,
+          "speakers": 6161319
+        },
+        {
+          "id": "NLD",
+          "population": 17772400,
+          "share": 71,
+          "speakers": 12618404
+        },
+        {
+          "id": "CHE",
+          "population": 8860570,
+          "share": 76,
+          "speakers": 6734033.2
+        },
+        {
+          "id": "AUT",
+          "population": 8967980,
+          "share": 97,
+          "speakers": 8698940.6
+        },
+        {
+          "id": "GRC",
+          "population": 10461100,
+          "share": 5,
+          "speakers": 523055
+        },
+        {
+          "id": "CZE",
+          "population": 10837900,
+          "share": 15,
+          "speakers": 1625685
+        },
+        {
+          "id": "USA",
+          "population": 341963000,
+          "share": 0.47,
+          "speakers": 1607226.1
+        },
+        {
+          "id": "CAN",
+          "population": 38794800,
+          "share": 1.2,
+          "speakers": 465537.6
+        },
+        {
+          "id": "BRA",
+          "population": 220052000,
+          "share": 0.84,
+          "speakers": 1848436.8
+        }
+      ]
+    },
+    {
+      "code": "ar",
+      "name": "Arabic",
+      "countries": [
+        {
+          "id": "GBR",
+          "population": 68459100,
+          "share": 0.3,
+          "speakers": 205377.3
+        },
+        {
+          "id": "CAN",
+          "population": 38794800,
+          "share": 2.3,
+          "speakers": 892280.4
+        },
+        {
+          "id": "EGY",
+          "population": 111247000,
+          "share": 94,
+          "speakers": 104572180
+        },
+        {
+          "id": "NGA",
+          "population": 236747000,
+          "share": 0.071,
+          "speakers": 168090.37
+        },
+        {
+          "id": "MAR",
+          "population": 37387600,
+          "share": 62,
+          "speakers": 23180312
+        },
+        {
+          "id": "TUR",
+          "population": 84119500,
+          "share": 0.56,
+          "speakers": 471069.20000000007
+        },
+        {
+          "id": "SAU",
+          "population": 36544400,
+          "share": 100,
+          "speakers": 36544400
+        }
+      ]
+    },
+    {
+      "code": "ru",
+      "name": "Russian",
+      "countries": [
+        {
+          "id": "LTU",
+          "population": 2628190,
+          "share": 80,
+          "speakers": 2102552
+        },
+        {
+          "id": "DEU",
+          "population": 84119100,
+          "share": 6,
+          "speakers": 5047146
+        },
+        {
+          "id": "POL",
+          "population": 38746300,
+          "share": 18,
+          "speakers": 6974334
+        },
+        {
+          "id": "EST",
+          "population": 1193790,
+          "share": 56,
+          "speakers": 668522.4
+        },
+        {
+          "id": "LVA",
+          "population": 1801250,
+          "share": 38,
+          "speakers": 684475
+        },
+        {
+          "id": "USA",
+          "population": 341963000,
+          "share": 0.24,
+          "speakers": 820711.2
+        },
+        {
+          "id": "CAN",
+          "population": 38794800,
+          "share": 0.85,
+          "speakers": 329755.8
+        }
+      ]
+    },
+    {
+      "code": "it",
+      "name": "Italian",
+      "countries": [
+        {
+          "id": "FRA",
+          "population": 68374600,
+          "share": 1.7,
+          "speakers": 1162368.2
+        },
+        {
+          "id": "DEU",
+          "population": 84119100,
+          "share": 7,
+          "speakers": 5888337
+        },
+        {
+          "id": "ITA",
+          "population": 60964900,
+          "share": 95,
+          "speakers": 57916655
+        },
+        {
+          "id": "GBR",
+          "population": 68459100,
+          "share": 0.2,
+          "speakers": 136918.2
+        },
+        {
+          "id": "CHE",
+          "population": 8860570,
+          "share": 15,
+          "speakers": 1329085.5
+        },
+        {
+          "id": "AUT",
+          "population": 8967980,
+          "share": 9,
+          "speakers": 807118.2
+        },
+        {
+          "id": "USA",
+          "population": 341963000,
+          "share": 0.34,
+          "speakers": 1162674.2000000002
+        },
+        {
+          "id": "CAN",
+          "population": 38794800,
+          "share": 1.5,
+          "speakers": 581922
+        },
+        {
+          "id": "BRA",
+          "population": 220052000,
+          "share": 0.28,
+          "speakers": 616145.6000000001
+        },
+        {
+          "id": "AUS",
+          "population": 26768600,
+          "share": 1.9,
+          "speakers": 508603.4
+        }
+      ]
+    },
+    {
+      "code": "nl",
+      "name": "Dutch",
+      "countries": [
+        {
+          "id": "BEL",
+          "population": 11977600,
+          "share": 55,
+          "speakers": 6587680
+        },
+        {
+          "id": "DEU",
+          "population": 84119100,
+          "share": 9,
+          "speakers": 7570719
+        },
+        {
+          "id": "NLD",
+          "population": 17772400,
+          "share": 100,
+          "speakers": 17772400
+        },
+        {
+          "id": "CAN",
+          "population": 38794800,
+          "share": 0.3,
+          "speakers": 116384.4
+        }
+      ]
+    },
+    {
+      "code": "hi",
+      "name": "Hindi",
+      "countries": [
+        {
+          "id": "CAN",
+          "population": 38794800,
+          "share": 2.1,
+          "speakers": 814690.8
+        },
+        {
+          "id": "IND",
+          "population": 1409130000,
+          "share": 41,
+          "speakers": 577743300
+        },
+        {
+          "id": "ZAF",
+          "population": 60442600,
+          "share": 2,
+          "speakers": 1208852
+        }
+      ]
+    },
+    {
+      "code": "ur",
+      "name": "Urdu",
+      "countries": [
+        {
+          "id": "GBR",
+          "population": 68459100,
+          "share": 3.5,
+          "speakers": 2396068.5
+        },
+        {
+          "id": "CAN",
+          "population": 38794800,
+          "share": 1.1,
+          "speakers": 426742.8
+        },
+        {
+          "id": "IND",
+          "population": 1409130000,
+          "share": 5,
+          "speakers": 70456500
+        }
+      ]
+    },
+    {
+      "code": "bn",
+      "name": "Bengali",
+      "countries": [
+        {
+          "id": "GBR",
+          "population": 68459100,
+          "share": 0.4,
+          "speakers": 273836.4
+        },
+        {
+          "id": "CAN",
+          "population": 38794800,
+          "share": 0.33,
+          "speakers": 128022.84
+        },
+        {
+          "id": "IND",
+          "population": 1409130000,
+          "share": 8.1,
+          "speakers": 114139530
+        }
+      ]
+    },
+    {
+      "code": "ta",
+      "name": "Tamil",
+      "countries": [
+        {
+          "id": "GBR",
+          "population": 68459100,
+          "share": 3.2,
+          "speakers": 2190691.2
+        },
+        {
+          "id": "CAN",
+          "population": 38794800,
+          "share": 0.65,
+          "speakers": 252166.2
+        },
+        {
+          "id": "IND",
+          "population": 1409130000,
+          "share": 5.9,
+          "speakers": 83138670.00000001
+        },
+        {
+          "id": "MYS",
+          "population": 34564800,
+          "share": 4.2,
+          "speakers": 1451721.6
+        }
+      ]
+    },
+    {
+      "code": "tr",
+      "name": "Turkish",
+      "countries": [
+        {
+          "id": "DEU",
+          "population": 84119100,
+          "share": 2.5,
+          "speakers": 2102977.5
+        },
+        {
+          "id": "GBR",
+          "population": 68459100,
+          "share": 0.2,
+          "speakers": 136918.2
+        },
+        {
+          "id": "NLD",
+          "population": 17772400,
+          "share": 1.2,
+          "speakers": 213268.8
+        },
+        {
+          "id": "GRC",
+          "population": 10461100,
+          "share": 1.2,
+          "speakers": 125533.2
+        },
+        {
+          "id": "TUR",
+          "population": 84119500,
+          "share": 93,
+          "speakers": 78231135
+        }
+      ]
+    },
+    {
+      "code": "pl",
+      "name": "Polish",
+      "countries": [
+        {
+          "id": "DEU",
+          "population": 84119100,
+          "share": 0.29,
+          "speakers": 243945.39
+        },
+        {
+          "id": "POL",
+          "population": 38746300,
+          "share": 96,
+          "speakers": 37196448
+        },
+        {
+          "id": "GBR",
+          "population": 68459100,
+          "share": 4,
+          "speakers": 2738364
+        },
+        {
+          "id": "CAN",
+          "population": 38794800,
+          "share": 0.56,
+          "speakers": 217250.88000000003
+        }
+      ]
+    },
+    {
+      "code": "ja",
+      "name": "Japanese",
+      "countries": [
+        {
+          "id": "CAN",
+          "population": 38794800,
+          "share": 0.27,
+          "speakers": 104745.96
+        },
+        {
+          "id": "BRA",
+          "population": 220052000,
+          "share": 0.21,
+          "speakers": 462109.2
+        },
+        {
+          "id": "JPN",
+          "population": 123202000,
+          "share": 95,
+          "speakers": 117041900
+        }
+      ]
+    },
+    {
+      "code": "ko",
+      "name": "Korean",
+      "countries": [
+        {
+          "id": "USA",
+          "population": 341963000,
+          "share": 0.3,
+          "speakers": 1025889
+        },
+        {
+          "id": "CAN",
+          "population": 38794800,
+          "share": 0.56,
+          "speakers": 217250.88000000003
+        },
+        {
+          "id": "JPN",
+          "population": 123202000,
+          "share": 0.52,
+          "speakers": 640650.4
+        },
+        {
+          "id": "KOR",
+          "population": 52081800,
+          "share": 100,
+          "speakers": 52081800
+        },
+        {
+          "id": "CHN",
+          "population": 1416040000,
+          "share": 0.15,
+          "speakers": 2124060
+        }
+      ]
+    },
+    {
+      "code": "sv",
+      "name": "Swedish",
+      "countries": [
+        {
+          "id": "FIN",
+          "population": 5626410,
+          "share": 44,
+          "speakers": 2475620.4
+        },
+        {
+          "id": "SWE",
+          "population": 10589800,
+          "share": 95,
+          "speakers": 10060310
+        },
+        {
+          "id": "DNK",
+          "population": 5973140,
+          "share": 13,
+          "speakers": 776508.2
+        }
+      ]
+    }
+  ]
+}

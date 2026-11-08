@@ -17,7 +17,7 @@ Commit source changes and the generated HTML together. Data download links use i
 
 The printed-atlas theme lives in `app/atlas-theme.css`, layered after the original layout styles by `build.mjs`. It uses parchment, sepia outlines, terracotta actions and flat rules instead of elevated panels. Explicit dark-mode tokens in the bundler retain the dark blue background, warm ink and distinct answer feedback. Question logic and source data are independent of this theme.
 
-`components/quiz-help.tsx` provides collapsed instructions for all nine styles. “Report this question” uses `lib/feedback-context.ts` to freeze the displayed question, entity IDs, settings and player input when clicked; changing rounds does not change a pending report. Reports use the same private feedback endpoint and daily per-page update behaviour. Footer links include About, Contact, Feedback and the implementation-based privacy note at `about.html#feedback-privacy`.
+`components/quiz-help.tsx` provides collapsed instructions for all ten styles. “Report this question” uses `lib/feedback-context.ts` to freeze the displayed question, entity IDs, settings and player input when clicked; changing rounds does not change a pending report. Reports use the same private feedback endpoint and daily per-page update behaviour. Footer links include About, Contact, Feedback and the implementation-based privacy note at `about.html#feedback-privacy`.
 
 Answer maps fit the actual country outlines or city points. City pinning supports up to 64× zoom, mouse wheel, touch pinch, dragging, a zoom slider and keyboard controls; these controls never reveal the correct location before submission. Full question headings include the measure and subject. Laptop layouts use a compact intro, four controls in one row, shorter cards and sticky answer actions. Mobile controls keep their stacked layout. City ranking uses a three-city podium: first place is the largest population, second the middle, third the smallest. Drag cards onto positions or select a city and tap a position; dragging between occupied positions swaps them. Submission requires three unique valid cities. Feedback and populations appear directly on the podium. Country rankings across all 21 measures use the same three-place podium, with country flags and outlines. First place means the highest numerical value, followed by middle and lowest. Country and city podiums share drag, swap and tap/keyboard controls. After submission, each position shows correctness, true rank and source value; the podium scrolls into view. Insertion rounds use a floating country card and highlighted gap targets.
 
@@ -26,7 +26,7 @@ Country coverage is 54 selected countries; city coverage is worldwide. Difficult
 ---
 
 # Atlas Play
-A visual geography quiz with nine question styles, 21 numerical measures, relative-gap difficulty, and worldwide city rankings.
+A visual geography quiz with ten question styles, 21 numerical measures, relative-gap difficulty, and worldwide city rankings.
 
 ## Run and check
 - Start: `npm run dev`
@@ -69,7 +69,7 @@ These are starting heuristics, not estimates calibrated from player results. Cit
 The source panel contains exact definitions, years, URLs, coverage and attribution. The INSEE French pack remains a labelled legacy reference; current city rounds use UN harmonized urban centres, not city-proper or commuting-area populations. UN city data is CC BY 3.0 IGO, credited to United Nations DESA Population Division.
 
 ### Guards and gaps
-- Every question compares the same observation year, cohort or period. Missing values are excluded, never zero-filled or borrowed from other years.
+- Numerical-measure questions compare the same observation year, cohort or period. Language questions use a pinned CLDR release with mixed underlying observation dates. Missing values are excluded, never zero-filled or borrowed from other years.
 - Values that tie after display rounding are excluded.
 - Happiness comparisons require nonoverlapping reported 95% confidence intervals.
 - Doctorate comparisons require reported standard errors and nonoverlapping approximate 95% intervals (`estimate +/-1.96 SE`), plus the precision guard. This is conservative gameplay filtering, not a formal statistical test. Countries without uncertainty remain eligible for estimates.
@@ -107,3 +107,13 @@ Country population uses 1 million to the highest available 2023 World Bank count
 City population uses the 2025 UN urban-area pool for the selected 1-million/100,000 threshold and keeps its UN source/period separate from country data. Other numeric measures use the available quiz-country pool, explicitly labelled as partial rather than worldwide. Electricity and human height retain their specialised visual contexts. Pin, border and history questions do not receive unrelated numeric-position charts. Download the global population/life reference JSON from the Data panel.
 
 Ratio rounds now use a `round-gap` container; insertion buttons are separately scoped as `.insert-gap`. This prevents the insertion button's fixed height/flex layout from collapsing the ratio question and overlapping the heading. Ratio headings explicitly show the numerator ÷ denominator.
+
+## Language questions (8 November 2026)
+
+Languages asks for the largest estimated number of functional users among three countries. It covers 18 exact language codes in Unicode CLDR 49, joined to the existing quiz countries. First- and second-language users are included; these are locale-planning estimates, not current census totals, native-speaker counts or a test of complete fluency. Source observation years differ. Chinese/script variants are not merged. Missing entries are excluded, never zero-filled.
+
+Counts = territory population × language population percentage / 100, without a literacy multiplier. Entries need at least 100,000 estimated users. The winner must lead the runner-up by at least 15%; displayed ties are excluded. Difficulty uses that relative gap: hard 15–25%, medium >25–<65%, easy ≥65%. These are gameplay thresholds, not confidence intervals. Each tier samples a language uniformly, then one eligible country triple.
+
+The mode appears in mixed trails with All measures selected and has a dedicated Languages selector option. Answer tiles reveal correctness and approximate counts; result bars start at zero. Data definitions, coverage caveats, source links, a JSON download and the full Unicode-3.0 licence are in the Data panel.
+
+Refresh from this directory: `python scripts/fetch-languages.py`, then `node scripts/prepare-languages.mjs`. Both inputs are pinned to CLDR JSON 49.0.0. Check with `node --experimental-strip-types scripts/check-languages.mjs` (also included in `npm test`); rebuild the static page afterwards. Normalized data and licence are tracked in `public/data/`; raw research inputs are ignored.

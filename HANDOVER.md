@@ -1,3 +1,10 @@
+## Atlas Play language questions — 2026-11-08
+
+- Added Languages: choose the country with the most estimated functional users of a named language from three flag/outline tiles. Included in the ten-style mixed trail and available for dedicated practice; numeric measure filters keep their existing question pool.
+- Pinned Unicode CLDR 49 data covers 18 eligible exact language codes, joined to the quiz countries. Counts derive from territory population × language share; first/second users, mixed observation dates and limited locale-planning coverage are explicit. Missing values are excluded. Full Unicode licence, download and reproducible fetch/prepare scripts included.
+- Winner/runner-up relative gaps set difficulty; comparisons below 15% or tied after display rounding are excluded. Results show direct tile feedback and zero-based count bars. Generic country-population visuals are skipped for this mode. Help and question reports include the language definition.
+- Validation: existing 2,175 generated-round suite and presentation/data/feedback checks pass, plus 300 new language rounds across all tiers. Desktop and 390px browser checks verify three choices, grading, approximate counts and no horizontal overflow.
+
 # Handover
 
 ## Atlas Play gets its own homepage entry — 2026-11-08

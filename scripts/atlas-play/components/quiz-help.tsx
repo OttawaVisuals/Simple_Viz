@@ -2,6 +2,7 @@ export function QuizHelp(){
  return <details className="quiz-help"><summary>How to play</summary>
   <p>There is no timer. Choose an answer, then select <strong>Check answer</strong> to reveal the result and sources.</p>
   <dl>
+   <div><dt>Languages</dt><dd>Given a language and three countries, choose the country with the most estimated functional users. First and second languages count; choose the number of users, not the highest percentage. CLDR estimates have mixed source dates.</dd></div>
    <div><dt>Compare / Then vs now</dt><dd>Choose the country with the higher value, or greater population growth for Then vs now.</dd></div>
    <div><dt>Rank / World cities</dt><dd>Put three places on the podium: highest value in 1st, middle in 2nd, lowest in 3rd. Drag a card, or select it and then select a position. Move a placed card onto another to swap them.</dd></div>
    <div><dt>Insert</dt><dd>Choose the gap where the missing country belongs in the ordered list. You can also drag its outline to a gap.</dd></div>

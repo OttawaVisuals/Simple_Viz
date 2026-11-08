@@ -1,3 +1,4 @@
+import languageData from './public/data/languages.json';
 import referenceScaleData from './public/data/reference-scales.json';
 import visualContextData from './public/data/visual-context.json';
 import data from './public/data/countries.json';
@@ -10,3 +11,5 @@ export const borderLicenseUrl=URL.createObjectURL(new Blob([borderLicense],{type
 export const visualDataUrl=URL.createObjectURL(new Blob([JSON.stringify(visualContextData)],{type:'application/json'}));
 
 export const referenceDataUrl=URL.createObjectURL(new Blob([JSON.stringify(referenceScaleData)],{type:'application/json'}));
+
+export const languageDataUrl=URL.createObjectURL(new Blob([JSON.stringify(languageData)],{type:'application/json'}));

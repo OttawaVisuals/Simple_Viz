@@ -30,4 +30,4 @@ for(const m of Object.keys(data.metrics))if(availableTypes(m).includes('estimate
 }
 for(const difficulty of ['easy','medium','hard'])for(let i=0;i<10;i++){const r=generateRound(data,'population',undefined,false,'history',{difficulty});let choice=growth(r.countries[0])>growth(r.countries[1])?0:1;assert.ok(grade(r,null,r.countries,{choice}));checked++}
 assert.ok(data.countries.filter(c=>c.doctorates!=null).length===29);assert.equal(c('USA').doctorates,null);assert.ok(data.metrics.heightMale.year.includes('1996'));assert.ok(data.metrics.renewable.year==='2021');
-console.log('PASS',checked,'rounds: all21measures, all9styles,3difficultytiers,2citypools, correct3-countrycitypodiums, pinprojection, grading and US/Finland vsFrance/Germany ordering.');console.log('Population pair cutoffs:',cuts.map(n=>(n*100).toFixed(1)+'%').join(', '));
+console.log('PASS',checked,'rounds: all21measures, base9styles + language checks,3difficultytiers,2citypools, correct3-countrycitypodiums, pinprojection, grading and US/Finland vsFrance/Germany ordering.');console.log('Population pair cutoffs:',cuts.map(n=>(n*100).toFixed(1)+'%').join(', '));

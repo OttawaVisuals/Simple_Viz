@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "test": "node --experimental-strip-types scripts/check-game.mjs && node --experimental-strip-types scripts/check-presentation.mjs && node scripts/check-visual-context.mjs && node --experimental-strip-types scripts/check-reference-scales.mjs && node --experimental-strip-types scripts/check-feedback-context.mjs"
+    "test": "node --experimental-strip-types scripts/check-game.mjs && node --experimental-strip-types scripts/check-presentation.mjs && node scripts/check-visual-context.mjs && node --experimental-strip-types scripts/check-reference-scales.mjs && node --experimental-strip-types scripts/check-feedback-context.mjs && node --experimental-strip-types scripts/check-languages.mjs"
   },
   "dependencies": {
     "animejs": "4.5.0",

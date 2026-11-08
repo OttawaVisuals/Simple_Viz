@@ -134,7 +134,19 @@
   .tile h3{margin:0;font-size:.98rem;font-weight:400;line-height:1.3;letter-spacing:-.01em;text-wrap:pretty}
 
 
-  /* Featured: one lead tile and four supporting ones. Their descriptions are printed on the
+  /* Atlas is a separate game, with its own compact entry above the experiments. */
+  .atlas-feature{margin:0 0 clamp(36px,4vw,52px)}
+  .atlas-spotlight{--accent:var(--cat-discoveries);display:grid;grid-template-columns:136px minmax(0,1fr) auto;align-items:center;gap:24px;padding:22px 0;border-block:1px solid var(--line2);color:var(--fg);text-decoration:none}
+  .atlas-spotlight .tile-icon{height:78px}
+  .atlas-type{margin:0 0 7px;font:11px ui-monospace,monospace;color:var(--muted)}
+  .atlas-spotlight h2{margin:0;font-size:clamp(1.5rem,2.5vw,2rem);font-weight:400;letter-spacing:-.025em}
+  .atlas-summary{margin:7px 0 0;font-size:.95rem;line-height:1.5;color:var(--muted2)}
+  .atlas-action{font:13px ui-monospace,monospace;white-space:nowrap;color:var(--accent);text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--line2)}
+  .atlas-spotlight:hover{color:var(--fg)}
+  .atlas-spotlight:hover .atlas-action{text-decoration-color:var(--accent)}
+  @media(max-width:640px){.atlas-spotlight{grid-template-columns:80px minmax(0,1fr);gap:12px 16px;padding:18px 0}.atlas-spotlight .tile-icon{height:64px}.atlas-action{grid-column:2;justify-self:start}}
+
+  /* Featured: four experiments. Their descriptions are printed on the
      tile instead of waiting for a hover, because a touch screen never gets the tooltip and a
      first-time visitor should be able to choose without probing. */
   .featured{margin:0 0 clamp(48px,6vw,80px)}
@@ -142,11 +154,6 @@
   .feature-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(12px,1.6vw,22px)}
   .feature-grid .tile-icon{height:72px}
   .tile .desc{margin:0;font-size:.88rem;line-height:1.55;color:var(--muted2);text-wrap:pretty}
-  .tile-lead{grid-column:span 2;grid-row:span 2;padding:20px 18px 24px}
-  .tile-lead .tile-icon{height:104px}
-  .tile-lead .meta{margin-top:auto}
-  .tile-lead h3{font-size:clamp(1.5rem,2.7vw,2.2rem);font-weight:300;letter-spacing:-.02em;line-height:1.1}
-  .tile-lead .desc{font-size:1.02rem;max-width:46ch}
 
   /* Description tooltip. The blurbs no longer fit on a tile, so they surface on hover and on
      keyboard focus from the same data-desc attribute the search reads. One shared element,
@@ -160,8 +167,8 @@
   @media (max-width:1180px){.tile-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
   @media (max-width:920px){.tile-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
   @media (max-width:640px){.tile-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-  @media (max-width:920px){.feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tile-lead{grid-row:auto}}
-  @media (max-width:640px){.settle .hint{display:none}.settle figcaption{grid-template-columns:1fr auto}.settle .ph-eq{grid-column:1/-1;order:3;text-align:left}.feature-grid{grid-template-columns:minmax(0,1fr)}.tile-lead{grid-column:auto}}
+  @media (max-width:920px){.feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:640px){.settle .hint{display:none}.settle figcaption{grid-template-columns:1fr auto}.settle .ph-eq{grid-column:1/-1;order:3;text-align:left}.feature-grid{grid-template-columns:minmax(0,1fr)}}
 
   /* Roadmap: same hairline list, with the equation in mono so it reads as data, not prose.
      Grouped by the same three categories as the built grid. */
@@ -253,7 +260,7 @@
   .icon-motion-toggle:hover{color:var(--accent);border-color:var(--accent)}
   @media(prefers-reduced-motion:no-preference){
     .tile-icon .wi-motion{animation-duration:var(--duration);animation-delay:var(--delay);animation-iteration-count:infinite;animation-timing-function:linear;animation-play-state:paused}
-    .tile.icon-playing .wi-motion{animation-play-state:running}
+    .icon-playing .wi-motion{animation-play-state:running}
     .tile-icon .wi-slide{animation-name:wi-slide;animation-timing-function:ease-in-out}
     .tile-icon .wi-spin{animation-name:wi-spin}
     .tile-icon .wi-stretch{animation-name:wi-stretch;animation-timing-function:ease-in-out}
@@ -270,7 +277,7 @@
     .tile-icon .wi-echo{animation-name:wi-echo}
     .tile-icon .wi-echo2{animation-name:wi-echo2}
     /* Unseen and user-paused icons retain a meaningful static drawing. */
-    .tile:not(.icon-playing) .wi-motion{animation-name:none}
+    :is(.tile,.atlas-spotlight):not(.icon-playing) .wi-motion{animation-name:none}
   }
   @keyframes wi-slide{0%,100%{transform:translate(0,0)}65%,80%{transform:translate(var(--dx),var(--dy))}}
   @keyframes wi-spin{to{transform:rotate(360deg)}}
@@ -323,13 +330,23 @@
     </figure>
   </div>
 
+  <section class="atlas-feature" aria-labelledby="atlas-heading">
+    <a class="atlas-spotlight" href="visualizations/atlas-play.html">
+      <div class="atlas-copy">
+        <p class="atlas-type">A geography game</p>
+        <h2 id="atlas-heading">Atlas Play</h2>
+        <p class="atlas-summary">Compare countries, rank world cities and put your world in order.</p>
+      </div>
+      <span class="atlas-action">Play Atlas &rarr;</span>
+    </a>
+  </section>
+
   <section class="featured" aria-labelledby="cat-featured">
     <div class="section-head">
       <h2 id="cat-featured">Featured</h2>
-      <span class="cat-count">Five to start with</span>
+      <span class="cat-count">Four to start with</span>
     </div>
     <div class="feature-grid">
-      <a class="tile tile-lead" data-cat="Discoveries" href="visualizations/atlas-play.html"><span class="meta">Discoveries · Geography quiz</span><h3>Atlas Play: put your world in order</h3><p class="desc">Compare countries, rank world cities and find your place on the map. Nine ways to play, with real data behind every answer.</p></a>
       <a class="tile" data-cat="Discoveries" href="visualizations/earth-moon-race.html"><span class="meta">Discoveries</span><h3>Earth to the Moon, at real speed</h3><p class="desc">Watch light cross the Earth&ndash;Moon gap, and magnify the tiny first part of the same journey for slower travellers.</p></a>
       <a class="tile" data-cat="Everyday maths" href="visualizations/pizza-area.html"><span class="meta">Everyday maths</span><h3>One big pizza, or two smaller ones?</h3><p class="desc">Compare true pizza areas with circles and area-equivalent shapes &mdash; the diameter that sounds smaller often wins.</p></a>
       <a class="tile" data-cat="Fun physics" href="visualizations/straw-hose-flow.html"><span class="meta">Fun physics</span><h3>Why the straw gives up</h3><p class="desc">See why a long drink straw becomes impossible to sip through while a much longer garden hose stays effortless.</p></a>
@@ -343,9 +360,9 @@
   <section class="catalogue" aria-labelledby="cat-all">
     <div class="section-head">
       <h2 id="cat-all">All pages</h2>
-      <span class="cat-count">Twenty-four pages</span>
+      <span class="cat-count">Twenty-three pages</span>
     </div>
-    <p class="cat-sub">Everything built so far, coloured by category. Shuffle the order if you would rather stumble into something than go looking for it.</p>
+    <p class="cat-sub">Physics and maths visualizations, coloured by category. Shuffle the order if you would rather stumble into something than go looking for it.</p>
 
     <div class="browse-tools" role="search" aria-label="Find a visualization">
       <input id="vizSearch" type="search" placeholder="Search visualizations" aria-label="Search visualizations">
@@ -358,7 +375,7 @@
       <button class="text-btn" id="shuffleBtn" type="button">Shuffle</button>
       <button class="text-btn" id="resetOrderBtn" type="button" hidden>Reset order</button>
       <button class="icon-motion-toggle" id="iconMotionToggle" type="button" aria-pressed="false">Pause icons</button>
-      <span class="results-count" id="resultsCount" aria-live="polite">24 pages</span>
+      <span class="results-count" id="resultsCount" aria-live="polite">23 pages</span>
     </div>
 
     <div class="tile-grid" id="catalogueGrid">
@@ -369,7 +386,6 @@
       <a class="tile" data-cat="Everyday maths" data-desc="Compare true pizza areas with circles and area-equivalent shapes &mdash; the diameter that sounds smaller often wins." href="visualizations/pizza-area.html"><span class="meta">Everyday maths</span><h3>One big pizza, or two smaller ones?</h3></a>
       <a class="tile" data-cat="Everyday maths" data-desc="Compare linear, quadratic, wave, exponential and logarithmic curves, then follow one moving input to see how the output changes." href="visualizations/basic-functions.html"><span class="meta">Everyday maths</span><h3>The curves behind most graphs</h3></a>
       <a class="tile" data-cat="Everyday maths" data-desc="Resize an egg from quail to ostrich and watch the same surface-to-volume geometry decide both how long it takes to hard-boil and how long the yolk stays hot after the shell feels cool." href="visualizations/egg-boiling-time.html"><span class="meta">Everyday maths</span><h3>Why the yolk stays hot after the shell goes cold</h3></a>
-      <a class="tile" data-cat="Discoveries" data-desc="A geography quiz: compare countries, rank worldwide cities and find your place on the map. Nine question styles, 21 measures and source notes for every answer." href="visualizations/atlas-play.html"><span class="meta">Discoveries</span><h3>Atlas Play: put your world in order</h3></a>
       <a class="tile" data-cat="Fun physics" data-desc="Drop a stone, time the splash, and separate the stone&rsquo;s fall from the sound&rsquo;s return journey to estimate the depth." href="visualizations/well-depth.html"><span class="meta">Fun physics</span><h3>How deep is the well?</h3></a>
       <a class="tile" data-cat="Discoveries" data-desc="Watch light cross the Earth&ndash;Moon gap, and magnify the tiny first part of the same journey for slower travellers." href="visualizations/earth-moon-race.html"><span class="meta">Discoveries</span><h3>Earth to the Moon, at real speed</h3></a>
       <a class="tile" data-cat="Discoveries" data-desc="Compare JPL-derived distances for the planets, then watch their relative movement during the light delay." href="visualizations/planet-light-delay.html"><span class="meta">Discoveries</span><h3>You are seeing the past</h3></a>
@@ -522,6 +538,7 @@
 
   // BEGIN WAVE GEOMETRY ARTWORK
   var ICONS = {
+  "atlas-play": "<circle cx=\"36\" cy=\"32\" r=\"21\" class=\"wi-soft\"/><circle cx=\"36\" cy=\"32\" r=\"21\"/><path d=\"M16.89 24.02q19.11 -10.08 38.22 0M16.89 39.980000000000004q19.11 10.08 38.22 0M36 11q-15.96 21 0 42M36 11q15.96 21 0 42\" class=\"wi-fine\"/><g class=\"wi-motion wi-slide\" style=\"--dy:-2px\"><g><path d=\"M76 23c0-10 17-10 17 0 0 7-8 6-8 15\" class=\"wi-accent\"/><circle cx=\"85\" cy=\"44\" r=\"1.5\" class=\"wi-dot\"/></g></g>",
   "earth-moon-race": "<circle cx=\"24\" cy=\"32\" r=\"13\" class=\"wi-soft\"/><circle cx=\"24\" cy=\"32\" r=\"13\"/><path d=\"M12.17 27.06q11.83 -6.24 23.66 0M12.17 36.94q11.83 6.24 23.66 0M24 19q-9.88 13 0 26M24 19q9.88 13 0 26\" class=\"wi-fine\"/><path d=\"M39 32h50\" class=\"wi-fine\"/><g class=\"wi-motion wi-wave\" style=\"--delay:0s;--dx:53px\"><path d=\"M39 23q6 9 0 18\" class=\"wi-accent\"/></g><g class=\"wi-motion wi-wave\" style=\"--delay:-1.13s;--dx:53px\"><path d=\"M39 23q6 9 0 18\" class=\"wi-accent\"/></g><g class=\"wi-motion wi-wave\" style=\"--delay:-2.26s;--dx:53px\"><path d=\"M39 23q6 9 0 18\" class=\"wi-accent\"/></g><circle cx=\"97\" cy=\"32\" r=\"7\" class=\"wi-surface\"/><path d=\"M97.5 25a7 7 0 0 0 0 14\" class=\"wi-fine\"/>",
   "pizza-area": "<g class=\"wi-motion wi-spin\" style=\"transform-origin:29px 32px;--duration:20s\"><circle cx=\"29\" cy=\"32\" r=\"23\" class=\"wi-soft\"/><circle cx=\"29\" cy=\"32\" r=\"23\"/><circle cx=\"29\" cy=\"32\" r=\"19.32\" class=\"wi-fine\"/><path d=\"M29 32l0.00 -19.32\" class=\"wi-fine\"/><path d=\"M29 32l16.73 -9.66\" class=\"wi-fine\"/><path d=\"M29 32l16.73 9.66\" class=\"wi-fine\"/><path d=\"M29 32l0.00 19.32\" class=\"wi-fine\"/><path d=\"M29 32l-16.73 9.66\" class=\"wi-fine\"/><path d=\"M29 32l-16.73 -9.66\" class=\"wi-fine\"/><circle cx=\"20.950000000000003\" cy=\"21.65\" r=\"1.61\" class=\"wi-dot\"/><circle cx=\"39.35\" cy=\"29.009999999999998\" r=\"1.61\" class=\"wi-dot\"/><circle cx=\"24.4\" cy=\"43.5\" r=\"1.61\" class=\"wi-dot\"/></g><path d=\"M59 28h9M59 35h9\" class=\"wi-fine\"/><g class=\"wi-motion wi-spin\" style=\"transform-origin:88px 19px;--duration:20s\"><circle cx=\"88\" cy=\"19\" r=\"13\" class=\"wi-soft\"/><circle cx=\"88\" cy=\"19\" r=\"13\"/><circle cx=\"88\" cy=\"19\" r=\"10.92\" class=\"wi-fine\"/><path d=\"M88 19l0.00 -10.92\" class=\"wi-fine\"/><path d=\"M88 19l9.46 -5.46\" class=\"wi-fine\"/><path d=\"M88 19l9.46 5.46\" class=\"wi-fine\"/><path d=\"M88 19l0.00 10.92\" class=\"wi-fine\"/><path d=\"M88 19l-9.46 5.46\" class=\"wi-fine\"/><path d=\"M88 19l-9.46 -5.46\" class=\"wi-fine\"/><circle cx=\"83.45\" cy=\"13.149999999999999\" r=\"0.9100000000000001\" class=\"wi-dot\"/><circle cx=\"93.85\" cy=\"17.31\" r=\"0.9100000000000001\" class=\"wi-dot\"/><circle cx=\"85.4\" cy=\"25.5\" r=\"0.9100000000000001\" class=\"wi-dot\"/></g><g class=\"wi-motion wi-spin\" style=\"transform-origin:94px 47px;--duration:20s\"><circle cx=\"94\" cy=\"47\" r=\"13\" class=\"wi-soft\"/><circle cx=\"94\" cy=\"47\" r=\"13\"/><circle cx=\"94\" cy=\"47\" r=\"10.92\" class=\"wi-fine\"/><path d=\"M94 47l0.00 -10.92\" class=\"wi-fine\"/><path d=\"M94 47l9.46 -5.46\" class=\"wi-fine\"/><path d=\"M94 47l9.46 5.46\" class=\"wi-fine\"/><path d=\"M94 47l0.00 10.92\" class=\"wi-fine\"/><path d=\"M94 47l-9.46 5.46\" class=\"wi-fine\"/><path d=\"M94 47l-9.46 -5.46\" class=\"wi-fine\"/><circle cx=\"89.45\" cy=\"41.15\" r=\"0.9100000000000001\" class=\"wi-dot\"/><circle cx=\"99.85\" cy=\"45.31\" r=\"0.9100000000000001\" class=\"wi-dot\"/><circle cx=\"91.4\" cy=\"53.5\" r=\"0.9100000000000001\" class=\"wi-dot\"/></g>",
   "straw-hose-flow": "<path d=\"M15 16h16v36H15Z\"/><rect x=\"16\" y=\"34\" width=\"14\" height=\"17\" rx=\"1.5\" class=\"wi-soft\"/><path d=\"M23 39V10h16\" class=\"wi-accent\"/><path d=\"M53 42c10 0 5-27 18-27s5 31 19 31h17\"/><path d=\"M53 38c10 0 5-27 18-27s5 31 19 31h17\" class=\"wi-fine\"/><circle cx=\"0\" cy=\"0\" r=\"1.7\" class=\"wi-dot wi-motion wi-path\" style=\"offset-path:path('M53 40C63 40 58 13 71 13S76 44 90 44H107');\"/><circle cx=\"0\" cy=\"0\" r=\"1.7\" class=\"wi-dot wi-motion wi-path\" style=\"offset-path:path('M23 39V10H39');--duration:6s\"/>",
@@ -532,7 +549,6 @@
   "shelf-sag": "<path d=\"M12 30l-5 11h10ZM108 30l-5 11h10Z\"/><path d=\"M12 27h96\" class=\"wi-fine\" stroke-dasharray=\"2 4\"/><g class=\"wi-motion wi-stretch\" style=\"transform-origin:60px 30px;--sy:1.25\"><path d=\"M12 30q48 16 96 0\" class=\"wi-accent\"/></g><g class=\"wi-motion wi-slide\" style=\"--dy:2px\"><rect x=\"52\" y=\"23\" width=\"16\" height=\"12\" rx=\"1.5\" class=\"wi-soft\"/><rect x=\"52\" y=\"23\" width=\"16\" height=\"12\" rx=\"1.5\"/><path d=\"M60 37l0 12m-3 -4l3 4l3 -4\" class=\"wi-accent\"/></g>",
   "basic-functions": "<path d=\"M15 10v43h92\" class=\"wi-fine\"/><path d=\"M19 46L100 17\" class=\"wi-accent wi-motion wi-draw\" pathLength=\"1\" style=\"\"/><path d=\"M20 46Q60 1 101 46\" class=\"wi-accent wi-motion wi-draw\" pathLength=\"1\" style=\"--delay:-1.1s\"/><path d=\"M20 33q10-17 20 0t20 0t20 0t20 0\" class=\"wi-accent wi-motion wi-draw\" pathLength=\"1\" style=\"--delay:-2.2s\"/>",
   "egg-boiling-time": "<path d=\"M60 8c13 0 23 18 23 30 0 13-10 20-23 20S37 51 37 38c0-12 10-30 23-30Z\"/><ellipse cx=\"60\" cy=\"39\" rx=\"13\" ry=\"11\" class=\"wi-soft\"/><g class=\"wi-motion wi-stretch\" style=\"transform-origin:60px 39px;--sx:1.18;--sy:1.18\"><ellipse cx=\"60\" cy=\"39\" rx=\"10\" ry=\"8\" class=\"wi-accent\"/></g><g class=\"wi-motion wi-rise\" style=\"--dy:-5px;--delay:0s\"><path d=\"M44 16q-4-3 0-7\" class=\"wi-accent wi-fine\"/></g><g class=\"wi-motion wi-rise\" style=\"--dy:-5px;--delay:-0.8s\"><path d=\"M60 16q-4-3 0-7\" class=\"wi-accent wi-fine\"/></g><g class=\"wi-motion wi-rise\" style=\"--dy:-5px;--delay:-1.6s\"><path d=\"M76 16q-4-3 0-7\" class=\"wi-accent wi-fine\"/></g>",
-  "atlas-play": "<circle cx=\"36\" cy=\"32\" r=\"21\" class=\"wi-soft\"/><circle cx=\"36\" cy=\"32\" r=\"21\"/><path d=\"M16.89 24.02q19.11 -10.08 38.22 0M16.89 39.980000000000004q19.11 10.08 38.22 0M36 11q-15.96 21 0 42M36 11q15.96 21 0 42\" class=\"wi-fine\"/><g class=\"wi-motion wi-slide\" style=\"--dy:-2px\"><g><path d=\"M76 23c0-10 17-10 17 0 0 7-8 6-8 15\" class=\"wi-accent\"/><circle cx=\"85\" cy=\"44\" r=\"1.5\" class=\"wi-dot\"/></g></g>",
   "well-depth": "<path d=\"M42 16v32q12 5 24 0V16M31 16h8M69 16h8\"/><ellipse cx=\"54\" cy=\"16\" rx=\"12\" ry=\"3\"/><ellipse cx=\"54\" cy=\"48\" rx=\"12\" ry=\"3\" class=\"wi-soft\"/><path d=\"M42 48q12-5 24 0\" class=\"wi-accent wi-fine\"/><path d=\"M54 23v17\" class=\"wi-fine\" stroke-dasharray=\"1 3\"/><ellipse cx=\"54\" cy=\"48\" rx=\"10\" ry=\"3\" class=\"wi-accent wi-motion wi-splash\" style=\"transform-origin:54px 48px\"/><path d=\"M48 46q6-5 12 0\" class=\"wi-accent wi-motion wi-echo\"/><path d=\"M48 46q6-5 12 0\" class=\"wi-accent wi-motion wi-echo2\"/><circle cx=\"54\" cy=\"16\" r=\"1.7\" class=\"wi-dot wi-motion wi-stone\"/><path d=\"M82 18v29M79 18h6M79 47h6M81 25h3M81 32h3M81 39h3\" class=\"wi-fine\"/>",
   "planet-light-delay": "<circle cx=\"20\" cy=\"32\" r=\"11\" class=\"wi-soft\"/><circle cx=\"20\" cy=\"32\" r=\"9\"/><path d=\"M20 16v-4M20 48v4M4 32H0M36 32h4M9 21l-3-3M31 43l3 3M9 43l-3 3M31 21l3-3\" class=\"wi-fine\"/><path d=\"M36 32h58\" class=\"wi-fine\"/><circle cx=\"101\" cy=\"32\" r=\"9\" class=\"wi-soft\"/><circle cx=\"101\" cy=\"32\" r=\"9\"/><path d=\"M92.81 28.58q8.19 -4.32 16.38 0M92.81 35.42q8.19 4.32 16.38 0M101 23q-6.84 9 0 18M101 23q6.84 9 0 18\" class=\"wi-fine\"/><circle cx=\"91\" cy=\"23\" r=\"9\" class=\"wi-fine\" stroke-dasharray=\"2 3\"/><circle cx=\"0\" cy=\"0\" r=\"2\" class=\"wi-dot wi-motion wi-path\" style=\"offset-path:path('M36 32H91');\"/><path d=\"M92 15l8 7m-4.985820602433066 -0.37628834735343863l4.985820602433066 0.37628834735343863l-1.034792955221957 -4.891748515594706\" class=\"wi-fine\"/>",
   "keplers-third-law": "<circle cx=\"47\" cy=\"32\" r=\"6\" class=\"wi-soft\"/><circle cx=\"47\" cy=\"32\" r=\"5\" class=\"wi-dot\"/><ellipse cx=\"56\" cy=\"32\" rx=\"29\" ry=\"17\"/><ellipse cx=\"62\" cy=\"32\" rx=\"49\" ry=\"26\" class=\"wi-fine\"/><circle cx=\"0\" cy=\"0\" r=\"2.6\" class=\"wi-dot wi-motion wi-path\" style=\"offset-path:path('M85 32A29 17 0 1 1 27 32A29 17 0 1 1 85 32Z');--duration:3.4s\"/><circle cx=\"0\" cy=\"0\" r=\"3\" class=\"wi-dot wi-motion wi-path\" style=\"offset-path:path('M111 32A49 26 0 1 1 13 32A49 26 0 1 1 111 32Z');--duration:7.5s\"/>",
@@ -550,7 +566,7 @@
   // END WAVE GEOMETRY ARTWORK
 
   // BEGIN WAVE GEOMETRY RUNTIME — generated by scripts/build-tile-icons.cjs.
-  var iconCards = Array.prototype.slice.call(document.querySelectorAll('.tile[href^="visualizations/"]'));
+  var iconCards = Array.prototype.slice.call(document.querySelectorAll('.tile[href^="visualizations/"],.atlas-spotlight[href^="visualizations/"]'));
   var SVG_NS = 'http://www.w3.org/2000/svg';
   iconCards.forEach(function(card){
     var slug = card.getAttribute('href').split('/').pop().replace(/\.html$/, '');

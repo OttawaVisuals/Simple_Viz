@@ -1,5 +1,11 @@
 # Handover
 
+## Atlas Play gets its own homepage entry — 2026-11-08
+
+- User requested a visible placement distinct from the physics tiles. Atlas now has one compact, full-width entry between the introduction and Featured, labelled “A geography game” with a Play Atlas link. It uses hairline separators and the animated globe artwork instead of a coloured catalogue tile.
+- Removed Atlas from Featured and All pages; Featured now has four experiments, and the searchable physics/maths catalogue has 23 entries. The game itself is unchanged.
+- Extended the icon generator to include the separate Atlas entry, preserving pause, off-screen suspension and reduced-motion behaviour. Browser checks pass in light/dark themes at 320/760/1440px; desktop and 390px mobile screenshots were inspected.
+
 ## Wave geometry tile icons — 2026-11-08
 
 - User approved the wave geometry direction after speed-of-light, gravity and well-depth previews, then requested the full set and publication.

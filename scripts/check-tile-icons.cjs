@@ -22,6 +22,11 @@ const pause=ms=>new Promise(r=>setTimeout(r,ms));
     return {cards:cards.length,icons:document.querySelectorAll('.tile > .tile-icon').length,empty:cards.filter(c=>!c.querySelector('.wi-motion')).map(c=>c.getAttribute('href')),active:document.querySelectorAll('.icon-playing').length,offscreen:cards.filter(c=>c.getBoundingClientRect().top>innerHeight&&!c.classList.contains('icon-playing')).length};
    });
    assert.equal(counts.icons,counts.cards);assert.deepEqual(counts.empty,[]);assert.ok(counts.active>0);assert.ok(counts.offscreen>0);
+   if(filename==='index.html'){
+    assert.equal(await page.locator('a[href="visualizations/atlas-play.html"]').count(),1,'Atlas has one distinct entry');
+    assert.equal(await page.locator('.atlas-spotlight > .tile-icon').count(),1);
+    assert.equal(await page.locator('.featured [href="visualizations/atlas-play.html"], #catalogueGrid [href="visualizations/atlas-play.html"]').count(),0);
+   }
    // Each motion type and path must produce finite, nonempty SVG bounds.
    assert.deepEqual(await page.evaluate(()=>[...document.querySelectorAll('.tile-icon')].filter(s=>{const b=s.getBBox();return !Number.isFinite(b.width)||b.width<=0||b.height<=0;}).map(s=>s.parentNode.getAttribute('href'))),[]);
    const playingBefore=await page.evaluate(()=>document.querySelector('.icon-playing .wi-motion').getAnimations()[0]?.currentTime);
@@ -43,7 +48,7 @@ const pause=ms=>new Promise(r=>setTimeout(r,ms));
    await page.locator('#iconMotionToggle').waitFor({state:'visible'});
    // Existing search and category controls continue to work.
    await page.locator('#vizSearch').fill('zzzz-no-concept');
-   assert.equal(await page.locator('.tile:not(.is-hidden)').filter({has:page.locator('h3')}).count(),filename==='index.html'?5:0);
+   assert.equal(await page.locator('.tile:not(.is-hidden)').filter({has:page.locator('h3')}).count(),filename==='index.html'?4:0);
    await page.locator('#vizSearch').fill('');
    await page.locator('#vizCategory').selectOption({label:'Discoveries'});
    assert.equal(await page.locator('.tile:not(.is-hidden)').evaluateAll(cards=>cards.some(c=>c.closest('#catalogueGrid, .group')&&c.dataset.cat!=='Discoveries')),false);
@@ -53,6 +58,9 @@ const pause=ms=>new Promise(r=>setTimeout(r,ms));
     for(const width of [320,760,1440]){
      await page.setViewportSize({width,height:1000});
      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,`${filename} ${theme} ${width}: overflow`);
+     if(filename==='index.html') assert.equal(await page.locator('.atlas-spotlight').evaluate(a=>{
+      const box=a.getBoundingClientRect();return [...a.children].every(c=>{const r=c.getBoundingClientRect();return r.left>=box.left-1&&r.right<=box.right+1&&r.top>=box.top-1&&r.bottom<=box.bottom+1;});
+     }),true,'Atlas icon, copy and action fit');
     }
     await page.screenshot({path:path.join(out,filename.replace('.html','')+'-'+theme+'.png'),fullPage:true});
    }

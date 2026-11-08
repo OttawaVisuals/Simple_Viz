@@ -1,5 +1,27 @@
 # Style guide
 
+## Catalogue icons — wave geometry (2026-11-08)
+
+The user approved the wave geometry direction for the tile icons: thin geometric
+outlines, a few translucent accent fills, and a small animation showing the concept.
+The speed-of-light, gravity, and well-depth previews established the direction.
+
+- Artwork and shared motion live in `scripts/build-tile-icons.cjs`. Run
+  `node scripts/build-tile-icons.cjs` after editing it. The script embeds only the
+  artwork used by each of `index.html` and `unreviewed.html`, so both pages remain
+  self-contained. Do not edit the generated blocks directly.
+- Use the tile's existing category accent, `currentColor` for structure, a 1.35-unit
+  primary stroke, 1-unit secondary strokes, and 13% accent fills in a `120 64` viewBox.
+  Motion and geometry are illustrative; do not imply measured quantities or times.
+- Animate visible tiles automatically, including on touch. Pause off-screen tiles
+  and hidden documents. The **Pause icons** control persists the preference locally.
+  Reduced-motion mode and print use a meaningful static drawing.
+- Every catalogue entry needs its own concept-specific artwork and motion. The
+  build rejects missing icons. `scripts/check-tile-icons.cjs` checks coverage,
+  animation, pause persistence, reduced motion, search, and responsive overflow,
+  and produces contact sheets in `outputs/tile-icons/` for visual review. It uses
+  Playwright from the local development environment, not a browser dependency.
+
 **As of 2026-08-14, [`visualizations/straw-hose-flow.html`](visualizations/straw-hose-flow.html)
 is the reference implementation for the site's visual language.** The user approved this
 design explicitly ("Ok this is the style") after several rounds of iteration. Start new

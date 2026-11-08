@@ -1,5 +1,13 @@
 # Handover
 
+## Wave geometry tile icons — 2026-11-08
+
+- User approved the wave geometry direction after speed-of-light, gravity and well-depth previews, then requested the full set and publication.
+- Replaced artwork for all 64 unique tiles across `index.html` and `unreviewed.html`: thin geometric outlines, soft category fills and concept-specific motion. Existing tile text, links, order and category colours are preserved.
+- Visible tiles animate automatically; off-screen tiles and hidden documents stop. Pause icons persists locally. Reduced motion and print use static drawings.
+- Canonical source: `scripts/build-tile-icons.cjs`; rebuild to embed artwork/runtime into each self-contained catalogue. The build is idempotent and rejects missing artwork.
+- Validation: `scripts/check-tile-icons.cjs` checks all 69 tile instances (including featured duplicates), animation, pause/reload persistence, reduced motion, search/category filtering, 320/760/1440px overflow, and light/dark themes. Both catalogues pass without browser errors. All 64 designs were inspected in contact sheets; previews live under `outputs/tile-icons/` locally.
+
 ## Site navigation, feedback privacy and quiz help/reporting — 2026-11-07
 
 - Standardized About / Contact / Feedback / Privacy links on the homepage, About, draft catalogue and visualization pages. Added missing inline feedback forms and a short privacy link. `scripts/sync-site-feedback.py` maintains standalone copies; `scripts/check-site-feedback.py` audits 69 static pages and inline script syntax. Atlas Play uses its own generated React footer.

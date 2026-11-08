@@ -149,6 +149,14 @@
   .footer{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,40px);font:11.5px/1.7 ui-monospace,monospace;color:var(--muted)}
   .footer a{color:var(--muted2);text-decoration-color:var(--line2)}
   @media (max-width:700px){.feedback-head{grid-template-columns:1fr}.feedback-choices{justify-content:flex-start}.footer{grid-template-columns:1fr;gap:10px}.ctrl-head{align-items:flex-start}.ctrl-rel{max-width:18ch;text-align:right}}
+
+/* Shared page links */
+.site-footer[data-site-links]{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px 24px;color:var(--muted);font:11.5px/1.7 ui-monospace,monospace}
+.site-footer[data-site-links]>span{max-width:70ch}
+.site-footer[data-site-links] nav{display:flex;align-items:center;flex-wrap:wrap;gap:0 10px}
+.site-footer[data-site-links] nav a{display:inline-flex;align-items:center;min-height:44px;color:var(--muted2);text-decoration:underline;text-underline-offset:3px}
+.feedback-privacy{margin:7px 0 0;font:11px/1.6 ui-monospace,monospace;color:var(--muted)}
+.feedback-privacy a{color:var(--muted2);text-decoration:underline}
 </style>
 <main>
 <div class="wrap">
@@ -235,12 +243,16 @@
   <p class="note"><strong>These are the fan affinity laws for changing the speed of the same fan at corresponding operating points:</strong> Q<sub>2</sub>/Q<sub>1</sub>&nbsp;=&nbsp;N<sub>2</sub>/N<sub>1</sub>, &Delta;p<sub>2</sub>/&Delta;p<sub>1</sub>&nbsp;=&nbsp;(N<sub>2</sub>/N<sub>1</sub>)&sup2;, and P<sub>2</sub>/P<sub>1</sub>&nbsp;=&nbsp;(N<sub>2</sub>/N<sub>1</sub>)&sup3;. The page holds fan diameter, air density and efficiency constant. It predicts power delivered at the fan shaft, not electrical input: motor, variable-speed drive, bearing and transmission losses do not follow the cube law. A system with a significant fixed static-pressure requirement may not produce airflow in direct proportion to speed. Similarity also becomes less reliable at very low speed. Never exceed a fan or motor&rsquo;s manufacturer-rated speed; the 120% setting is a mathematical comparison, not an operating recommendation. Measured fan and system curves remain the authority. The <a href="https://www.energy.gov/sites/prod/files/2014/04/f15/motor_tip_sheet11.pdf" target="_blank" rel="noopener">U.S. Department of Energy</a> gives the same 20%-speed-reduction example; <a href="https://en.wikipedia.org/wiki/Affinity_laws" target="_blank" rel="noopener">Wikipedia&rsquo;s affinity-laws article</a> gives an accessible derivation; and <a href="https://www.amca.org/assets/resources/public/pdf/Publications/amca-210-25-downloadable.pdf" target="_blank" rel="noopener">ANSI/AMCA 210-25, Annex E</a> defines the similarity relationships and their limits.</p>
 
   <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
-    <div class="feedback-head"><div><p class="feedback-kicker">Private feedback</p><h2 id="feedbackHeading">Was this clear?</h2><p class="feedback-copy">Your response is private and helps improve this page.</p></div>
+    <div class="feedback-head"><div><p class="feedback-kicker">Private feedback</p><h2 id="feedbackHeading">Was this clear?</h2><p class="feedback-copy">Your response is private and helps improve this page.</p>
+        <p class="feedback-privacy">No reply address is collected. <a href="../about.html#feedback-privacy">How private feedback works</a>.</p></div>
       <div class="feedback-choices" role="group" aria-label="Clarity rating"><button class="feedback-choice" type="button" data-rating="clear" aria-pressed="false">Yes</button><button class="feedback-choice" type="button" data-rating="almost" aria-pressed="false">Almost</button><button class="feedback-choice" type="button" data-rating="not-yet" aria-pressed="false">Not yet</button></div>
     </div>
     <form class="feedback-form" hidden><label for="feedbackComment">What could be clearer? <span>Optional, 1,200 characters maximum.</span></label><textarea id="feedbackComment" name="comment" maxlength="1200" placeholder="A confusing step, a possible mistake, or an idea..."></textarea><label class="feedback-trap" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label><div class="feedback-actions"><button class="feedback-send" type="submit">Send private feedback</button><span class="feedback-status" role="status" aria-live="polite"></span></div></form>
   </section>
-  <div class="footer"><span>Designed and maintained by Simon using AI-assisted development. Sources and approximations are stated on each page. <a href="../about.html">Why this site exists</a>.</span><span>Spot a mistake or have an idea? Write to <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.</span></div>
+  <div class="site-footer" data-site-links>
+    <span>Designed and maintained by Simon using AI-assisted development. Sources and approximations are stated on each page.</span>
+    <nav aria-label="Page links"><a href="../about.html">About</a> · <a href="mailto:hello@madeclear.ca">Contact</a> · <a href="#feedbackHeading">Feedback</a> · <a href="../about.html#feedback-privacy">Privacy</a></nav>
+  </div>
 </div>
 </main>
 <script>

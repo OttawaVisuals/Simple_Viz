@@ -17,6 +17,36 @@
   .meaning{padding:40px 0 35px;border-bottom:1px solid var(--line)}.meaning h2{font-size:clamp(28px,3.3vw,42px);font-weight:400;letter-spacing:-.035em;margin:0 0 20px}.meaning-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(20px,4vw,54px)}.meaning-grid h3{font-size:20px;font-weight:400;font-style:italic;margin:0 0 8px}.meaning-grid p{margin:0;color:var(--muted2);font-size:16px;line-height:1.48}.meaning-grid b{font-weight:400;color:var(--fg)}
   .home{padding:40px 0;border-bottom:1px solid var(--line)}.home .sub{max-width:none;margin-bottom:22px}.home-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:clamp(20px,4vw,54px)}.home h3{font:italic 20px Georgia,serif;margin:0 0 9px}.home p,.home li{color:var(--muted2);line-height:1.48}.home p{margin:0}.home ol{padding-left:1.25em;margin:0}.safety{color:var(--bad)!important}.note{margin:30px 0 0;color:var(--muted);font:12px/1.55 ui-monospace,monospace}.site-footer{display:flex;justify-content:space-between;gap:22px;flex-wrap:wrap;margin-top:36px;color:var(--muted);font:11px/1.5 ui-monospace,monospace}
   @media(max-width:800px){.topgrid,.resultrow{grid-template-columns:1fr}.equation{text-align:left}.legend{max-width:420px}.meaning-grid,.home-grid{grid-template-columns:1fr}.experiment{min-height:260px}.range-row{grid-template-columns:1fr 70px;gap:8px}.range-row label{grid-column:1/-1}.mode-row{align-items:flex-start;flex-direction:column}.status{text-align:left}}@media(max-width:460px){.topbar-right{gap:10px}.brand-word{display:none}.topgrid{padding-top:48px}.experiment{min-height:220px}}
+  .feedback{margin-top:clamp(40px,4.6vw,64px);padding-top:20px;border-top:1px solid var(--line)}
+  .feedback-head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:20px}
+  .feedback-kicker{margin:0 0 5px;font:10px/1.3 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .feedback h2{margin:0;font-size:clamp(21px,2.2vw,28px);font-weight:400;letter-spacing:-.02em}
+  .feedback-copy{margin:5px 0 0;font:12px/1.6 ui-monospace,monospace;color:var(--muted)}
+  .feedback-choices{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+  .feedback-choice{appearance:none;border:1px solid var(--line2);border-radius:999px;background:transparent;color:var(--muted2);padding:7px 12px;font:12px/1 ui-monospace,monospace;cursor:pointer}
+  .feedback-choice:hover,.feedback-choice:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
+  .feedback-choice[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--bg))}
+  .feedback-form{margin-top:18px;max-width:760px}
+  .feedback-form[hidden]{display:none}
+  .feedback-form label{display:block;margin-bottom:7px;font:12px/1.5 ui-monospace,monospace;color:var(--muted2)}
+  .feedback-form label span{color:var(--muted)}
+  .feedback-form textarea{box-sizing:border-box;width:100%;min-height:84px;resize:vertical;border:1px solid var(--line2);border-radius:3px;background:transparent;color:var(--fg);padding:10px 11px;font:14px/1.5 Georgia,serif}
+  .feedback-form textarea:focus{border-color:var(--accent);outline:1px solid var(--accent);outline-offset:2px}
+  .feedback-actions{display:flex;align-items:baseline;gap:14px;margin-top:9px}
+  .feedback-send{appearance:none;border:0;border-bottom:1px solid var(--line2);background:transparent;color:var(--muted2);padding:2px 0;font:12px/1.4 ui-monospace,monospace;cursor:pointer}
+  .feedback-send:hover,.feedback-send:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+  .feedback-send:disabled{cursor:wait;opacity:.55}
+  .feedback-status{font:11px/1.5 ui-monospace,monospace;color:var(--muted)}
+  .feedback-trap{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}
+@media(max-width:700px){.feedback-head{grid-template-columns:1fr}.feedback-choices{justify-content:flex-start}}
+
+/* Shared page links */
+.site-footer[data-site-links]{margin-top:24px;padding-top:16px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:12px 24px;color:var(--muted);font:11.5px/1.7 ui-monospace,monospace}
+.site-footer[data-site-links]>span{max-width:70ch}
+.site-footer[data-site-links] nav{display:flex;align-items:center;flex-wrap:wrap;gap:0 10px}
+.site-footer[data-site-links] nav a{display:inline-flex;align-items:center;min-height:44px;color:var(--muted2);text-decoration:underline;text-underline-offset:3px}
+.feedback-privacy{margin:7px 0 0;font:11px/1.6 ui-monospace,monospace;color:var(--muted)}
+.feedback-privacy a{color:var(--muted2);text-decoration:underline}
 </style>
 <main><div class="wrap">
   <div class="topbar"><a class="brand" href="../index.html" aria-label="Made clear — home"><svg class="brand-icon" viewBox="0 0 58 28" aria-hidden="true"><text x="22" y="16">mc</text><path d="M1 22 C3 22 3 16 5 16 S7 26 9 26 S11 13 13 13 S15 23 17 23 S19 18 21 18 L57 18"/></svg><span class="brand-word" aria-hidden="true"><span>m</span><span class="sub">ade</span><span>c</span><span class="sub">lear</span></span></a><div class="topbar-right"><span>Quantum interference</span><button class="theme-toggle" id="themeToggle" type="button"></button></div></div>
@@ -26,7 +56,35 @@
   <section class="meaning"><h2>What it means — and what it does not</h2><div class="meaning-grid"><div><h3>Light is a wave</h3><p>Young&rsquo;s original 1801 experiment used light. Two paths combine: in step gives a bright stripe; out of step gives a dark one. Water waves and sound can do this too.</p></div><div><h3>Detections are discrete</h3><p>With sufficiently weak light, the screen records separate photon-sized events. Over many events, their positions reproduce the same interference pattern.</p></div><div><h3>Measuring the path changes it</h3><p><b>Not because a person looks.</b> A device that can record which slit couples to the particle and removes the coherent phase relationship the fringes require.</p></div></div></section>
   <section class="home"><h2>You can do the wave version at home</h2><p class="sub">You can reproduce the optical interference pattern. A true one-photon-at-a-time version needs specialized low-light detection, so this is an analogue of the original light experiment.</p><div class="home-grid"><div><h3>What you need</h3><p>A low-power laser pointer, a commercial double-slit slide (most reliable), a white wall or paper screen, and a dim room. A diffraction grating is an easier alternative, but makes many slits rather than two.</p></div><div><h3>Try it</h3><ol><li>Place the slide in the beam.</li><li>Put the screen 1–3 m away.</li><li>Rotate or move the screen until central and side bright bands are clear.</li><li>Measure fringe spacing; it grows with wavelength and screen distance, and shrinks as slits move farther apart.</li></ol></div><div><h3>Safety and limits</h3><p class="safety">Never aim a laser at eyes, reflective surfaces, vehicles, or aircraft. Do not use a high-power laser.</p><p>DIY slits made from razor blades or foil are difficult to align and can add unnecessary sharp-object risk. A ready-made slide is safer and more dependable.</p></div></div></section>
   <p class="note">Historical note: Thomas Young&rsquo;s double-slit demonstration (1801) supported the wave theory of light. The particle-by-particle version is a later quantum experiment. Sources: Feynman, Leighton &amp; Sands, <i>The Feynman Lectures on Physics</i>, Vol. III, Ch. 1; single-slit Fraunhofer diffraction approximation.</p>
-  <footer class="site-footer"><span>Designed and maintained by Simon using AI-assisted development. Sources and approximations are stated on each page. <a href="../about.html">Why this site exists</a>.</span><span>Spot a mistake or have an idea? Write to <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.</span></footer>
+    <section class="feedback" data-feedback aria-labelledby="feedbackHeading">
+    <div class="feedback-head">
+      <div>
+        <p class="feedback-kicker">Private feedback</p>
+        <h2 id="feedbackHeading">Was this clear?</h2>
+        <p class="feedback-copy">Your response is private and helps improve this page.</p>
+        <p class="feedback-privacy">No reply address is collected. <a href="../about.html#feedback-privacy">How private feedback works</a>.</p>
+      </div>
+      <div class="feedback-choices" role="group" aria-label="Clarity rating">
+        <button class="feedback-choice" type="button" data-rating="clear" aria-pressed="false">Yes</button>
+        <button class="feedback-choice" type="button" data-rating="almost" aria-pressed="false">Almost</button>
+        <button class="feedback-choice" type="button" data-rating="not-yet" aria-pressed="false">Not yet</button>
+      </div>
+    </div>
+    <form class="feedback-form" hidden>
+      <label for="feedbackComment">What could be clearer? <span>Optional, 1,200 characters maximum.</span></label>
+      <textarea id="feedbackComment" name="comment" maxlength="1200" placeholder="A confusing step, a possible mistake, or an idea..."></textarea>
+      <label class="feedback-trap" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
+      <div class="feedback-actions">
+        <button class="feedback-send" type="submit">Send private feedback</button>
+        <span class="feedback-status" role="status" aria-live="polite"></span>
+      </div>
+    </form>
+  </section>
+
+  <div class="site-footer" data-site-links>
+    <span>Designed and maintained by Simon using AI-assisted development. Sources and approximations are stated on each page.</span>
+    <nav aria-label="Page links"><a href="../about.html">About</a> · <a href="mailto:hello@madeclear.ca">Contact</a> · <a href="#feedbackHeading">Feedback</a> · <a href="../about.html#feedback-privacy">Privacy</a></nav>
+  </div>
 </div></main>
 <script>
 (function(){
@@ -45,5 +103,76 @@
     if(hitMode){for(var i=0;i<800;i++){var q=pickY(p,true,i);if(q.show)s+='<circle class="dot" cx="'+(870+(i%5)*9)+'" cy="'+(215+q.y).toFixed(1)+'" r="1.8" opacity="'+(.25+(i%4)*.18)+'"/>'}}else if(measuredMode){for(var j=0;j<640;j++){var m=pickY(p,false,j);if(m.show)s+='<circle class="dot" cx="'+(870+(j%5)*9)+'" cy="'+(215+m.y).toFixed(1)+'" r="1.7" opacity="'+(.2+(j%4)*.16)+'"/>'}}else{for(var z=0;z<170;z++){var yy=44+z*2,vv=intensity(yy-215,p),op=.08+.8*vv;s+='<rect x="854" y="'+yy+'" width="66" height="2.3" fill="var(--accent)" opacity="'+op+'"/>'}}marks.innerHTML=s;
     if(mode==='wave'){status.textContent='continuous intensity prediction';takeaway.textContent='Two paths interfere: bright, dark, bright.';explain.textContent='The smooth stripes are the wave calculation. Their spacing responds to your three controls.'}else if(mode==='hits'){status.textContent='800 sampled detection events';takeaway.textContent='Each dot lands alone. The pattern does not.';explain.textContent='A single detection is localized, but many detections follow the same probability distribution as the wave intensity.'}else{status.textContent='path information available';takeaway.textContent='The fringes disappear when path information exists.';explain.textContent='The two broad lobes are not an ordinary interference pattern. Recording which slit removes the shared phase needed for it.'}}
   [spacing,wavelength,distance].forEach(function(el){el.addEventListener('input',render)});document.querySelectorAll('.mode').forEach(function(btn){btn.addEventListener('click',function(){mode=btn.dataset.mode;document.querySelectorAll('.mode').forEach(function(b){b.setAttribute('aria-pressed',b===btn?'true':'false')});render()})});render();
+})();
+</script>
+
+<script>
+(function(){
+  var root = document.querySelector('[data-feedback]');
+  if(!root) return;
+  var form = root.querySelector('.feedback-form');
+  var choices = Array.prototype.slice.call(root.querySelectorAll('.feedback-choice'));
+  var textarea = root.querySelector('textarea');
+  var status = root.querySelector('.feedback-status');
+  var send = root.querySelector('.feedback-send');
+  var rating = '';
+
+  choices.forEach(function(choice){
+    choice.addEventListener('click', function(){
+      rating = choice.dataset.rating;
+      choices.forEach(function(item){ item.setAttribute('aria-pressed', item===choice ? 'true' : 'false'); });
+      form.hidden = false;
+      status.textContent = '';
+    });
+  });
+
+  function pageSlug(){
+    var file = location.pathname.split('/').pop() || '';
+    return file.replace(/\.html?$/i,'').toLowerCase() || 'visualization';
+  }
+
+  function currentContext(){
+    var values = [];
+    Array.prototype.forEach.call(document.querySelectorAll('[role="slider"]'), function(slider){
+      var label = slider.getAttribute('aria-label') || 'Control';
+      var value = slider.getAttribute('aria-valuetext') || slider.getAttribute('aria-valuenow');
+      if(value) values.push(label+': '+value);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('select'), function(select){
+      var label = select.getAttribute('aria-label') || select.name || 'Selection';
+      var option = select.options[select.selectedIndex];
+      if(option) values.push(label+': '+option.textContent.trim());
+    });
+    return values.slice(0,20);
+  }
+
+  form.addEventListener('submit', function(event){
+    event.preventDefault();
+    if(!rating) return;
+    if(location.protocol==='file:'){
+      status.textContent = 'Feedback can be sent from madeclear.ca.';
+      return;
+    }
+    send.disabled = true;
+    status.textContent = 'Sending…';
+    fetch('/api/feedback', {
+      method:'POST',
+      credentials:'same-origin',
+      headers:{'content-type':'application/json'},
+      body:JSON.stringify({
+        page:pageSlug(),
+        rating:rating,
+        comment:textarea.value,
+        website:form.elements.website.value,
+        context:currentContext()
+      })
+    }).then(function(response){
+      if(!response.ok) throw new Error('request failed');
+      status.textContent = 'Thank you — your feedback is private.';
+      textarea.value = '';
+    }).catch(function(){
+      status.innerHTML = 'Could not send. Try <a href="mailto:hello@madeclear.ca">hello@madeclear.ca</a>.';
+    }).then(function(){ send.disabled = false; });
+  });
 })();
 </script>

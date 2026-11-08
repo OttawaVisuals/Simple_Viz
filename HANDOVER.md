@@ -1,5 +1,13 @@
 # Handover
 
+## Site navigation, feedback privacy and quiz help/reporting — 2026-11-07
+
+- Standardized About / Contact / Feedback / Privacy links on the homepage, About, draft catalogue and visualization pages. Added missing inline feedback forms and a short privacy link. `scripts/sync-site-feedback.py` maintains standalone copies; `scripts/check-site-feedback.py` audits 69 static pages and inline script syntax. Atlas Play uses its own generated React footer.
+- Added an implementation-based privacy section to `about.html#feedback-privacy`: stored fields, private review, conditional Resend notifications, no reply address, daily duplicate-control key, raw metadata distinction, per-page replacement behaviour and contact/removal requests. No unverified retention period or provider-wide tracking claims.
+- Added collapsed help for all nine quiz styles and a “Report this question” action. Reports freeze the question, place IDs, settings and player input at click time, survive round changes, require an explicit clarity rating and can be cancelled. Hidden source answers are excluded from the report context.
+- Validation: production build, existing 2,175-round suite and new snapshot/context tests pass. Static audit checks all shared footer/feedback/privacy anchors and 141 inline scripts. Browser verified help expansion, missing-rating validation, local mocked submission retaining the original city question after switching to Compare, and responsive report/footer layout at 390px. No production feedback sent during QA.
+- The pre-existing egg-boiling simulation changes remain separate; only the shared footer/privacy changes from that file are included in this publication.
+
 ## Atlas Play private feedback — 2026-11-07
 
 - Added `components/page-feedback.tsx` above the quiz footer with the site's existing Yes / Almost / Not yet clarity ratings, optional 1,200-character comment, honeypot and private-feedback status. Uses the existing same-origin `/api/feedback` endpoint with `page: atlas-play`, current question and selected settings; no backend changes.

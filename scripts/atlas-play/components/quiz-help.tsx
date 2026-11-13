@@ -8,7 +8,7 @@ export function QuizHelp(){
    <div><dt>Flags, capitals, cities</dt><dd>Four options. Name the country for a flag, pick a country’s capital, or say which country a city is in.</dd></div>
    <div><dt>Head to head / Then vs now</dt><dd>Choose the country with the higher value, or the greater population growth for Then vs now.</dd></div>
    <div><dt>Podiums</dt><dd>Put three places on the podium: highest value in 1st, middle in 2nd, lowest in 3rd. Drag a card, or select it and then select a position. Each pair in the right order earns credit.</dd></div>
-   <div><dt>Find its place</dt><dd>Choose the gap where the missing country belongs in the ordered list. One place off still earns some points.</dd></div>
+   <div><dt>Closest value</dt><dd>Four countries show their values. Pick the one nearest the hidden country. The runner-up still earns some points.</dd></div>
    <div><dt>Guess the gap</dt><dd>Choose the ratio: the first country’s value divided by the second country’s value.</dd></div>
    <div><dt>Odd one out</dt><dd>Choose the country that does not share a land border with the named country.</dd></div>
    <div><dt>Languages</dt><dd>Choose the country with the most people who can speak the language, as a first or second language. Count people, not the share of the population.</dd></div>

@@ -333,3 +333,19 @@ body{background:#f2f1e8;color:#233d30}.app{position:relative;isolation:isolate;m
 .language-bar-track{height:9px;background:var(--line);border-radius:3px;margin-top:6px;overflow:hidden}.language-bar-track>i{display:block;height:100%;background:var(--green);border-radius:3px}
 .language-license{font:10px/1.5 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-height:280px;overflow:auto}
 @media(max-width:760px){.language-choices{gap:6px}.language-choices .country-choice{padding:10px 5px}.language-choices .shape{height:65px}.language-choices .country-name{font-size:14px}.language-choices .choice-hint{font-size:8px;gap:3px}.language-choices .choice-hint svg{display:none}.language-choices .tile-verdict{font-size:10px}.language-choices .tile-verdict svg{width:13px}.language-choices .tile-verdict small{font-size:8px}.language-count{font-size:18px}.language-count-note{font-size:8px}.language-badge>strong{font-size:25px}.language-badge>span{width:100%;text-align:center}.language-snapshot-note{font-size:9px}.language-result-row>div:first-child{font-size:11px}.language-result-row b{font-size:12px}}
+
+/* Guess the gap: one value shown, the other hidden. */
+.ratio-value{display:block;margin-top:4px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:16px}
+.ratio-prompt{margin:0 0 14px;color:var(--muted)}
+
+/* Closest value: four countries with their values, one hidden target. */
+.closest-game{display:grid;gap:18px}
+.closest-target{display:flex;align-items:center;gap:18px}.closest-target .shape{width:140px;height:106px;flex:none;fill:var(--atlas-map);stroke:var(--atlas-map-ink)}.closest-target strong{display:block;font-size:22px;margin:4px 0}
+.closest-value{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:16px}
+.closest-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.closest-option .shape{height:96px;margin:2px 0 10px}.closest-option .country-name{min-height:2.4em}.closest-option .closest-value{margin-top:6px}
+.closest-option .tile-verdict{margin-top:8px}
+@media(max-width:760px){.closest-grid{grid-template-columns:1fr 1fr}.closest-target .shape{width:110px;height:84px}}
+
+/* Native dropdown lists need their own background: the select itself is transparent, which left light text on a white list in dark mode. */
+select option,select optgroup{background-color:var(--paper);color:var(--ink)}

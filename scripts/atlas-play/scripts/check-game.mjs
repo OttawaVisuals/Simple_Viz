@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';
-import {generateRound,grade,canAnswer,availableTypes,trailTypes,modeNames,growth,pinDistance,cityPoint,relativeGap,numericCalibration,roundDifficulty,separate,formatValue,scoreAnswer,awardPoints,seededRandom,cityPool,capitalOf,answerSummary,explanation,roundSource,metricWeights,normalizeDataset} from '../lib/game.ts';
+import {closestIndex,generateRound,grade,canAnswer,availableTypes,trailTypes,modeNames,growth,pinDistance,cityPoint,relativeGap,numericCalibration,roundDifficulty,separate,formatValue,scoreAnswer,awardPoints,seededRandom,cityPool,capitalOf,answerSummary,explanation,roundSource,metricWeights,normalizeDataset} from '../lib/game.ts';
 import {questionTitle} from '../lib/presentation.ts';
 const data=JSON.parse(readFileSync('public/data/countries.json','utf8'));
 assert.equal(Object.keys(data.metrics).length,21);assert.equal(data.globalCities.length,6172);assert.equal(data.globalCities.filter(c=>c.population>=1e6).length,511);
@@ -14,7 +14,7 @@ for(const metric of Object.keys(data.metrics))for(const type of availableTypes(m
   let selection=null,a={},order=r.countries;
   if(type==='compare')selection=r.countries[0][metric]>r.countries[1][metric]?0:1;
   if(type==='rank'){assert.equal(r.countries.length,3);order=[...r.countries].sort((a,b)=>b[metric]-a[metric]);a={ranking:order.map(c=>c.id)};assert.equal(canAnswer(r,null,{}),false);assert.equal(canAnswer(r,null,{ranking:[order[0].id,order[0].id,order[1].id]}),false);assert.equal(grade(r,null,order,{ranking:[...a.ranking].reverse()}),false)}
-  if(type==='insert')selection=r.countries.filter(c=>c[metric]>r.target[metric]).length;
+  if(type==='insert'){const gaps=r.countries.map(c=>Math.abs(c[metric]-r.target[metric])/Math.max(Math.abs(c[metric]),Math.abs(r.target[metric]))),s=[...gaps].sort((a,b)=>a-b);assert.ok(s[1]-s[0]>=.05);selection=gaps.indexOf(s[0]);assert.equal(selection,closestIndex(r))}
   if(type==='gap'){a={choice:r.answer};const ratio=r.countries[0][metric]/r.countries[1][metric];assert.equal(r.options[r.answer],r.options.reduce((a,b)=>Math.abs(a-ratio)<Math.abs(b-ratio)?a:b))}
   assert.ok(grade(r,selection,order,a));checked++;
  }
@@ -63,7 +63,7 @@ assert.equal(capitalOf(data,'TUR').name,'Ankara');assert.equal(capitalOf(data,'I
  assert.deepEqual(scoreAnswer(r,null,[],{ranking:right}),{fraction:1,correct:true});assert.equal(scoreAnswer(r,null,[],{ranking:[right[1],right[0],right[2]]}).fraction,.5);assert.equal(scoreAnswer(r,null,[],{ranking:[...right].reverse()}).fraction,0);assert.equal(scoreAnswer(r,null,[],{}).fraction,0);
  const pin=generateRound(data,'all',undefined,false,'pin',{difficulty:'medium'}),p=cityPoint(pin.city);assert.ok(scoreAnswer(pin,null,[],{pin:p}).fraction>.999999);const far=scoreAnswer(pin,null,[],{pin:[p[0],Math.max(0,p[1]-12)]});assert.ok(far.fraction<1&&!far.correct||far.correct);
  const e=generateRound(data,'life',undefined,false,'estimate',{difficulty:'medium'}),v=e.countries[0].life;assert.equal(scoreAnswer(e,null,[],{estimate:v}).fraction,1);const near=scoreAnswer(e,null,[],{estimate:v+e.tolerance*2});assert.ok(!near.correct&&near.fraction>0&&near.fraction<.5);assert.equal(scoreAnswer(e,null,[],{estimate:v+e.tolerance*4}).fraction,0);
- const ins=generateRound(data,'area',undefined,false,'insert',{difficulty:'easy'}),spot=ins.countries.filter(x=>x.area>ins.target.area).length;assert.equal(scoreAnswer(ins,spot,[],{}).fraction,1);assert.equal(scoreAnswer(ins,spot===0?1:spot-1,[],{}).fraction,.4);
+ const ins=generateRound(data,'area',undefined,false,'insert',{difficulty:'easy'}),spot=closestIndex(ins);assert.equal(scoreAnswer(ins,spot,[],{}).fraction,1);const other=ins.countries.map((_,i)=>i).filter(i=>i!==spot).map(i=>({i,g:Math.abs(ins.countries[i].area-ins.target.area)/Math.max(ins.countries[i].area,ins.target.area)})).sort((a,b)=>a.g-b.g);assert.equal(scoreAnswer(ins,other[0].i,[],{}).fraction,.4);assert.equal(scoreAnswer(ins,other[2].i,[],{}).fraction,0);
  assert.deepEqual(awardPoints({fraction:1,correct:true},'hard',3,5),{base:200,streak:30,speed:50,total:280});assert.deepEqual(awardPoints({fraction:.5,correct:false},'medium',9,1),{base:75,streak:0,speed:0,total:75});assert.equal(awardPoints({fraction:1,correct:true},'easy',0).total,100);assert.equal(awardPoints({fraction:1,correct:true},'easy',0,30).speed,0)}
 // Daily trail: the same seed gives the same ten questions.
 const daily=seed=>{const rng=seededRandom(seed);return trailTypes('all').slice(0,10).map(type=>{const r=generateRound(data,'all',undefined,false,type,{difficulty:'medium',rng,mixed:true});return questionTitle(r)+'|'+answerSummary(r)+'|'+(r.countries||[]).map(x=>x.id).join(',')+(r.choices||[]).map(x=>x.id).join(',')}).join('\n')};

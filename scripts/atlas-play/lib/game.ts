@@ -12,7 +12,7 @@ export type Dataset={countries:Country[];cities:City[];globalCities:City[];cityS
 export type Choice={id:string;label:string;code?:string;sub?:string};
 export type Round={type:Kind;metric:Metric;countries:Country[];target?:Country;city?:City;cities?:City[];options?:number[];choices?:Choice[];answer?:number;difficulty?:Difficulty;gapScore?:number;cuts?:[number,number];tolerance?:number;mapWorld?:boolean;estimateRange?:{min:number;max:number;step:number};cityMinimum?:number;language?:LanguageChallenge};
 export type ExtraAnswer={cities?:string[];ranking?:string[];choice?:number;estimate?:number;pin?:[number,number]};
-export const modeNames:Record<Kind,string>={compare:'Compare',insert:'Insert',rank:'Rank',topfive:'World cities',gap:'Guess the gap',exception:'Odd one out',pin:'Pin the city',estimate:'Estimate',history:'Then vs now',languages:'Languages',flag:'Flags',capital:'Capitals',whereis:'City to country'};
+export const modeNames:Record<Kind,string>={compare:'Compare',insert:'Closest',rank:'Rank',topfive:'World cities',gap:'Guess the gap',exception:'Odd one out',pin:'Pin the city',estimate:'Estimate',history:'Then vs now',languages:'Languages',flag:'Flags',capital:'Capitals',whereis:'City to country'};
 export const choiceKinds:Kind[]=['flag','capital','whereis'];
 export const shuffle=<T,>(arr:T[],rng:Random=Math.random):T[]=>{const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 /** Deterministic generator for the daily trail: same text, same sequence. */
@@ -76,10 +76,13 @@ export function capitalOf(data:Dataset,id:string):City|undefined{
  if(capitalFixes[id])return flagged.find(c=>c.name===capitalFixes[id]);return flagged.length===1?flagged[0]:undefined
 }
 
+/** Index of the anchor country whose value is nearest the hidden target's (by relative gap). */
+export function closestIndex(r:Round){const t=Number(r.target![r.metric]);let best=0;r.countries.forEach((c,i)=>{if(relativeGap(Number(c[r.metric]),t)<relativeGap(Number(r.countries[best][r.metric]),t))best=i});return best}
+function nearGaps(r:Round){const t=Number(r.target![r.metric]);return r.countries.map(c=>relativeGap(Number(c[r.metric]),t)).sort((a,b)=>a-b)}
 function scoreRound(r:Round){
  if(r.type==='topfive'){const values=r.cities!.map(c=>c.population).sort((a,b)=>b-a);return Math.min(...values.slice(1).map((n,i)=>relativeGap(values[i],n)))}
  if(r.type==='history')return relativeGap(100+growth(r.countries[0]),100+growth(r.countries[1]));
- if(r.type==='insert')return Math.min(...r.countries.map(c=>relativeGap(Number(c[r.metric]),Number(r.target![r.metric]))));
+ if(r.type==='insert'){const n=nearGaps(r);return n[1]-n[0]}
  const values=r.countries.map(c=>Number(c[r.metric])).sort((a,b)=>b-a);return Math.min(...values.slice(1).map((n,i)=>relativeGap(values[i],n)))
 }
 const banks=new WeakMap<Dataset,Map<string,{rounds:Round[];cuts:[number,number]}>>();
@@ -99,7 +102,7 @@ function bank(data:Dataset,m:Metric,type:Kind,minimum:number,difficulty:Difficul
   const count=type==='compare'||type==='gap'?2:type==='rank'?3:5,chosen:Country[]=[];
   for(let tries=0;tries<100&&chosen.length<count;tries++){const c=sample(pool);if(c&&chosen.every(x=>x.id!==c.id&&separate(c,x,m)))chosen.push(c)}
   if(chosen.length!==count)continue;
-  if(type==='insert'){const[target,...rest]=chosen;rounds.push({type,metric:m,target,countries:rest.sort((a,b)=>Number(b[m])-Number(a[m]))})}
+  if(type==='insert'){const[target,...rest]=chosen,r:Round={type,metric:m,target,countries:rest.sort((a,b)=>Number(b[m])-Number(a[m]))},n=nearGaps(r);if(n[1]-n[0]>=.05&&n[1]>=n[0]*1.25)rounds.push(r)}
   else if(type==='gap'){
    chosen.sort((a,b)=>Number(b[m])-Number(a[m]));const ratio=Number(chosen[0][m])/Number(chosen[1][m]);if(!Number.isFinite(ratio)||ratio<1.15||ratio>100)continue;
    // The window of four offered ratios slides at random, so the right answer can be the smallest, the largest or in between.
@@ -179,7 +182,7 @@ export function generateRound(data:Dataset,filter:Metric|'all',previous?:Kind,fe
  if(type==='gap'){const correct=r.options![r.answer!];r.options=shuffle(r.options!,rng);r.answer=r.options.indexOf(correct)}
  return r
 }
-export function isCorrect(r:Round,selection:number|null,order:Country[]){if(r.type==='compare')return selection!==null&&Number(r.countries[selection]?.[r.metric])===Math.max(...r.countries.map(c=>Number(c[r.metric])));if(r.type==='insert')return selection===r.countries.filter(c=>Number(c[r.metric])>Number(r.target![r.metric])).length;const sorted=[...r.countries].sort((a,b)=>Number(b[r.metric])-Number(a[r.metric]));return order.length===sorted.length&&order.every((c,i)=>c.id===sorted[i].id)}
+export function isCorrect(r:Round,selection:number|null,order:Country[]){if(r.type==='compare')return selection!==null&&Number(r.countries[selection]?.[r.metric])===Math.max(...r.countries.map(c=>Number(c[r.metric])));if(r.type==='insert')return selection===closestIndex(r);const sorted=[...r.countries].sort((a,b)=>Number(b[r.metric])-Number(a[r.metric]));return order.length===sorted.length&&order.every((c,i)=>c.id===sorted[i].id)}
 export function distanceKm(lon1:number,lat1:number,lon2:number,lat2:number){const rad=Math.PI/180,a=Math.sin((lat2-lat1)*rad/2)**2+Math.cos(lat1*rad)*Math.cos(lat2*rad)*Math.sin((lon2-lon1)*rad/2)**2;return 6371*2*Math.asin(Math.sqrt(Math.min(1,a)))}
 export function pinDistance(r:Round,pin:[number,number]){if(r.mapWorld)return distanceKm(pin[0]/2-180,90-pin[1]/2,r.city!.lon,r.city!.lat);const p=r.countries[0].projection;return distanceKm((pin[0]-p.left)/p.scale/p.cos,-(pin[1]-p.top)/p.scale,r.city!.lon,r.city!.lat)}
 export function cityPoint(c:City):[number,number]{return[(c.lon+180)*2,(90-c.lat)*2]}
@@ -200,7 +203,7 @@ export function scoreAnswer(r:Round,selection:number|null,order:Country[],a:Extr
  }
  if(r.type==='pin')return{fraction:Math.max(0,1-pinDistance(r,a.pin!)/(3*(r.tolerance??100))),correct};
  if(r.type==='estimate')return{fraction:Math.max(0,1-Math.abs(a.estimate!-Number(r.countries[0][r.metric]))/(3*r.tolerance!)),correct};
- if(r.type==='insert'&&!correct){const right=r.countries.filter(c=>Number(c[r.metric])>Number(r.target![r.metric])).length;return{fraction:Math.abs(selection!-right)===1?.4:0,correct}}
+ if(r.type==='insert'&&!correct){const t=Number(r.target![r.metric]),runnerUp=nearGaps(r)[1];return{fraction:selection!==null&&relativeGap(Number(r.countries[selection][r.metric]),t)===runnerUp?.4:0,correct}}
  return{fraction:correct?1:0,correct}
 }
 export const difficultyMultiplier:Record<Difficulty,number>={easy:1,medium:1.5,hard:2};
@@ -239,7 +242,7 @@ export function answerSummary(r:Round):string{
  switch(r.type){
  case 'compare':return byMetric()[0].name;
  case 'history':return [...r.countries].sort((a,b)=>growth(b)-growth(a))[0].name;
- case 'insert':{const i=r.countries.filter(c=>Number(c[r.metric])>Number(r.target![r.metric])).length;return i===0?`Above ${r.countries[0].name}`:i===r.countries.length?`Below ${r.countries.at(-1)!.name}`:`Between ${r.countries[i-1].name} and ${r.countries[i].name}`}
+ case 'insert':return `Closest to ${r.countries[closestIndex(r)].name}`
  case 'rank':return byMetric().map(c=>c.name).join(' › ');
  case 'topfive':return [...r.cities!].sort((a,b)=>b.population-a.population).map(c=>c.name).join(' › ');
  case 'gap':return `About ${r.options![r.answer!]}×`;

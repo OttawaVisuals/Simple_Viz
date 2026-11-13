@@ -268,6 +268,126 @@
           "population": 84119500,
           "share": 17,
           "speakers": 14300315
+        },
+        {
+          "id": "PAK",
+          "population": 252364000,
+          "share": 50,
+          "speakers": 126182000
+        },
+        {
+          "id": "BGD",
+          "population": 168697000,
+          "share": 18,
+          "speakers": 30365460
+        },
+        {
+          "id": "IRQ",
+          "population": 42083400,
+          "share": 35,
+          "speakers": 14729190
+        },
+        {
+          "id": "KAZ",
+          "population": 20260000,
+          "share": 15,
+          "speakers": 3039000
+        },
+        {
+          "id": "NPL",
+          "population": 31122400,
+          "share": 3,
+          "speakers": 933672
+        },
+        {
+          "id": "LKA",
+          "population": 21982600,
+          "share": 10,
+          "speakers": 2198260
+        },
+        {
+          "id": "ARE",
+          "population": 10032200,
+          "share": 50,
+          "speakers": 5016100
+        },
+        {
+          "id": "JOR",
+          "population": 11174000,
+          "share": 45,
+          "speakers": 5028300
+        },
+        {
+          "id": "DZA",
+          "population": 47022500,
+          "share": 7,
+          "speakers": 3291575
+        },
+        {
+          "id": "TZA",
+          "population": 67462100,
+          "share": 69,
+          "speakers": 46548849
+        },
+        {
+          "id": "GHA",
+          "population": 34589100,
+          "share": 21,
+          "speakers": 7263711
+        },
+        {
+          "id": "UGA",
+          "population": 49283000,
+          "share": 3.9,
+          "speakers": 1922037
+        },
+        {
+          "id": "CMR",
+          "population": 30966100,
+          "share": 38,
+          "speakers": 11767118
+        },
+        {
+          "id": "MDG",
+          "population": 29452700,
+          "share": 18,
+          "speakers": 5301486
+        },
+        {
+          "id": "ZMB",
+          "population": 20799100,
+          "share": 16,
+          "speakers": 3327856
+        },
+        {
+          "id": "RUS",
+          "population": 140821000,
+          "share": 3.8,
+          "speakers": 5351198
+        },
+        {
+          "id": "HUN",
+          "population": 9855750,
+          "share": 20,
+          "speakers": 1971150
+        },
+        {
+          "id": "GTM",
+          "population": 18255200,
+          "share": 3.1,
+          "speakers": 565911.2
+        },
+        {
+          "id": "PNG",
+          "population": 10046200,
+          "share": 50,
+          "speakers": 5023100
+        },
+        {
+          "id": "FJI",
+          "population": 951611,
+          "share": 94,
+          "speakers": 894514.34
         }
       ]
     },
@@ -364,6 +484,54 @@
           "population": 37387600,
           "share": 36,
           "speakers": 13459536
+        },
+        {
+          "id": "DZA",
+          "population": 47022500,
+          "share": 33,
+          "speakers": 15517425
+        },
+        {
+          "id": "COD",
+          "population": 115403000,
+          "share": 51,
+          "speakers": 58855530
+        },
+        {
+          "id": "CMR",
+          "population": 30966100,
+          "share": 68,
+          "speakers": 21056948
+        },
+        {
+          "id": "SEN",
+          "population": 18847500,
+          "share": 26,
+          "speakers": 4900350
+        },
+        {
+          "id": "CIV",
+          "population": 29981800,
+          "share": 34,
+          "speakers": 10193812
+        },
+        {
+          "id": "TUN",
+          "population": 12048800,
+          "share": 53,
+          "speakers": 6385864
+        },
+        {
+          "id": "MDG",
+          "population": 29452700,
+          "share": 27,
+          "speakers": 7952229
+        },
+        {
+          "id": "HUN",
+          "population": 9855750,
+          "share": 1.2,
+          "speakers": 118269
         }
       ]
     },
@@ -466,6 +634,36 @@
           "population": 118277000,
           "share": 31,
           "speakers": 36665870
+        },
+        {
+          "id": "ECU",
+          "population": 18310000,
+          "share": 96,
+          "speakers": 17577600
+        },
+        {
+          "id": "BOL",
+          "population": 12312000,
+          "share": 61,
+          "speakers": 7510320
+        },
+        {
+          "id": "CUB",
+          "population": 10966000,
+          "share": 100,
+          "speakers": 10966000
+        },
+        {
+          "id": "GTM",
+          "population": 18255200,
+          "share": 88,
+          "speakers": 16064576
+        },
+        {
+          "id": "URY",
+          "population": 3425330,
+          "share": 88,
+          "speakers": 3014290.4
         }
       ]
     },
@@ -508,6 +706,18 @@
           "population": 220052000,
           "share": 91,
           "speakers": 200247320
+        },
+        {
+          "id": "AGO",
+          "population": 37202100,
+          "share": 67,
+          "speakers": 24925407
+        },
+        {
+          "id": "MOZ",
+          "population": 33351000,
+          "share": 27,
+          "speakers": 9004770
         }
       ]
     },
@@ -622,6 +832,24 @@
           "population": 220052000,
           "share": 0.84,
           "speakers": 1848436.8
+        },
+        {
+          "id": "KAZ",
+          "population": 20260000,
+          "share": 6.4,
+          "speakers": 1296640
+        },
+        {
+          "id": "RUS",
+          "population": 140821000,
+          "share": 0.79,
+          "speakers": 1112485.9
+        },
+        {
+          "id": "HUN",
+          "population": 9855750,
+          "share": 18,
+          "speakers": 1774035
         }
       ]
     },
@@ -670,6 +898,48 @@
           "population": 36544400,
           "share": 100,
           "speakers": 36544400
+        },
+        {
+          "id": "IRN",
+          "population": 88386900,
+          "share": 2,
+          "speakers": 1767738
+        },
+        {
+          "id": "IRQ",
+          "population": 42083400,
+          "share": 68,
+          "speakers": 28616712
+        },
+        {
+          "id": "ARE",
+          "population": 10032200,
+          "share": 78,
+          "speakers": 7825116
+        },
+        {
+          "id": "JOR",
+          "population": 11174000,
+          "share": 100,
+          "speakers": 11174000
+        },
+        {
+          "id": "DZA",
+          "population": 47022500,
+          "share": 74,
+          "speakers": 34796650
+        },
+        {
+          "id": "CMR",
+          "population": 30966100,
+          "share": 0.39,
+          "speakers": 120767.79
+        },
+        {
+          "id": "TUN",
+          "population": 12048800,
+          "share": 90,
+          "speakers": 10843920
         }
       ]
     },
@@ -718,6 +988,30 @@
           "population": 38794800,
           "share": 0.85,
           "speakers": 329755.8
+        },
+        {
+          "id": "KAZ",
+          "population": 20260000,
+          "share": 72,
+          "speakers": 14587200
+        },
+        {
+          "id": "UZB",
+          "population": 36520600,
+          "share": 14,
+          "speakers": 5112884
+        },
+        {
+          "id": "RUS",
+          "population": 140821000,
+          "share": 99,
+          "speakers": 139412790
+        },
+        {
+          "id": "UKR",
+          "population": 35661800,
+          "share": 46,
+          "speakers": 16404428
         }
       ]
     },
@@ -838,6 +1132,18 @@
           "population": 60442600,
           "share": 2,
           "speakers": 1208852
+        },
+        {
+          "id": "NPL",
+          "population": 31122400,
+          "share": 0.42,
+          "speakers": 130714.08
+        },
+        {
+          "id": "FJI",
+          "population": 951611,
+          "share": 44,
+          "speakers": 418708.84
         }
       ]
     },
@@ -862,6 +1168,12 @@
           "population": 1409130000,
           "share": 5,
           "speakers": 70456500
+        },
+        {
+          "id": "PAK",
+          "population": 252364000,
+          "share": 95,
+          "speakers": 239745800
         }
       ]
     },
@@ -886,6 +1198,12 @@
           "population": 1409130000,
           "share": 8.1,
           "speakers": 114139530
+        },
+        {
+          "id": "BGD",
+          "population": 168697000,
+          "share": 98,
+          "speakers": 165323060
         }
       ]
     },
@@ -916,6 +1234,12 @@
           "population": 34564800,
           "share": 4.2,
           "speakers": 1451721.6
+        },
+        {
+          "id": "LKA",
+          "population": 21982600,
+          "share": 15,
+          "speakers": 3297390
         }
       ]
     },
@@ -952,6 +1276,18 @@
           "population": 84119500,
           "share": 93,
           "speakers": 78231135
+        },
+        {
+          "id": "UZB",
+          "population": 36520600,
+          "share": 0.62,
+          "speakers": 226427.72
+        },
+        {
+          "id": "UKR",
+          "population": 35661800,
+          "share": 0.42,
+          "speakers": 149779.56
         }
       ]
     },
@@ -982,6 +1318,12 @@
           "population": 38794800,
           "share": 0.56,
           "speakers": 217250.88000000003
+        },
+        {
+          "id": "UKR",
+          "population": 35661800,
+          "share": 2.4,
+          "speakers": 855883.2
         }
       ]
     },

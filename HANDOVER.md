@@ -7,6 +7,19 @@
 
 # Handover
 
+## Atlas Play becomes a game — 2026-11-13
+
+- User asked for a review, then "fix all": question fairness, new question types, wider data and a layout that plays like a game. Source is `scripts/atlas-play/`; the page is rebuilt.
+- **Screens.** Start screen (Daily trail, Classic, Survival, plus a folded Custom game with the old measure/style/city-pool selectors), a sticky score bar (progress, streak, points, lives), a short verdict with "See the data" folded underneath, and a results screen with a question-by-question review and a copyable result. The sidebar is gone; its source note moved into "See the data". New styles live in `app/game-ui.css`, layered last by `build.mjs`.
+- **Scoring.** `scoreAnswer` and `awardPoints` in `lib/game.ts`: 100 × difficulty (1 / 1.5 / 2) × closeness, +10 per answer already in the streak (max 50), optional speed bonus (max 50). Pins and estimates score by distance, podiums by ordered pairs, insertion one place off earns 40%. Bests are per mode in localStorage; the daily record keeps the first run of the day. The daily trail is seeded from the local date, always medium and untimed.
+- **Question fixes.** Ratio questions no longer put the answer second-smallest every time (the option window now slides). Runs open with a population or area head-to-head. Measures are weighted so population/area lead and the three traffic and two height series are rare. Border exceptions are nearby non-neighbours, graded by distance, across 31 vetted targets. Language rounds need a leader with at least 1 million speakers and say "people who can speak". "Then vs now" shares Compare's slot in mixed runs.
+- **New types.** Flags, Capitals and City to country (`components/choice-round.tsx`). Capitals with split, contested or missing entries in the UN file are skipped (AUS, ZAF, BOL, TZA, CIV, LKA).
+- **Cities.** Names are shown in common English form (`normalizeDataset`); UN spellings stay in the data as `unName`. `cityPool` limits how many cities one country contributes by difficulty, so India and China no longer supply 30% of city questions.
+- **Data.** 54 → 89 countries via the additive `scripts/add-countries.py` (Europe 28, Asia 23, Africa 19, Americas 15, Oceania 4). Every fetched series was compared with the stored values for the original 54 and matched, except CO₂: the Global Carbon Budget revised 2023, so CO₂ was refreshed for all countries from one file. Doctorates and some traffic series stay sparse; missing values remain null. Natural Earth attaches Crimea to Russia; that polygon is dropped from the Russia highlight so it is shown for neither country. Israel was left out to avoid a disputed outline.
+- **Not done / to decide.** Difficulty tiers are still heuristics, not calibrated on player results. The daily trail uses the device date, so two time zones can see different trails for a few hours. No server leaderboard. Typecheck was not run (TypeScript is not installed in the package); esbuild build and all `npm test` checks pass (2,895 generated rounds).
+- Checked in the browser at 1024px and 375px, light and dark: full Classic run, Survival run, daily start, every question style, no horizontal overflow, verdict visible above the action bar, no text under 14px on the play screen.
+
+
 ## Atlas Play gets its own homepage entry — 2026-11-08
 
 - User requested a visible placement distinct from the physics tiles. Atlas now has one compact, full-width entry between the introduction and Featured, labelled “A geography game” with a Play Atlas link. It uses hairline separators and the animated globe artwork instead of a coloured catalogue tile.

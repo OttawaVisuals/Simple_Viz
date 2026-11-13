@@ -9,6 +9,7 @@ export function questionReport(round:Round,title:string,settings:string[],number
   ...(round.cities||[]).map(city=>`City: ${city.id} — ${city.name}, ${city.country}`),
   ...(round.city?[`Target city: ${round.city.id} — ${round.city.name}, ${round.city.country}`]:[]),
   ...(round.options?[`Displayed options: ${round.options.join(', ')}`]:[]),
+  ...(round.choices?[`Displayed choices: ${round.choices.map(c=>c.label).join(', ')}`]:[]),
   `Answer checked: ${answered?'yes':'no'}`,`Player input: ${JSON.stringify({selection,...answer})}`];
  return {title,context:context.slice(0,20).map(value=>value.slice(0,200))};
 }

@@ -4,7 +4,7 @@ import {generateRound,grade,canAnswer,availableTypes,roundSource,explanation} fr
 import {languageEntries,languageMetadata,languageCoverage,formatSpeakers,languageDifficulty} from '../lib/languages.ts';
 import {questionTitle} from '../lib/presentation.ts';
 const data=JSON.parse(readFileSync('public/data/countries.json','utf8')),ids=new Set(data.countries.map(c=>c.id));
-assert.equal(availableTypes('all').length,10);assert.ok(availableTypes('all').includes('languages'));assert.ok(!availableTypes('life').includes('languages'));assert.equal(languageEntries.length,18);assert.ok(languageMetadata.year.includes('mixed'));assert.ok(languageMetadata.licenseText.includes('UNICODE LICENSE V3'));
+assert.equal(availableTypes('all').length,13);assert.ok(availableTypes('all').includes('languages'));assert.ok(!availableTypes('life').includes('languages'));assert.equal(languageEntries.length,18);assert.ok(languageMetadata.year.includes('mixed'));assert.ok(languageMetadata.licenseText.includes('UNICODE LICENSE V3'));
 for(const l of languageEntries){assert.ok(l.countries.length>=3);assert.equal(new Set(l.countries.map(c=>c.id)).size,l.countries.length);for(const c of l.countries){assert.ok(ids.has(c.id));assert.ok(c.share>0&&c.share<=100);assert.ok(c.speakers>=100000);assert.ok(Math.abs(c.speakers-c.population*c.share/100)<1e-6)}}
 const coverage=languageCoverage(data);assert.equal(new Set(Object.values(coverage).flat().map(l=>l.name)).size,18);
 let checked=0;

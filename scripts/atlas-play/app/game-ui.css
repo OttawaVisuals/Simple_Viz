@@ -1,0 +1,191 @@
+/* Game shell (13 Nov 2026): start screen, score bar, verdict, results. Layered after the atlas theme.
+   Flat rules and outlines only; colours come from the theme tokens so dark mode follows. */
+main{max-width:1500px}
+.start,.play-screen,.done{max-width:900px;margin:0 auto}
+.app .header-actions .text-button,.motion-toggle{font-size:14px;min-height:44px}
+
+/* ---- Start screen ---- */
+.start{padding:28px 0 8px}
+.start-kicker{margin:0 0 10px;font-size:14px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted)}
+.start h1{font-size:clamp(34px,6.2vw,58px);line-height:1.08;margin:0 0 14px;letter-spacing:-.5px;text-wrap:balance}
+.start h1 em{font-style:normal;color:var(--green)}
+.start-sub{font-size:17px;line-height:1.55;color:var(--muted);max-width:60ch;margin:0 0 26px}
+.mode-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:22px}
+.mode-card{display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;background:transparent;border:1px solid var(--line);border-radius:2px;padding:18px 18px 16px;color:var(--ink);min-height:168px;transition:border-color .15s,background .15s}
+.mode-card>svg{color:var(--atlas-map-ink)}
+.mode-card strong{font-family:Georgia,'Iowan Old Style',serif;font-weight:400;font-size:26px;line-height:1.15}
+.mode-card span{font-size:15px;line-height:1.45;color:var(--muted)}
+.mode-card em{font-style:normal;font-size:15px;color:var(--green);display:inline-flex;align-items:center;gap:6px;margin-top:auto;padding-top:8px}
+.mode-card:hover:not(:disabled),.mode-card:focus-visible{border-color:var(--green);background:var(--atlas-sheet)}
+.mode-card.featured{border-color:var(--green);background:var(--atlas-sheet);box-shadow:inset 0 0 0 1px var(--green)}
+.mode-card:disabled{opacity:.55}
+.start-options{display:flex;flex-wrap:wrap;gap:14px 34px;padding:16px 0;border-top:1px solid var(--line)}
+.pill-group{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.pill-group>span{font-size:14px;color:var(--muted);margin-right:4px}
+.pill{display:inline-flex;align-items:center;gap:7px;background:transparent;border:1px solid var(--line);border-radius:999px;color:var(--ink);padding:8px 16px;min-height:44px;font-size:15px}
+.pill small{font-size:13px;color:var(--muted)}
+.pill:hover{border-color:var(--atlas-map-ink)}
+.pill[aria-pressed=true]{border-color:var(--green);background:var(--atlas-selected);box-shadow:inset 0 0 0 1px var(--green)}
+.start-note{font-size:14px;line-height:1.5;color:var(--muted);margin:0 0 14px;max-width:70ch}
+.custom-game{border-top:1px solid var(--line);padding:6px 0 14px;font-size:15px}
+.custom-game summary,.see-data summary{cursor:pointer;color:var(--green);padding:10px 0;width:fit-content;font-size:15px;min-height:44px;display:list-item}
+.custom-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:8px 0 16px}
+.custom-grid label{display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--muted)}
+.custom-grid select{font:inherit;font-size:16px;color:var(--ink);background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:9px 0;min-height:44px;width:100%}
+.custom-grid select:focus-visible{outline:2px solid var(--orange);outline-offset:3px}
+.start .quiz-help{border-top:1px solid var(--line);border-bottom:0;margin:0;padding:6px 0 0;font-size:15px}
+.start .quiz-help summary{font-size:15px;min-height:44px;padding:10px 0}
+
+/* ---- Score bar ---- */
+.hud{position:sticky;top:0;z-index:8;display:grid;grid-template-columns:auto auto minmax(0,1fr) auto auto;align-items:center;gap:8px 16px;padding:10px 0;background:var(--paper);border-bottom:1px solid var(--line)}
+.hud-quit{display:grid;place-items:center;width:44px;height:44px;background:transparent;border:1px solid var(--line);border-radius:50%;color:var(--muted)}
+.hud-quit:hover{border-color:var(--atlas-map-ink);color:var(--ink)}
+.hud-mode{display:flex;flex-direction:column;line-height:1.3}
+.hud-mode strong{font-size:15px;font-weight:600}
+.hud-mode span{font-size:14px;color:var(--muted)}
+.hud-dots{display:flex;gap:5px;justify-content:center}
+.hud-dots span{flex:1 1 0;max-width:34px;height:8px;background:var(--atlas-wash);border-radius:1px}
+.hud-dots .current{background:transparent;box-shadow:inset 0 0 0 2px var(--ink)}
+.hud-dots .full,.done-marks .full{background:var(--atlas-success)}
+.hud-dots .part,.done-marks .part{background:#c9963b}
+.hud-dots .miss,.done-marks .miss{background:var(--atlas-error)}
+.hud-lives{display:flex;gap:6px;justify-content:center}
+.hud-lives .alive{color:var(--atlas-error);fill:var(--atlas-error)}
+.hud-lives .lost{color:var(--line)}
+.hud-streak{display:inline-flex;align-items:center;gap:4px;font-size:16px;font-variant-numeric:tabular-nums;color:var(--muted);opacity:.45}
+.hud-streak.on{color:var(--orange);opacity:1;font-weight:600}
+.hud-points{font-family:Georgia,'Iowan Old Style',serif;font-size:28px;line-height:1;font-variant-numeric:tabular-nums;min-width:78px;text-align:right;transform-origin:right center}
+.hud-points small{font-family:system-ui,Arial,sans-serif;font-size:14px;color:var(--muted);margin-left:5px}
+.hud-timer{grid-column:1/-1;height:4px;background:var(--atlas-wash)}
+.hud-timer i{display:block;height:100%;background:var(--orange);transform-origin:left;animation:atlas-timer 25s linear forwards}
+.hud-timer.stopped i{animation-play-state:paused}
+@keyframes atlas-timer{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+
+/* ---- Question ---- */
+.play-screen .game-card{scroll-margin-top:80px}
+.play-screen .question-head{padding:18px 0 4px}
+.play-screen .question-head .metric-label{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;font-size:14px;letter-spacing:.2px;text-transform:none;color:var(--muted)}
+.play-screen .question-head .metric-label span{font-size:14px;letter-spacing:0;text-transform:none;color:var(--muted)}
+.play-screen .question-head .metric-label .kind-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:4px 12px;color:var(--ink);font-size:14px}
+.play-screen .question-head h2{font-size:clamp(26px,4.2vw,38px);line-height:1.15;margin:12px 0 8px;max-width:26ch}
+.play-screen .question-head p{font-size:16px;line-height:1.5;color:var(--muted);margin:0;max-width:62ch}
+.play-screen .play-area{padding-left:0;padding-right:0}
+.play-screen .game-actions{padding:12px 0;gap:14px;margin-top:8px}
+.play-screen .game-actions>span{font-size:14px;max-width:none;line-height:1.4}
+.app .primary{font-size:16px;padding:13px 20px;min-height:48px}
+.play-screen .question-report-action{padding:4px 0 8px}
+.play-screen .question-report-action .text-button{font-size:14px;min-height:44px}
+
+/* Four-option questions */
+.choice-game{display:flex;flex-direction:column;gap:18px;padding:10px 0 4px}
+.flag-card{display:flex;justify-content:center;padding:4px 0}
+.flag-card .country-flag{display:block;width:min(320px,72vw);height:auto;aspect-ratio:4/3;margin:0;border-radius:2px;box-shadow:0 0 0 1px var(--line)}
+.choice-subject{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.choice-subject .shape{width:min(240px,60vw);height:150px}
+.choice-subject strong{display:inline-flex;align-items:center;gap:10px;font-family:Georgia,'Iowan Old Style',serif;font-weight:400;font-size:30px;line-height:1.15}
+.choice-subject strong .country-flag{display:inline-block;width:32px;height:24px;margin:0}
+.choice-subject.city-subject{padding:22px 0 10px;color:var(--atlas-map-ink)}
+.choice-subject.city-subject strong{font-size:clamp(34px,7vw,52px);color:var(--ink)}
+.choice-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.choice-option{display:flex;align-items:center;gap:12px;text-align:left;background:transparent;border:1px solid var(--line);border-radius:2px;color:var(--ink);padding:14px 16px;min-height:64px;font-size:18px;line-height:1.25}
+.choice-option .country-flag{display:inline-block;width:32px;height:24px;margin:0;flex-shrink:0}
+.choice-key{display:grid;place-items:center;flex-shrink:0;width:26px;height:26px;border:1px solid var(--line);border-radius:50%;font-size:14px;color:var(--muted)}
+.choice-label{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
+.choice-mark{display:inline-flex;align-items:center;gap:5px;font-size:14px;white-space:nowrap}
+.choice-option:hover:not(:disabled){background:var(--atlas-sheet);border-color:var(--atlas-map-ink)}
+.choice-option.selected{background:var(--atlas-selected);border-color:var(--green);box-shadow:inset 0 0 0 1px var(--green)}
+.choice-option.correct{background:var(--atlas-success-wash);border-color:var(--atlas-success);box-shadow:inset 0 0 0 1px var(--atlas-success)}
+.choice-option.incorrect{background:var(--atlas-error-wash);border-color:var(--atlas-error);box-shadow:inset 0 0 0 1px var(--atlas-error)}
+.choice-option.muted{opacity:.6}
+
+/* ---- Verdict ---- */
+.verdict{border-top:1px solid var(--line);border-left:4px solid var(--line);padding:14px 0 6px 16px;margin-top:14px;scroll-margin:90px 0 96px}
+.verdict.full{border-left-color:var(--atlas-success)}
+.verdict.part{border-left-color:#c9963b}
+.verdict.miss{border-left-color:var(--atlas-error)}
+.verdict-main{display:flex;align-items:center;gap:10px}
+.verdict-icon{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;border:1px solid currentColor;flex-shrink:0}
+.verdict.full .verdict-icon{color:var(--atlas-success)}
+.verdict.part .verdict-icon{color:#a8761f}
+.verdict.miss .verdict-icon{color:var(--atlas-error)}
+.verdict-main strong{font-family:Georgia,'Iowan Old Style',serif;font-weight:400;font-size:26px;line-height:1.15;flex:1 1 auto}
+.verdict-points{font-family:Georgia,'Iowan Old Style',serif;font-size:32px;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap;transform-origin:right center}
+.verdict-points small{font-family:system-ui,Arial,sans-serif;font-size:14px;color:var(--muted);margin-left:4px}
+.verdict-breakdown{font-size:14px;color:var(--muted);margin:6px 0 10px}
+.verdict-fact{font-size:17px;line-height:1.55;color:var(--ink);margin:0 0 8px;max-width:68ch}
+.see-data{border-top:1px solid var(--line);margin-top:10px}
+.reveal-details{padding:4px 0 10px}
+.reveal-details .metric-visual-context{margin:14px 0;padding:14px 0;border:0;border-top:1px solid var(--line);background:transparent;border-radius:0}
+.reveal-details .chart-note,.reveal-details .gap-explainer{display:block;font-size:14px;color:var(--muted);margin:8px 0}
+.reveal-source{border-top:1px solid var(--line);margin-top:16px;padding-top:12px;font-size:14px;line-height:1.5;color:var(--muted)}
+.reveal-source strong{color:var(--ink);font-weight:600;margin-right:8px}
+.reveal-source p{margin:6px 0;max-width:75ch}
+.reveal-source .text-button{font-size:14px;min-height:44px}
+
+/* ---- Results ---- */
+.done{padding:26px 0 8px;text-align:center}
+.done>h2{font-size:clamp(28px,5vw,42px);line-height:1.15;margin:0 0 6px}
+.done .big-score{font-size:clamp(64px,13vw,104px);line-height:1;color:var(--green);margin:10px 0 6px;font-variant-numeric:tabular-nums}
+.done .big-score>span:last-child{font-size:22px;color:var(--muted)}
+.done-line{font-size:16px;color:var(--muted);margin:0 0 14px}
+.done-marks{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;margin:0 auto 18px;max-width:420px}
+.done-marks span{width:26px;height:10px;border-radius:1px}
+.done-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:26px}
+.done>h3{font-size:22px;text-align:left;margin:0;padding:16px 0 8px;border-top:1px solid var(--line)}
+.review{list-style:none;margin:0;padding:0;text-align:left}
+.review li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.review-mark{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;border:1px solid currentColor}
+.review .full .review-mark{color:var(--atlas-success)}
+.review .part .review-mark{color:#a8761f}
+.review .miss .review-mark{color:var(--atlas-error)}
+.review strong{display:block;font-weight:500;font-size:16px;line-height:1.35}
+.review div span{display:inline-flex;align-items:center;gap:6px;font-size:15px;color:var(--muted);line-height:1.4;margin-top:2px}
+.review b{font-family:Georgia,'Iowan Old Style',serif;font-weight:400;font-size:20px;font-variant-numeric:tabular-nums}
+.review .miss b{color:var(--muted)}
+
+@media(max-width:760px){
+ .start{padding-top:18px}
+ .start-sub{font-size:16px;margin-bottom:20px}
+ .mode-cards{grid-template-columns:1fr;gap:10px}
+ .mode-card{min-height:0;padding:14px 16px;display:grid;grid-template-columns:auto 1fr;column-gap:12px;row-gap:4px}
+ .mode-card>svg{grid-row:1/3;align-self:start;margin-top:4px}
+ .mode-card strong{font-size:23px}
+ .mode-card span,.mode-card em{grid-column:2}
+ .mode-card em{padding-top:2px}
+ .custom-grid{grid-template-columns:1fr}
+ .hud{grid-template-columns:auto minmax(0,1fr) auto auto;gap:6px 10px;padding:8px 0}
+ .hud-dots,.hud-lives{grid-column:1/-1;grid-row:2}
+ .hud-dots span{max-width:none}
+ .hud-points{font-size:25px;min-width:0}
+ .choice-options{grid-template-columns:1fr;gap:9px}
+ .choice-option{min-height:56px;padding:11px 14px;font-size:17px}
+ .choice-subject .shape{height:110px}
+ .verdict{padding-left:12px}
+ .verdict-main strong{font-size:22px}
+ .verdict-points{font-size:27px}
+ .play-screen .game-actions>span{display:none}
+ .play-screen .game-actions .primary{width:100%}
+}
+
+/* ---- Readable sizes for the question components (nothing below 14px while playing) ---- */
+.play-screen .choice-number{display:none}
+.play-screen :is(.choice-hint,.versus,.tile-verdict small,.context-heading span,.position-scale-tools span,.position-scale-tools button,.position-axis-note,.position-place-label span,.context-footnote,.context-sources p,.context-sources a,.context-sources summary,.gap-explainer,.eyebrow,.map-legend span,.map-controls button,.map-zoom-slider,.map-zoom-slider output,.map-gesture-help,.map-keyboard-help,.pin-game>p,.pin-tolerance,.chart-row span,.chart-row b,.locator>.eyebrow){font-size:14px;letter-spacing:.2px;line-height:1.45}
+.play-screen .tile-verdict{font-size:15px}
+.play-screen .value-reveal{font-size:19px}
+.play-screen .pin-map-label span{font-size:16px;letter-spacing:0;text-transform:none}
+.play-screen .pin-game{display:flex;flex-direction:column;align-items:stretch;gap:8px}
+.play-screen .pin-game .pin-map-label{order:0;justify-content:center}
+.play-screen .pin-game .pin-map{order:1;margin:0 auto}
+.play-screen .pin-game .map-gesture-help{order:2;margin:0;text-align:center}
+.play-screen .pin-game .map-controls{order:3;justify-content:center}
+.play-screen .pin-game .map-keyboard-help{order:4;text-align:center}
+.play-screen .pin-game>p{order:5;margin:0;text-align:center}
+.play-screen .pin-game .pin-tolerance{order:6;text-align:center}
+@media(pointer:coarse){.play-screen .map-keyboard-help{display:none}}
+.play-screen .map-code,.play-screen .anchor-rank{display:none}
+.play-screen :is(.map-gesture-help,.target-caption,.scale-note,.ladder-label,.insert-gap,.anchor-country span,.anchor-country small,.inline-rank-result span,.podium-plinth span,.podium-feedback span,.podium-feedback small,.podium-adjust-note,.ratio-reveal small,.extra-option span,.estimate-game label,.estimate-game>p,.range-labels span,.estimate-reveal span,.position-benchmark,.position-benchmark b,.growth-legend span,.language-badge span,.language-snapshot-note,.language-count-note,.language-license,.language-result-row small,.language-result-row span,.position-grid span,.position-grid b,.position-grid small,.electricity-bar-row span,.electricity-bar-row p,.fuel-row span,.fuel-row b,.context-country-tabs button){font-size:14px!important;letter-spacing:.2px;line-height:1.4}
+.play-screen :is(.podium-city,.podium-bank-city) strong{font-size:15px!important;line-height:1.25;overflow-wrap:anywhere}
+.play-screen :is(.podium-city,.podium-bank-city) small{font-size:14px!important;line-height:1.25;overflow-wrap:anywhere}
+.play-screen .anchor-country span{font-size:16px!important}
+.play-screen .inline-rank-result strong{font-size:16px}
+.play-screen .language-count,.play-screen .language-result-row b{font-size:17px!important}

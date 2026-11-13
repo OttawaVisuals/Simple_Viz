@@ -13,7 +13,7 @@ for(const code of new Set(dataset.globalCities.map(c=>c.country))){
 }
 const flagLicense=await readFile(path.join(dir,'node_modules/flag-icons/LICENSE'),'utf8');
 const result=await build({absWorkingDir:dir,entryPoints:['entry.tsx'],plugins:[{name:'inline-country-flags',setup(b){b.onResolve({filter:/^atlas-flags$/},()=>({path:'atlas-flags',namespace:'flags'}));b.onLoad({filter:/.*/,namespace:'flags'},()=>({contents:'export default '+JSON.stringify(flags),loader:'js'}));}}],bundle:true,minify:true,write:false,format:'iife',platform:'browser',target:['es2022'],jsx:'automatic',loader:{'.svg':'dataurl','.txt':'text'},define:{'process.env.NODE_ENV':'"production"'},legalComments:'inline'});
-let css=await readFile(path.join(dir,'app/globals.css'),'utf8')+'\n'+await readFile(path.join(dir,'app/atlas-theme.css'),'utf8');
+let css=await readFile(path.join(dir,'app/globals.css'),'utf8')+'\n'+await readFile(path.join(dir,'app/atlas-theme.css'),'utf8')+'\n'+await readFile(path.join(dir,'app/game-ui.css'),'utf8');
 css=css.split('\n').filter(line=>!line.startsWith('@import')).join('\n').replaceAll("'DM Sans',Arial,sans-serif","system-ui,Arial,sans-serif").replaceAll("'Libre Caslon Display',Georgia,serif","Georgia,'Iowan Old Style',serif");
 // Preserve the light palette, and transform literal colours for a dark blue theme.
 const colors=[...new Set(css.match(/#[0-9a-fA-F]{3,8}\b/g)||[])];
@@ -31,10 +31,10 @@ const html=`<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Atlas Play — Made clear</title>
-<meta name="description" content="A visual geography quiz: nine question styles, 21 numerical measures, worldwide cities and relative-gap difficulty. Explore the sources behind every answer.">
+<meta name="description" content="A geography game: flags, capitals, borders, cities and real statistics for 89 countries. Daily trail, Classic and Survival modes, scored on how close you get.">
 <link rel="canonical" href="https://madeclear.ca/visualizations/atlas-play.html">
 <meta property="og:title" content="Atlas Play — Made clear">
-<meta property="og:description" content="Put your world in order. A visual geography quiz with nine ways to play.">
+<meta property="og:description" content="How well do you know the world? A geography game with a daily trail and thirteen question styles.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://madeclear.ca/visualizations/atlas-play.html">
 <link rel="icon" href="../assets/brand/favicon.svg">

@@ -12,7 +12,7 @@ const icons={population:Users,area:Globe2,life:Heart,happiness:Smile,density:Use
 export function PositionScale({round:r,motion}:{round:Round;motion:boolean}){
  const[zoomed,setZoomed]=useState(false),[shown,setShown]=useState(!motion);
  useEffect(()=>{setShown(true)},[]);
- if(['pin','exception','history','languages'].includes(r.type))return null;
+ if(['pin','exception','history','languages','flag','capital','whereis'].includes(r.type))return null;
  const isCity=r.type==='topfive',metric=r.metric;
  const places=isCity?r.cities!.map(c=>({id:c.id,name:c.name,value:c.population,flag:c.country,countryName:c.countryName})): [...r.countries,...(r.target?[r.target]:[])].map(c=>({id:c.id,name:c.name,value:Number(c[metric]),flag:c.id,countryName:undefined}));
  const global=isCity?undefined:globals[metric];

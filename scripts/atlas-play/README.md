@@ -17,16 +17,16 @@ Commit source changes and the generated HTML together. Data download links use i
 
 The printed-atlas theme lives in `app/atlas-theme.css`, layered after the original layout styles by `build.mjs`. It uses parchment, sepia outlines, terracotta actions and flat rules instead of elevated panels. Explicit dark-mode tokens in the bundler retain the dark blue background, warm ink and distinct answer feedback. Question logic and source data are independent of this theme.
 
-`components/quiz-help.tsx` provides collapsed instructions for all ten styles. “Report this question” uses `lib/feedback-context.ts` to freeze the displayed question, entity IDs, settings and player input when clicked; changing rounds does not change a pending report. Reports use the same private feedback endpoint and daily per-page update behaviour. Footer links include About, Contact, Feedback and the implementation-based privacy note at `about.html#feedback-privacy`.
+`components/quiz-help.tsx` provides collapsed instructions for the game modes and all thirteen styles. “Report this question” uses `lib/feedback-context.ts` to freeze the displayed question, entity IDs, settings and player input when clicked; changing rounds does not change a pending report. Reports use the same private feedback endpoint and daily per-page update behaviour. Footer links include About, Contact, Feedback and the implementation-based privacy note at `about.html#feedback-privacy`.
 
 Answer maps fit the actual country outlines or city points. City pinning supports up to 64× zoom, mouse wheel, touch pinch, dragging, a zoom slider and keyboard controls; these controls never reveal the correct location before submission. Full question headings include the measure and subject. Laptop layouts use a compact intro, four controls in one row, shorter cards and sticky answer actions. Mobile controls keep their stacked layout. City ranking uses a three-city podium: first place is the largest population, second the middle, third the smallest. Drag cards onto positions or select a city and tap a position; dragging between occupied positions swaps them. Submission requires three unique valid cities. Feedback and populations appear directly on the podium. Country rankings across all 21 measures use the same three-place podium, with country flags and outlines. First place means the highest numerical value, followed by middle and lowest. Country and city podiums share drag, swap and tap/keyboard controls. After submission, each position shows correctness, true rank and source value; the podium scrolls into view. Insertion rounds use a floating country card and highlighted gap targets.
 
-Country coverage is 54 selected countries; city coverage is worldwide. Difficulty is a numerical heuristic, not measured player performance. Dataset years and limitations remain in the in-game Data panel and documentation below.
+Country coverage is 89 selected countries; city coverage is worldwide. Difficulty is a numerical heuristic, not measured player performance. Dataset years and limitations remain in the in-game Data panel and documentation below.
 
 ---
 
 # Atlas Play
-A visual geography quiz with ten question styles, 21 numerical measures, relative-gap difficulty, and worldwide city rankings.
+A geography game with thirteen question styles, 21 numerical measures, graded scoring, three game modes and worldwide city questions. See "Game modes, scoring and the 89-country set" at the end for the 13 Nov 2026 changes; where older sections below disagree, that section wins.
 
 ## Run and check
 - Start: `npm run dev`
@@ -117,3 +117,17 @@ Counts = territory population × language population percentage / 100, without a
 The mode appears in mixed trails with All measures selected and has a dedicated Languages selector option. Answer tiles reveal correctness and approximate counts; result bars start at zero. Data definitions, coverage caveats, source links, a JSON download and the full Unicode-3.0 licence are in the Data panel.
 
 Refresh from this directory: `python scripts/fetch-languages.py`, then `node scripts/prepare-languages.mjs`. Both inputs are pinned to CLDR JSON 49.0.0. Check with `node --experimental-strip-types scripts/check-languages.mjs` (also included in `npm test`); rebuild the static page afterwards. Normalized data and licence are tracked in `public/data/`; raw research inputs are ignored.
+
+## Game modes, scoring and the 89-country set (13 November 2026)
+
+**Modes.** Daily trail: ten questions seeded from the device's local date (`seededRandom('atlas-daily-'+date)`), medium, untimed; the first run of the day is the stored result. Classic: ten mixed questions at the chosen difficulty. Survival: three lives, easy for questions 1–4, medium for 5–9, hard after. Custom game keeps the measure, style and city-pool selectors. Every non-custom run opens with a population or land-area head-to-head.
+
+**Scoring** (`scoreAnswer`, `awardPoints` in `lib/game.ts`). Points = 100 × difficulty (easy 1, medium 1.5, hard 2) × closeness. Pins and estimates: closeness falls linearly to zero at three times the accepted range. Podiums: 3, 2, 1, 0 correctly ordered pairs give 1, 0.5, 0.2, 0. Insertion one place off gives 0.4. Others are 1 or 0. A correct answer adds 10 per answer already in the streak (max 50) and, with the speed bonus on, up to 50 (full within 5 s, none after 25 s). `grade` keeps the pass/fail meaning used for streaks and lives.
+
+**Question changes.** Ratio options: the four-option window now slides at random, so the answer is not always the second-smallest (checked in `check-game.mjs`). Measure weights are in `metricWeights`. Border exceptions: 31 vetted targets, the exception is a non-neighbour chosen by distance (hard: 3 nearest; medium: 2nd–6th; easy: 6th–13th). Languages: leader needs ≥1 million estimated users. "Then vs now" takes one Compare slot in four in mixed runs. New four-option styles: Flags, Capitals, City to country. Capitals come from the UN file's capital flag; NLD, CHL, IND, PAK, MYS are pinned to one city and AUS, ZAF, BOL, TZA, CIV, LKA are not asked.
+
+**Cities.** `normalizeDataset` shows common English names and keeps the UN spelling in `unName`. `cityPool(data, difficulty, minimum)`: easy keeps each country's largest city plus capitals and 5 million+ cities among its top three; medium the four largest per country; hard the ten largest.
+
+**Countries.** `scripts/add-countries.py` appends 35 countries without changing existing records, using the same sources and years, and prints a per-series comparison against the stored values. All series matched except CO₂ (revised upstream), which was refreshed for every country from the same file. It caches downloads under ignored `data/raw/add-*`. After running it: `python -X utf8 scripts/prepare-visual-context.py`, `node scripts/prepare-languages.mjs`, `npm test`, `npm run build`. Coverage per measure is shown in the Custom game selector and the Data panel. Crimea is excluded from the Russia highlight and is shown for neither country.
+
+**UI.** `app/game-ui.css` holds the start screen, score bar, verdict, results and the 14px minimum text size on the play screen; `build.mjs` appends it after `atlas-theme.css`. `components/choice-round.tsx` renders the four-option styles; `RevealDetails` in `components/extra-rounds.tsx` is the folded "See the data" content.

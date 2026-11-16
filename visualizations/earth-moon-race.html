@@ -103,6 +103,20 @@
   .hero svg{width:100%;height:auto;display:block;overflow:visible}
   .hero .lane{transition:opacity .25s}
   .hero .lane.dim{opacity:.32}
+  .mobile-scene{display:none}
+  @media (max-width:620px){
+    .hero svg{display:none}
+    .mobile-scene{display:block;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 0 10px}
+    .mobile-route{display:grid;grid-template-columns:auto minmax(40px,1fr) auto;align-items:center;gap:9px;font:11px ui-monospace,monospace;color:var(--muted)}
+    .mobile-route i{height:2px;background:linear-gradient(90deg,var(--c-light),color-mix(in srgb,var(--c-light) 20%,var(--line)));position:relative}
+    .mobile-route i::after{content:'';position:absolute;right:0;top:50%;width:7px;height:7px;border-top:2px solid var(--c-light);border-right:2px solid var(--c-light);transform:translateY(-50%) rotate(45deg)}
+    .mobile-route b{color:var(--fg);font-weight:500}
+    .mobile-route-note{margin:9px 0 14px;font:12px/1.45 ui-monospace,monospace;color:var(--c-light)}
+    .mobile-zoom-title{margin:0 0 7px;font:10px ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+    .mobile-lanes{display:grid;gap:0;border-top:1px solid var(--line)}
+    .mobile-lane{display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:9px 0;border-bottom:1px solid var(--line);font:12px/1.35 ui-monospace,monospace}
+    .mobile-lane b{font-size:12px}.mobile-lane span{color:var(--muted)}.mobile-lane em{grid-column:2;grid-row:1 / span 2;align-self:center;font-style:normal;color:var(--muted2);white-space:nowrap}
+  }
 
   .resultrow{display:grid;grid-template-columns:1fr;margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
 
@@ -333,6 +347,18 @@
         <text x="1120" y="508" text-anchor="end">5,000 km</text>
       </g>
     </svg>
+    <div class="mobile-scene" aria-label="Earth to Moon distance and the first 5,000 kilometres magnified for slower travellers">
+      <div class="mobile-route"><b>Earth</b><i></i><b>Moon</b></div>
+      <p class="mobile-route-note">384,400 km · light arrives in 1.28 s</p>
+      <p class="mobile-zoom-title">First 5,000 km — magnified</p>
+      <div class="mobile-lanes">
+        <div class="mobile-lane"><b style="color:var(--c-parker)">Parker Solar Probe</b><span>192 km/s</span><em>33.4 min</em></div>
+        <div class="mobile-lane"><b style="color:var(--c-soundwater)">Sound in water</b><span>1.48 km/s</span><em>3.0 days</em></div>
+        <div class="mobile-lane"><b style="color:var(--c-bullet)">Rifle bullet</b><span>1 km/s</span><em>4.45 days</em></div>
+        <div class="mobile-lane"><b style="color:var(--c-soundair)">Sound in air</b><span>0.343 km/s</span><em>13.0 days</em></div>
+        <div class="mobile-lane"><b style="color:var(--c-jet)">Jet airliner</b><span>0.25 km/s</span><em>17.8 days</em></div>
+      </div>
+    </div>
   </div>
 
   <div class="resultrow">

@@ -270,8 +270,8 @@
       <div class="slider-stack">
       <div class="ctrl" id="loadCtrl">
         <div class="ctrl-head">
-          <span class="ctrl-title">Load <em id="pLabel">P</em></span>
-          <span class="ctrl-rel">P &prop; &delta;</span>
+          <span class="ctrl-title">Load mass <em id="pLabel">m</em></span>
+          <span class="ctrl-rel">P = mg &prop; &delta;</span>
         </div>
         <div class="readout mono" id="loadReadout"></div>
         <div class="track" id="loadTrack" tabindex="0" role="slider" aria-label="Point load">
@@ -279,7 +279,7 @@
           <div class="fill" id="loadFill"></div>
           <div class="thumb" id="loadThumb"></div>
         </div>
-        <div class="track-range"><span>5 kg</span><span class="mid">double P &middot; double the sag</span><span>100 kg</span></div>
+        <div class="track-range"><span>5 kg</span><span class="mid">double mass &middot; double the sag</span><span>100 kg</span></div>
       </div>
 
       <div class="ctrl" id="spanCtrl">
@@ -564,7 +564,8 @@
 
     var a=loadA(), s=Math.min(a, state.L-a);
     var rows = [
-      {sym:'P', name:'point load', val:state.P+' kg', key:'P'},
+      {sym:'m', name:'load mass', val:state.P+' kg', key:'P'},
+      {sym:'P', name:'force on shelf', val:Math.round(state.P*G)+' N', key:'P'},
       {sym:'a', name:'distance from left support', val:a.toFixed(2)+' m', key:'aFrac'},
       {sym:'s', name:'distance to nearer support', val:s.toFixed(2)+' m', key:'aFrac'},
       {sym:'L', name:'span between supports', val:state.L.toFixed(2)+' m', key:'L'},
@@ -787,7 +788,7 @@
     drawEquationAndLegend();
     drawSection();
     spanSlider.draw(); loadSlider.draw(); positionSlider.draw();
-    $('loadReadout').textContent = state.P+' kg';
+    $('loadReadout').textContent = state.P+' kg  ·  '+Math.round(state.P*G)+' N';
     $('spanReadout').textContent = state.L.toFixed(2)+' m';
     $('positionReadout').textContent = loadA().toFixed(2)+' m';
     drawResult();

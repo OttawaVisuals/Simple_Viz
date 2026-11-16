@@ -75,6 +75,11 @@
   #distLine1.animate-signal{animation:signal-reveal .9s cubic-bezier(.22,.8,.28,1) both}
   @keyframes signal-reveal{from{transform:scaleX(0)}to{transform:scaleX(1)}}
   @media (prefers-reduced-motion:reduce){#distLine1.animate-signal{animation:none}}
+  @media (max-width:620px){
+    .hero{margin-top:16px}
+    .hero .lbl{font-size:9px;letter-spacing:.035em}
+    #lblScale{max-width:11em;white-space:normal;line-height:1.25}
+  }
 
   .resultrow{display:grid;grid-template-columns:2fr 1fr;gap:clamp(28px,4vw,64px);margin-top:clamp(24px,3vw,40px);border-top:1px solid var(--line);padding-top:clamp(20px,2.4vw,30px)}
   @media (max-width:700px){.resultrow{grid-template-columns:1fr}}
@@ -456,8 +461,8 @@
 
   function geom(w){
     var narrow = w < 620;
-    var vbH = narrow ? 330 : 310;
-    var cy = narrow ? 270 : 255;
+    var vbH = narrow ? 260 : 310;
+    var cy = narrow ? 170 : 255;
     var earthX = narrow ? 52 : 82, earthR = narrow ? 30 : 39;
     var seenX = narrow ? w*.72 : w*.78;
     return {w:w,vbH:vbH,cy:cy,earthX:earthX,earthR:earthR,seenX:seenX,narrow:narrow};
@@ -547,16 +552,17 @@
     var px=function(x){return (x/w*100)+'%';};
     var py=function(y){return (y/g.vbH*100)+'%';};
     lblEarth.style.left=px(g.earthX); lblEarth.style.top=py(g.cy+g.earthR+13);
+    lblEarth.style.transform=g.narrow?'translateX(-8%)':'translateX(-50%)';
     lblDist.style.left=px(midX); lblDist.style.top=py(g.cy-24);
     lblDist.textContent=fmtDist(distKm())+' · '+fmtTime(lightTime())+' of light travel';
-    lblSeen.style.left=px(g.seenX); lblSeen.style.top=py(g.cy+iconR+13);
+    lblSeen.style.left=px(g.seenX); lblSeen.style.top=py(g.cy+iconR+(g.narrow?18:13));
     lblSeen.textContent=state.obj.toUpperCase()+' WHEN LIGHT LEFT';
     lblNow.style.left=px(g.seenX); lblNow.style.top=py(Math.max(4,finalY-iconR-22));
     lblNow.textContent=state.obj.toUpperCase()+' WHEN LIGHT ARRIVES';
-    lblScale.style.left=px(g.narrow?arrowX-10:arrowX+10); lblScale.style.top=py((g.cy+finalY)/2);
-    lblScale.style.transform=g.narrow?'translate(-100%,-50%)':'translateY(-50%)';
+    lblScale.style.left=px(g.narrow?g.seenX:arrowX+10); lblScale.style.top=py(g.narrow?g.cy+iconR+39:(g.cy+finalY)/2);
+    lblScale.style.transform=g.narrow?'translateX(-50%)':'translateY(-50%)';
     var scaleNote=literalOffset<minOffset?' · ENLARGED TO SHOW':literalOffset>maxOffset?' · COMPRESSED TO FIT':' · DIAMETER SCALE';
-    lblScale.textContent=fmtDiameters(diameters)+'× '+state.obj.toUpperCase()+' DIAMETER'+scaleNote;
+    lblScale.textContent=g.narrow ? fmtDiameters(diameters)+'× diameter · visual aid' : fmtDiameters(diameters)+'× '+state.obj.toUpperCase()+' DIAMETER'+scaleNote;
 
     [seenIcon,nowIcon,travelLine,travelTip,lblSeen,lblNow,lblScale].forEach(function(node){node.style.opacity=0;});
     animateHero(g.seenX,g.cy,finalY,reducedMotion);
